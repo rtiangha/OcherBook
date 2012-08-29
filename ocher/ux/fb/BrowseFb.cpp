@@ -29,8 +29,15 @@ void BrowseFb::read(Renderer& renderer)
         if (renderer.render(pageNum, true) < 0)
             break;
 
-        getchar(); //DDD
-        ++pageNum;
+        char key = getchar();
+        if (key == 'p' || key == 'b') {
+            if (pageNum > 0)
+                pageNum--;
+        } else if (key == 'q') {
+            break;
+        } else {
+            pageNum++;
+        }
     }
 }
 

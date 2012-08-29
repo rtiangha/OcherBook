@@ -143,6 +143,7 @@ int RenderFb::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit)
 
 int RenderFb::render(unsigned int pageNum, bool doBlit)
 {
+    clc::Log::info("ocher.renderer.fb", "render page %u %u", pageNum, doBlit);
     m_penX = settings.marginLeft;
     m_penY = settings.marginTop;
     m_fb->clear();
@@ -217,14 +218,14 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
             case Layout::OpCmd:
                 switch (op) {
                     case Layout::CmdPopAttr:
-                        clc::Log::debug("ocher.render.fb", "OpCmd CmdPopAttr");
+                        clc::Log::trace("ocher.render.fb", "OpCmd CmdPopAttr");
                         if (arg == 0)
                             arg = 1;
                         while (arg--)
                             popAttrs();
                         break;
                     case Layout::CmdOutputStr: {
-                        clc::Log::debug("ocher.render.fb", "OpCmd CmdOutputStr");
+                        clc::Log::trace("ocher.render.fb", "OpCmd CmdOutputStr");
                         ASSERT(i + sizeof(clc::Buffer*) <= N);
                         clc::Buffer *str = *(clc::Buffer**)(raw+i);
                         ASSERT(strOffset <= str->size());
@@ -234,14 +235,14 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
                             if (!doBlit) {
                                 m_pagination.set(pageNum, i-2, breakOffset);
                             }
-                            m_fb->update(0, 0, m_fb->width(), m_fb->height(), false); // DDD
+                            m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
                             return 0;
                         }
                         i += sizeof(clc::Buffer*);
                         break;
                     }
                     case Layout::CmdForcePage:
-                        clc::Log::debug("ocher.render.fb", "OpCmd CmdForcePage");
+                        clc::Log::trace("ocher.render.fb", "OpCmd CmdForcePage");
                         break;
                     default:
                         clc::Log::error("ocher.render.fb", "unknown OpCmd");
@@ -259,6 +260,6 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
                 break;
         };
     }
-    m_fb->update(0, 0, m_fb->width(), m_fb->height(), false); // DDD
+    m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
     return 1;
 }

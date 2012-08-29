@@ -139,6 +139,7 @@ int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doB
 
 int RenderCurses::render(unsigned int pageNum, bool doBlit)
 {
+    clc::Log::info("ocher.render.ncurses", "render page %u %u", pageNum, doBlit);
     m_x = 0;
     m_y = 0;
     if (m_height) {
@@ -169,7 +170,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
         unsigned int arg = code & 0xff;
         switch (opType) {
             case Layout::OpPushTextAttr:
-                clc::Log::debug("ocher.renderer.fd", "OpPushTextAttr");
+                clc::Log::debug("ocher.render.ncurses", "OpPushTextAttr");
                 switch (op) {
                     case Layout::AttrBold:
                         pushAttrs();
@@ -196,13 +197,13 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
                         pushAttrs();
                         break;
                     default:
-                        clc::Log::error("ocher.renderer.fd", "unknown OpPushTextAttr");
+                        clc::Log::error("ocher.render.ncurses", "unknown OpPushTextAttr");
                         ASSERT(0);
                         break;
                 }
                 break;
             case Layout::OpPushLineAttr:
-                clc::Log::debug("ocher.renderer.fd", "OpPushLineAttr");
+                clc::Log::debug("ocher.render.ncurses", "OpPushLineAttr");
                 switch (op) {
                     case Layout::LineJustifyLeft:
                         break;
@@ -213,7 +214,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
                     case Layout::LineJustifyRight:
                         break;
                     default:
-                        clc::Log::error("ocher.renderer.fd", "unknown OpPushLineAttr");
+                        clc::Log::error("ocher.render.ncurses", "unknown OpPushLineAttr");
                         ASSERT(0);
                         break;
                 }
@@ -221,14 +222,14 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
             case Layout::OpCmd:
                 switch (op) {
                     case Layout::CmdPopAttr:
-                        clc::Log::debug("ocher.renderer.fd", "OpCmd CmdPopAttr");
+                        clc::Log::trace("ocher.render.ncurses", "OpCmd CmdPopAttr");
                         if (arg == 0)
                             arg = 1;
                         while (arg--)
                             popAttrs();
                         break;
                     case Layout::CmdOutputStr: {
-                        clc::Log::debug("ocher.renderer.fd", "OpCmd CmdOutputStr");
+                        clc::Log::trace("ocher.render.ncurses", "OpCmd CmdOutputStr");
                         ASSERT(i + sizeof(clc::Buffer*) <= N);
                         clc::Buffer *str = *(clc::Buffer**)(raw+i);
                         ASSERT(strOffset <= str->size());
@@ -246,10 +247,10 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
                         break;
                     }
                     case Layout::CmdForcePage:
-                        clc::Log::debug("ocher.renderer.fd", "OpCmd CmdForcePage");
+                        clc::Log::trace("ocher.render.ncurses", "OpCmd CmdForcePage");
                         break;
                     default:
-                        clc::Log::error("ocher.renderer.fd", "unknown OpCmd");
+                        clc::Log::error("ocher.render.ncurses", "unknown OpCmd");
                         ASSERT(0);
                         break;
                 }
@@ -259,7 +260,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
             case Layout::OpImage:
                 break;
             default:
-                clc::Log::error("ocher.renderer.fd", "unknown op type");
+                clc::Log::error("ocher.render.ncurses", "unknown op type");
                 ASSERT(0);
                 break;
 

@@ -163,6 +163,7 @@ int RendererFd::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBli
 
 int RendererFd::render(unsigned int pageNum, bool doBlit)
 {
+    clc::Log::info("ocher.renderer.fd", "render page %u %u", pageNum, doBlit);
     m_x = 0;
     m_y = 0;
     if (m_height) {
@@ -245,14 +246,14 @@ int RendererFd::render(unsigned int pageNum, bool doBlit)
             case Layout::OpCmd:
                 switch (op) {
                     case Layout::CmdPopAttr:
-                        clc::Log::debug("ocher.renderer.fd", "OpCmd CmdPopAttr");
+                        clc::Log::trace("ocher.renderer.fd", "OpCmd CmdPopAttr");
                         if (arg == 0)
                             arg = 1;
                         while (arg--)
                             popAttrs();
                         break;
                     case Layout::CmdOutputStr: {
-                        clc::Log::debug("ocher.renderer.fd", "OpCmd CmdOutputStr");
+                        clc::Log::trace("ocher.renderer.fd", "OpCmd CmdOutputStr");
                         ASSERT(i + sizeof(clc::Buffer*) <= N);
                         clc::Buffer *str = *(clc::Buffer**)(raw+i);
                         ASSERT(strOffset <= str->size());
@@ -268,7 +269,7 @@ int RendererFd::render(unsigned int pageNum, bool doBlit)
                         break;
                     }
                     case Layout::CmdForcePage:
-                        clc::Log::debug("ocher.renderer.fd", "OpCmd CmdForcePage");
+                        clc::Log::trace("ocher.renderer.fd", "OpCmd CmdForcePage");
                         break;
                     default:
                         clc::Log::error("ocher.renderer.fd", "unknown OpCmd");

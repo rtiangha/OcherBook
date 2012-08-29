@@ -1,17 +1,19 @@
 0.0.8
-font selection (don't hardcode filename!)
-event loop
-    SDL event loop vs
-"N of M" for fd and ncurses paging
+event loop (SDL, Haiku, GTK, cutsom, ...?)
+native win2, haiku builds
+start of automated testing framework
 
 0.0.9
 margins
 word wrap on fb
+font selection (don't hardcode filename!)
 factory init/deinit vs new/delete; cleanup up in error paths; ...
+"N of M" for fd and ncurses paging
+paginate on demand, not entire book up-front
 
 0.1.0
-native win2, haiku builds
 test build on multiple platforms
+survive purgatory.sh
 
 
 
@@ -86,6 +88,7 @@ harden:
     - test harness
     - valgrind across many epubs
     - airbag_fd
+    - guerilla testing
 
 cleanup:
     - remove exceptions from File

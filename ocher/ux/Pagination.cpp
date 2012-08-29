@@ -39,6 +39,9 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
 
 bool Pagination::get(unsigned int pageNum, unsigned int *layoutOffset, unsigned int *strOffset /* TODO attrs */)
 {
+    clc::Log::debug("ocher.pagination", "get page %u", pageNum);
+    if (pageNum > m_numPages)
+        return false;
     unsigned int chunk = pageNum / pagesPerChunk;
     if (chunk > m_pages.countItems()) {
         return false;

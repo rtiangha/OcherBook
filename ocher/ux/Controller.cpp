@@ -69,9 +69,9 @@ void Controller::run()
     // TODO:  speed stats
     // TODO:  faster? max_advance_width
     for (int pageNum = 0; ; pageNum++) {
-        if (renderer.render(pageNum, false) != 0)
+        clc::Log::info("ocher", "Paginating page %d", pageNum);
+        if (renderer.render(pageNum, false) <= 0)
             break;
-        clc::Log::info("ocher", "Paginated page %d", pageNum);
     }
 
     browser.read(renderer);

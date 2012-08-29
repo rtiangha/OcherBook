@@ -76,5 +76,5 @@ Escape character is '^]'.
 08:03:41.215054 INFO  ocher      Paginated page 2
 ```
 
-Enter for next page, ^C to end.
+Enter for next page, p or b to to back, q to quit.
 

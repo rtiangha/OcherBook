@@ -35,7 +35,7 @@ public:
 
     /**
      * Render the page.
-     * @return -1 if this is an unknown page (prior page not paginated),
+     * @return -1 if this is an unknown page (error; prior page not paginated),
      *  0 if reached the end of the page and it overflowed;
      *  1 if reached the end of the layout (no overflow)
      */
