@@ -12,10 +12,11 @@ public:
     bool init();
     int render(unsigned int pageNum, bool doBlit);
 
-    void setWidth(int width);
     int outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit);
 
 protected:
+    int m_isTty;
+
     int m_fd;
     int m_width;
     int m_height;

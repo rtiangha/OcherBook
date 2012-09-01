@@ -43,6 +43,7 @@ public:
 
 protected:
     clc::Buffer m_layout;
+public: //TODO: yuck
     Pagination m_pagination;
 };
 

@@ -65,14 +65,17 @@ void Controller::run()
     Renderer& renderer = m_factory->getRenderer();
     renderer.set(memLayout);
 
-    // Run through all pages without blitting to re-paginate
-    // TODO:  speed stats
-    // TODO:  faster? max_advance_width
+    // Optionally, run through all pages without blitting to get an accurate
+    // page count.
+#if 1
     for (int pageNum = 0; ; pageNum++) {
         clc::Log::info("ocher", "Paginating page %d", pageNum);
-        if (renderer.render(pageNum, false) <= 0)
+        int r = renderer.render(pageNum, false);
+
+        if (r < 0)
             break;
     }
+#endif
 
     browser.read(renderer);
 

@@ -141,6 +141,8 @@ int RenderFb::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit)
     return -1;  // think of this as "failed to cross page boundary"
 }
 
+// TODO:  speed stats
+// TODO:  faster: max_advance_width
 int RenderFb::render(unsigned int pageNum, bool doBlit)
 {
     clc::Log::info("ocher.renderer.fb", "render page %u %u", pageNum, doBlit);
@@ -156,6 +158,7 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
     } else if (! m_pagination.get(pageNum-1, &layoutOffset, &strOffset)) {
         // Previous page not already paginated?
         // Perhaps at end of book?
+        clc::Log::error("ocher.renderer.fb", "page %u not found", pageNum);
         return -1;
     }
 
@@ -232,9 +235,8 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;
                         if (breakOffset >= 0) {
-                            if (!doBlit) {
-                                m_pagination.set(pageNum, i-2, breakOffset);
-                            }
+                            m_pagination.set(pageNum, i-2, breakOffset);
+                            clc::Log::debug("ocher.renderer.fb", "page %u break", pageNum);
                             m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
                             return 0;
                         }
@@ -260,6 +262,7 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
                 break;
         };
     }
+    clc::Log::debug("ocher.renderer.fb", "page %u done", pageNum);
     m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
     return 1;
 }

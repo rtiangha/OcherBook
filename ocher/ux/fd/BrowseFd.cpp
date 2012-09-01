@@ -8,7 +8,7 @@
 #include "ocher/ux/Renderer.h"
 #include "ocher/settings/Options.h"
 
-// TODO:  handle non-ttys
+// TODO:  handle !isatty(stdin)
 
 static char getKey()
 {
@@ -53,6 +53,10 @@ void BrowseFd::read(Renderer& renderer)
     for (int pageNum = 0; ; ) {
         if (renderer.render(pageNum, true) < 0)
             return;
+
+        char buf[16];
+        sprintf(buf, "%u of %u: ", pageNum, renderer.m_pagination.numPages());
+        write(m_out, buf, strlen(buf));
 
         char key = getKey();
         if (key == 'p' || key == 'b') {

@@ -271,10 +271,10 @@ public:
     Buffer&    unlockBuffer(size_t length = 0);
 
     // Upercase <-> Lowercase
-    Buffer&    ToLower();
-    Buffer&    ToUpper();
+    //Buffer&    ToLower();
+    //Buffer&    ToUpper();
 
-    Buffer&    Capitalize();
+    //Buffer&    Capitalize();
 
     // Escaping and De-escaping
     Buffer&    CharacterEscape(const char* original, const char* setOfCharsToEscape, char escapeWith);

@@ -1,4 +1,5 @@
 #define __USE_GNU  // for memrchr
+#include <errno.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -15,6 +16,7 @@
 
 
 // TODO:  margins (not the same as margins for fb?)
+// TODO:  if isatty: SIGWINCH
 
 RendererFd::RendererFd() :
     m_fd(-1),
@@ -23,25 +25,29 @@ RendererFd::RendererFd() :
     m_page(1),
     ai(1)
 {
-    struct winsize win;
-    if (ioctl(0, TIOCGWINSZ, &win) != 0) {
-        m_width = 80;
-        m_height = 0;
-    } else {
-        m_width = win.ws_col;
-        m_height = win.ws_row;
-    }
 }
 
 bool RendererFd::init()
 {
     m_fd = opt.inFd;
+    m_width = 80;
+    m_height = 0;
+    if (isatty(m_fd) == -1) {
+        if (errno == EBADF) {
+            clc::Log::error("ocher.renderer.fd", "bad file descriptor");
+            return false;
+        } else {
+            m_isTty = 0;
+        }
+    } else {
+        m_isTty = 1;
+        struct winsize win;
+        if (ioctl(0, TIOCGWINSZ, &win) == 0) {
+            m_width = win.ws_col;
+            m_height = win.ws_row;
+        }
+    }
     return true;
-}
-
-void RendererFd::setWidth(int width)
-{
-    m_width = width;
 }
 
 void RendererFd::clearScreen()
@@ -152,7 +158,7 @@ int RendererFd::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBli
                 p++;
                 len--;
             }
-            if (m_height > 0 && m_y >= m_height) {
+            if (m_height > 0 && m_y + 1 >= m_height) {
                 return p - start;
             }
         }
@@ -178,6 +184,7 @@ int RendererFd::render(unsigned int pageNum, bool doBlit)
     } else if (! m_pagination.get(pageNum-1, &layoutOffset, &strOffset)) {
         // Previous page not already paginated?
         // Perhaps at end of book?
+        clc::Log::error("ocher.renderer.fd", "page %u not found", pageNum);
         return -1;
     }
 
@@ -260,9 +267,8 @@ int RendererFd::render(unsigned int pageNum, bool doBlit)
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;
                         if (breakOffset >= 0) {
-                            if (!doBlit) {
-                                m_pagination.set(pageNum, i-2, breakOffset);
-                            }
+                            m_pagination.set(pageNum, i-2, breakOffset);
+                            clc::Log::debug("ocher.renderer.fd", "page %u break", pageNum);
                             return 0;
                         }
                         i += sizeof(clc::Buffer*);
@@ -288,5 +294,6 @@ int RendererFd::render(unsigned int pageNum, bool doBlit)
 
         };
     }
+    clc::Log::debug("ocher.renderer.fd", "page %u done", pageNum);
     return 1;
 }

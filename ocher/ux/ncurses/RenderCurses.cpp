@@ -128,7 +128,7 @@ int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doB
                 p++;
                 len--;
             }
-            if (m_height > 0 && m_y >= m_height) {
+            if (m_height > 0 && m_y + 1 >= m_height) {
                 return p - start;
             }
         }
@@ -154,6 +154,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
     } else if (! m_pagination.get(pageNum-1, &layoutOffset, &strOffset)) {
         // Previous page not already paginated?
         // Perhaps at end of book?
+        clc::Log::error("ocher.renderer.ncurses", "page %u not found", pageNum);
         return -1;
     }
 
@@ -236,11 +237,11 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;
                         if (breakOffset >= 0) {
-                            if (!doBlit) {
-                                m_pagination.set(pageNum, i-2, breakOffset);
-                            } else {
+                            m_pagination.set(pageNum, i-2, breakOffset);
+                            if (doBlit) {
                                 m_window->refresh();
                             }
+                            clc::Log::debug("ocher.renderer.ncurses", "page %u break", pageNum);
                             return 0;
                         }
                         i += sizeof(clc::Buffer*);
@@ -266,6 +267,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
 
         };
     }
+    clc::Log::debug("ocher.renderer.ncurses", "page %u done", pageNum);
     m_window->refresh();
     return 1;
 }

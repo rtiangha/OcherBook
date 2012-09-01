@@ -1363,6 +1363,7 @@ Buffer::unlockBuffer(size_t len)
 }
 
 
+#if 0
 Buffer&
 Buffer::ToLower()
 {
@@ -1374,8 +1375,9 @@ Buffer::ToLower()
     }
     return *this;
 }
+#endif
 
-
+#if 0
 Buffer&
 Buffer::ToUpper()
 {
@@ -1387,8 +1389,9 @@ Buffer::ToUpper()
     }
     return *this;
 }
+#endif
 
-
+#if 0
 Buffer&
 Buffer::Capitalize()
 {
@@ -1402,7 +1405,7 @@ Buffer::Capitalize()
     }
     return *this;
 }
-
+#endif
 
 Buffer&
 Buffer::CharacterEscape(const char* original,

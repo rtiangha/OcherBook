@@ -29,6 +29,8 @@ public:
 
     bool get(unsigned int page, unsigned int* layoutOffset, unsigned int* strOffset /* TODO attrs */);
 
+    unsigned int numPages() const { return m_numPages; }
+
 protected:
     struct PageMapping
     {

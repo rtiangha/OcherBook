@@ -31,10 +31,12 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
     }
     struct PageMapping *mapping = (struct PageMapping*)m_pages.ItemAtFast(chunk);
     mapping += pageNum % pagesPerChunk;
-    mapping->layoutOffset = layoutOffset;
-    mapping->strOffset = strOffset;
-    m_numPages = pageNum + 1;
-    clc::Log::debug("ocher.pagination", "set page %u breaks at layoutOffset %u strOffset %u", pageNum, layoutOffset, strOffset);
+    if (mapping->layoutOffset != layoutOffset || mapping->strOffset != strOffset) {
+        mapping->layoutOffset = layoutOffset;
+        mapping->strOffset = strOffset;
+        m_numPages = pageNum + 1;
+        clc::Log::debug("ocher.pagination", "set page %u breaks at layoutOffset %u strOffset %u", pageNum, layoutOffset, strOffset);
+    }
 }
 
 bool Pagination::get(unsigned int pageNum, unsigned int *layoutOffset, unsigned int *strOffset /* TODO attrs */)

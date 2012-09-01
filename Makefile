@@ -210,8 +210,8 @@ endif
 
 ifeq ($(OCHER_UI_SDL),1)
 	OCHER_OBJS += \
-		ocher/input/SdlLoop.o \
 		ocher/output/sdl/FbSdl.o \
+		ocher/ux/SdlLoop.o \
 		ocher/ux/fb/FactoryFbSdl.o
 	OCHER_LIBS += -lSDL
 endif
