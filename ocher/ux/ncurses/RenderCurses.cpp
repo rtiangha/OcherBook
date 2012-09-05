@@ -23,10 +23,10 @@ RenderCurses::RenderCurses() :
 {
 }
 
-bool RenderCurses::init(clc::Tui* tui)
+bool RenderCurses::init(CDKSCREEN* screen)
 {
-    m_window = new clc::Window(tui->mainWindow());
-    m_window->getMaxXY(m_width, m_height);
+    m_screen = screen;
+//    m_window->getMaxXY(m_width, m_height);
     return true;
 }
 
@@ -116,7 +116,8 @@ int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doB
             n = nl - p;
 
         if (doBlit) {
-            m_window->mvAddNStr(m_x, m_y, (const char*)p, n);
+// TODO cdk_swindow?
+//            m_window->mvAddNStr(m_x, m_y, (const char*)p, n);
         }
         p += n;
         len -= n;
@@ -143,7 +144,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
     m_x = 0;
     m_y = 0;
     if (m_height) {
-        m_window->clear();
+        cleanCDKSwindow(m_window);
     }
 
     unsigned int layoutOffset;
@@ -239,7 +240,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
                         if (breakOffset >= 0) {
                             m_pagination.set(pageNum, i-2, breakOffset);
                             if (doBlit) {
-                                m_window->refresh();
+                                refreshCDKScreen(m_screen);
                             }
                             clc::Log::debug("ocher.renderer.ncurses", "page %u break", pageNum);
                             return 0;
@@ -268,6 +269,6 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
         };
     }
     clc::Log::debug("ocher.renderer.ncurses", "page %u done", pageNum);
-    m_window->refresh();
+    refreshCDKScreen(m_screen);
     return 1;
 }

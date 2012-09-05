@@ -3,7 +3,7 @@
 
 #include "SDL/SDL.h"
 
-#include "ocher/output/FrameBuffer.h"
+#include "ocher/ux/fb/FrameBuffer.h"
 
 
 class FbSdl : public FrameBuffer
@@ -23,6 +23,7 @@ public:
     int update(int x, int y, int w, int h, bool full=true);
 
 protected:
+    int m_sdl;
     SDL_Surface *m_screen;
 };
 

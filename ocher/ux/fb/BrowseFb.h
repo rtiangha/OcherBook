@@ -10,8 +10,8 @@ public:
     ~BrowseFb() {}
 
     bool init();
-    void browse();
-    void read(Renderer& renderer);
+    Meta* browse(clc::List& meta);
+    void read(Renderer* renderer, Meta* meta);
 };
 
 #endif

@@ -15,12 +15,12 @@ public:
     bool init();
     void deinit();
     const char* getName();
-    Browse& getBrowser();
-    Renderer& getRenderer();
+    Browse* getBrowser();
+    Renderer* getRenderer();
 
 protected:
-    BrowseFd m_browser;
-    RendererFd m_renderer;
+    BrowseFd* m_browser;
+    RendererFd* m_renderer;
 };
 
 #endif

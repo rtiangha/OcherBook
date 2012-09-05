@@ -3,7 +3,7 @@
 
 #include <linux/mxcfb.h>
 
-#include "ocher/output/FrameBuffer.h"
+#include "ocher/ux/FrameBuffer.h"
 
 class Mx50Fb : public FrameBuffer
 {

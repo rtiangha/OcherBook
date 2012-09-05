@@ -2,14 +2,11 @@
 #define OCHER_OPTIONS_H
 
 struct Options {
-    Options() : verbose(0), dir(0), inFd(0), outFd(1) {}
+    Options() : verbose(0), inFd(0), outFd(1) {}
 
     int verbose;
 
-    const char *driverName;
-
-    const char *dir;
-    const char *file;
+    const char **files;
 
     int inFd;
     int outFd;

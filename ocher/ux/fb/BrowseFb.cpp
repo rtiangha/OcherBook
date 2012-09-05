@@ -15,18 +15,16 @@ bool BrowseFb::init()
     return true;
 }
 
-void BrowseFb::browse()
+Meta* BrowseFb::browse(clc::List& meta)
 {
-    //for (const char *d = fs.ocherLibraries[0]; d; ++d) {
-    //    printf("%s\n", d);
-    //}
-
+    // TODO  temp hack, just default to the first (if any)
+    return (Meta*)meta.get(0);
 }
 
-void BrowseFb::read(Renderer& renderer)
+void BrowseFb::read(Renderer* renderer, Meta* meta)
 {
     for (int pageNum = 0; ; ) {
-        if (renderer.render(pageNum, true) < 0)
+        if (renderer->render(pageNum, true) < 0)
             break;
 
         char key = getchar();

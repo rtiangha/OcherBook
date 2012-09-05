@@ -4,9 +4,9 @@
 #include "clc/support/Logger.h"
 
 #include "ocher/fmt/Layout.h"
-#include "ocher/output/FreeType.h"
-#include "ocher/output/FrameBuffer.h"
 #include "ocher/settings/Settings.h"
+#include "ocher/ux/fb/FrameBuffer.h"
+#include "ocher/ux/fb/FreeType.h"
 #include "ocher/ux/fb/RenderFb.h"
 
 

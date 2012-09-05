@@ -40,22 +40,28 @@ bool BrowseFd::init()
     return true;
 }
 
-void BrowseFd::browse()
+Meta* BrowseFd::browse(clc::List& meta)
 {
-    //for (const char *d = fs.ocherLibraries[0]; d; ++d) {
-    //    printf("%s\n", d);
-    //}
+    printf("\n");
+    for (unsigned int i = 0; i < meta.size(); ++i) {
+        Meta* m = (Meta*)meta.get(i);
+        printf("%3d: %s\n", i+1, m->relPath.c_str());
+        // TODO: print meta: type, pages read, ...
+    }
 
+    // TODO temp
+    char key = getKey();
+    return (Meta*)meta.get(key - '1');
 }
 
-void BrowseFd::read(Renderer& renderer)
+void BrowseFd::read(Renderer* renderer, Meta* meta)
 {
     for (int pageNum = 0; ; ) {
-        if (renderer.render(pageNum, true) < 0)
+        if (renderer->render(pageNum, true) < 0)
             return;
 
         char buf[16];
-        sprintf(buf, "%u of %u: ", pageNum, renderer.m_pagination.numPages());
+        sprintf(buf, "%u of %u: ", pageNum+1, renderer->m_pagination.numPages());
         write(m_out, buf, strlen(buf));
 
         char key = getKey();

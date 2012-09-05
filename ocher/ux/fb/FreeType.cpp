@@ -1,8 +1,8 @@
 #include <ctype.h>
 
 #include "ocher/device/Device.h"
-#include "ocher/output/FreeType.h"
-#include "ocher/output/FrameBuffer.h"
+#include "ocher/ux/fb/FreeType.h"
+#include "ocher/ux/fb/FrameBuffer.h"
 
 #include "clc/support/Logger.h"
 
@@ -10,6 +10,11 @@
 FreeType::FreeType(FrameBuffer *fb) :
     m_fb(fb)
 {
+}
+
+FreeType::~FreeType()
+{
+    // TODO
 }
 
 bool FreeType::init()

@@ -1,7 +1,7 @@
 #ifndef OCHER_CURSES_RENDER_H
 #define OCHER_CURSES_RENDER_H
 
-#include "clc/tui/Tui.h"
+#include <cdk/cdk.h>
 
 #include "ocher/ux/Renderer.h"
 
@@ -11,13 +11,14 @@ class RenderCurses : public Renderer
 public:
     RenderCurses();
 
-    bool init(clc::Tui* tui);
+    bool init(CDKSCREEN* screen);
     int render(unsigned int pageNum, bool doBlit);
 
     int outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit);
 
 protected:
-    clc::Window* m_window;
+    CDKSCREEN* m_screen;
+    CDKSWINDOW* m_window;
     int m_width;
     int m_height;
     int m_x;

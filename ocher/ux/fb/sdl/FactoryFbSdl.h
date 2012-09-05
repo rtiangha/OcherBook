@@ -2,7 +2,7 @@
 #define OCHER_UX_FACTORY_FB_SDL_H
 
 #include "ocher/ux/fb/FactoryFb.h"
-#include "ocher/output/sdl/FbSdl.h"
+#include "ocher/ux/fb/sdl/FbSdl.h"
 
 
 class UiFactoryFbSdl : public UiFactoryFb
@@ -15,7 +15,7 @@ public:
     const char* getName();
 
 protected:
-    FbSdl m_fb;
+    FbSdl* m_fb;
 };
 
 #endif

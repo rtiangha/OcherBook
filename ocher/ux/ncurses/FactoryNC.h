@@ -13,14 +13,16 @@ public:
 
     bool init();
     void deinit();
+
     const char* getName();
-    Browse& getBrowser();
-    Renderer& getRenderer();
+    Browse* getBrowser();
+    Renderer* getRenderer();
 
 protected:
-    BrowseCurses m_browser;
-    RenderCurses m_renderer;
-    clc::Tui* m_tui;
+    BrowseCurses* m_browser;
+    RenderCurses* m_renderer;
+    WINDOW* m_scr;
+    CDKSCREEN *m_screen;
 };
 
 #endif

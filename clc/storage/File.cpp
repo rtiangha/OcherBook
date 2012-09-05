@@ -341,42 +341,5 @@ bool File::isEof() const
     return (feof(m_fd) > 0);
 }
 
-#if 0
-bool File::isDirectory(const char *path)
-{
-    struct clc_statstruct statbuf;
-    int r = clc_stat(path, &statbuf);
-    if (r != 0) {
-        return false;
-    }
-    if (statbuf.st_mode & S_IFDIR) {
-        return true;
-    }
-    return false;
-}
-
-int File::removePath(const char *path)
-{
-    int r;
-    if (isDirectory(path)) {
-        r = clc_rmdir(path);
-    } else {
-        r = remove(path);
-    }
-    if (r == -1) {
-        return errno;
-    }
-    return 0;
-}
-
-int File::rename(const char *oldPath, const char *newPath)
-{
-    int r = ::rename(oldPath, newPath);
-    if (r != 0)
-        r = errno;
-    return r;
-}
-#endif
-
 }
 

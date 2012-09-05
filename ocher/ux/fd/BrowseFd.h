@@ -10,8 +10,8 @@ public:
     ~BrowseFd() {}
 
     bool init();
-    void browse();
-    void read(Renderer& renderer);
+    Meta* browse(clc::List& meta);
+    void read(Renderer* renderer, Meta* meta);
 
 protected:
     int m_in;

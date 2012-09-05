@@ -10,6 +10,7 @@ class FreeType
 {
 public:
     FreeType(FrameBuffer *fb);
+    ~FreeType();
 
     bool init();
     void setSize(unsigned int points);

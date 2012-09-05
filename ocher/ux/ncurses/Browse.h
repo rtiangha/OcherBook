@@ -1,8 +1,9 @@
 #ifndef OCHER_BROWSE_CURSES_H
 #define OCHER_BROWSE_CURSES_H
 
+#include <cdk/cdk.h>
+
 #include "clc/data/Buffer.h"
-#include "clc/tui/Tui.h"
 
 #include "ocher/ux/Browse.h"
 
@@ -13,12 +14,12 @@ public:
     BrowseCurses();
     ~BrowseCurses() {}
 
-    bool init(clc::Tui* tui);
-    void browse();
-    void read(Renderer& renderer);
+    bool init(CDKSCREEN* screen);
+    Meta* browse(clc::List& meta);
+    void read(Renderer* renderer, Meta* meta);
 
 protected:
-    clc::Tui* m_tui;
+    CDKSCREEN* m_screen;
 };
 
 

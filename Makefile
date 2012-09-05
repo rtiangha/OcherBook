@@ -177,16 +177,13 @@ OCHER_OBJS = \
 	ocher/device/Device.o \
 	ocher/device/Filesystem.o \
 	ocher/fmt/Layout.o \
-	ocher/fmt/Meta.o \
+	ocher/shelf/Meta.o \
 	ocher/ocher.o \
 	ocher/settings/Settings.o \
 	ocher/ux/Browse.o \
 	ocher/ux/Controller.o \
 	ocher/ux/Pagination.o \
-	ocher/ux/Renderer.o \
-	ocher/ux/fb/BrowseFb.o \
-	ocher/ux/fb/FactoryFb.o \
-	ocher/ux/fb/RenderFb.o
+	ocher/ux/Renderer.o
 
 ifeq ($(OCHER_AIRBAG_FD),1)
 OCHER_OBJS += \
@@ -208,18 +205,26 @@ OCHER_OBJS += \
 	ocher/fmt/text/LayoutText.o
 endif
 
+OCHER_UI_FB=$(shell [ "$(OCHER_UI_SDL)" = "1" ] || [ "$(OCHER_UI_MX50)" = "1" ] && echo 1 )
+ifeq ($(OCHER_UI_FB), 1)
+OCHER_OBJS += \
+	ocher/ux/fb/BrowseFb.o \
+	ocher/ux/fb/FactoryFb.o \
+	ocher/ux/fb/RenderFb.o
+endif
+
 ifeq ($(OCHER_UI_SDL),1)
 	OCHER_OBJS += \
-		ocher/output/sdl/FbSdl.o \
-		ocher/ux/SdlLoop.o \
-		ocher/ux/fb/FactoryFbSdl.o
+		ocher/ux/fb/sdl/SdlLoop.o \
+		ocher/ux/fb/sdl/FactoryFbSdl.o \
+		ocher/ux/fb/sdl/FbSdl.o
 	OCHER_LIBS += -lSDL
 endif
 
 ifeq ($(OCHER_UI_MX50),1)
 	OCHER_OBJS += \
-		ocher/output/mx50/fb.o \
-		ocher/ux/fb/FactoryFbMx50.o
+		ocher/ux/fb/mx50/fb.o \
+		ocher/ux/fb/mx50/FactoryFbMx50.o
 endif
 
 ifeq ($(OCHER_UI_FD),1)
@@ -231,15 +236,14 @@ endif
 
 ifeq ($(OCHER_UI_NCURSES),1)
 	OCHER_OBJS += \
-		clc/tui/Tui.o \
 		ocher/ux/ncurses/Browse.o \
 		ocher/ux/ncurses/RenderCurses.o \
 		ocher/ux/ncurses/FactoryNC.o
-	OCHER_LIBS += -lncurses -lform
+	OCHER_LIBS += -lcdk
 endif
 
 OCHER_OBJS += \
-	ocher/output/FreeType.o
+	ocher/ux/fb/FreeType.o
 
 $(OCHER_OBJS): Makefile ocher.config $(BUILD_DIR)/ocher_config.h
 

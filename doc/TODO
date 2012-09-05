@@ -1,39 +1,19 @@
 0.0.8
-event loop (SDL, Haiku, GTK, cutsom, ...?)
-native win2, haiku builds
-+ start of automated testing framework
+ability to select book
+consistent naming
 
 0.0.9
 margins
 word wrap on fb
 font selection (don't hardcode filename!)
-factory init/deinit vs new/delete; cleanup up in error paths; ...
-+ "N of M" for fd and ncurses paging
 paginate on demand, not entire book up-front
+flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
 
 0.1.0
-test build on multiple platforms
+testing
 survive purgatory.sh
 
-0.2
-    can navigate a single book via kobo touch screen
 
-0.3
-    can browse / select books via kobo touch screen
-
-0.4
-
-0.5
-
-0.6
-
-0.7
-
-0.8
-
-0.9
-
-1.0
 
 
 
@@ -46,10 +26,8 @@ device specific:
         - touch input
         - home, power button
 
-workflow:
-
 layout:
-    - pagination (0.1)
+    - pagination
     - margins
     - FreeType:
         - integrate into RenderFd for real word wrap
@@ -126,6 +104,8 @@ reader features:
 
 metadata:
     - cache metadata in dotfiles beside the epub
+
+translations
 
 bluesky:
     - RSS

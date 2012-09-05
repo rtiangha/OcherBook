@@ -17,9 +17,9 @@ public:
 
     virtual const char* getName() = 0;
 
-    virtual Browse& getBrowser() = 0;
+    virtual Browse* getBrowser() = 0;
 
-    virtual Renderer& getRenderer() = 0;
+    virtual Renderer* getRenderer() = 0;
 };
 
 #endif

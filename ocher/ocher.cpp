@@ -59,7 +59,6 @@ void usage(const char *msg)
     }
     printf(
       // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
-        "-d,--directory <dir> Process (browse or validate) all epubs in the directory.\n"
         "-f,--flatten         Flatten (do not show to user) the directory heirarchy.\n"
         "-t,--test            Test (validate) the epubs rather than view.\n"
         "-h,--help            Help.\n"
@@ -82,10 +81,10 @@ clc::List drivers;
 int main(int argc, char **argv)
 {
     bool listDrivers = false;
+    const char* driverName = 0;
 
     struct option long_options[] =
     {
-        {"directory",    required_argument, 0,'d'},
         {"flatten",      no_argument,       0,'f'},
         {"help",         no_argument,       0,'h'},
         {"quiet",        no_argument,       0,'q'},
@@ -106,9 +105,6 @@ int main(int argc, char **argv)
         switch (c) {
             case 0:
                 break;
-            case 'd':
-                opt.dir = optarg;
-                break;
             case 'v':
                 opt.verbose++;
                 break;
@@ -119,7 +115,7 @@ int main(int argc, char **argv)
                 usage(0);
                 break;
             case OPT_DRIVER:
-                opt.driverName = optarg;
+                driverName = optarg;
                 break;
             case OPT_LIST_DRIVERS:
                 listDrivers = true;
@@ -141,8 +137,8 @@ int main(int argc, char **argv)
 
         if (listDrivers) {
             printf("\t%s\n", factory->getName());
-        } else if (opt.driverName) {
-            if (strcmp(factory->getName(), opt.driverName) == 0) {
+        } else if (driverName) {
+            if (strcmp(factory->getName(), driverName) == 0) {
                 if (!factory->init()) {
                     return 1;
                 }
@@ -166,14 +162,11 @@ int main(int argc, char **argv)
 
     // TODO: error messages after this point must go to the driver, not stderr
 
-    while (optind < argc) {
-        // TODO  list
-        opt.file = argv[optind++];
+    if (optind >= argc) {
+        usage("Please specify one or more files or directories.");
     }
 
-    if (!opt.file && !opt.dir) {
-        usage("Please specify an epub file or directory.");
-    }
+    opt.files = (const char**)&argv[optind];
 
     Controller c(driver);
     c.run();

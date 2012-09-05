@@ -3,35 +3,39 @@
 
 #include "clc/support/Logger.h"
 
-#include "ocher/output/sdl/FbSdl.h"
+#include "ocher/ux/fb/sdl/FbSdl.h"
 
 
 FbSdl::FbSdl() :
+    m_sdl(0),
     m_screen(0)
 {
 }
 
 FbSdl::~FbSdl()
 {
+    if (m_sdl)
+        SDL_Quit();
 }
 
 bool FbSdl::init()
 {
-    if (SDL_Init(SDL_INIT_AUDIO|SDL_INIT_VIDEO) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         const char *err = SDL_GetError();
         clc::Log::error("ocher.sdl", "SDL_Init failed: %s", err);
         return false;
     }
-    atexit(SDL_Quit);
 
     // TODO:  store window size in user settings
     m_screen = SDL_SetVideoMode(600, 800, 8, SDL_SWSURFACE);
     if (! m_screen) {
         const char *err = SDL_GetError();
         clc::Log::error("ocher.sdl", "SDL_SetVideoMode failed: %s", err);
+        SDL_Quit();
         return false;
     }
     clear();
+    m_sdl = 1;
     return true;
 }
 
@@ -66,7 +70,7 @@ void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
         }
     }
 
-    //SDL_BlitSurface(m_screen, NULL, 
+    //SDL_BlitSurface(m_screen, NULL,
     for (int i = 0; i < h; ++i) {
         memcpy(((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x, p, w);
         y++;

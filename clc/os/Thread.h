@@ -7,7 +7,6 @@
 #include <kernel/OS.h>
 #else
 #include <pthread.h>
-typedef pthread_t thread_id;
 #endif
 
 #include "clc/data/Buffer.h"
@@ -124,6 +123,13 @@ protected:
 
     static thread_status_t bootstrap(void* _self);
 
+    enum Flags
+    {
+        DAEMON      = 1,
+        INTERRUPTED = 2,
+    };
+    unsigned int m_flags;
+
     enum State
     {
         STARTING,
@@ -134,13 +140,6 @@ protected:
 
     State m_state;
     Monitor m_stateChange;
-
-    enum Flags
-    {
-        DAEMON      = 1,
-        INTERRUPTED = 2,
-    };
-    unsigned int m_flags;
 
     Buffer m_name;
 
