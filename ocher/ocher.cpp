@@ -59,6 +59,8 @@ void usage(const char *msg)
     }
     printf(
       // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+        "Usage:  ocher [OPTIONS]... [FILE]...\n"
+        "\n"
         "-f,--flatten         Flatten (do not show to user) the directory heirarchy.\n"
         "-t,--test            Test (validate) the epubs rather than view.\n"
         "-h,--help            Help.\n"
@@ -66,11 +68,13 @@ void usage(const char *msg)
         "-q,--quiet           Quiet; decrease logging verbosity.\n"
         "   --list-drivers    List all available output drivers.  Each driver consists of\n"
         "                     a font renderer driving a hardware device.\n"
-        "   --driver <driver>\n"
-      //"-w             Allow re-writing the epubs.\n"
-        "<file>         \n"
+        "   --driver <driver> Use a specific driver.\n"
+        "\n"
+        "Multiple files and/or directories may be specified.\n"
+        "Directories will be recursed.\n"
+        "\n"
     );
-    exit(0);
+    exit(msg ? 0 : 1);
 }
 
 #define OPT_DRIVER 256

@@ -11,9 +11,3 @@ Text::Text(const char *filename)
     clc::Log::debug("ocher.fmt.text", "Loaded %u bytes", m_text.size());
 }
 
-clc::Buffer Text::getFormatName()
-{
-    static clc::Buffer name("TEXT");
-    return name;
-}
-

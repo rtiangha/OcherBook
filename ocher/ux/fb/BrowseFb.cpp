@@ -24,14 +24,13 @@ Meta* BrowseFb::browse(clc::List& meta)
 void BrowseFb::read(Renderer* renderer, Meta* meta)
 {
     for (int pageNum = 0; ; ) {
-        if (renderer->render(pageNum, true) < 0)
-            break;
+        int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 
         char key = getchar();
         if (key == 'p' || key == 'b') {
             if (pageNum > 0)
                 pageNum--;
-        } else if (key == 'q') {
+        } else if (key == 'q' || atEnd) {
             break;
         } else {
             pageNum++;

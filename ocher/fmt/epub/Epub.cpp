@@ -8,11 +8,6 @@
 #include "ocher/fmt/epub/Epub.h"
 
 
-clc::Buffer Epub::getFormatName() {
-    static clc::Buffer name("EPUB");
-    return name;
-}
-
 static bool stripUtf8Bom(clc::Buffer &data)
 {
     // Unicode standard does not recommend BOM for UTF8.

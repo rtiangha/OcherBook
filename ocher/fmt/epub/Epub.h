@@ -22,11 +22,8 @@ public:
     Epub(const char* epubFilename, const char *password=0);
     virtual ~Epub() {}
 
-    clc::Buffer getFormatName();
-
     clc::Buffer m_epubVersion;
     clc::Buffer m_uid;
-    clc::Buffer m_title;
 
     clc::Buffer getFile(const char *filename) {
         TreeFile *f = m_zip.getFile(filename, m_contentPath.c_str());

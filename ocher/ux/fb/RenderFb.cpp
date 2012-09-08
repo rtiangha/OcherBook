@@ -5,6 +5,7 @@
 
 #include "ocher/fmt/Layout.h"
 #include "ocher/settings/Settings.h"
+#include "ocher/ux/Pagination.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/fb/FreeType.h"
 #include "ocher/ux/fb/RenderFb.h"
@@ -17,7 +18,6 @@ RenderFb::RenderFb(FreeType *ft, FrameBuffer *fb) :
     m_penX(settings.marginLeft),
     m_penY(settings.marginTop),
     m_lineHeight(10),
-    m_page(1),
     ai(1)
 {
 }
@@ -143,7 +143,7 @@ int RenderFb::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit)
 
 // TODO:  speed stats
 // TODO:  faster: max_advance_width
-int RenderFb::render(unsigned int pageNum, bool doBlit)
+int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
     clc::Log::info("ocher.renderer.fb", "render page %u %u", pageNum, doBlit);
     m_penX = settings.marginLeft;
@@ -155,7 +155,7 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
     if (!pageNum) {
         layoutOffset = 0;
         strOffset = 0;
-    } else if (! m_pagination.get(pageNum-1, &layoutOffset, &strOffset)) {
+    } else if (! pagination->get(pageNum-1, &layoutOffset, &strOffset)) {
         // Previous page not already paginated?
         // Perhaps at end of book?
         clc::Log::error("ocher.renderer.fb", "page %u not found", pageNum);
@@ -235,7 +235,7 @@ int RenderFb::render(unsigned int pageNum, bool doBlit)
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;
                         if (breakOffset >= 0) {
-                            m_pagination.set(pageNum, i-2, breakOffset);
+                            pagination->set(pageNum, i-2, breakOffset);
                             clc::Log::debug("ocher.renderer.fb", "page %u break", pageNum);
                             m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
                             return 0;

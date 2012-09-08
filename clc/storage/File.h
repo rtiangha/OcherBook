@@ -35,12 +35,6 @@ namespace clc
 class File
 {
 public:
-    enum SeekMethod {
-        FromBeg,
-        FromCur,
-        FromEnd
-    };
-
     /**
      *  Constructs an empty File object, which is not usable for IO.  Call setTo before using.
      */
@@ -60,10 +54,10 @@ public:
     File(const char* filename, const char *mode="r");
 
     /**
-     *  See Constructor.
+     *  Like constructor, but does not throw.
      */
-    void setTo(const Buffer& filename, const char *mode="r");
-    void setTo(const char* filename, const char *mode="r");
+    int setTo(const Buffer& filename, const char *mode="r");
+    int setTo(const char* filename, const char *mode="r");
 
     /**
      *  Closes the file, and returns the object to an uninitialized state.
@@ -93,7 +87,7 @@ public:
      *  @throw  IOException if seek failed
      *  @return  The new absolute offset
      */
-    uint64_t seek(int64_t offset, SeekMethod how);
+    uint64_t seek(int64_t offset, int whence);
 
     /**
      *  Attempts to read numBytes into buffer, from the current position of the file.
@@ -159,11 +153,12 @@ public:
      */
     bool isEof() const;
 
+    FILE *m_fd;
+
 protected:
-    void init(const char *mode);
+    int init(const char *mode);
 
     Buffer m_filename;
-    FILE *m_fd;
     bool m_temp;
 };
 

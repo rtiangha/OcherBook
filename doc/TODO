@@ -1,5 +1,10 @@
 0.0.8
+meta -
+    -probe files
 ability to select book
+    fd
+    ncurses
+    fb
 consistent naming
 
 0.0.9
@@ -28,6 +33,7 @@ device specific:
 
 layout:
     - pagination
+        - discrete pages vs scrollable (makes no sense on e-ink)
     - margins
     - FreeType:
         - integrate into RenderFd for real word wrap

@@ -7,9 +7,10 @@
 #include "clc/support/Debug.h"
 #include "clc/support/Logger.h"
 
-#include "ocher/settings/Options.h"
-#include "ocher/ux/ncurses/RenderCurses.h"
 #include "ocher/fmt/Layout.h"
+#include "ocher/settings/Options.h"
+#include "ocher/ux/Pagination.h"
+#include "ocher/ux/ncurses/RenderCurses.h"
 
 
 // TODO:  page size
@@ -18,32 +19,36 @@
 RenderCurses::RenderCurses() :
     m_x(0),
     m_y(0),
-    m_page(1),
     ai(1)
 {
 }
 
-bool RenderCurses::init(CDKSCREEN* screen)
+bool RenderCurses::init(WINDOW* scr, CDKSCREEN* screen)
 {
+    m_scr = scr;
     m_screen = screen;
-//    m_window->getMaxXY(m_width, m_height);
+    getmaxyx(m_scr, m_height, m_width);
     return true;
 }
 
 void RenderCurses::enableUl()
 {
+    // TODO
 }
 
 void RenderCurses::disableUl()
 {
+    // TODO
 }
 
 void RenderCurses::enableEm()
 {
+    // TODO
 }
 
 void RenderCurses::disableEm()
 {
+    // TODO
 }
 
 void RenderCurses::pushAttrs()
@@ -116,8 +121,7 @@ int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doB
             n = nl - p;
 
         if (doBlit) {
-// TODO cdk_swindow?
-//            m_window->mvAddNStr(m_x, m_y, (const char*)p, n);
+            mvwaddnstr(m_scr, m_y, m_x, (const char*)p, n);
         }
         p += n;
         len -= n;
@@ -138,13 +142,13 @@ int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doB
 }
 
 
-int RenderCurses::render(unsigned int pageNum, bool doBlit)
+int RenderCurses::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
     clc::Log::info("ocher.render.ncurses", "render page %u %u", pageNum, doBlit);
     m_x = 0;
     m_y = 0;
     if (m_height) {
-        cleanCDKSwindow(m_window);
+        wclear(m_scr);
     }
 
     unsigned int layoutOffset;
@@ -152,7 +156,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
     if (!pageNum) {
         layoutOffset = 0;
         strOffset = 0;
-    } else if (! m_pagination.get(pageNum-1, &layoutOffset, &strOffset)) {
+    } else if (! pagination->get(pageNum-1, &layoutOffset, &strOffset)) {
         // Previous page not already paginated?
         // Perhaps at end of book?
         clc::Log::error("ocher.renderer.ncurses", "page %u not found", pageNum);
@@ -238,7 +242,7 @@ int RenderCurses::render(unsigned int pageNum, bool doBlit)
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;
                         if (breakOffset >= 0) {
-                            m_pagination.set(pageNum, i-2, breakOffset);
+                            pagination->set(pageNum, i-2, breakOffset);
                             if (doBlit) {
                                 refreshCDKScreen(m_screen);
                             }

@@ -45,8 +45,11 @@ Meta* BrowseFd::browse(clc::List& meta)
     printf("\n");
     for (unsigned int i = 0; i < meta.size(); ++i) {
         Meta* m = (Meta*)meta.get(i);
-        printf("%3d: %s\n", i+1, m->relPath.c_str());
-        // TODO: print meta: type, pages read, ...
+        // TODO:  title/author
+        // TODO:  pad to width
+        printf("%3d: %s\n", i+1, m->title.c_str());
+        printf("     %s\n", m->author.c_str());
+        printf("     %4s  %u of %d\n", Meta::fmtToStr(m->format), 0, 100);
     }
 
     // TODO temp
@@ -57,18 +60,17 @@ Meta* BrowseFd::browse(clc::List& meta)
 void BrowseFd::read(Renderer* renderer, Meta* meta)
 {
     for (int pageNum = 0; ; ) {
-        if (renderer->render(pageNum, true) < 0)
-            return;
+        int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 
         char buf[16];
-        sprintf(buf, "%u of %u: ", pageNum+1, renderer->m_pagination.numPages());
+        sprintf(buf, "%u of %u: ", pageNum+1, meta->m_pagination.numPages()+1);
         write(m_out, buf, strlen(buf));
 
         char key = getKey();
         if (key == 'p' || key == 'b') {
             if (pageNum > 0)
                 pageNum--;
-        } else if (key == 'q') {
+        } else if (key == 'q' || atEnd) {
             break;
         } else {
             pageNum++;

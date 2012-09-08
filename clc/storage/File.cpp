@@ -29,31 +29,35 @@ File::File() : m_fd(0)
 {
 }
 
-File::File(Buffer const& pathname, const char *mode) : m_filename(pathname), m_fd(0), m_temp(false)
+File::File(Buffer const& pathname, const char *mode) : m_fd(0), m_filename(pathname), m_temp(false)
 {
-    init(mode);
+    int r = init(mode);
+    if (r)
+        throw IOException("init", r);
 }
 
-File::File(const char* pathname, const char *mode) : m_filename(pathname), m_fd(0), m_temp(false)
+File::File(const char* pathname, const char *mode) : m_fd(0), m_filename(pathname), m_temp(false)
 {
-    init(mode);
+    int r = init(mode);
+    if (r)
+        throw IOException("init", r);
 }
 
-void File::setTo(const char* pathname, const char* mode)
-{
-    unset();
-    m_filename = pathname;
-    init(mode);
-}
-
-void File::setTo(const Buffer& pathname, const char* mode)
+int File::setTo(const char* pathname, const char* mode)
 {
     unset();
     m_filename = pathname;
-    init(mode);
+    return init(mode);
 }
 
-void File::init(const char *mode)
+int File::setTo(const Buffer& pathname, const char* mode)
+{
+    unset();
+    m_filename = pathname;
+    return init(mode);
+}
+
+int File::init(const char *mode)
 {
     /*
      * Cannot use fopen because the strings are not completely portable (in particular, "x" to
@@ -81,7 +85,7 @@ void File::init(const char *mode)
                 } else if (c == 'a') {
                     oflag |= (O_WRONLY | O_CREAT | O_APPEND);
                 } else {
-                    throw IOException("init", EINVAL);
+                    return EINVAL;
                 }
                 fmode[fmi++] = c;
                 ++state;
@@ -109,7 +113,7 @@ void File::init(const char *mode)
                 } else if (c == 't') {
                     m_temp = true;
                 } else {
-                    throw IOException("init", EINVAL);
+                    return EINVAL;
                 }
                 break;
             }
@@ -144,19 +148,20 @@ void File::init(const char *mode)
         fd = open(m_filename.c_str(), oflag, omode);
     }
     if (fd == -1) {
-        throw IOException("init", errno);
+        return errno;
     }
     m_fd = fdopen(fd, &fmode[0]);
     if (m_fd == NULL) {
         int e = errno;
         ::close(fd);
-        throw IOException("init", e);
+        return e;
     }
 #ifdef UCLIBC_FTELL_BUG
     if (oflag & O_APPEND) {
         ::fseek(m_fd, 0, SEEK_END);
     }
 #endif
+    return 0;
 }
 
 void File::unset()
@@ -184,12 +189,12 @@ uint64_t File::position() const
     return clc_tell(m_fd);
 }
 
-uint64_t File::seek(int64_t offset, SeekMethod how)
+uint64_t File::seek(int64_t offset, int whence)
 {
     if (!m_fd) {
         throw IOException("seek", EINVAL);
     }
-    int r = clc_seek(m_fd, offset, (int)how);
+    int r = clc_seek(m_fd, offset, whence);
     if (r == -1)
         throw IOException("seek", errno);
     return clc_tell(m_fd);

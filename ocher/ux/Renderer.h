@@ -3,8 +3,7 @@
 
 #include "clc/data/Buffer.h"
 
-#include "ocher/ux/Pagination.h"
-
+class Pagination;
 
 /**
  */
@@ -39,12 +38,10 @@ public:
      *  0 if reached the end of the page and it overflowed;
      *  1 if reached the end of the layout (no overflow)
      */
-    virtual int render(unsigned int pageNum, bool doBlit) = 0;
+    virtual int render(Pagination* pagination, unsigned int pageNum, bool doBlit) = 0;
 
 protected:
     clc::Buffer m_layout;
-public: //TODO: yuck
-    Pagination m_pagination;
 };
 
 #endif

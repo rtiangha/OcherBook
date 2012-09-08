@@ -20,7 +20,7 @@ bool UiFactoryCurses::init()
     m_screen = initCDKScreen(m_scr);
     initCDKColor();
     m_browser->init(m_screen);
-    m_renderer->init(m_screen);
+    m_renderer->init(m_scr, m_screen);
 
     return true;
 }

@@ -26,11 +26,8 @@ Settings::Settings() :
 void Settings::load()
 {
     clc::File s;
-    try {
-        s.setTo(fs.getSettings());
-    } catch(...) {
+    if (s.setTo(fs.getSettings()) != 0)
         return;
-    }
 
     clc::Buffer line;
     while (!s.isEof()) {

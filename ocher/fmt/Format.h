@@ -3,15 +3,22 @@
 
 #include "clc/data/Buffer.h"
 
+#include "ocher/shelf/Meta.h"
+
+
 /**
  *  Base class for file-format readers.
  */
 class Format
 {
 public:
-    virtual clc::Buffer getFormatName() = 0;
+    virtual void loadMeta(Meta* meta) {}
+
+    clc::Buffer m_title;
+    clc::Buffer m_author;
 };
 
+Fmt detectFormat(const char* file);
 
 #endif
 

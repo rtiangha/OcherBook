@@ -3,6 +3,18 @@
 
 #include "clc/data/Buffer.h"
 
+#include "ocher/ux/Pagination.h"
+
+
+enum Encoding {
+    OCHER_ENC_UNKNOWN,
+    OCHER_ENC_UTF8,
+    OCHER_ENC_UTF16BE,
+    OCHER_ENC_UTF16LE,
+    OCHER_ENC_UTF32BE,
+    OCHER_ENC_UTF32LE,
+};
+
 enum Fmt {
     OCHER_FMT_UNKNOWN,
     OCHER_FMT_EPUB,
@@ -26,9 +38,10 @@ class Meta
 public:
     Meta();
 
-    void detect(const char* file);
+    static const char* fmtToStr(Fmt fmt);
 
     Fmt format;
+    Encoding encoding;
 
     clc::Buffer relPath;  // TODO: for now, full path
 
@@ -38,6 +51,7 @@ public:
 
     clc::Buffer icon;
 
+    Pagination m_pagination;
     unsigned int pages; // is this even meaningful?
 
     BookRecord record;   // TODO:  per-user

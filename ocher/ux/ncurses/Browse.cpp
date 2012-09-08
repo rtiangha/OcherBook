@@ -22,9 +22,10 @@ Meta* BrowseCurses::browse(clc::List& meta)
         items[i] = m->relPath.c_str();
     }
 
-    CDKSCROLL* scroll = newCDKScroll(m_screen, LEFT, TOP, RIGHT, 0, 0, "Browse books...",
-            items, nItems, 0, 0, 0, 0);
+    CDKSCROLL* scroll = newCDKScroll(m_screen, LEFT, TOP, RIGHT, 0, 0, "Select a book...",
+            items, nItems, 0, 0, 1, 1);
     int r = activateCDKScroll(scroll, NULL);
+    destroyCDKScroll(scroll);
     if (r == -1) {
         return (Meta*)0;
     } else {
@@ -35,21 +36,17 @@ Meta* BrowseCurses::browse(clc::List& meta)
 void BrowseCurses::read(Renderer* renderer, Meta* meta)
 {
     for (int pageNum = 0; ; ) {
-        if (renderer->render(pageNum, true) < 0)
-            return;
+        int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 
-#if 0
-        clc::Keystroke::Modifiers m;
-        clc::Keystroke key = clc::Tui::getKey(&m);
+        int key = getch();
         if (key == 'p' || key == 'b') {
             if (pageNum > 0)
                 pageNum--;
-        } else if (key == 'q') {
+        } else if (key == 'q' || atEnd) {
             break;
         } else {
             pageNum++;
         }
-#endif
     }
 }
 

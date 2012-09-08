@@ -4,6 +4,8 @@
 #include "mxml.h"
 
 #include "clc/storage/File.h"
+#include "clc/storage/Path.h"
+#include "clc/storage/DirIter.h"
 #include "clc/support/Logger.h"
 
 #include "ocher/ux/Factory.h"
@@ -33,22 +35,26 @@ void Controller::processFiles(const char** files)
 void Controller::processFile(const char* file)
 {
     struct stat s;
-    Meta* m = 0;
     if (stat(file, &s)) {
         clc::Log::warn("ocher", "%s: stat: %s", file, strerror(errno));
     } else {
         if (S_ISREG(s.st_mode)) {
-            if (!m)
-                m = new Meta;
-            m->detect(file);
-            if (m->format == OCHER_FMT_UNKNOWN) {
-                clc::Log::warn("ocher", "%s: unknown format", file);
-                delete m;
-            } else {
+            Fmt format = detectFormat(file);
+            clc::Log::info("ocher", "%s: %s", file, Meta::fmtToStr(format));
+            if (format != OCHER_FMT_UNKNOWN) {
+                Meta* m = new Meta;
+                m->format = format;
+                m->relPath = file;
+                // TODO: loadMeta
                 m_meta.add(m);
             }
         } else if (S_ISDIR(s.st_mode)) {
-            // TODO
+            clc::Buffer name;
+            clc::DirIter dir(file);
+            while (dir.getNext(name) == 0 && name.length()) {
+                clc::Buffer entryName = clc::Path::join(file, name);
+                processFile(entryName.c_str());
+            }
         }
     }
 }
@@ -67,25 +73,21 @@ void Controller::run()
         if (!meta)
             break;
 
-        const char* file = meta->relPath.c_str();
         clc::Buffer memLayout;
         // TODO:  rework Layout constructors to have separate init due to scoping
         Layout *layout = 0;
-        clc::File f(file);
+        const char* file = meta->relPath.c_str();
+        clc::Log::info("ocher", "Loading %s: %s", Meta::fmtToStr(meta->format), file);
         switch (meta->format) {
             case OCHER_FMT_TEXT: {
                 Text text(file);
                 layout = new LayoutText(&text);
-                clc::Log::info("ocher", "Loading %s: %s", text.getFormatName().c_str(), file);
                 memLayout = layout->unlock();
                 break;
             }
             case OCHER_FMT_EPUB: {
                 Epub epub(file);
                 layout = new LayoutEpub(&epub);
-
-                clc::Log::info("ocher", "Loading %s: %s", epub.getFormatName().c_str(), file);
-
                 clc::Buffer html;
                 for (int i = 0; ; i++) {
                     if (epub.getSpineItemByIndex(i, html) != 0)
@@ -113,9 +115,9 @@ void Controller::run()
 #if 1
         for (int pageNum = 0; ; pageNum++) {
             clc::Log::info("ocher", "Paginating page %d", pageNum);
-            int r = renderer->render(pageNum, false);
+            int r = renderer->render(&meta->m_pagination, pageNum, false);
 
-            if (r < 0)
+            if (r != 0)
                 break;
         }
 #endif

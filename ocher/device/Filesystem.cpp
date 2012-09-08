@@ -1,4 +1,3 @@
-#include "clc/storage/Directory.h"
 #include "clc/storage/File.h"
 #include "clc/storage/Path.h"
 
@@ -6,7 +5,10 @@
 
 #include <stdlib.h>
 #ifdef _WIN32
+#include <direct.h>
 #include <shlobj.h>
+#else
+#include <sys/stat.h>
 #endif
 #if !defined(_WIN32) && !defined(__HAIKU__)
 #include <pwd.h>

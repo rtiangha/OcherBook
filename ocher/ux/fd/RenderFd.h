@@ -10,7 +10,7 @@ public:
     RendererFd();
 
     bool init();
-    int render(unsigned int pageNum, bool doBlit);
+    int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
     int outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit);
 
@@ -22,7 +22,6 @@ protected:
     int m_height;
     int m_x;
     int m_y;
-    int m_page;
 
     void clearScreen();
     void enableUl();
