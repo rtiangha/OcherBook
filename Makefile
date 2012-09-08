@@ -170,7 +170,7 @@ OCHER_OBJS = \
 	clc/os/Lock.o \
 	clc/os/Monitor.o \
 	clc/os/Thread.o \
-	clc/storage/Directory.o \
+	clc/storage/DirIter.o \
 	clc/storage/File.o \
 	clc/storage/Path.o \
 	clc/support/Debug.o \

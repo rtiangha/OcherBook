@@ -7,6 +7,8 @@
 class UiFactory
 {
 public:
+    virtual ~UiFactory() {}
+
     /**
      * Called after user options have been parsed.
      * @return True iff sucessfully initialized, else output msg

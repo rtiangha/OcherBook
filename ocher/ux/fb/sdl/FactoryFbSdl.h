@@ -9,13 +9,10 @@ class UiFactoryFbSdl : public UiFactoryFb
 {
 public:
     UiFactoryFbSdl();
-    ~UiFactoryFbSdl();
+    virtual ~UiFactoryFbSdl();
 
     bool init();
     const char* getName();
-
-protected:
-    FbSdl* m_fb;
 };
 
 #endif

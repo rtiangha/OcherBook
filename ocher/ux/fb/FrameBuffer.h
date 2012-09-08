@@ -6,6 +6,7 @@ class FrameBuffer
 {
 public:
     FrameBuffer() {}
+    virtual ~FrameBuffer() {}
 
     virtual unsigned int height() = 0;
     virtual unsigned int width() = 0;

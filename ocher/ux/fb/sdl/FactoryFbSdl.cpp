@@ -6,8 +6,7 @@ UX_DRIVER_REGISTER(FbSdl);
 
 
 UiFactoryFbSdl::UiFactoryFbSdl() :
-    UiFactoryFb(),
-    m_fb(0)
+    UiFactoryFb()
 {
 }
 
