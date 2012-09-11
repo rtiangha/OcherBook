@@ -19,7 +19,7 @@ public:
 
     void clear();
     void blit(unsigned char *p, int x, int y, int w, int h);
-    int update(int x, int y, int w, int h, bool full);
+    int update(unsigned int x, unsigned int y, unsigned int w, unsigned int h, bool full);
 
     /**
      * @param marker  Waits on the specified update, or -1 for all

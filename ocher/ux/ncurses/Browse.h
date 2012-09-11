@@ -16,7 +16,7 @@ public:
 
     bool init(CDKSCREEN* screen);
     Meta* browse(clc::List& meta);
-    void read(Renderer* renderer, Meta* meta);
+    void read(UiFactory* factory, Meta* meta);
 
 protected:
     CDKSCREEN* m_screen;

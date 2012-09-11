@@ -3,8 +3,8 @@
 
 #include "clc/data/List.h"
 
-#include "ocher/shelf/Meta.h"
-class Renderer;
+class UiFactory;
+class Meta;
 
 class Browse
 {
@@ -15,7 +15,7 @@ public:
     virtual bool init() { return true; }
     // TODO:  instead return some epub meta record and/or requested action
     virtual Meta* browse(clc::List& meta) = 0;
-    virtual void read(Renderer* renderer, Meta* meta) = 0;
+    virtual void read(UiFactory* factory, Meta* meta) = 0;
 };
 
 

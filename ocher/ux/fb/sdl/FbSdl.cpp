@@ -27,6 +27,7 @@ bool FbSdl::init()
     }
 
     // TODO:  store window size in user settings
+    // TODO:  move this to SDL event thread
     m_screen = SDL_SetVideoMode(600, 800, 8, SDL_SWSURFACE);
     if (! m_screen) {
         const char *err = SDL_GetError();
@@ -63,12 +64,29 @@ void FbSdl::clear()
 
 void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
 {
-    clc::Log::debug("ocher.sdl", "blit");
+    clc::Log::trace("ocher.sdl", "blit");
     if ( SDL_MUSTLOCK(m_screen) ) {
         if ( SDL_LockSurface(m_screen) < 0 ) {
             return;
         }
     }
+
+    const int fbw = width();
+    if (x >= fbw)
+        return;
+    const int fbh = height();
+    if (y >= fbh)
+        return;
+    if (x < 0) {
+        // TODO
+    }
+    if (x + w >= fbw)
+        w = fbw - x;
+    if (y < 0) {
+        // TODO
+    }
+    if (y + h >= fbh)
+        h = fbh - y;
 
     //SDL_BlitSurface(m_screen, NULL,
     for (int i = 0; i < h; ++i) {
@@ -81,7 +99,7 @@ void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
     }
 }
 
-int FbSdl::update(int x, int y, int w, int h, bool /*full*/)
+int FbSdl::update(unsigned int x, unsigned int y, unsigned int w, unsigned int h, bool /*full*/)
 {
     clc::Log::debug("ocher.sdl", "update");
     SDL_Rect dest;

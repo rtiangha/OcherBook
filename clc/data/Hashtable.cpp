@@ -73,34 +73,33 @@ List* Hashtable::bucket(const void* key, size_t len) const
     return (List*)m_buckets.ItemAtFast(bucketNum(key, len));
 }
 
-int Hashtable::findIndex(const List* bucket, const void* key, size_t len) const
+int Hashtable::findIndex(const List* _bucket, const void* key, size_t len) const
 {
     // Fastest to append new items on end, but locality suggests that recently appended items
     // are more likely to be referenced again soon, so search from back.
-    const unsigned int size = bucket->countItems();
-    for (int i = size-1; i >= 0; --i) {
-        Item *item = (Item*)bucket->ItemAtFast(i);
+    for (int i = _bucket->countItems()-1; i >= 0; --i) {
+        Item *item = (Item*)_bucket->ItemAtFast(i);
         if (item->keyLen == len && memcmp(item->key, key, len) == 0)
             return i;
     }
     return -1;
 }
 
-Hashtable::Item* Hashtable::find(const List* bucket, const void* key, size_t len) const
+Hashtable::Item* Hashtable::find(const List* _bucket, const void* key, size_t len) const
 {
-    int index = findIndex(bucket, key, len);
+    int index = findIndex(_bucket, key, len);
     if (index < 0) {
         return (Item*)0;
     }
-    return (Item*)bucket->ItemAtFast(index);
+    return (Item*)_bucket->ItemAtFast(index);
 }
 
-Hashtable::Item* Hashtable::remove(List* bucket, const void* key, size_t len)
+Hashtable::Item* Hashtable::remove(List* _bucket, const void* key, size_t len)
 {
-    int index = findIndex(bucket, key, len);
+    int index = findIndex(_bucket, key, len);
     if (index < 0)
         return (Item*)0;
-    return (Item*)bucket->remove(index);
+    return (Item*)_bucket->remove(index);
 }
 
 Hashtable::Item* Hashtable::newItem(const void* key, size_t len, void* value)

@@ -1,18 +1,13 @@
 #ifndef OCHER_SDL_LOOP_H
 #define OCHER_SDL_LOOP_H
 
-#include "clc/os/Thread.h"
+#include "ocher/device/Event.h"
 
-class Controller;
 
-class SdlLoop : clc::Thread
+class SdlLoop : public EventLoop
 {
 public:
-    SdlLoop(Controller *c);
-
-protected:
-    void run();
-
+    int wait(struct OcherEvent* evt);
 };
 
 #endif

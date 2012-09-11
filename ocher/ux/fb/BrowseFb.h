@@ -3,6 +3,7 @@
 
 #include "ocher/ux/Browse.h"
 
+
 class BrowseFb : public Browse
 {
 public:
@@ -11,7 +12,7 @@ public:
 
     bool init();
     Meta* browse(clc::List& meta);
-    void read(Renderer* renderer, Meta* meta);
+    void read(UiFactory* factory, Meta* meta);
 };
 
 #endif

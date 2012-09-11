@@ -1,5 +1,6 @@
-#include "ocher/ux/Renderer.h"
+#include "ocher/ux/Factory.h"
 #include "ocher/ux/ncurses/Browse.h"
+#include "ocher/shelf/Meta.h"
 
 
 BrowseCurses::BrowseCurses()
@@ -33,8 +34,9 @@ Meta* BrowseCurses::browse(clc::List& meta)
     }
 }
 
-void BrowseCurses::read(Renderer* renderer, Meta* meta)
+void BrowseCurses::read(UiFactory* factory, Meta* meta)
 {
+    Renderer* renderer = factory->getRenderer();
     for (int pageNum = 0; ; ) {
         int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 

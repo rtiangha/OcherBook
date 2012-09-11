@@ -32,27 +32,44 @@ Fmt detectFormat(const char* file)
                 skip = 4;
                 encoding = OCHER_ENC_UTF32BE;
             } else {
-                // Recommended for UTF8 to not have BOM.  Also handles plain ascii.
+                // Recommended for UTF8 to not have BOM.  UTF8 also handles plain ascii.
                 skip = 0;
                 encoding = OCHER_ENC_UTF8;
             }
 
-            unsigned char buf2[512];
+            char buf2[512];
             f.seek(skip, SEEK_SET);
-            r = f.read((char*)buf2, sizeof(buf2));
-            if (r >= 0) {
-                // TODO:  real heuristic
-                if (r > 0 && buf2[0] == '<')
-                    format = OCHER_FMT_HTML;
-                else {
+            r = f.read(buf2, sizeof(buf2));
+            if (r > 0) {
+                // Simple heuristics.  Should look at what the file command does.
+                // TODO:  convert to UTF8 based on encoding so heuristics have a chance
+                unsigned int i = 0;
+
+                // HTML ought to start out something like: \s*<\s*html
+                while (i < r && isspace(buf2[i]))
+                    ++i;
+                if (i < r && buf2[i] == '<') {
+                    ++i;
+                    while (i < r && isspace(buf2[i]))
+                        ++i;
+                    if (strncasecmp(buf2+i, "html", r-i) == 0)
+                        format = OCHER_FMT_HTML;
+                }
+
+                // Unrecognized formatting?  Call it plain text.
+                if (format == OCHER_FMT_UNKNOWN)
                     format = OCHER_FMT_TEXT;
-                    for (int i = 0; i < r; ++i) {
-                        if (!buf2[i]) {
-                            format = OCHER_FMT_UNKNOWN;
-                            break;
-                        }
+
+                // But if more than a few binary chars, it's an unknown format.
+                int bin = 0;
+                for (i = 0; i < r; ++i) {
+                    char c = buf2[i];
+                    if (c < 8 || (c > 13 && c < 32)) {
+                        bin++;
                     }
                 }
+                if (bin > 1)
+                    format = OCHER_FMT_UNKNOWN;
             }
         }
     }

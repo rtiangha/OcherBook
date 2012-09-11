@@ -39,8 +39,7 @@ void FreeType::setSize(unsigned int points)
     FT_Set_Char_Size(m_face, 0, points*64, m_fb->dpi(), m_fb->dpi());
 }
 
-// TODO:  how slow is this?  Might be worth caching rendered words (per
-// face/size)
+// TODO:  insanely slow; implement glyph cache
 bool FreeType::renderGlyph(int c, bool doBlit, int penX, int penY, int *dx, int *dy, int *height)
 {
     FT_GlyphSlot slot = m_face->glyph;

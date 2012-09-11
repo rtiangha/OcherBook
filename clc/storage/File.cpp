@@ -129,14 +129,14 @@ int File::init(const char *mode)
         while (1) {
             do {
                 for (unsigned int i = 0; i < 6; ++i) {
-                    char c = rnd.nextInt(10+26+26);
-                    if (c >= 10+26)
-                        c += ('a'-10-26);
-                    else if (c >= 10)
-                        c += ('A'-10);
+                    char l = rnd.nextInt(10+26+26);
+                    if (l >= 10+26)
+                        l += ('a'-10-26);
+                    else if (l >= 10)
+                        l += ('A'-10);
                     else
-                        c += '0';
-                    m_filename[len-1-i] = c;
+                        l += '0';
+                    m_filename[len-1-i] = l;
                 }
             } while (Path::exists(m_filename.c_str()));
             fd = open(m_filename.c_str(), oflag, omode);

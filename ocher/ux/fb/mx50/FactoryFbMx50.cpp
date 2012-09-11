@@ -1,3 +1,4 @@
+#include "ocher/device/kobo/KoboEvents.h"
 #include "ocher/ocher.h"
 #include "ocher/ux/fb/FactoryFbMx50.h"
 
@@ -16,10 +17,15 @@ UiFactoryFbMx50::~UiFactoryFbMx50()
 
 bool UiFactoryFbMx50::init()
 {
-    m_fb = new Mx50Fb;
-    if (UiFactoryFb::init())
-        return true;
-    delete m_fb;
+    Mx50Fb* fb = new Mx50Fb;
+    if (fb->init()) {
+        m_fb = fb;
+        if (UiFactoryFb::init()) {
+            m_loop = new KoboEvents;
+            return true;
+        }
+    }
+    delete fb;
     return false;
 }
 

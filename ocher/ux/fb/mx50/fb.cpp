@@ -126,6 +126,23 @@ static void invcpy(unsigned char *dst, unsigned char *src, size_t n)
 
 void Mx50Fb::blit(unsigned char *p, int x, int y, int w, int h)
 {
+    clc::Log::trace("ocher.mx50", "blit");
+    const int fbw = width();
+    if (x >= fbw)
+        return;
+    const int fbh = height();
+    if (y >= fbh)
+        return;
+    if (x < 0) {
+        // TODO
+    }
+    if (x + w >= fbw)
+        w = fbw - x;
+    if (y < 0) {
+        // TODO
+    if (y + h >= fbh)
+        h = fbh - y;
+
     for (int i = 0; i < h; ++i) {
         invcpy(((unsigned char*)m_fb) + y*vinfo.xres_virtual + x, p, w);
         y++;
@@ -133,7 +150,7 @@ void Mx50Fb::blit(unsigned char *p, int x, int y, int w, int h)
     }
 }
 
-int Mx50Fb::update(int x, int y, int w, int h, bool full)
+int Mx50Fb::update(unsigned int x, unsigned int y, unsigned int w, unsigned int h, bool full)
 {
     if (m_clears > settings.fullRefreshPages) {
         m_clears = 0;

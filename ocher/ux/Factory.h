@@ -4,6 +4,8 @@
 #include "ocher/ux/Browse.h"
 #include "ocher/ux/Renderer.h"
 
+class EventLoop;
+
 class UiFactory
 {
 public:
@@ -22,6 +24,8 @@ public:
     virtual Browse* getBrowser() = 0;
 
     virtual Renderer* getRenderer() = 0;
+
+    virtual EventLoop* getLoop() { return (EventLoop*)0; }
 };
 
 #endif

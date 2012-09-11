@@ -65,6 +65,7 @@ void Controller::run()
 
     while (1) {
         Meta* meta = 0;
+        EventLoop* loop = m_factory->getLoop();
         Browse* browser = m_factory->getBrowser();
 
         // TODO:  home screen
@@ -101,6 +102,7 @@ void Controller::run()
                     }
                 }
                 memLayout = layout->unlock();
+                break;
             }
             default: {
                 clc::Log::warn("ocher", "Unhandled format %d", meta->format);
@@ -122,7 +124,7 @@ void Controller::run()
         }
 #endif
 
-        browser->read(renderer, meta);
+        browser->read(m_factory, meta);
 
         delete layout;
     }

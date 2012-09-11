@@ -6,7 +6,8 @@ UiFactoryFb::UiFactoryFb() :
     m_fb(0),
     m_ft(0),
     m_browser(0),
-    m_render(0)
+    m_render(0),
+    m_loop(0)
 {
 }
 
@@ -30,16 +31,4 @@ bool UiFactoryFb::init()
 void UiFactoryFb::deinit()
 {
 }
-
-Browse* UiFactoryFb::getBrowser()
-{
-    return m_browser;
-}
-
-Renderer* UiFactoryFb::getRenderer()
-{
-    return m_render;
-}
-
-
 

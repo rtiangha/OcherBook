@@ -18,7 +18,7 @@ namespace clc
 class Exception : public std::exception
 {
 public:
-    Exception(char const* what="") throw() : m_what(what) {}
+    Exception(char const* _what="") throw() : m_what(_what) {}
     virtual char const* what() const throw() { return m_what; }
 private:
     char const* m_what;
@@ -29,8 +29,8 @@ private:
 class IOException : public Exception
 {
 public:
-    IOException(char const* what="") throw() : Exception(what), fn(0), err(0) {}
-    IOException(char const* fn, int e) throw() : Exception("IOException"), fn(fn), err(e) {}
+    IOException(char const* _what="") throw() : Exception(_what), fn(0), err(0) {}
+    IOException(char const* _fn, int e) throw() : Exception("IOException"), fn(_fn), err(e) {}
     // TODO:  istream or ostream pointer
     const char* fn;
     int err;
@@ -39,46 +39,8 @@ public:
 class BufferOverflowException : public Exception
 {
 public:
-    BufferOverflowException(char const* what="") throw() : Exception(what) {}
+    BufferOverflowException(char const* _what="") throw() : Exception(_what) {}
 };
-
-#if 0
-class BufferUnderflowException : public Exception
-{
-public:
-    BufferUnderflowException(char const* what="") throw() : Exception(what) {}
-};
-
-class IndexOutOfBoundsException : public Exception
-{
-public:
-    IndexOutOfBoundsException(char const* what="") throw() : Exception(what) {}
-};
-
-class UnsupportedOperationException : public Exception
-{
-public:
-    UnsupportedOperationException(char const* what="") throw() : Exception(what) {}
-};
-
-class IllegalArgumentException : public Exception
-{
-public:
-    IllegalArgumentException(char const* what="") throw() : Exception(what) {}
-};
-
-class IllegalFormatException : public Exception
-{
-public:
-    IllegalFormatException(char const* what="") throw() : Exception(what) {}
-};
-
-class IllegalStateException : public Exception
-{
-public:
-    IllegalStateException(char const* what="") throw() : Exception(what) {}
-};
-#endif
 
 }
 

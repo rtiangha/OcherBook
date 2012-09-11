@@ -1585,11 +1585,11 @@ Buffer::_Init(const char* src, size_t len)
 
 
 char*
-Buffer::_Clone(const char* data, size_t len)
+Buffer::_Clone(const char* src, size_t len)
 {
     char* newData = _Alloc(len, false);
-    if (data)
-        memcpy(newData, data, len);
+    if (src)
+        memcpy(newData, src, len);
     return newData;
 }
 
@@ -1615,24 +1615,24 @@ Buffer::_ShrinkAtBy(size_t offset, size_t len)
 
 
 void
-Buffer::_DetachWith(const char* data, size_t dataLen, size_t totalLen)
+Buffer::_DetachWith(const char* src, size_t srcLen, size_t totalLen)
 {
     if (refCount() > 1) {
         // Note:  Ordering is significant due to possible exceptions
         char* newData = _Alloc(totalLen, false);
-        if (data) {
-            dataLen = min_clamp0(dataLen, totalLen);
-            memcpy(newData, data, dataLen);
+        if (src) {
+            srcLen = min_clamp0(srcLen, totalLen);
+            memcpy(newData, src, srcLen);
         }
         if (decRef() == 0)
             _FreePrivateData();
         m_data = newData;
     } else {
-        bool self = (data == m_data);
+        bool self = (src == m_data);
         _Realloc(totalLen);
-        if (!self && data) {
-            dataLen = min_clamp0(dataLen, totalLen);
-            memcpy(m_data, data, dataLen);
+        if (!self && src) {
+            srcLen = min_clamp0(srcLen, totalLen);
+            memcpy(m_data, src, srcLen);
         }
     }
 }

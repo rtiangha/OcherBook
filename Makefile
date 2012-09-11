@@ -62,7 +62,7 @@ ifneq ($(OCHER_TARGET),haiku)
 endif
 
 # Additional CFLAGS for ocher
-OCHER_CFLAGS=-Wall -W -Wformat=2 -Wno-write-strings
+OCHER_CFLAGS=-Wall -W -Wformat=2 -Wno-write-strings -Wshadow
 ifeq ($(OCHER_DEV),1)
 	OCHER_CFLAGS+=-Werror
 endif
@@ -96,7 +96,7 @@ FREETYPE_LIB=$(FREETYPE_DIR)/objs/.libs/libfreetype.a
 $(FREETYPE_LIB):
 	@mkdir -p $(BUILD_DIR)
 	tar -zxf $(FREETYPE_TGZ) -C $(BUILD_DIR)
-	cd $(FREETYPE_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure --without-bzip2 --disable-shared --host i686-linux
+	cd $(FREETYPE_DIR) && CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC) ./configure --without-bzip2 --disable-shared --host i686-linux
 	cd $(FREETYPE_DIR) && $(MAKE)
 
 freetype_clean:

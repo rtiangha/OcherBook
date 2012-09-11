@@ -163,6 +163,7 @@ int main(int argc, char **argv)
         printf("No suitable output driver found\n");
         return 1;
     }
+    clc::Log::info("ocher", "Using the %s driver", driver->getName());
 
     // TODO: error messages after this point must go to the driver, not stderr
 

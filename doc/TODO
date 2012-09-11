@@ -1,11 +1,8 @@
 0.0.8
-meta -
-    -probe files
-ability to select book
-    fd
-    ncurses
-    fb
-consistent naming
+generic text printing routines, built on freetype
+ability to select book via fb
+finish kobo events (see evtest, ...)
+(optional!) event thread, with queuing
 
 0.0.9
 margins
@@ -36,6 +33,8 @@ layout:
         - discrete pages vs scrollable (makes no sense on e-ink)
     - margins
     - FreeType:
+        - glyph cache
+            - FTC_Manager_New
         - integrate into RenderFd for real word wrap
     - option to build some fonts into the binary for easy install
 
@@ -97,7 +96,7 @@ harden:
 
 cleanup:
     - remove exceptions from File
-    - clean up Directory/Path/File to be simpler, more posix-like
+    - clean up Path/File to be simpler, more posix-like
 
 docs:
     - document complete walk-through of installing, recovery, etc

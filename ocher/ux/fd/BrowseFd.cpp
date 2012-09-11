@@ -4,9 +4,10 @@
 #include <unistd.h>
 
 #include "ocher/device/Filesystem.h"
-#include "ocher/ux/fd/BrowseFd.h"
-#include "ocher/ux/Renderer.h"
 #include "ocher/settings/Options.h"
+#include "ocher/shelf/Meta.h"
+#include "ocher/ux/fd/BrowseFd.h"
+#include "ocher/ux/Factory.h"
 
 // TODO:  handle !isatty(stdin)
 
@@ -57,8 +58,9 @@ Meta* BrowseFd::browse(clc::List& meta)
     return (Meta*)meta.get(key - '1');
 }
 
-void BrowseFd::read(Renderer* renderer, Meta* meta)
+void BrowseFd::read(UiFactory* factory, Meta* meta)
 {
+    Renderer* renderer = factory->getRenderer();
     for (int pageNum = 0; ; ) {
         int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 
