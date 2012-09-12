@@ -34,7 +34,7 @@ void Hashtable::dump()
     const int buckets = m_size;
     for (int i = 0; i < buckets; ++i) {
         printf("%p[%d] = ", this, i);
-        List* list = (List*)m_buckets.ItemAtFast(i);
+        List* list = (List*)m_buckets.itemAtFast(i);
         if (list) {
             const int items = list->countItems();
             printf("List %p with %d items\n", list, items);
@@ -47,11 +47,11 @@ void Hashtable::clear(bool deleteValues)
 {
     const int buckets = m_size;
     for (int i = 0; i < buckets; ++i) {
-        List* list = (List*)m_buckets.ItemAtFast(i);
+        List* list = (List*)m_buckets.itemAtFast(i);
         if (list) {
             const int items = list->countItems();
             for (int j = 0; j < items; ++j) {
-                Item* item = (Item*)list->ItemAtFast(j);
+                Item* item = (Item*)list->itemAtFast(j);
                 if (deleteValues)
                     deleteValue(item->value);
                 deleteItem(item);
@@ -70,7 +70,7 @@ unsigned int Hashtable::bucketNum(const void* key, size_t len) const
 
 List* Hashtable::bucket(const void* key, size_t len) const
 {
-    return (List*)m_buckets.ItemAtFast(bucketNum(key, len));
+    return (List*)m_buckets.itemAtFast(bucketNum(key, len));
 }
 
 int Hashtable::findIndex(const List* _bucket, const void* key, size_t len) const
@@ -78,7 +78,7 @@ int Hashtable::findIndex(const List* _bucket, const void* key, size_t len) const
     // Fastest to append new items on end, but locality suggests that recently appended items
     // are more likely to be referenced again soon, so search from back.
     for (int i = _bucket->countItems()-1; i >= 0; --i) {
-        Item *item = (Item*)_bucket->ItemAtFast(i);
+        Item *item = (Item*)_bucket->itemAtFast(i);
         if (item->keyLen == len && memcmp(item->key, key, len) == 0)
             return i;
     }
@@ -91,7 +91,7 @@ Hashtable::Item* Hashtable::find(const List* _bucket, const void* key, size_t le
     if (index < 0) {
         return (Item*)0;
     }
-    return (Item*)_bucket->ItemAtFast(index);
+    return (Item*)_bucket->itemAtFast(index);
 }
 
 Hashtable::Item* Hashtable::remove(List* _bucket, const void* key, size_t len)
@@ -122,7 +122,7 @@ unsigned int Hashtable::size()
     const int buckets = m_size;
     for (int i = 0; i < buckets; ++i)
     {
-        List* list = (List*)m_buckets.ItemAtFast(i);
+        List* list = (List*)m_buckets.itemAtFast(i);
         if (list)
             n += list->countItems();
     }
@@ -195,12 +195,12 @@ void Hashtable::put(uint32_t key, void *value)
 void Hashtable::put(const void* key, size_t len, void* value)
 {
     unsigned int n = bucketNum(key, len);
-    List* l = (List*)m_buckets.ItemAtFast(n);
+    List* l = (List*)m_buckets.itemAtFast(n);
     if (! l) {
-        bool added = m_buckets.ReplaceItem(n, l = new List);
+        bool added = m_buckets.replaceItem(n, l = new List);
         ASSERT(added); (void)added;
     }
-    ASSERT(m_buckets.ItemAtFast(n));
+    ASSERT(m_buckets.itemAtFast(n));
     Item* i = find(l, key, len);
     if (i)
     {
@@ -291,7 +291,7 @@ void* HashtableIter::remove()
     if (! m_cur.item && ! m_next.item) {
         // Past the end
     } else if (m_cur.item) {
-        List* bucket = (List*)m_ht.m_buckets.ItemAtFast(m_cur.bucket);
+        List* bucket = (List*)m_ht.m_buckets.itemAtFast(m_cur.bucket);
         Hashtable::Item* item = (Hashtable::Item*)bucket->remove(m_cur.index);
         ASSERT(item == m_cur.item);
         m_cur.index--;
@@ -312,12 +312,12 @@ void HashtableIter::scan(struct Bookmark& bookmark)
 {
     const int buckets = m_ht.m_size;
     for ( ; bookmark.bucket < buckets; ++bookmark.bucket) {
-        List* list = (List*)m_ht.m_buckets.ItemAtFast(bookmark.bucket);
+        List* list = (List*)m_ht.m_buckets.itemAtFast(bookmark.bucket);
         if (! list)
             continue;
         bookmark.index++;
         if (bookmark.index < (int)list->countItems()) {
-            bookmark.item = (Hashtable::Item*)list->ItemAtFast(bookmark.index);
+            bookmark.item = (Hashtable::Item*)list->itemAtFast(bookmark.index);
             return;
         }
         bookmark.index = -1;

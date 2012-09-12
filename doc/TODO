@@ -1,6 +1,7 @@
 0.0.8
 generic text printing routines, built on freetype
 ability to select book via fb
+
 finish kobo events (see evtest, ...)
 (optional!) event thread, with queuing
 
@@ -96,6 +97,7 @@ harden:
 
 cleanup:
     - remove exceptions from File
+    - allow std::bad_alloc?
     - clean up Path/File to be simpler, more posix-like
 
 docs:

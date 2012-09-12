@@ -98,7 +98,7 @@ bool List::add(void *item)
 }
 
 
-bool List::AddList(const List *list, size_t index)
+bool List::addList(const List *list, size_t index)
 {
     bool result = (list && index <= m_itemCount);
     if (result && list->m_itemCount > 0) {
@@ -116,7 +116,7 @@ bool List::AddList(const List *list, size_t index)
 }
 
 
-bool List::AddList(const List *list)
+bool List::addList(const List *list)
 {
     bool result = (list != 0);
     if (result && list->m_itemCount > 0) {
@@ -161,16 +161,16 @@ bool List::split(size_t index, List* tail)
 }
 
 
-bool List::RemoveItem(void *item)
+bool List::removeItem(void *item)
 {
     size_t index = indexOf(item);
     if (index != NotFound)
-        RemoveItem(index);
+        removeItem(index);
     return (index != NotFound);
 }
 
 
-void* List::RemoveItem(size_t index)
+void* List::removeItem(size_t index)
 {
     void *item = 0;
     if (index < m_itemCount) {
@@ -184,7 +184,7 @@ void* List::RemoveItem(size_t index)
 }
 
 
-bool List::RemoveItems(size_t index, size_t count)
+bool List::removeItems(size_t index, size_t count)
 {
     bool result = index <= m_itemCount;
     if (result) {
@@ -200,7 +200,7 @@ bool List::RemoveItems(size_t index, size_t count)
 }
 
 
-bool List::ReplaceItem(size_t index, void *newItem)
+bool List::replaceItem(size_t index, void *newItem)
 {
     bool result = false;
 
@@ -226,7 +226,7 @@ void List::sortItems(int (*compareFunc)(const void *, const void *))
 }
 
 
-bool List::SwapItems(size_t indexA, size_t indexB)
+bool List::swapItems(size_t indexA, size_t indexB)
 {
     bool result = false;
 
@@ -242,7 +242,7 @@ bool List::SwapItems(size_t indexA, size_t indexB)
 }
 
 
-bool List::MoveItem(size_t fromIndex, size_t toIndex)
+bool List::moveItem(size_t fromIndex, size_t toIndex)
 {
     if ((fromIndex >= m_itemCount) || (toIndex >= m_itemCount))
         return false;

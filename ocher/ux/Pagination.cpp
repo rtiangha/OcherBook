@@ -29,7 +29,7 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
             m_pages.add(new PageMapping[pagesPerChunk]);
         }
     }
-    struct PageMapping *mapping = (struct PageMapping*)m_pages.ItemAtFast(chunk);
+    struct PageMapping *mapping = (struct PageMapping*)m_pages.itemAtFast(chunk);
     mapping += pageNum % pagesPerChunk;
     if (mapping->layoutOffset != layoutOffset || mapping->strOffset != strOffset) {
         mapping->layoutOffset = layoutOffset;
@@ -48,7 +48,7 @@ bool Pagination::get(unsigned int pageNum, unsigned int *layoutOffset, unsigned 
     if (chunk > m_pages.countItems()) {
         return false;
     }
-    struct PageMapping *mapping = (struct PageMapping*)m_pages.ItemAtFast(chunk);
+    struct PageMapping *mapping = (struct PageMapping*)m_pages.itemAtFast(chunk);
     mapping += pageNum % pagesPerChunk;
     *layoutOffset = mapping->layoutOffset;
     *strOffset = mapping->strOffset;

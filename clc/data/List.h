@@ -30,23 +30,23 @@ public:
     /* Adding and removing items. */
     bool addAt(void* item, size_t index);
     bool add(void* item);
-    bool AddList(const List* list, size_t index);
-    bool AddList(const List* list);
+    bool addList(const List* list, size_t index);
+    bool addList(const List* list);
     List* split(size_t index);
     bool split(size_t index, List* tail);
-    bool RemoveItem(void* item);
-    void* RemoveItem(size_t index);
-    bool RemoveItems(size_t index, size_t count);
-    bool ReplaceItem(size_t index, void* newItem);
+    bool removeItem(void* item);
+    void* removeItem(size_t index);
+    bool removeItems(size_t index, size_t count);
+    bool replaceItem(size_t index, void* newItem);
     void clear();
 
-    inline void set(size_t index, void* newItem) { ReplaceItem(index, newItem); }
-    inline void* remove(size_t index) { return RemoveItem(index); }
+    inline void set(size_t index, void* newItem) { replaceItem(index, newItem); }
+    inline void* remove(size_t index) { return removeItem(index); }
     void* remove();
 
     // Reorder items
     void sortItems(int (*compareFunc)(const void*, const void*));
-    bool SwapItems(size_t indexA, size_t indexB);
+    bool swapItems(size_t indexA, size_t indexB);
     /**
      * This moves a list item from posititon a to position b, moving the appropriate block of
      *  list elements to make up for the move.  For example, in the array:
@@ -54,7 +54,7 @@ public:
      *  Moving 1(B)->6(G) would result in this:
      * A C D E F G B H I J
      */
-    bool MoveItem(size_t fromIndex, size_t toIndex);
+    bool moveItem(size_t fromIndex, size_t toIndex);
 
     // Retrieve items
     /**
@@ -64,7 +64,7 @@ public:
     void* itemAt(int index) const;
     void* get(size_t index) const { return itemAt(index); }
     void* firstItem() const;
-    void* ItemAtFast(size_t index) const { return m_objectList[index]; }
+    void* itemAtFast(size_t index) const { return m_objectList[index]; }
     void* lastItem() const;
     void* items() const { return m_objectList; }
 

@@ -13,7 +13,7 @@ class SetIterator;
 
 
 /**
- *  Loosely based on java.util.Set.
+ *  Light-weight set of pointers.
  */
 class Set
 {
@@ -41,7 +41,7 @@ public:
      *  Removes a particular element.
      *  @return True iff the element was found.
      */
-    inline bool remove(void* o) { return m_set.RemoveItem(o); }
+    inline bool remove(void* o) { return m_set.removeItem(o); }
 
     bool removeAll(Set const& s);
 
@@ -73,7 +73,7 @@ public:
     virtual void* next()
     {
         if (hasNext()) {
-            return m_set.m_set.ItemAtFast(m_next++);
+            return m_set.m_set.itemAtFast(m_next++);
         }
         return 0;
     }
@@ -105,7 +105,7 @@ public:
             return 0;
         }
         m_next--;
-        return m_mutableSet.m_set.RemoveItem(m_next);
+        return m_mutableSet.m_set.removeItem(m_next);
     }
 
 private:
