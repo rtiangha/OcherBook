@@ -25,6 +25,7 @@ public:
 protected:
     int m_sdl;
     SDL_Surface *m_screen;
+    bool m_mustLock;
 };
 
 #endif

@@ -114,7 +114,7 @@ void Controller::run()
 
         // Optionally, run through all pages without blitting to get an accurate
         // page count.
-#if 1
+#if 0
         for (int pageNum = 0; ; pageNum++) {
             clc::Log::info("ocher", "Paginating page %d", pageNum);
             int r = renderer->render(&meta->m_pagination, pageNum, false);

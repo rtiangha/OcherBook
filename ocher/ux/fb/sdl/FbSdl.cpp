@@ -35,17 +35,18 @@ bool FbSdl::init()
         SDL_Quit();
         return false;
     }
+    m_mustLock = SDL_MUSTLOCK(m_screen);
     clear();
     m_sdl = 1;
     return true;
 }
 
-unsigned int FbSdl::height()
+inline unsigned int FbSdl::height()
 {
     return m_screen->h;
 }
 
-unsigned int FbSdl::width()
+inline unsigned int FbSdl::width()
 {
     return m_screen->w;
 }
@@ -65,36 +66,38 @@ void FbSdl::clear()
 void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
 {
     clc::Log::trace("ocher.sdl", "blit");
-    if ( SDL_MUSTLOCK(m_screen) ) {
-        if ( SDL_LockSurface(m_screen) < 0 ) {
+    if (m_mustLock) {
+        if (SDL_LockSurface(m_screen) < 0) {
             return;
         }
     }
 
     const int fbw = width();
-    if (x >= fbw)
-        return;
-    const int fbh = height();
-    if (y >= fbh)
-        return;
+    if (x + w >= fbw) {
+        if (x >= fbw)
+            return;
+        w = fbw - x;
+    }
     if (x < 0) {
         // TODO
     }
-    if (x + w >= fbw)
-        w = fbw - x;
+    const int fbh = height();
+    if (y + h >= fbh) {
+        if (y >= fbh)
+            return;
+        h = fbh - y;
+    }
     if (y < 0) {
         // TODO
     }
-    if (y + h >= fbh)
-        h = fbh - y;
 
-    //SDL_BlitSurface(m_screen, NULL,
+    // TODO: beware SDL's bpp
     for (int i = 0; i < h; ++i) {
         memcpy(((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x, p, w);
         y++;
         p = p + w;
     }
-    if ( SDL_MUSTLOCK(m_screen) ) {
+    if (m_mustLock) {
         SDL_UnlockSurface(m_screen);
     }
 }

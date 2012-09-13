@@ -1,14 +1,13 @@
 How to paginate?
 ================
 
-Users probably still expect page numbers.  But accurately calculating them is
-very slow (at least for framebuffers).
+Users probably still expect page numbers.
 
 Three options:
 
-* Accurately calculate the page numbers, for the user's font settings.  Very
-slow (minutes).  Even with caching of the layout, this is probably not
-realistic.
+* Accurately calculate the page numbers, for the user's font settings.  Perhaps
+slow on e-readers.  Accurate for the current font size, but inconsistent across
+devices.
 * Statistical "pages".  Faster, but possibly confusing.  No one-to-one mapping
 between physical and logical pages, and book may end early or late.
 * Discard page numbers, and favor better navigation.  Difficult to retrain

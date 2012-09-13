@@ -1,4 +1,9 @@
 0.0.8
+glyph cache
+    imageType size?
+    dynamically select memory usage?
+valgrind...
+SDL is not greyscale...
 generic text printing routines, built on freetype
 ability to select book via fb
 
@@ -9,7 +14,6 @@ finish kobo events (see evtest, ...)
 margins
 word wrap on fb
 font selection (don't hardcode filename!)
-paginate on demand, not entire book up-front
 flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
 
 0.1.0
@@ -65,6 +69,7 @@ formats:
 per-user:
     - all user record with optional OpenSSL-compatible encryption
     - keep personal log of books read (title, author, date, notes, ...)?
+    - reading wish list
     - ability to export per-use stats
     - annotations
     - settings

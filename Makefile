@@ -113,7 +113,7 @@ ZLIB_LIB=$(ZLIB_DIR)/libz.a
 $(ZLIB_LIB):
 	@mkdir -p $(BUILD_DIR)
 	tar -zxf $(ZLIB_TGZ) -C $(BUILD_DIR)
-	cd $(ZLIB_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure --static
+	cd $(ZLIB_DIR) && CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC) ./configure --static
 	cd $(ZLIB_DIR) && $(MAKE)
 
 INCS+=-I$(ZLIB_DIR) -I$(ZLIB_DIR)/contrib/minizip
@@ -135,7 +135,7 @@ MXML_LIB=$(MXML_DIR)/libmxml.a
 $(MXML_LIB):
 	@mkdir -p $(BUILD_DIR)
 	tar -zxf $(MXML_TGZ) -C $(BUILD_DIR)
-	cd $(MXML_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure --host i686-linux
+	cd $(MXML_DIR) && CFLAGS="$(CFLAGS_COMMON -O3)" CC=$(CC) ./configure --host i686-linux
 	cd $(MXML_DIR) && $(MAKE) libmxml.a
 
 INCS+=-I$(MXML_DIR)

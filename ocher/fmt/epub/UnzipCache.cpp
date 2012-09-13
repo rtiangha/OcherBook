@@ -123,7 +123,7 @@ int UnzipCache::unzipFile(const char *pattern, clc::Buffer *matchedName)
                 }
             } while (err > 0);
         }
-        buffer.unlockBuffer();
+        buffer.unlockBuffer(file_info.uncompressed_size);
         tfile->data = buffer;
 
         if (err == UNZ_OK) {

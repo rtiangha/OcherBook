@@ -148,7 +148,8 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
     clc::Log::info("ocher.renderer.fb", "render page %u %u", pageNum, doBlit);
     m_penX = settings.marginLeft;
     m_penY = settings.marginTop;
-    m_fb->clear();
+    if (doBlit)
+        m_fb->clear();
 
     unsigned int layoutOffset;
     unsigned int strOffset;
@@ -237,7 +238,8 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
                         if (breakOffset >= 0) {
                             pagination->set(pageNum, i-2, breakOffset);
                             clc::Log::debug("ocher.renderer.fb", "page %u break", pageNum);
-                            m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
+                            if (doBlit)
+                                m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
                             return 0;
                         }
                         i += sizeof(clc::Buffer*);
@@ -263,6 +265,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
         };
     }
     clc::Log::debug("ocher.renderer.fb", "page %u done", pageNum);
-    m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
+    if (doBlit)
+        m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
     return 1;
 }
