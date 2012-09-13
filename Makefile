@@ -49,6 +49,9 @@ ifeq ($(OCHER_DEBUG),1)
 else
 	CFLAGS+=-Os -DNDEBUG
 endif
+ifeq ($(OCHER_TARGET),freebsd)
+	CFLAGS+=-DUSE_FILE32API  # for minizip
+endif
 ifeq ($(OCHER_TARGET),cygwin)
 	CFLAGS+=-DUSE_FILE32API  # for minizip
 	INCS+=-I/usr/include/ncurses
@@ -96,7 +99,7 @@ FREETYPE_LIB=$(FREETYPE_DIR)/objs/.libs/libfreetype.a
 $(FREETYPE_LIB):
 	@mkdir -p $(BUILD_DIR)
 	tar -zxf $(FREETYPE_TGZ) -C $(BUILD_DIR)
-	cd $(FREETYPE_DIR) && CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC) ./configure --without-bzip2 --disable-shared --host i686-linux
+	cd $(FREETYPE_DIR) && GNUMAKE=$(MAKE) CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC) ./configure --without-bzip2 --disable-shared --host i686-linux
 	cd $(FREETYPE_DIR) && $(MAKE)
 
 freetype_clean:
