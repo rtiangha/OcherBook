@@ -1,4 +1,4 @@
-.PHONY: clean config test dist dist-src doc help
+.PHONY: clean test dist dist-src doc help
 
 # TODO:
 # conditionalize freetype, etc
@@ -247,21 +247,19 @@ endif
 OCHER_OBJS += \
 	ocher/ux/fb/FreeType.o
 
-$(OCHER_OBJS): Makefile ocher.config $(BUILD_DIR)/ocher_config.h
-
-$(BUILD_DIR)/ocher_config.h: Makefile ocher.config
 CONFIG_BOOL=OCHER_DEV OCHER_DEBUG OCHER_AIRBAG_FD OCHER_EPUB OCHER_TEXT OCHER_HTML OCHER_UI_FD OCHER_UI_NCURSES OCHER_UI_SDL OCHER_UI_MX50
 lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
-ocher_config_clean:
-	@echo "CONFIG	ocher_config.h"
-	@mkdir -p $(BUILD_DIR)
-	@rm -f $(BUILD_DIR)/ocher_config.h
-	@echo "#define OCHER_TARGET_$(call uc,$(OCHER_TARGET))" >> $(BUILD_DIR)/ocher_config.h
 OCHER_%:
 	@([ "$(OCHER_$*)" = "1" ] && echo "#define OCHER_$* 1" || echo "/* OCHER_$* */") >> $(BUILD_DIR)/ocher_config.h
-$(BUILD_DIR)/ocher_config.h: ocher_config_clean $(CONFIG_BOOL)
-# TODO: ocher_config_clean is PHONY, and OCHER_OBJS depened on it, so continual full rebuild...
+ocher_config_clean:
+	@rm -f $(BUILD_DIR)/ocher_config.h
+$(BUILD_DIR)/ocher_config.h: Makefile ocher.config | ocher_config_clean $(CONFIG_BOOL)
+	@echo "CONFIG	ocher_config.h"
+	@mkdir -p $(BUILD_DIR)
+	@echo "#define OCHER_TARGET_$(call uc,$(OCHER_TARGET))" >> $(BUILD_DIR)/ocher_config.h
+config: $(BUILD_DIR)/ocher_config.h
+$(OCHER_OBJS): Makefile ocher.config | $(BUILD_DIR)/ocher_config.h
 
 #ODIR=obj
 #OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
