@@ -9,14 +9,15 @@ class Pagination;
  */
 class Attrs {
 public:
-    Attrs() : ul(0), b(0), em(0), pre(0), ws(0), nl(0), pts(12) {}
-    int ul;
-    int b;
-    int em;
-    int pre;
-    int ws;
-    int nl;
-    int pts;   ///< text points
+    Attrs() : pre(0), ws(0), nl(0), ul(0), b(0), em(0), pts(12) {}
+    int pre : 1;
+    int ws : 1;
+    int nl : 1;
+    int ul : 1;  ///< underline
+    int b : 1;  ///< bold
+    int em : 1;  ///< emphasize/italics
+    int pad : 2;
+    uint8_t pts;   ///< text points
 };
 
 

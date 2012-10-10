@@ -1,8 +1,8 @@
 #ifndef OCHER_UX_FACTORY_FB_H
 #define OCHER_UX_FACTORY_FB_H
 
+#include "ocher/ux/Event.h"
 #include "ocher/ux/Factory.h"
-#include "ocher/device/Event.h"
 #include "ocher/ux/fb/BrowseFb.h"
 #include "ocher/ux/fb/FreeType.h"
 #include "ocher/ux/fb/RenderFb.h"
@@ -21,6 +21,7 @@ public:
     Renderer* getRenderer() { return m_render; }
     EventLoop* getLoop() { return m_loop; }
     FrameBuffer* getFrameBuffer() { return m_fb; }
+    FreeType* getFontEngine() { return m_ft; }
 
 protected:
     FrameBuffer* m_fb;

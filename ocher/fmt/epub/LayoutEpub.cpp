@@ -5,6 +5,7 @@
 #include "ocher/fmt/epub/Epub.h"
 #include "ocher/fmt/epub/LayoutEpub.h"
 #include "ocher/fmt/epub/TreeMem.h"
+#include "ocher/settings/Settings.h"
 
 
 // TODO:  meta should be attached to the bytecode
@@ -40,10 +41,13 @@ void LayoutEpub::processNode(mxml_node_t *node)
         } else if (strcasecmp(name, "br") == 0) {
             outputBr();
         } else if ((name[0] == 'h' || name[0] == 'H') && isdigit(name[1]) && !name[2]) {
-            // TODO CSS: text size, ...
             outputNl();
             pushTextAttr(AttrBold, 0);
-            pushTextAttr(AttrSizeAbs, 12+(9-name[1]-'0')*2);
+            // TODO CSS: text size, ...
+            int inc = 3 - (name[1]-'0');
+            if (inc < 0)
+                inc = 0;
+            pushTextAttr(AttrSizeAbs, settings.fontPoints+inc*2);
             processSiblings(node->child);
             popTextAttr(2);
             outputNl();

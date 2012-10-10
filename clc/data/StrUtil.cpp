@@ -228,9 +228,9 @@ bool startsWith(Buffer& haystack, Buffer const& needle)
         memcmp(haystack.c_str(), needle.c_str(), needle.length()) == 0;
 }
 
+#if 0
 void capitalizeEachWord(Buffer& s)
 {
-#if 0
     size_t len = s.length();
 
     // TODO:  Lock to avoid repeated refcount checks?
@@ -259,8 +259,8 @@ void capitalizeEachWord(Buffer& s)
             }
         } while (count < len);
     }
-#endif
 }
+#endif
 
 }
 }

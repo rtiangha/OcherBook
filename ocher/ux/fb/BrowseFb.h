@@ -11,8 +11,8 @@ public:
     ~BrowseFb() {}
 
     bool init();
-    Meta* browse(clc::List& meta);
-    void read(UiFactory* factory, Meta* meta);
+    Meta* browse(clc::List* meta);
+    void read(Meta* meta);
 };
 
 #endif

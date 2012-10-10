@@ -102,7 +102,7 @@ void Loggers::setRoot()
 #ifndef SINGLE_THREADED
         m_rwlock.unlock();
 #endif
-        ASSERT(m_loggers.getLogger("", 0));
+        ASSERT(get(""));
     }
 }
 

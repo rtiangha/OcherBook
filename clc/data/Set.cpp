@@ -29,7 +29,7 @@ bool Set::add(void* item)
 void* Set::remove()
 {
     ASSERT(m_set.countItems());
-    return m_set.removeItem(m_set.countItems()-1);
+    return m_set.removeAt(m_set.countItems()-1);
 }
 
 bool Set::removeAll(Set const& s)

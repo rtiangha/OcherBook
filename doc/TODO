@@ -1,26 +1,26 @@
-0.0.8
-glyph cache
-    imageType size?
-    dynamically select memory usage?
-valgrind...
-SDL is not greyscale...
-generic text printing routines, built on freetype
+0.0.8 - build UI
 ability to select book via fb
+    windowing system
+        widget signal/slot model....
+            http://www.erikyyy.de/sigslot/
+        finish kobo events (see evtest, ...)
+FontEngine
 
-finish kobo events (see evtest, ...)
-(optional!) event thread, with queuing
-
-0.0.9
+0.0.9 - improve UI
 margins
 word wrap on fb
+    http://www.freetype.org/freetype2/docs/tutorial/step2.html
 font selection (don't hardcode filename!)
 flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
+SDL is not greyscale
+do settings apply before or after layout?
+    better definition around what AttrSizeAbs, etc mean
+    are absolute font sizes really absolute while in the layout?
 
 0.1.0
 testing
+valgrind...
 survive purgatory.sh
-
-
 
 
 
@@ -42,13 +42,15 @@ layout:
             - FTC_Manager_New
         - integrate into RenderFd for real word wrap
     - option to build some fonts into the binary for easy install
+    - images
 
 build system:
-    - config system
+    - config system (current ocher.config is a mess)
     - modularize
     - detect platform, etc...
     - download tool
     - include kobo linux headers, for easier build
+    - option to build-in all resources (fonts, icons, ...)
 
 renderers:
     - user able to interrupt any long-running layout action
@@ -58,12 +60,16 @@ renderers:
     - sdl
     - kobo mx50
     - ...
+    - generic text printing routines
+        - make FreeType optional (genericise as FontEngine)
 
 formats:
     - probe file type
+    - test UTF8 throughout
     - epub
         - CSS
     - text
+    - markdown
     - ...
 
 per-user:
@@ -80,6 +86,8 @@ per-user:
         - way to share metadata about the book (tweet / ... ?)
 
 features:
+    - live links (eg: table of contents)
+    - ability to compile-out large features
     - search
     - bookmarks
     - annotations
@@ -97,8 +105,10 @@ features:
 harden:
     - test harness
     - valgrind across many epubs
-    - airbag_fd
+    - huge fonts crash
+    - non-linux platforms hang in global ctor realloc
     - guerilla testing
+    - general strategy for OOM
 
 cleanup:
     - remove exceptions from File

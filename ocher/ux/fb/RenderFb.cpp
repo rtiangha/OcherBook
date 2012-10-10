@@ -9,6 +9,7 @@
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/fb/FreeType.h"
 #include "ocher/ux/fb/RenderFb.h"
+#include "ocher/ux/Factory.h"
 
 
 RenderFb::RenderFb(FreeType *ft, FrameBuffer *fb) :
@@ -147,7 +148,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
     clc::Log::info("ocher.renderer.fb", "render page %u %u", pageNum, doBlit);
     m_penX = settings.marginLeft;
-    m_penY = settings.marginTop;
+    m_penY = settings.marginTop + g_ft->getAscender();
     if (doBlit)
         m_fb->clear();
 
@@ -165,6 +166,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 
     const unsigned int N = m_layout.size();
     const char *raw = m_layout.data();
+    Rect fullPage(0, 0, m_fb->width(), m_fb->height());
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i+2 <= N);
@@ -176,7 +178,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
         unsigned int arg = code & 0xff;
         switch (opType) {
             case Layout::OpPushTextAttr:
-                clc::Log::debug("ocher.render.fb", "OpPushTextAttr");
+                clc::Log::trace("ocher.render.fb", "OpPushTextAttr");
                 switch (op) {
                     case Layout::AttrBold:
                         pushAttrs();
@@ -192,9 +194,15 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
                         break;
                     case Layout::AttrSizeRel:
                         pushAttrs();
+                        clc::Log::debug("ocher.render.fb", "font rel %d", (int)arg);
+                        a[ai].pts += (int)arg;
+                        m_ft->setSize(a[ai].pts);
                         break;
                     case Layout::AttrSizeAbs:
                         pushAttrs();
+                        clc::Log::debug("ocher.render.fb", "font abs %d", (int)arg);
+                        a[ai].pts = (int)arg;
+                        m_ft->setSize(a[ai].pts);
                         break;
                     default:
                         clc::Log::error("ocher.render.fb", "unknown OpPushTextAttr");
@@ -227,6 +235,9 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
                             arg = 1;
                         while (arg--)
                             popAttrs();
+                        // TODO:  only reset what has changed
+                        clc::Log::debug("ocher.render.fb", "font pop %d", a[ai].pts);
+                        m_ft->setSize(a[ai].pts);
                         break;
                     case Layout::CmdOutputStr: {
                         clc::Log::trace("ocher.render.fb", "OpCmd CmdOutputStr");
@@ -239,7 +250,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
                             pagination->set(pageNum, i-2, breakOffset);
                             clc::Log::debug("ocher.renderer.fb", "page %u break", pageNum);
                             if (doBlit)
-                                m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
+                                m_fb->update(&fullPage, false);
                             return 0;
                         }
                         i += sizeof(clc::Buffer*);
@@ -266,6 +277,6 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
     }
     clc::Log::debug("ocher.renderer.fb", "page %u done", pageNum);
     if (doBlit)
-        m_fb->update(0, 0, m_fb->width(), m_fb->height(), false);
+        m_fb->update(&fullPage, false);
     return 1;
 }

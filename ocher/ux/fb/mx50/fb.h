@@ -3,7 +3,7 @@
 
 #include <linux/mxcfb.h>
 
-#include "ocher/ux/FrameBuffer.h"
+#include "ocher/ux/fb/FrameBuffer.h"
 
 class Mx50Fb : public FrameBuffer
 {
@@ -17,9 +17,15 @@ public:
     unsigned int width();
     unsigned int dpi() { return 170; }  // Kobo Touch -- measure it yourself!
 
+    void setFg(uint8_t r, uint8_t b, uint8_t g);
+    void setBg(uint8_t r, uint8_t b, uint8_t g);
     void clear();
+    void pset(int x, int y);
+    void hline(int x1, int y, int x2);
+    inline void vline(int x, int y1, int y2) { line(x, y1, x, y2); }
     void blit(unsigned char *p, int x, int y, int w, int h);
-    int update(unsigned int x, unsigned int y, unsigned int w, unsigned int h, bool full);
+    void fillRect(Rect* r);
+    int update(Rect* r, bool full);
 
     /**
      * @param marker  Waits on the specified update, or -1 for all
@@ -38,6 +44,8 @@ protected:
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
     unsigned int m_clears;
+    uint8_t m_fgColor;
+    uint8_t m_bgColor;
 };
 
 #endif

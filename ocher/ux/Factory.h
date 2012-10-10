@@ -5,6 +5,13 @@
 #include "ocher/ux/Renderer.h"
 
 class EventLoop;
+class FreeType;
+class FrameBuffer;
+
+// for ease of access
+extern FrameBuffer* g_fb;
+extern FreeType* g_ft;
+extern EventLoop* g_loop;
 
 class UiFactory
 {
@@ -26,7 +33,13 @@ public:
     virtual Renderer* getRenderer() = 0;
 
     virtual EventLoop* getLoop() { return (EventLoop*)0; }
+
+    virtual FrameBuffer* getFrameBuffer() { return (FrameBuffer*)0; }
+
+    virtual FreeType* getFontEngine() { return (FreeType*)0; }
 };
+
+extern UiFactory* uiFactory;
 
 #endif
 

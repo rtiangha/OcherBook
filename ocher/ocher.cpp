@@ -16,6 +16,8 @@
 
 struct Options opt;
 
+UiFactory* uiFactory;
+
 
 void initCrash()
 {
@@ -135,7 +137,6 @@ int main(int argc, char **argv)
     initDevice();
     initSettings();
 
-    UiFactory *driver = 0;
     for (unsigned int i = 0; i < drivers.size(); ++i) {
         UiFactory *factory = (UiFactory*)drivers.get(i);
 
@@ -146,12 +147,12 @@ int main(int argc, char **argv)
                 if (!factory->init()) {
                     return 1;
                 }
-                driver = factory;
+                uiFactory = factory;
                 break;
             }
         } else {
             if (factory->init()) {
-                driver = factory;
+                uiFactory = factory;
                 break;
             }
         }
@@ -159,23 +160,26 @@ int main(int argc, char **argv)
     if (listDrivers) {
         return 0;
     }
-    if (! driver) {
+    if (! uiFactory) {
         printf("No suitable output driver found\n");
         return 1;
     }
-    clc::Log::info("ocher", "Using the %s driver", driver->getName());
+    clc::Log::info("ocher", "Using the %s driver", uiFactory->getName());
 
-    // TODO: error messages after this point must go to the driver, not stderr
-
-    if (optind >= argc) {
+    if (optind < argc) {
+        opt.files = (const char**)&argv[optind];
+    } else {
+        opt.files = fs.m_libraries;
+    }
+    if (!opt.files || !opt.files[0]) {
+        uiFactory->deinit();
         usage("Please specify one or more files or directories.");
     }
 
-    opt.files = (const char**)&argv[optind];
-
-    Controller c(driver);
+    Controller c;
     c.run();
-    driver->deinit();
+
+    uiFactory->deinit();
 
     return 0;
 }

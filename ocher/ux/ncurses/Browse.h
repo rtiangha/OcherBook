@@ -15,8 +15,8 @@ public:
     ~BrowseCurses() {}
 
     bool init(CDKSCREEN* screen);
-    Meta* browse(clc::List& meta);
-    void read(UiFactory* factory, Meta* meta);
+    Meta* browse(clc::List* meta);
+    void read(Meta* meta);
 
 protected:
     CDKSCREEN* m_screen;

@@ -45,8 +45,8 @@ public:
 
     Buffer();
     Buffer(const char* string);
-    Buffer(const Buffer& string);
     Buffer(const char* string, size_t maxLength);
+    Buffer(const Buffer& string);
     ~Buffer();
 
     // Drop-in for std::string:
@@ -58,6 +58,7 @@ public:
     const char* data() const { return m_data; }
     void clear() { setTo("", 0); }
     size_t length() const;
+    size_t max_size() const { return ((size_t)-1) - sizeof(size_t) - 4; }
     size_t size() const { return length(); }
     bool empty() const { return length() == 0; }
     // TODO: void resize(size_t n, char c=0);

@@ -13,13 +13,13 @@ bool BrowseCurses::init(CDKSCREEN* screen)
     return true;
 }
 
-Meta* BrowseCurses::browse(clc::List& meta)
+Meta* BrowseCurses::browse(clc::List* meta)
 {
-    const unsigned int nItems = meta.size();
+    const unsigned int nItems = meta->size();
     char* items[nItems];
 
     for (unsigned int i = 0; i < nItems; ++i) {
-        Meta* m = (Meta*)meta.get(i);
+        Meta* m = (Meta*)meta->get(i);
         items[i] = m->relPath.c_str();
     }
 
@@ -30,13 +30,13 @@ Meta* BrowseCurses::browse(clc::List& meta)
     if (r == -1) {
         return (Meta*)0;
     } else {
-        return (Meta*)meta.get(r);
+        return (Meta*)meta->get(r);
     }
 }
 
-void BrowseCurses::read(UiFactory* factory, Meta* meta)
+void BrowseCurses::read(Meta* meta)
 {
-    Renderer* renderer = factory->getRenderer();
+    Renderer* renderer = uiFactory->getRenderer();
     for (int pageNum = 0; ; ) {
         int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 

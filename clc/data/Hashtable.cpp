@@ -13,9 +13,10 @@ Hashtable::Hashtable(unsigned int capacity) :
     m_buckets()
 {
     ASSERT(capacity);
-    // TODO: optimize
-    while(capacity--)
-        m_buckets.add(0);
+    m_buckets.setSize(capacity);
+    for (size_t i = 0; i < capacity; ++i) {
+        m_buckets.replaceItem(i, 0);
+    }
 }
 
 Hashtable::~Hashtable()
@@ -57,7 +58,7 @@ void Hashtable::clear(bool deleteValues)
                 deleteItem(item);
             }
             delete list;
-            m_buckets.set(i, 0);
+            m_buckets.replaceItem(i, 0);
         }
     }
 }
@@ -77,10 +78,10 @@ int Hashtable::findIndex(const List* _bucket, const void* key, size_t len) const
 {
     // Fastest to append new items on end, but locality suggests that recently appended items
     // are more likely to be referenced again soon, so search from back.
-    for (int i = _bucket->countItems()-1; i >= 0; --i) {
-        Item *item = (Item*)_bucket->itemAtFast(i);
+    for (int i = _bucket->countItems(); i > 0; --i) {
+        Item *item = (Item*)_bucket->itemAtFast(i-1);
         if (item->keyLen == len && memcmp(item->key, key, len) == 0)
-            return i;
+            return i-1;
     }
     return -1;
 }
@@ -99,7 +100,7 @@ Hashtable::Item* Hashtable::remove(List* _bucket, const void* key, size_t len)
     int index = findIndex(_bucket, key, len);
     if (index < 0)
         return (Item*)0;
-    return (Item*)_bucket->remove(index);
+    return (Item*)_bucket->removeAt(index);
 }
 
 Hashtable::Item* Hashtable::newItem(const void* key, size_t len, void* value)
@@ -120,8 +121,7 @@ unsigned int Hashtable::size()
 {
     unsigned int n = 0;
     const int buckets = m_size;
-    for (int i = 0; i < buckets; ++i)
-    {
+    for (int i = 0; i < buckets; ++i) {
         List* list = (List*)m_buckets.itemAtFast(i);
         if (list)
             n += list->countItems();
@@ -168,8 +168,7 @@ void* Hashtable::get(uint32_t key) const
 void* Hashtable::get(const void* key, size_t len) const
 {
     List* l = bucket(key, len);
-    if (l)
-    {
+    if (l) {
         Item* i = find(l, key, len);
         if (i)
             return i->value;
@@ -202,13 +201,10 @@ void Hashtable::put(const void* key, size_t len, void* value)
     }
     ASSERT(m_buckets.itemAtFast(n));
     Item* i = find(l, key, len);
-    if (i)
-    {
+    if (i) {
         deleteValue(i->value);
         i->value = value;
-    }
-    else
-    {
+    } else {
         i = newItem(key, len, value);
         l->add(i);
     }
@@ -233,11 +229,9 @@ void* Hashtable::remove(const void* key, size_t len)
 {
     void* value = (void*)0;
     List* l = bucket(key, len);
-    if (l)
-    {
+    if (l) {
         Item* i = remove(l, key, len);
-        if (i)
-        {
+        if (i) {
             value = i->value;
             deleteItem(i);
         }
@@ -292,7 +286,7 @@ void* HashtableIter::remove()
         // Past the end
     } else if (m_cur.item) {
         List* bucket = (List*)m_ht.m_buckets.itemAtFast(m_cur.bucket);
-        Hashtable::Item* item = (Hashtable::Item*)bucket->remove(m_cur.index);
+        Hashtable::Item* item = (Hashtable::Item*)bucket->removeAt(m_cur.index);
         ASSERT(item == m_cur.item);
         m_cur.index--;
         // list shifted; m_next may now be wrong so rescan

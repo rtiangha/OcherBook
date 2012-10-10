@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "clc/support/Debug.h"
 #include "clc/data/List.h"
 
 
@@ -17,66 +16,52 @@ static inline void moveItems(void** items, int offset, size_t count)
 
 
 List::List(size_t capacity) :
-    m_objectList(0),
+    m_list(0),
     m_allocated(0),
-    m_itemCount(0),
-    m_blockSize(capacity),
-    m_resizeThreshold(0)
+    m_used(0)
 {
-    if (!m_blockSize)
-        m_blockSize = 1;
-    _resizeArray(m_itemCount);
+    _resizeArray(capacity);
 }
 
 
-List::List(const List& anotherList) :
-    m_objectList(0),
+List::List(const List& list) :
+    m_list(0),
     m_allocated(0),
-    m_itemCount(0),
-    m_blockSize(anotherList.m_blockSize)
+    m_used(0)
 {
-    *this = anotherList;
+    *this = list;
 }
 
 
 List::~List()
 {
-    free(m_objectList);
+    free(m_list);
 }
 
 
-List& List::operator =(const List &list)
+List& List::operator=(const List &list)
 {
-    m_blockSize = list.m_blockSize;
-    _resizeArray(list.m_itemCount);
-    m_itemCount = list.m_itemCount;
-    memcpy(m_objectList, list.m_objectList, m_itemCount * sizeof(void*));
+    if (m_list) {
+        free(m_list);
+        m_list = 0;
+    }
+    _resizeArray(list.m_used);
+    m_used = list.m_used;
+    memcpy(m_list, list.m_list, m_used * sizeof(void*));
     return *this;
 }
 
 
-void* List::remove()
-{
-    if (m_itemCount)
-        return remove(m_itemCount-1);
-    return 0;
-}
-
 bool List::addAt(void *item, size_t index)
 {
-    if (index > m_itemCount) {
-        ASSERT(0);
-        return false;
-    }
-
     bool result = true;
-
-    if (m_itemCount + 1 > m_allocated)
-        result = _resizeArray(m_itemCount + 1);
+    if (index >= m_allocated)
+        result = _resizeArray(index+1);
     if (result) {
-        ++m_itemCount;
-        moveItems(m_objectList + index, 1, m_itemCount - index - 1);
-        m_objectList[index] = item;
+        moveItems(m_list + index, 1, m_used - index - 1);
+        m_list[index] = item;
+        if (index >= m_used)
+            m_used = index+1;
     }
     return result;
 }
@@ -85,13 +70,13 @@ bool List::addAt(void *item, size_t index)
 bool List::add(void *item)
 {
     bool result = true;
-    if (m_allocated > m_itemCount) {
-        m_objectList[m_itemCount] = item;
-        ++m_itemCount;
+    if (m_allocated > m_used) {
+        m_list[m_used] = item;
+        ++m_used;
     } else {
-        if ((result = _resizeArray(m_itemCount + 1))) {
-            m_objectList[m_itemCount] = item;
-            ++m_itemCount;
+        if ((result = _resizeArray(m_used + 1))) {
+            m_list[m_used] = item;
+            ++m_used;
         }
     }
     return result;
@@ -100,16 +85,16 @@ bool List::add(void *item)
 
 bool List::addList(const List *list, size_t index)
 {
-    bool result = (list && index <= m_itemCount);
-    if (result && list->m_itemCount > 0) {
-        size_t count = list->m_itemCount;
-        if (m_itemCount + count > m_allocated)
-            result = _resizeArray(m_itemCount + count);
+    bool result = (list && index <= m_used);
+    if (result && list->m_used > 0) {
+        size_t count = list->m_used;
+        if (m_used + count > m_allocated)
+            result = _resizeArray(m_used + count);
         if (result) {
-            m_itemCount += count;
-            moveItems(m_objectList + index, count, m_itemCount - index - count);
-            memcpy(m_objectList + index, list->m_objectList,
-                   list->m_itemCount * sizeof(void *));
+            m_used += count;
+            moveItems(m_list + index, count, m_used - index - count);
+            memcpy(m_list + index, list->m_list,
+                   list->m_used * sizeof(void *));
         }
     }
     return result;
@@ -119,15 +104,15 @@ bool List::addList(const List *list, size_t index)
 bool List::addList(const List *list)
 {
     bool result = (list != 0);
-    if (result && list->m_itemCount > 0) {
-        size_t index = m_itemCount;
-        size_t count = list->m_itemCount;
-        if (m_itemCount + count > m_allocated)
-            result = _resizeArray(m_itemCount + count);
+    if (result && list->m_used > 0) {
+        size_t index = m_used;
+        size_t count = list->m_used;
+        if (m_used + count > m_allocated)
+            result = _resizeArray(m_used + count);
         if (result) {
-            m_itemCount += count;
-            memcpy(m_objectList + index, list->m_objectList,
-                   list->m_itemCount * sizeof(void *));
+            m_used += count;
+            memcpy(m_list + index, list->m_list,
+                   list->m_used * sizeof(void *));
         }
     }
     return result;
@@ -145,68 +130,78 @@ List* List::split(size_t index)
 bool List::split(size_t index, List* tail)
 {
     bool result = true;
-    tail->m_itemCount = 0;
-    if (index < m_itemCount) {
-        size_t n = m_itemCount - index;
+    tail->m_used = 0;
+    if (index < m_used) {
+        size_t n = m_used - index;
         if (tail->m_allocated < n) {
             result = tail->_resizeArray(n);
         }
         if (result) {
-            tail->m_itemCount = n;
-            memcpy(tail->m_objectList, m_objectList+n, n*sizeof(void*));
-            m_itemCount -= n;
+            tail->m_used = n;
+            memcpy(tail->m_list, m_list+n, n*sizeof(void*));
+            m_used -= n;
         }
     }
     return result;
 }
 
 
+void* List::remove()
+{
+    if (m_used)
+        return removeAt(m_used-1);
+    return 0;
+}
+
 bool List::removeItem(void *item)
 {
     size_t index = indexOf(item);
     if (index != NotFound)
-        removeItem(index);
+        removeAt(index);
     return (index != NotFound);
 }
 
 
-void* List::removeItem(size_t index)
+void* List::removeAt(size_t index)
 {
-    void *item = 0;
-    if (index < m_itemCount) {
-        item = m_objectList[index];
-        moveItems(m_objectList + index + 1, -1, m_itemCount - index - 1);
-        --m_itemCount;
-        if (m_itemCount <= m_resizeThreshold)
-            _resizeArray(m_itemCount);
-    }
+    void* item;
+    if (index < m_used) {
+        item = m_list[index];
+        moveItems(m_list + index + 1, -1, m_used - index - 1);
+        --m_used;
+        if (m_used <= m_allocated>>2)
+            _resizeArray(m_used);
+    } else
+        item = 0;
     return item;
 }
 
 
 bool List::removeItems(size_t index, size_t count)
 {
-    bool result = index <= m_itemCount;
+    bool result = index <= m_used;
     if (result) {
-        if (index + count > m_itemCount)
-            count = m_itemCount - index;
-        moveItems(m_objectList + index + count, -count,
-                   m_itemCount - index - count);
-        m_itemCount -= count;
-        if (m_itemCount <= m_resizeThreshold)
-            _resizeArray(m_itemCount);
+        if (index + count > m_used)
+            count = m_used - index;
+        moveItems(m_list + index + count, -count,
+                   m_used - index - count);
+        m_used -= count;
+        if (m_used <= m_allocated>>2)
+            _resizeArray(m_used);
     }
     return result;
 }
 
 
-bool List::replaceItem(size_t index, void *newItem)
+bool List::replaceItem(size_t index, void* newItem)
 {
     bool result = false;
 
-    if (index < m_itemCount) {
-        m_objectList[index] = newItem;
+    if (index < m_allocated) {
+        m_list[index] = newItem;
         result = true;
+        if (index >= m_used)
+            m_used = index+1;
     }
     return result;
 }
@@ -214,7 +209,7 @@ bool List::replaceItem(size_t index, void *newItem)
 
 void List::clear()
 {
-    m_itemCount = 0;
+    m_used = 0;
     _resizeArray(0);
 }
 
@@ -222,7 +217,7 @@ void List::clear()
 void List::sortItems(int (*compareFunc)(const void *, const void *))
 {
     if (compareFunc)
-        qsort(m_objectList, m_itemCount, sizeof(void *), compareFunc);
+        qsort(m_list, m_used, sizeof(void *), compareFunc);
 }
 
 
@@ -230,10 +225,10 @@ bool List::swapItems(size_t indexA, size_t indexB)
 {
     bool result = false;
 
-    if (indexA < m_itemCount && indexB < m_itemCount) {
-        void *tmpItem = m_objectList[indexA];
-        m_objectList[indexA] = m_objectList[indexB];
-        m_objectList[indexB] = tmpItem;
+    if (indexA < m_used && indexB < m_used) {
+        void *tmpItem = m_list[indexA];
+        m_list[indexA] = m_list[indexB];
+        m_list[indexB] = tmpItem;
 
         result = true;
     }
@@ -244,20 +239,20 @@ bool List::swapItems(size_t indexA, size_t indexB)
 
 bool List::moveItem(size_t fromIndex, size_t toIndex)
 {
-    if ((fromIndex >= m_itemCount) || (toIndex >= m_itemCount))
+    if ((fromIndex >= m_used) || (toIndex >= m_used))
         return false;
 
     if (fromIndex < toIndex)
     {
-        void * tmp_mover = m_objectList[fromIndex];
-        memmove(m_objectList + fromIndex + 1, m_objectList + fromIndex, (toIndex - fromIndex) * sizeof(void *));
-        m_objectList[toIndex] = tmp_mover;
+        void * tmp_mover = m_list[fromIndex];
+        memmove(m_list + fromIndex + 1, m_list + fromIndex, (toIndex - fromIndex) * sizeof(void *));
+        m_list[toIndex] = tmp_mover;
     }
     else if (fromIndex > toIndex)
     {
-        void * tmp_mover = m_objectList[fromIndex];
-        memmove(m_objectList + toIndex + 1, m_objectList + toIndex, (fromIndex - toIndex) * sizeof(void *));
-        m_objectList[toIndex] = tmp_mover;
+        void * tmp_mover = m_list[fromIndex];
+        memmove(m_list + toIndex + 1, m_list + toIndex, (fromIndex - toIndex) * sizeof(void *));
+        m_list[toIndex] = tmp_mover;
     };
     return true;
 }
@@ -267,9 +262,9 @@ void* List::itemAt(int index) const
 {
     void *item;
     if (index < 0)
-        index = (int)m_itemCount + index;
-    if (index >= 0 && (size_t)index < m_itemCount)
-        item = m_objectList[index];
+        index = (int)m_used + index;
+    if (index >= 0 && (size_t)index < m_used)
+        item = m_list[index];
     else
         item = 0;
     return item;
@@ -279,8 +274,8 @@ void* List::itemAt(int index) const
 void* List::firstItem() const
 {
     void *item = 0;
-    if (m_itemCount > 0)
-        item = m_objectList[0];
+    if (m_used > 0)
+        item = m_list[0];
     return item;
 }
 
@@ -288,29 +283,29 @@ void* List::firstItem() const
 void* List::lastItem() const
 {
     void *item = 0;
-    if (m_itemCount > 0)
-        item = m_objectList[m_itemCount - 1];
+    if (m_used > 0)
+        item = m_list[m_used - 1];
     return item;
 }
 
 
 size_t List::indexOf(void *item) const
 {
-    for (size_t i = 0; i < m_itemCount; i++) {
-        if (m_objectList[i] == item)
+    for (size_t i = 0; i < m_used; i++) {
+        if (m_list[i] == item)
             return i;
     }
     return NotFound;
 }
 
 
-void List::DoForEach(bool (*func)(void* item))
+void List::doForEach(bool (*func)(void* item))
 {
     if (func != 0) {
         bool terminate = false;
         size_t index = 0;
-        while ((!terminate) && (index < m_itemCount)) {
-            terminate = func(m_objectList[index]);
+        while ((!terminate) && (index < m_used)) {
+            terminate = func(m_list[index]);
             index++;
         };
     }
@@ -318,31 +313,34 @@ void List::DoForEach(bool (*func)(void* item))
 }
 
 
-void List::DoForEach(bool (*func)(void* item, void* arg), void * arg)
+void List::doForEach(bool (*func)(void* item, void* arg), void * arg)
 {
     if (func != 0) {
         bool terminate = false;
         size_t index = 0;
-        while ((!terminate) && (index < m_itemCount)) {
-            terminate = func(m_objectList[index], arg);
+        while ((!terminate) && (index < m_used)) {
+            terminate = func(m_list[index], arg);
             index++;
         };
     }
+}
+
+void List::setSize(size_t count)
+{
+    _resizeArray(count);
+    m_used = count;
 }
 
 bool List::_resizeArray(size_t count)
 {
     bool result = true;
-    // calculate the new physical size
-    // by doubling the existing size
-    // until we can hold at least count items
-    size_t newSize = m_allocated > 0 ? m_allocated : m_blockSize;
-    size_t targetSize = count;
-    if (targetSize > m_allocated) {
-        while (newSize < targetSize)
+    size_t newSize = m_allocated;
+    if (count > m_allocated) {
+        newSize++;
+        while (newSize < count)
             newSize <<= 1;
-    } else if (targetSize <= m_resizeThreshold) {
-        newSize = m_resizeThreshold;
+    } else if (count <= m_allocated>>2) {
+        newSize = count;
     }
     // Never go down to 0, because realloc of 0 frees.
     if (newSize == 0)
@@ -350,13 +348,12 @@ bool List::_resizeArray(size_t count)
 
     // resize if necessary
     if (newSize != m_allocated) {
-        void** newObjectList = (void**)realloc(m_objectList, newSize * sizeof(void*));
+        void** newObjectList = (void**)realloc(m_list, newSize * sizeof(void*));
         if (newObjectList) {
-            m_objectList = newObjectList;
+            m_list = newObjectList;
             m_allocated = newSize;
-            // set our lower bound to either 1/4
-            //of the current physical size, or 0
-            m_resizeThreshold = m_allocated >> 2 >= m_blockSize ? m_allocated >> 2 : 0;
+            if (m_used > m_allocated)
+                m_used = m_allocated;
         } else {
             result = false;
         }

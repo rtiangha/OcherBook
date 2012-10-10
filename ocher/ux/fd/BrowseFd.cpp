@@ -41,11 +41,11 @@ bool BrowseFd::init()
     return true;
 }
 
-Meta* BrowseFd::browse(clc::List& meta)
+Meta* BrowseFd::browse(clc::List* meta)
 {
     printf("\n");
-    for (unsigned int i = 0; i < meta.size(); ++i) {
-        Meta* m = (Meta*)meta.get(i);
+    for (unsigned int i = 0; i < meta->size(); ++i) {
+        Meta* m = (Meta*)meta->get(i);
         // TODO:  title/author
         // TODO:  pad to width
         printf("%3d: %s\n", i+1, m->title.c_str());
@@ -55,12 +55,12 @@ Meta* BrowseFd::browse(clc::List& meta)
 
     // TODO temp
     char key = getKey();
-    return (Meta*)meta.get(key - '1');
+    return (Meta*)meta->get(key - '1');
 }
 
-void BrowseFd::read(UiFactory* factory, Meta* meta)
+void BrowseFd::read(Meta* meta)
 {
-    Renderer* renderer = factory->getRenderer();
+    Renderer* renderer = uiFactory->getRenderer();
     for (int pageNum = 0; ; ) {
         int atEnd = renderer->render(&meta->m_pagination, pageNum, true);
 

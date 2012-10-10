@@ -1,6 +1,6 @@
 #include "ocher/device/kobo/KoboEvents.h"
 #include "ocher/ocher.h"
-#include "ocher/ux/fb/FactoryFbMx50.h"
+#include "ocher/ux/fb/mx50/FactoryFbMx50.h"
 
 UX_DRIVER_REGISTER(FbMx50);
 

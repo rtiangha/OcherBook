@@ -25,6 +25,9 @@ enum Fmt {
 // TODO: per-user
 class BookRecord
 {
+public:
+    BookRecord() : lastPage(0) {}
+
     int lastPage;  // TODO:  can't use page number; varies by device/settings
 
     // TODO: dates

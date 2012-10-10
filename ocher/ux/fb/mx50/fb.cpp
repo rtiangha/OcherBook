@@ -74,6 +74,7 @@ bool Mx50Fb::init()
     }
 
     clear();
+    update(NULL, true);
     return true;
 
 fail1:
@@ -101,10 +102,46 @@ Mx50Fb::~Mx50Fb()
     }
 }
 
+static inline uint8_t getColor(uint8_t r, uint8_t b, uint8_t g)
+{
+    return (((uint16_t)r*61)+((uint16_t)g*174)+((uint16_t)b*21))>>8;
+}
+
+void Mx50Fb::setFg(uint8_t r, uint8_t b, uint8_t g)
+{
+    m_fgColor = getColor(r, b, g);
+}
+
+void Mx50Fb::setBg(uint8_t r, uint8_t b, uint8_t g)
+{
+    m_bgColor = getColor(r, b, g);
+}
+
 void Mx50Fb::clear()
 {
     ++m_clears;
-    memset(m_fb, 0xff, m_fbSize);
+    memset(m_fb, m_bgColor, m_fbSize);
+}
+
+void Mx50Fb::pset(int x, int y)
+{
+    *(((unsigned char*)m_fb) + y*vinfo.xres_virtual + x) = m_fgColor;
+}
+
+inline void Mx50Fb::hline(int x1, int y, int x2)
+{
+    int dx = x2 - x1;
+    if (dx < 0)
+        dx = -dx;
+    memset(m_fb + y*vinfo.xres_virtual + x1, m_fgColor, dx+1);
+}
+
+void Mx50Fb::fillRect(Rect* r)
+{
+    int y2 = r->y + r->h - 1;
+    for (int y = r->y; y < y2; ++y) {
+        hline(r->x, y, r->x+r->w-1);
+    }
 }
 
 static void invcpy(unsigned char *dst, unsigned char *src, size_t n)
@@ -140,6 +177,7 @@ void Mx50Fb::blit(unsigned char *p, int x, int y, int w, int h)
         w = fbw - x;
     if (y < 0) {
         // TODO
+    }
     if (y + h >= fbh)
         h = fbh - y;
 
@@ -150,21 +188,26 @@ void Mx50Fb::blit(unsigned char *p, int x, int y, int w, int h)
     }
 }
 
-int Mx50Fb::update(unsigned int x, unsigned int y, unsigned int w, unsigned int h, bool full)
+int Mx50Fb::update(Rect* r, bool full)
 {
+    Rect _r;
+    if (!r) {
+        _r.x = _r.y = 0;
+        _r.w = width();
+        _r.h = height();
+        r = &_r;
+    }
     if (m_clears > settings.fullRefreshPages) {
         m_clears = 0;
         full = true;
-    } else {
-        full = false;
     }
 
     struct mxcfb_update_data region;
 
-    region.update_region.left = x;
-    region.update_region.top = y;
-    region.update_region.width = w;
-    region.update_region.height = h;
+    region.update_region.left = r->x;
+    region.update_region.top = r->y;
+    region.update_region.width = r->w;
+    region.update_region.height = r->h;
     region.waveform_mode = WAVEFORM_MODE_AUTO;
     region.update_mode = full ? UPDATE_MODE_FULL : UPDATE_MODE_PARTIAL;
     region.update_marker = ++m_marker;
@@ -173,7 +216,7 @@ int Mx50Fb::update(unsigned int x, unsigned int y, unsigned int w, unsigned int 
 
     if (ioctl(m_fd, MXCFB_SEND_UPDATE, &region) == -1) {
         clc::Log::error("ocher.mx50", "MXCFB_SEND_UPDATE(%d, %d, %d, %d, %d): %s",
-                x, y, w, h, m_marker, strerror(errno));
+                r->x, r->y, r->w, r->h, m_marker, strerror(errno));
     }
     return m_marker;
 }

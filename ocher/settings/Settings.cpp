@@ -26,7 +26,7 @@ Settings::Settings() :
 void Settings::load()
 {
     clc::File s;
-    if (s.setTo(fs.getSettings()) != 0)
+    if (s.setTo(fs.m_settings) != 0)
         return;
 
     clc::Buffer line;
@@ -42,7 +42,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    clc::File s(fs.getSettings(), "w");
+    clc::File s(fs.m_settings, "w");
 
     clc::Buffer b;
 

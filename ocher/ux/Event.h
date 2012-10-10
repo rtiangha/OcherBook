@@ -4,10 +4,18 @@
 #include <stdint.h>
 
 
-#define OEVT_KEY_DOWN           0
-#define OEVT_KEY_UP             1
-#define OEVTK_HOME              0x1000
-#define OEVTK_POWER             0x1001
+#define OEVT_KEYPRESS           0
+#define OEVT_KEY_DOWN           1
+#define OEVT_KEY_UP             2
+#define OEVTK_ENTER             13
+#define OEVTK_UP                273
+#define OEVTK_DOWN              274
+#define OEVTK_RIGHT             275
+#define OEVTK_LEFT              276
+#define OEVTK_HOME              278
+#define OEVTK_PAGEUP            280
+#define OEVTK_PAGEDOWN          281
+#define OEVTK_POWER             320
 
 struct OcherKeyEvent
 {
@@ -70,11 +78,21 @@ struct OcherEvent
     };
 };
 
+class EventHandler
+{
+public:
+    virtual int eventReceived(struct OcherEvent* evt) = 0;
+};
+
 class EventLoop
 {
 public:
     virtual ~EventLoop() {}
     virtual int wait(struct OcherEvent* evt) = 0;
+    /**
+     * @return -1 handled, -2 pass on, >=0 done
+     */
+    int run(EventHandler* handler);
 };
 
 #endif

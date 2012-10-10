@@ -8,19 +8,20 @@
 #include "clc/storage/DirIter.h"
 #include "clc/support/Logger.h"
 
-#include "ocher/ux/Factory.h"
-#include "ocher/ux/Controller.h"
-#include "ocher/settings/Options.h"
-
+#include "ocher_config.h"
+#ifdef OCHER_EPUB
 #include "ocher/fmt/epub/Epub.h"
 #include "ocher/fmt/epub/LayoutEpub.h"
-#include "ocher/fmt/text/Text.h"
+#endif
 #include "ocher/fmt/text/LayoutText.h"
+#include "ocher/fmt/text/Text.h"
+#include "ocher/settings/Options.h"
 #include "ocher/shelf/Meta.h"
+#include "ocher/ux/Controller.h"
+#include "ocher/ux/Factory.h"
 
 
-Controller::Controller(UiFactory *factory) :
-    m_factory(factory)
+Controller::Controller()
 {
     // TODO:  kick off event loop; give it Controller
 }
@@ -46,6 +47,8 @@ void Controller::processFile(const char* file)
                 m->format = format;
                 m->relPath = file;
                 // TODO: loadMeta
+                m->title = file; //TODO
+                m->author = "Some Author";  //TODO
                 m_meta.add(m);
             }
         } else if (S_ISDIR(s.st_mode)) {
@@ -61,16 +64,20 @@ void Controller::processFile(const char* file)
 
 void Controller::run()
 {
+    // Populate globals for ease of access
+    g_fb = uiFactory->getFrameBuffer();
+    g_ft = uiFactory->getFontEngine();
+    g_loop = uiFactory->getLoop();
+
     processFiles(opt.files);
 
     while (1) {
         Meta* meta = 0;
-        EventLoop* loop = m_factory->getLoop();
-        Browse* browser = m_factory->getBrowser();
+        Browse* browser = uiFactory->getBrowser();
 
         // TODO:  home screen
 
-        meta = browser->browse(m_meta);
+        meta = browser->browse(&m_meta);
         if (!meta)
             break;
 
@@ -86,6 +93,7 @@ void Controller::run()
                 memLayout = layout->unlock();
                 break;
             }
+#ifdef OCHER_EPUB
             case OCHER_FMT_EPUB: {
                 Epub epub(file);
                 layout = new LayoutEpub(&epub);
@@ -104,12 +112,13 @@ void Controller::run()
                 memLayout = layout->unlock();
                 break;
             }
+#endif
             default: {
                 clc::Log::warn("ocher", "Unhandled format %d", meta->format);
             }
         }
 
-        Renderer* renderer = m_factory->getRenderer();
+        Renderer* renderer = uiFactory->getRenderer();
         renderer->set(memLayout);
 
         // Optionally, run through all pages without blitting to get an accurate
@@ -124,7 +133,7 @@ void Controller::run()
         }
 #endif
 
-        browser->read(m_factory, meta);
+        browser->read(meta);
 
         delete layout;
     }

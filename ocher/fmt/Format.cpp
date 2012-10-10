@@ -43,7 +43,7 @@ Fmt detectFormat(const char* file)
             if (r > 0) {
                 // Simple heuristics.  Should look at what the file command does.
                 // TODO:  convert to UTF8 based on encoding so heuristics have a chance
-                unsigned int i = 0;
+                int i = 0;
 
                 // HTML ought to start out something like: \s*<\s*html
                 while (i < r && isspace(buf2[i]))

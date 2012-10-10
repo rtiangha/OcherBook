@@ -105,7 +105,7 @@ public:
             return 0;
         }
         m_next--;
-        return m_mutableSet.m_set.removeItem(m_next);
+        return m_mutableSet.m_set.removeAt(m_next);
     }
 
 private:

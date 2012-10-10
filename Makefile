@@ -19,24 +19,23 @@ include ocher.config
 
 #################### Platforms
 
-ifeq ($(OCHER_TARGET),posix)
-	CC=gcc
-	CXX=g++
-endif
-ifeq ($(OCHER_TARGET),cygwin)
-	CC=gcc
-	CXX=g++
-endif
+AR=ar
+CC=gcc
+CXX=g++
 ifeq ($(OCHER_TARGET),kobo)
+	AR=$(PWD)/arm-2010q1/bin/arm-linux-ar
 	CC=$(PWD)/arm-2010q1/bin/arm-linux-gcc
 	CXX=$(PWD)/arm-2010q1/bin/arm-linux-g++
+endif
+QUIET=@
+MSG=@echo
+ifeq ($(VERBOSE),1)
+	QUIET=
+	MSG=@true
 endif
 ifeq ($(OCHER_VERBOSE),1)
 	QUIET=
 	MSG=@true
-else
-	QUIET=@
-	MSG=@echo
 endif
 
 
@@ -45,20 +44,25 @@ endif
 # Common CFLAGS applied everywhere
 CFLAGS?=
 ifeq ($(OCHER_DEBUG),1)
-	CFLAGS+=-O1 -g
+	CFLAGS+=-O0 -g -DDEBUG
 else
 	CFLAGS+=-Os -DNDEBUG
 endif
+ifeq ($(OCHER_TARGET),kobo)
+	CFLAGS+=-Wno-psabi  # suppress "mangling of va_list has changed"
+endif
+MINIZIP_CFLAGS=-Wno-unused
 ifeq ($(OCHER_TARGET),freebsd)
-	CFLAGS+=-DUSE_FILE32API  # for minizip
+	MINIZIP_CFLAGS+=-DUSE_FILE32API
 endif
 ifeq ($(OCHER_TARGET),cygwin)
-	CFLAGS+=-DUSE_FILE32API  # for minizip
+	MINIZIP_CFLAGS+=-DUSE_FILE32API
 	INCS+=-I/usr/include/ncurses
 endif
 ifeq ($(OCHER_TARGET),haiku)
-	CFLAGS+=-DUSE_FILE32API  # for minizip
+	MINIZIP_CFLAGS+=-DUSE_FILE32API
 endif
+CFLAGS+=-I. -Ibuild -DSINGLE_THREADED
 CFLAGS_COMMON:=$(CFLAGS)
 ifneq ($(OCHER_TARGET),haiku)
 	CFLAGS+=-std=c99
@@ -69,7 +73,6 @@ OCHER_CFLAGS=-Wall -W -Wformat=2 -Wno-write-strings -Wshadow
 ifeq ($(OCHER_DEV),1)
 	OCHER_CFLAGS+=-Werror
 endif
-OCHER_CFLAGS+=-Wno-unused  # TODO: only apply to minizip
 OCHER_CFLAGS+=-DOCHER_MAJOR=$(OCHER_MAJOR) -DOCHER_MINOR=$(OCHER_MINOR) -DOCHER_PATCH=$(OCHER_PATCH)
 
 default: ocher
@@ -147,21 +150,59 @@ mxml_clean:
 	cd $(MXML_DIR) && $(MAKE) clean || true
 
 
+#################### UnitTest++
+
+UNITTESTCPP_ROOT = test/unittest-cpp/UnitTest++/
+UNITTESTCPP_LIB = $(BUILD_DIR)/libUnitTest++.a
+UNITTESTCPP_OBJS = \
+	$(UNITTESTCPP_ROOT)/src/AssertException.o \
+	$(UNITTESTCPP_ROOT)/src/Test.o \
+	$(UNITTESTCPP_ROOT)/src/Checks.o \
+	$(UNITTESTCPP_ROOT)/src/TestRunner.o \
+	$(UNITTESTCPP_ROOT)/src/TestResults.o \
+	$(UNITTESTCPP_ROOT)/src/TestReporter.o \
+	$(UNITTESTCPP_ROOT)/src/TestReporterStdout.o \
+	$(UNITTESTCPP_ROOT)/src/ReportAssert.o \
+	$(UNITTESTCPP_ROOT)/src/TestList.o \
+	$(UNITTESTCPP_ROOT)/src/TimeConstraint.o \
+	$(UNITTESTCPP_ROOT)/src/TestDetails.o \
+	$(UNITTESTCPP_ROOT)/src/MemoryOutStream.o \
+	$(UNITTESTCPP_ROOT)/src/DeferredTestReporter.o \
+	$(UNITTESTCPP_ROOT)/src/DeferredTestResult.o \
+	$(UNITTESTCPP_ROOT)/src/XmlTestReporter.o \
+	$(UNITTESTCPP_ROOT)/src/CurrentTest.o
+ifeq ($(TARGET), MINGW32)
+	UNITTESTCPP_OBJS += \
+		$(UNITTESTCPP_ROOT)/src/Win32/TimeHelpers.o
+else
+	UNITTESTCPP_OBJS += \
+		$(UNITTESTCPP_ROOT)/src/Posix/SignalTranslator.o \
+		$(UNITTESTCPP_ROOT)/src/Posix/TimeHelpers.o
+endif
+
+$(UNITTESTCPP_LIB): $(UNITTESTCPP_OBJS)
+	$(MSG) "LINK	$@"
+	$(QUIET)$(AR) rs $(UNITTESTCPP_LIB) $(UNITTESTCPP_OBJS)
+
+unittestpp_clean:
+	rm -f $(UNITTESTCPP_OBJS)
+
+
 #################### OcherBook
 
-OCHER_CFLAGS+=-I. -Ibuild -DSINGLE_THREADED
 OCHER_CFLAGS+=$(INCS) $(FREETYPE_DEFS)
 ifeq ($(OCHER_DEBUG),1)
 	OCHER_CFLAGS+=-DCLC_LOG_LEVEL=5
 else
 	OCHER_CFLAGS+=-DCLC_LOG_LEVEL=2
 endif
+OCHER_CXXFLAGS:=$(OCHER_CFLAGS) -fno-rtti
 ifneq ($(OCHER_TARGET),haiku)
 	LD_FLAGS+=-lrt
 endif
 LD_FLAGS+=$(OCHER_LIBS)
 
-OCHER_OBJS = \
+CLC_OBJS = \
 	clc/algorithm/Random.o \
 	clc/crypto/MurmurHash2.o \
 	clc/data/Buffer.o \
@@ -178,6 +219,9 @@ OCHER_OBJS = \
 	clc/storage/Path.o \
 	clc/support/Debug.o \
 	clc/support/Logger.o \
+
+OCHER_OBJS = \
+	$(CLC_OBJS) \
 	ocher/device/Device.o \
 	ocher/device/Filesystem.o \
 	ocher/fmt/Format.o \
@@ -187,8 +231,15 @@ OCHER_OBJS = \
 	ocher/settings/Settings.o \
 	ocher/ux/Browse.o \
 	ocher/ux/Controller.o \
+	ocher/ux/Event.o \
+	ocher/ux/Factory.o \
 	ocher/ux/Pagination.o \
 	ocher/ux/Renderer.o
+
+ifeq ($(OCHER_TARGET),kobo)
+OCHER_OBJS += \
+	ocher/device/kobo/KoboEvents.o
+endif
 
 ifeq ($(OCHER_AIRBAG_FD),1)
 OCHER_OBJS += \
@@ -202,6 +253,7 @@ OCHER_OBJS += \
 	ocher/fmt/epub/UnzipCache.o \
 	ocher/fmt/epub/LayoutEpub.o \
 	$(ZLIB_OBJS)
+OCHER_CFLAGS+=$(MINIZIP_CFLAGS)  #TODO limit to just minizip
 endif
 
 ifeq ($(OCHER_TEXT),1)
@@ -215,7 +267,10 @@ ifeq ($(OCHER_UI_FB), 1)
 OCHER_OBJS += \
 	ocher/ux/fb/BrowseFb.o \
 	ocher/ux/fb/FactoryFb.o \
-	ocher/ux/fb/RenderFb.o
+	ocher/ux/fb/FrameBuffer.o \
+	ocher/ux/fb/FreeType.o \
+	ocher/ux/fb/RenderFb.o \
+	ocher/ux/fb/Widgets.o
 endif
 
 ifeq ($(OCHER_UI_SDL),1)
@@ -247,9 +302,6 @@ ifeq ($(OCHER_UI_NCURSES),1)
 	OCHER_LIBS += -lcdk
 endif
 
-OCHER_OBJS += \
-	ocher/ux/fb/FreeType.o
-
 CONFIG_BOOL=OCHER_DEV OCHER_DEBUG OCHER_AIRBAG_FD OCHER_EPUB OCHER_TEXT OCHER_HTML OCHER_UI_FD OCHER_UI_NCURSES OCHER_UI_SDL OCHER_UI_MX50
 lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 uc = $(subst a,A,$(subst b,B,$(subst c,C,$(subst d,D,$(subst e,E,$(subst f,F,$(subst g,G,$(subst h,H,$(subst i,I,$(subst j,J,$(subst k,K,$(subst l,L,$(subst m,M,$(subst n,N,$(subst o,O,$(subst p,P,$(subst q,Q,$(subst r,R,$(subst s,S,$(subst t,T,$(subst u,U,$(subst v,V,$(subst w,W,$(subst x,X,$(subst y,Y,$(subst z,Z,$1))))))))))))))))))))))))))
@@ -273,23 +325,30 @@ $(OCHER_OBJS): Makefile ocher.config | $(BUILD_DIR)/ocher_config.h
 
 .cpp.o:
 	$(MSG) "CXX	$*.cpp"
-	$(QUIET)$(CXX) -c $(CFLAGS_COMMON) $(OCHER_CFLAGS) $*.cpp -o $@
+	$(QUIET)$(CXX) -c $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) $*.cpp -o $@
 
 ocher: $(BUILD_DIR)/ocher
 $(BUILD_DIR)/ocher: $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) $(OCHER_OBJS)
 	$(MSG) "LINK	$@"
-	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CFLAGS) -o $@ $(OCHER_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
+	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) -o $@ $(OCHER_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
 
-clean: zlib_clean freetype_clean mxml_clean ocher_config_clean
-	rm -f $(OCHER_OBJS) $(BUILD_DIR)/ocher
 
-unittestpp:
+#################### test
+
+clctest: $(CLC_OBJS) $(UNITTESTCPP_LIB)
+	$(MSG) "LINK	$@"
+	$(QUIET)$(CXX) $(CFLAGS_COMMON) clc/test/clcTestMain.cpp -I. -I$(UNITTESTCPP_ROOT)/src $^ -o $(BUILD_DIR)/$@ -L$(BUILD_DIR) -lrt -lpthread
 
 ochertest:
 	# TODO
 
-test: unittestpp ocher ochertest
-	# TODO
+test: clctest ochertest
+
+
+####################
+
+clean: zlib_clean freetype_clean mxml_clean ocher_config_clean unittestpp_clean
+	rm -f $(OCHER_OBJS) $(BUILD_DIR)/ocher
 
 dist: ocher
 	tar -C $(BUILD_DIR) -Jcf ocher-`uname -s`-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz ocher
@@ -308,7 +367,6 @@ help:
 	@echo "	clean		Clean"
 	@echo "	fonts		Download GPL fonts"
 	@echo "*	ocher		Build the e-reader software"
-	@echo "	ochertest	Build the unit tests"
 	@echo "	test		Build and run the unit tests"
 	@echo "	doc		Run Doxygen"
 	@echo "	dist		Build distribution packages"

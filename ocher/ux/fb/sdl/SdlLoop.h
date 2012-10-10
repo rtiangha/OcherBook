@@ -1,7 +1,7 @@
 #ifndef OCHER_SDL_LOOP_H
 #define OCHER_SDL_LOOP_H
 
-#include "ocher/device/Event.h"
+#include "ocher/ux/Event.h"
 
 
 class SdlLoop : public EventLoop

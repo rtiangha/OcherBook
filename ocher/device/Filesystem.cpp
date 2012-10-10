@@ -121,9 +121,14 @@ static clc::Buffer settingsDir()
 
 Filesystem fs;
 
-Filesystem::Filesystem()
+Filesystem::Filesystem() :
+    m_libraries(0)
 {
 #ifdef OCHER_TARGET_KOBO
+    m_libraries = new char*[3];
+    m_libraries[0] = "/mnt/onboard";
+    m_libraries[1] = "/mnt/sd";
+    m_libraries[2] = 0;
     m_home = "/mnt/onboard/.ocher";
     m_settings = "/mnt/onboard/.ocher/settings";
 #else
@@ -149,20 +154,6 @@ Filesystem::~Filesystem()
     free(m_home);
     free(m_settings);
 #endif
+    delete m_libraries;
 }
-
-
-#if 0
-    static const char *d[] = {
-        "/mnt/sd",
-        "/mnt/onboard",
-        0
-    };
-    ocherLibraries = d;
-
-void Filesystem::mkdirs()
-{
-    ::mkdir(ocherHome, 0775);
-}
-#endif
 

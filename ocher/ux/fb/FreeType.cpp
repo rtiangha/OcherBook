@@ -6,11 +6,13 @@
 
 #include "clc/support/Logger.h"
 
-#define GLYPH_CACHE
+// TODO: something is broken
+#undef GLYPH_CACHE
 
 FreeType::FreeType(FrameBuffer *fb) :
     m_lib(0),
     m_cache(0),
+    m_size(12),
     m_fb(fb)
 {
 }
@@ -26,7 +28,7 @@ FT_Error FreeType::faceRequester(FTC_FaceID faceID, FT_Library lib, FT_Pointer r
 {
     clc::Log::debug("ocher.freetype", "face request");
     int r = FT_New_Face(lib, "FreeSans.otf", 0, face);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
     FreeType* self = (FreeType*)reqData;
     self->m_face = *face;
     return 0;
@@ -62,10 +64,30 @@ void FreeType::setSize(unsigned int points)
 {
 #ifndef GLYPH_CACHE
     FT_Set_Char_Size(m_face, 0, points*64, m_fb->dpi(), m_fb->dpi());
+#else
+    m_size = points*64;
 #endif
 }
 
-bool FreeType::renderGlyph(int c, bool doBlit, int penX, int penY, int* dx, int* dy, int* height)
+bool FreeType::renderString(const char* s, bool doBlit, int penX, int penY, int* dx, int* dy, uint8_t* height)
+{
+    while (1) {
+        int c = *s;
+        if (!c)
+            break;
+        int cdx, cdy;
+        if (renderGlyph(c, doBlit, penX, penY, &cdx, &cdy, height)) {
+            *dx += cdx;
+            *dy += cdy;
+            penX += cdx;
+            penY += cdy;
+        }
+        s++;
+    }
+    return true;
+}
+
+bool FreeType::renderGlyph(int c, bool doBlit, int penX, int penY, int* dx, int* dy, uint8_t* height)
 {
 #ifndef GLYPH_CACHE
     unsigned int glyphIndex = FT_Get_Char_Index(m_face, c);
@@ -97,8 +119,8 @@ bool FreeType::renderGlyph(int c, bool doBlit, int penX, int penY, int* dx, int*
 
     FTC_ImageTypeRec ftcImageType;
     ftcImageType.face_id = 0;   // TODO faceId
-    ftcImageType.width = 16;  // TODO size
-    ftcImageType.height = 16;  // TODO size
+    ftcImageType.width = m_size;
+    ftcImageType.height = m_size;
     ftcImageType.flags = FT_LOAD_DEFAULT | FT_LOAD_RENDER;
 
     FTC_SBit sbit;

@@ -27,14 +27,14 @@ int SdlLoop::wait(struct OcherEvent* evt)
         {
             evt->type = OEVT_KEY;
             evt->subtype = OEVT_KEY_UP;
-            evt->key.key = event.key.keysym.sym;  // TODO map?
+            evt->key.key = event.key.keysym.sym;
             break;
         }
         case SDL_KEYDOWN:
         {
             evt->type = OEVT_KEY;
             evt->subtype = OEVT_KEY_DOWN;
-            evt->key.key = event.key.keysym.sym;  // TODO map?
+            evt->key.key = event.key.keysym.sym;
             break;
         }
         case SDL_MOUSEMOTION:

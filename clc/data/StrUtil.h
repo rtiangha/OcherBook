@@ -153,7 +153,7 @@ namespace str
      */
     bool startsWith(Buffer& haystack, Buffer const& needle);
 
-    void capitalizeEachWord(Buffer &s);
+    //void capitalizeEachWord(Buffer &s);
 };
 
 }

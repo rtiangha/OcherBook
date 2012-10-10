@@ -27,10 +27,12 @@ public:
 
     inline void nextBytes(char* bytes, unsigned int n) { nextBytes((uint8_t*)bytes, n); }
 
+#ifndef NFLOAT
     /**
      *  @return random number uniformly distributed between 0.0 (inclusive) and 1.0 (exclusive)
      */
     double nextDouble();
+#endif
 
     /**
      *  @return random number uniformly distributed between 0 (inclusive) and n (exclusive for n>0)

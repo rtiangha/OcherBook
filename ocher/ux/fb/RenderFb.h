@@ -25,7 +25,7 @@ protected:
     int m_col;
     int m_penX;
     int m_penY;
-    int m_lineHeight;
+    uint8_t m_lineHeight;
 
     void pushAttrs();
     void applyAttrs(int i);

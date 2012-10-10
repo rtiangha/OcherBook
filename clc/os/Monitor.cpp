@@ -21,9 +21,9 @@ Monitor::Monitor() : m_locked(false), m_waiting(false)
 //    m_lock = PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP;
     int r;
     r = pthread_mutex_init(&m_lock, NULL);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
     r = pthread_cond_init(&m_cond, NULL);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
 #endif
 }
 
@@ -39,9 +39,9 @@ Monitor::~Monitor()
 #else
     int r;
     r = pthread_cond_destroy(&m_cond);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
     r = pthread_mutex_destroy(&m_lock);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
 #endif
 }
 
@@ -57,7 +57,7 @@ Monitor::notify()
 #else
     int r;
     r = pthread_cond_signal(&m_cond);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
 #endif
 }
 
@@ -73,7 +73,7 @@ Monitor::notifyAll()
 #else
     int r;
     r = pthread_cond_broadcast(&m_cond);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
 #endif
 }
 
@@ -97,10 +97,10 @@ Monitor::wait(unsigned int timeoutUsec)
     if (timeoutUsec) {
         struct timespec absTime = Clock::futureUsec(timeoutUsec);
         r = pthread_cond_timedwait(&m_cond, &m_lock, &absTime);
-        ASSERT(r == 0 || r == ETIMEDOUT);
+        ASSERT(r == 0 || r == ETIMEDOUT);(void)r;
     } else {
         r = pthread_cond_wait(&m_cond, &m_lock);
-        ASSERT(r == 0);
+        ASSERT(r == 0);(void)r;
     }
     m_locked = true;
     m_waiting = false;
@@ -135,7 +135,7 @@ void Monitor::lock()
 #else
     int r;
     r = pthread_mutex_lock(&m_lock);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
 #endif
     m_locked = true;
 }
@@ -151,7 +151,7 @@ void Monitor::unlock()
 #else
     int r;
     r = pthread_mutex_unlock(&m_lock);
-    ASSERT(r == 0);
+    ASSERT(r == 0);(void)r;
 #endif
 }
 
