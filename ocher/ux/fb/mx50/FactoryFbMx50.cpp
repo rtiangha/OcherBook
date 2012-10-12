@@ -6,8 +6,7 @@ UX_DRIVER_REGISTER(FbMx50);
 
 
 UiFactoryFbMx50::UiFactoryFbMx50() :
-    UiFactoryFb(),
-    m_fb(0)
+    UiFactoryFb()
 {
 }
 

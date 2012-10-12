@@ -87,16 +87,19 @@ int KoboEvents::wait(struct OcherEvent* evt)
                     evt->type = OEVT_KEY;
                     evt->subtype = kevt.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
                     evt->key.key = OEVTK_HOME;
+                    return 0;
                 } else if (kevt.button == 0x74) {
                     evt->type = OEVT_KEY;
                     evt->subtype = kevt.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
                     evt->key.key = OEVTK_POWER;
+                    return 0;
                 }
             } else {
                 break;
             }
         }
 
+        // http://www.kernel.org/doc/Documentation/input/event-codes.txt
         while (1) {
             struct input_event kevt[64];
             r = read(m_touchFd, &kevt, sizeof(struct input_event)*64);
@@ -109,17 +112,26 @@ int KoboEvents::wait(struct OcherEvent* evt)
                 for (int i = 0; i < r / (int)sizeof(struct input_event); i++) {
                     clc::Log::info("ocher.kobo", "type %d code %d value %d", kevt[i].type,
                             kevt[i].code, kevt[i].value);
-                   // if (kevt[i].type == EV_SYN) {
-                   //     evt->type = OEVT_MOUSE;
-                   //     //kevt[i].time.tv_sec, kevt[i].time.tv_usec, kevt[i].code ? "Config Sync" : "Report Sync" );
-                   // }
+                    if (kevt[i].type == EV_SYN) {
+                        return 0;
+                    } else if (kevt[i].type == EV_ABS) {
+                        evt->type = OEVT_MOUSE;
+                        uint16_t code = kevt[i].code;
+                        if (code == ABS_X) {
+                            evt->mouse.x = kevt[i].value;
+                        } else if (code == ABS_Y) {
+                            evt->mouse.y = kevt[i].value;
+                        } else if (code == ABS_PRESSURE) {
+                            evt->subtype = kevt[i].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
+                        }
+                    }
                 }
             } else {
                 break;
             }
         }
     }
-    return 0;
+    return -1;
 }
 
 

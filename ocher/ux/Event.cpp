@@ -6,7 +6,7 @@ int EventLoop::run(EventHandler* handler)
     struct OcherEvent evt;
     while (wait(&evt) == 0) {
         if (evt.type == OEVT_NONE) {
-            ;
+            continue;
         }
         int r = handler->eventReceived(&evt);
         if (r >= 0)

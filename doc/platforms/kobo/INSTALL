@@ -16,12 +16,7 @@ http://ccoffing.net/tech/embedded/kobo/
 This is a work-in-progress.  For example:
 
 - margins and word-wrap not done
-- touch screen is not wired up; must control via telnet (press Enter for next
-  page, etc)
 - must upload a font manually; path must match what's compiled in
-- no file browser; must specify on command line
-- very slow to open large books because currently laying it all out when the
-  book is opened.
 
 # Walk-though #
 
@@ -77,4 +72,9 @@ Escape character is '^]'.
 ```
 
 Enter for next page, p or b to to back, q to quit.
+
+
+# Developing #
+
+My dev cycle is edit, "make", "tools/put-kobo.sh", and then run from a telnet session.
 

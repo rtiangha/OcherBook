@@ -22,6 +22,7 @@ include ocher.config
 AR=ar
 CC=gcc
 CXX=g++
+STRIP=strip
 ifeq ($(OCHER_TARGET),kobo)
 	AR=$(PWD)/arm-2010q1/bin/arm-linux-ar
 	CC=$(PWD)/arm-2010q1/bin/arm-linux-gcc

@@ -1,9 +1,9 @@
 0.0.8 - build UI
+finish kobo events
 ability to select book via fb
     windowing system
         widget signal/slot model....
             http://www.erikyyy.de/sigslot/
-        finish kobo events (see evtest, ...)
 FontEngine
 
 0.0.9 - improve UI

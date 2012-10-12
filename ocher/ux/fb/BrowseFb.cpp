@@ -261,7 +261,7 @@ void BrowseFb::read(Meta* meta)
                         }
                         break;
                     case OEVT_MOUSE:
-                        if (evt.subtype == OEVT_MOUSE1_CLICKED) {
+                        if (evt.subtype == OEVT_MOUSE1_CLICKED || evt.subtype == OEVT_MOUSE1_DOWN) {
                             if (evt.mouse.y > g_fb->height()*.9) {
                                 // TODO
                             } else if (evt.mouse.x < g_fb->width()/2) {

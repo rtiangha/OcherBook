@@ -31,6 +31,13 @@ public:
     int8_t dy;
 };
 
+
+class GlyphCache
+{
+public:
+    GlyphCache();
+
+};
 /**
  * Converts glyphs to bitmaps.
  */

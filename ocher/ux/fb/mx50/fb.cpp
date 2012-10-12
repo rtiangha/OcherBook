@@ -75,6 +75,7 @@ bool Mx50Fb::init()
 
     clear();
     update(NULL, true);
+    clc::Log::info("ocher.mx50", "initialized");
     return true;
 
 fail1:

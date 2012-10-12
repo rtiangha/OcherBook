@@ -29,7 +29,7 @@ void initCrash()
 void initLog()
 {
     static clc::LogAppenderCFile appender(stderr);
-    clc::Logger *l = clc::Log::get("ocher");
+    clc::Logger *l = clc::Log::get("");
     l->setAppender(&appender);
     if (opt.verbose < 0)
         l->setLevel(clc::Log::Fatal);
@@ -144,7 +144,9 @@ int main(int argc, char **argv)
             printf("\t%s\n", factory->getName());
         } else if (driverName) {
             if (strcmp(factory->getName(), driverName) == 0) {
+                clc::Log::debug("ocher", "Attempting to init the '%s' driver", driverName);
                 if (!factory->init()) {
+                    clc::Log::warn("ocher", "Failed to init the '%s' driver", driverName);
                     return 1;
                 }
                 uiFactory = factory;
@@ -164,7 +166,7 @@ int main(int argc, char **argv)
         printf("No suitable output driver found\n");
         return 1;
     }
-    clc::Log::info("ocher", "Using the %s driver", uiFactory->getName());
+    clc::Log::info("ocher", "Using the '%s' driver", uiFactory->getName());
 
     if (optind < argc) {
         opt.files = (const char**)&argv[optind];

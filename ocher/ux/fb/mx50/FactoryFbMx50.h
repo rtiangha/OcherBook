@@ -12,11 +12,7 @@ public:
     ~UiFactoryFbMx50();
 
     bool init();
-
     const char* getName();
-
-protected:
-    Mx50Fb* m_fb;
 };
 
 #endif
