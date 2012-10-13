@@ -73,6 +73,7 @@ bool Mx50Fb::init()
         goto fail1;
     }
 
+    setBg(0xff, 0xff, 0xff);
     clear();
     update(NULL, true);
     clc::Log::info("ocher.mx50", "initialized");
