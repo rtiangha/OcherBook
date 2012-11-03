@@ -3,13 +3,24 @@
 
 #include <stdint.h>
 
+
+struct Pos {
+    int16_t x, y;
+
+    Pos() {}
+    Pos(int16_t _x, int16_t _y) : x(_x), y(_y) {}
+};
+
 struct Rect {
-    Rect() {}
-    Rect(int16_t _x, int16_t _y, uint16_t _w, uint16_t _h) : x(_x), y(_y), w(_w), h(_h) {}
     int16_t x, y;
     uint16_t w, h;
 
+    Rect() {}
+    Rect(int16_t _x, int16_t _y, uint16_t _w, uint16_t _h) : x(_x), y(_y), w(_w), h(_h) {}
+    Pos* pos() { return (Pos*)this; }
+    void offsetBy(Pos* p) { x += p->x; y += p->y; }
     void unionRects(Rect* r1, Rect* r2);
+    bool contains(Pos* p) { return p->x >= x && p->y >= y && p->x < x+w && p->y < y+h; }
 };
 
 
@@ -26,7 +37,10 @@ public:
     virtual void setFg(uint8_t r, uint8_t b, uint8_t g) = 0;
     virtual void setBg(uint8_t r, uint8_t b, uint8_t g) = 0;
     virtual void clear() = 0;
+    virtual void rect(Rect* rect);
     virtual void fillRect(Rect* r) = 0;
+    virtual void roundRect(Rect* rect, unsigned int radius);
+
     /**
      * Sets a pixel in the current color.
      * No clipping.
@@ -50,7 +64,10 @@ public:
      * @param p  'w' x 'h' bitmap.  Matches the bpp of the framebuffer.
      */
     virtual void blit(unsigned char *p, int x, int y, int w, int h) = 0;
-    virtual int update(Rect* r, bool full) = 0;
+
+    //virtual void blit(RleBitmap* rle, int x, int y) = 0;
+
+    virtual int update(Rect* r, bool full=false) = 0;
 };
 
 #endif

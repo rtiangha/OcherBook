@@ -1,10 +1,28 @@
+PRIORITIZE BASED ON GETTING ON KOBO FOR REAL ASAP
+
 0.0.8 - build UI
-finish kobo events
-ability to select book via fb
-    windowing system
-        widget signal/slot model....
-            http://www.erikyyy.de/sigslot/
+shelf
+clear damage model, update, etc
+convert to Activities
+    - threaded for spinners, etc?
+    sync
+        FontEngine, clipping
+        images
+    home
+        FontEngine, clipping
+        images
+        shelf
+    library
+        FontEngine, clipping
+        images
+        shelf
+    read
+    settings
 FontEngine
+    for glyph caching
+battery
+    RLE images
+widget packing...
 
 0.0.9 - improve UI
 margins
@@ -106,6 +124,7 @@ harden:
     - test harness
     - valgrind across many epubs
     - huge fonts crash
+    - stress-test airbag_fd
     - non-linux platforms hang in global ctor realloc
     - guerilla testing
     - general strategy for OOM

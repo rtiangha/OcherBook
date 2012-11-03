@@ -1,4 +1,6 @@
 #include "ocher/ux/fb/FrameBuffer.h"
+#include "ocher/ux/fb/RleBitmap.h"
+
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #define max(a,b) (((a) > (b)) ? (a) : (b))
@@ -14,6 +16,10 @@ void Rect::unionRects(Rect* r1, Rect* r2)
     int y2 = r2->y + r2->h;
     h = y - max(y1, y2);
 }
+
+//void FrameBuffer::blit(RleBitmap* rle, int x, int y)
+//{
+//}
 
 void FrameBuffer::line(int x0, int y0, int x1, int y1)
 {
@@ -54,3 +60,21 @@ void FrameBuffer::line(int x0, int y0, int x1, int y1)
     }
 }
 
+void FrameBuffer::rect(Rect* r)
+{
+    hline(r->x, r->y, r->x+r->w-1);
+    hline(r->x, r->y+r->h-1, r->x+r->w-1);
+    vline(r->x, r->y, r->y+r->h-1);
+    vline(r->x+r->w-1, r->y, r->y+r->h-1);
+}
+
+void FrameBuffer::roundRect(Rect* r, unsigned int radius)
+{
+    hline(r->x+radius, r->y, r->x+r->w-1-radius);
+    hline(r->x+radius, r->y+r->h-1, r->x+r->w-1-radius);
+    vline(r->x, r->y+radius, r->y+r->h-1-radius);
+    vline(r->x+r->w-1, r->y+radius, r->y+r->h-1-radius);
+    if (radius > 1) {
+        // TODO
+    }
+}

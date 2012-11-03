@@ -225,17 +225,23 @@ OCHER_OBJS = \
 	$(CLC_OBJS) \
 	ocher/device/Device.o \
 	ocher/device/Filesystem.o \
+	ocher/device/Battery.o \
 	ocher/fmt/Format.o \
 	ocher/fmt/Layout.o \
 	ocher/shelf/Meta.o \
 	ocher/ocher.o \
 	ocher/settings/Settings.o \
-	ocher/ux/Browse.o \
 	ocher/ux/Controller.o \
 	ocher/ux/Event.o \
 	ocher/ux/Factory.o \
 	ocher/ux/Pagination.o \
-	ocher/ux/Renderer.o
+	ocher/ux/Renderer.o \
+	ocher/ux/Activity.o \
+	ocher/ux/ReadActivity.o \
+	ocher/ux/LibraryActivity.o \
+	ocher/ux/HomeActivity.o \
+	ocher/ux/SettingsActivity.o \
+	ocher/ux/SyncActivity.o
 
 ifeq ($(OCHER_TARGET),kobo)
 OCHER_OBJS += \
@@ -266,10 +272,11 @@ endif
 OCHER_UI_FB=$(shell [ "$(OCHER_UI_SDL)" = "1" ] || [ "$(OCHER_UI_MX50)" = "1" ] && echo 1 )
 ifeq ($(OCHER_UI_FB), 1)
 OCHER_OBJS += \
-	ocher/ux/fb/BrowseFb.o \
+	ocher/ux/fb/BatteryIcon.o \
 	ocher/ux/fb/FactoryFb.o \
 	ocher/ux/fb/FrameBuffer.o \
 	ocher/ux/fb/FreeType.o \
+	ocher/ux/fb/SystemBar.o \
 	ocher/ux/fb/RenderFb.o \
 	ocher/ux/fb/Widgets.o
 endif
@@ -290,14 +297,12 @@ endif
 
 ifeq ($(OCHER_UI_FD),1)
 	OCHER_OBJS += \
-		ocher/ux/fd/BrowseFd.o \
 		ocher/ux/fd/RenderFd.o \
 		ocher/ux/fd/FactoryFd.o
 endif
 
 ifeq ($(OCHER_UI_NCURSES),1)
 	OCHER_OBJS += \
-		ocher/ux/ncurses/Browse.o \
 		ocher/ux/ncurses/RenderCurses.o \
 		ocher/ux/ncurses/FactoryNC.o
 	OCHER_LIBS += -lcdk

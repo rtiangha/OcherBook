@@ -46,8 +46,8 @@ int RenderFb::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit)
 {
     int dx, dy;
     int len = b->size();
-    const unsigned char *start = (const unsigned char*)b->data();
-    const unsigned char *p = start;
+    const unsigned char* start = (const unsigned char*)b->data();
+    const unsigned char* p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;

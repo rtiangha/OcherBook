@@ -7,7 +7,7 @@
 
 #include "clc/support/Logger.h"
 
-#include "ocher/device/Version.h"
+#include "ocher/ocher.h"
 #include "ocher/device/Device.h"
 
 

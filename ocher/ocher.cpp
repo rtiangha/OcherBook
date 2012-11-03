@@ -178,7 +178,12 @@ int main(int argc, char **argv)
         usage("Please specify one or more files or directories.");
     }
 
+    // Populate globals for ease of access
+    g_fb = uiFactory->getFrameBuffer();
+    g_ft = uiFactory->getFontEngine();
+    g_loop = uiFactory->getLoop();
     Controller c;
+    g_cont = &c;
     c.run();
 
     uiFactory->deinit();

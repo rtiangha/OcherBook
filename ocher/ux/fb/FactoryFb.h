@@ -3,7 +3,6 @@
 
 #include "ocher/ux/Event.h"
 #include "ocher/ux/Factory.h"
-#include "ocher/ux/fb/BrowseFb.h"
 #include "ocher/ux/fb/FreeType.h"
 #include "ocher/ux/fb/RenderFb.h"
 
@@ -17,7 +16,6 @@ public:
     bool init();
     void deinit();
 
-    Browse* getBrowser() { return m_browser; }
     Renderer* getRenderer() { return m_render; }
     EventLoop* getLoop() { return m_loop; }
     FrameBuffer* getFrameBuffer() { return m_fb; }
@@ -26,7 +24,6 @@ public:
 protected:
     FrameBuffer* m_fb;
     FreeType* m_ft;
-    BrowseFb* m_browser;
     RenderFb* m_render;
     EventLoop* m_loop;
 };

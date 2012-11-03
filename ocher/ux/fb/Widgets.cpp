@@ -7,18 +7,21 @@
 static const unsigned int borderWidth = 2;
 static const unsigned int roundRadius = 1;
 
+#define HIDDEN 1
 
 Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     m_rect(x, y, w, h),
+    m_flags(0),
     m_parent(0)
 {
 }
 
 Widget::~Widget()
 {
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        delete ((Widget*)m_children.get(i));
-    }
+    // TODO:  owned vs non-owned
+//    for (unsigned int i = 0; i < m_children.size(); ++i) {
+//        delete ((Widget*)m_children.get(i));
+//    }
 }
 
 void Widget::addChild(Widget* child)
@@ -26,10 +29,16 @@ void Widget::addChild(Widget* child)
     m_children.add(child);
 }
 
-void Widget::drawChildren()
+void Widget::drawChildren(Pos* pos)
 {
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        ((Widget*)m_children.get(i))->draw();
+    const size_t N = m_children.size();
+    if (N) {
+        for (unsigned int i = 0; i < N; ++i) {
+            Widget* w = (Widget*)m_children.get(i);
+           if (! (w->m_flags & HIDDEN)) {
+                w->draw(pos);
+           }
+        }
     }
 }
 
@@ -70,12 +79,15 @@ Canvas::Canvas() :
 {
 }
 
-void Canvas::draw()
+void Canvas::draw(Pos* pos)
 {
+    Rect rect(m_rect);
+    if (pos)
+        rect.offsetBy(pos);
     g_fb->setFg(128, 128, 128);
-    g_fb->fillRect(&m_rect);
-    drawChildren();
-    g_fb->update(&m_rect, false);
+    g_fb->fillRect(&rect);
+    drawChildren(rect.pos());
+    g_fb->update(&rect, false);
 }
 
 
@@ -102,29 +114,49 @@ void Window::setTitle(const char* title)
     m_title = strdup(title);
 }
 
-void Window::draw()
+void Window::draw(Pos* pos)
 {
     Rect rect(m_rect);
+    rect.offsetBy(pos);
+    drawBorder(&rect);
+    drawTitle(&rect);
+    drawBg(&rect);
+    drawContent(&rect);
+    drawChildren(rect.pos());
+    g_fb->update(&rect, false);
+}
+
+void Window::drawBorder(Rect* rect)
+{
     if (m_borderWidth) {
         g_fb->setFg(0, 0, 0);
-        g_fb->hline(rect.x, rect.y, rect.x+rect.w-1);
-        g_fb->hline(rect.x, rect.y+rect.h-1, rect.x+rect.w-1);
-        g_fb->vline(rect.x, rect.y, rect.y+rect.h-1);
-        g_fb->vline(rect.x+rect.w-1, rect.y, rect.y+rect.h-1);
-        rect.x += m_borderWidth;
-        rect.y += m_borderWidth;
-        rect.w -= m_borderWidth*2;
-        rect.h -= m_borderWidth*2;
+        g_fb->rect(rect);
+        rect->x += m_borderWidth;
+        rect->y += m_borderWidth;
+        rect->w -= m_borderWidth*2;
+        rect->h -= m_borderWidth*2;
     }
-    g_fb->setFg(0xff, 0xff, 0xff);
-    g_fb->fillRect(&rect);
+}
+
+void Window::drawTitle(Rect* rect)
+{
     if (m_flags & OWF_CLOSE) {
         g_fb->setFg(0, 0, 0);
-        g_fb->line(rect.x + rect.w - 12, rect.y + 4, rect.x + rect.w - 4, rect.y + 12);
-        g_fb->line(rect.x + rect.w - 4, rect.y + 4, rect.x + rect.w - 12, rect.y + 12);
+        g_fb->line(rect->x + rect->w - 12, rect->y + 4, rect->x + rect->w - 4, rect->y + 12);
+        g_fb->line(rect->x + rect->w - 4, rect->y + 4, rect->x + rect->w - 12, rect->y + 12);
+        rect->y += 12;
+        rect->h -= 12;
     }
-    draw(-1);
-    drawChildren();
+}
+
+void Window::drawBg(Rect* rect)
+{
+    g_fb->setFg(0xff, 0xff, 0xff);
+    g_fb->fillRect(rect);
+}
+
+void Window::drawContent(Rect*)
+{
 }
 
 
@@ -140,17 +172,24 @@ Button::~Button()
         free(m_label);
 }
 
-void Button::draw()
+void Button::draw(Pos* pos)
 {
-    g_fb->hline(m_rect.x+roundRadius, m_rect.y, m_rect.x+m_rect.w-1-roundRadius);
-    g_fb->hline(m_rect.x+roundRadius, m_rect.y+m_rect.h-1, m_rect.x+m_rect.w-1-roundRadius);
-    g_fb->vline(m_rect.x, m_rect.y+roundRadius, m_rect.y+m_rect.h-1-roundRadius);
-    g_fb->vline(m_rect.x+m_rect.w-1, m_rect.y+roundRadius, m_rect.y+m_rect.h-1-roundRadius);
-    // TODO label
-    if (roundRadius <= 1) {
-        return;
+    Rect rect(m_rect);
+    rect.offsetBy(pos);
+    drawBorder(&rect);
+    drawLabel(&rect);
+}
+
+void Button::drawBorder(Rect* rect)
+{
+    g_fb->roundRect(rect, roundRadius);
+}
+
+void Button::drawLabel(Rect* rect)
+{
+    if (m_label) {
+        // TODO
     }
-    // TODO
 }
 
 int Button::evtKey(struct OcherEvent*)
@@ -161,5 +200,11 @@ int Button::evtKey(struct OcherEvent*)
 int Button::evtMouse(struct OcherEvent*)
 {
     return -1;
+}
+
+
+Icon::Icon(int x, int y, unsigned int w, unsigned int h) :
+    Widget(x, y, w, h)
+{
 }
 

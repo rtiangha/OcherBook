@@ -1,8 +1,8 @@
 #ifndef OCHER_UX_FACTORY_H
 #define OCHER_UX_FACTORY_H
 
-#include "ocher/ux/Browse.h"
 #include "ocher/ux/Renderer.h"
+#include "ocher/ux/Controller.h"
 
 class EventLoop;
 class FreeType;
@@ -12,6 +12,7 @@ class FrameBuffer;
 extern FrameBuffer* g_fb;
 extern FreeType* g_ft;
 extern EventLoop* g_loop;
+extern Controller* g_cont;
 
 class UiFactory
 {
@@ -27,8 +28,6 @@ public:
     virtual void deinit() = 0;
 
     virtual const char* getName() = 0;
-
-    virtual Browse* getBrowser() = 0;
 
     virtual Renderer* getRenderer() = 0;
 

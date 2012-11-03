@@ -4,6 +4,8 @@
 #include <map>
 #include <vector>
 
+#include "mxml.h"
+
 #include "clc/data/Buffer.h"
 
 #include "ocher/fmt/Format.h"

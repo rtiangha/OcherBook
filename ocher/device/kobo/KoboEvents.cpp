@@ -10,6 +10,22 @@
 #include "ocher/device/kobo/KoboEvents.h"
 
 
+/*
+Processor       : ARMv7 Processor rev 5 (v7l)
+BogoMIPS        : 159.90
+Features        : swp half thumb fastmult vfp edsp neon vfpv3 
+CPU implementer : 0x41
+CPU architecture: 7
+CPU variant     : 0x2
+CPU part        : 0xc08
+CPU revision    : 5
+
+Hardware        : Freescale MX50 ARM2 Board
+Revision        : 50011
+Serial          : 0000000000000000
+*/
+
+
 KoboEvents::KoboEvents()
 {
     // TODO handle failures

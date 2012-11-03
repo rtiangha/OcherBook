@@ -14,7 +14,6 @@ struct BrowseItem
 {
     Rect rect;
     Meta* meta;
-    BrowseItem* next;
 };
 
 class BrowseWindow : public Window
@@ -28,7 +27,7 @@ public:
 
     void freeLayout();
     void layout();
-    void draw(int);
+    void drawContent(Rect* rect);
     void drawItem(int i);
 
 protected:
@@ -46,7 +45,6 @@ BrowseWindow::BrowseWindow(clc::List* meta) :
     m_item(-1),
     m_titlePts(16)
 {
-    m_borderWidth = 0;
 }
 
 BrowseWindow::~BrowseWindow()
@@ -56,6 +54,7 @@ BrowseWindow::~BrowseWindow()
 
 int BrowseWindow::evtKey(struct OcherEvent* evt)
 {
+    clc::Log::debug("ocher.fb.browse", "key");
     int r = -2;
     int n = (int)m_items.size();
     if (evt->subtype == OEVT_KEY_DOWN) {
@@ -90,12 +89,14 @@ int BrowseWindow::evtKey(struct OcherEvent* evt)
             r = -2;
         }
     }
+    draw(m_rect.pos());
     return r;
 }
 
 int BrowseWindow::evtMouse(struct OcherEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_CLICKED) {
+        printf("clicked\n");
         // TODO
     }
     return -2;
@@ -178,7 +179,7 @@ void BrowseWindow::drawItem(int i)
     g_fb->update(&rect, false);
 }
 
-void BrowseWindow::draw(int)
+void BrowseWindow::drawContent(Rect* rect)
 {
     clc::Log::debug("ocher.fb.browse", "draw");
     int w = g_fb->width();
@@ -187,6 +188,9 @@ void BrowseWindow::draw(int)
     int penY = h*.2;
     int dx, dy;
     uint8_t lineHeight;
+
+    // TODO
+    // "BOOKS" centered
 
     g_ft->setSize(m_titlePts);
     g_ft->renderGlyph('T', false, penX, penY, &dx, &dy, &m_titleHeight);
@@ -225,9 +229,10 @@ bool BrowseFb::init()
 
 Meta* BrowseFb::browse(clc::List* meta)
 {
+    Pos p(0, 0);
     Canvas c;
     c.addChild(new BrowseWindow(meta));
-    c.draw();
+    c.draw(&p);
     int r = g_loop->run(&c);
     if (r < 0)
         return NULL;

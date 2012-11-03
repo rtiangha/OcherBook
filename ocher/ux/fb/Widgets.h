@@ -6,8 +6,6 @@
 #include "ocher/ux/Event.h"
 
 
-extern FrameBuffer* fb;
-
 class Widget : public EventHandler
 {
 public:
@@ -16,7 +14,7 @@ public:
 
     void addChild(Widget* child);
 
-    virtual void draw() = 0;
+    virtual void draw(Pos* pos) = 0;
 
     int eventReceived(struct OcherEvent* evt);
     virtual int evtKey(struct OcherEvent*) { return -1; }
@@ -24,13 +22,15 @@ public:
     virtual int evtApp(struct OcherEvent*) { return -1; }
     virtual int evtDevice(struct OcherEvent*) { return -1; }
 
-protected:
-    void drawChildren();
-
     Rect m_rect;
+protected:
+    void drawChildren(Pos* pos);
+
+    unsigned int m_flags;
     Widget* m_parent;
     clc::List m_children;
     //focus
+    //hidden
 };
 
 class Canvas : public Widget
@@ -39,7 +39,7 @@ public:
     Canvas();
     ~Canvas() {}
 
-    void draw();
+    void draw(Pos* pos);
 
 protected:
 };
@@ -52,8 +52,11 @@ public:
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window();
 
-    void draw();
-    virtual void draw(int) {}
+    virtual void draw(Pos* pos);
+    virtual void drawBorder(Rect* rect);
+    virtual void drawTitle(Rect* rect);
+    virtual void drawBg(Rect* rect);
+    virtual void drawContent(Rect* rect);
 
     void setTitle(const char* title);
 
@@ -74,7 +77,10 @@ public:
     ~Button();
 
     void setLabel(const char* label);
-    void draw();
+
+    virtual void draw(Pos* pos);
+    virtual void drawBorder(Rect* rect);
+    virtual void drawLabel(Rect* rect);
 
 protected:
     int evtKey(struct OcherEvent*);
@@ -95,21 +101,29 @@ class Menu : public Widget
     title;
     selected;
 };
+#endif
 
+#if 0
 class Spinner : public Widget
 {
     state;
     speed;
 };
+#endif
 
+#if 0
 class TextEntry : public Window
 {
 };
+#endif
 
+#if 0
 class OSKeyboard : public Widget
 {
 };
+#endif
 
+#if 0
 class Label : public Widget
 {
     label;
@@ -117,24 +131,33 @@ class Label : public Widget
     size;
     attrs;
 };
+#endif
 
 class Icon : public Widget
 {
+public:
+    Icon(int x, int y, unsigned int w, unsigned int h);
+    virtual ~Icon() {}
+
+    virtual void draw(Pos*) {}
 };
 
+#if 0
 class Srubber : public Widget
 {
     plus/minus vs arrows
         ff arrows
 };
+#endif
 
+#if 0
 class DropDown : public Window
 {
 };
+#endif
 
+#if 0
 class ButtonBar;
-
 #endif
 
 #endif
-
