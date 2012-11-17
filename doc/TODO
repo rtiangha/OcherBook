@@ -1,44 +1,64 @@
 PRIORITIZE BASED ON GETTING ON KOBO FOR REAL ASAP
 
-0.0.8 - build UI
-shelf
-clear damage model, update, etc
-convert to Activities
-    - threaded for spinners, etc?
-    sync
-        FontEngine, clipping
-        images
-    home
-        FontEngine, clipping
-        images
-        shelf
-    library
-        FontEngine, clipping
-        images
-        shelf
-    read
-    settings
+0.0.8 - test on kobo
+test on kobo
+fonts are oversized
+2nd book crashes
+fix wrapping bug in FontEngine::renderString
+
+0.0.9 - UI round 2
+fix close button in SDL
 FontEngine
-    for glyph caching
+    FontEngine is more of a layout engine...
+    convert from RenderFb::outputWrapped to FontEngine::renderString
+    use FontEngine::renderString on widgets (buttons, ...)
+    FE::renderString should return bbox or bboxes
+    layout by line, to do centering
+    single global instance
+HomeActivity
+    real titles / authors
+ReadActivity
+    text size is unreliable
+    page numbers
+    title on system bar
+RLE
+    RLE compress/decompress
+    build step
 battery
     RLE images
-widget packing...
 
-0.0.9 - improve UI
-margins
-word wrap on fb
-    http://www.freetype.org/freetype2/docs/tutorial/step2.html
-font selection (don't hardcode filename!)
+0.1.0 - UI round 3
+fonts
+    selection
+        italic, bold faces
+        sans, serif
+    improved font metrics:
+        subpixel rendering
+        kerning
+integrate libjpeg, libpng
+HomeActivity
+    cover art
+persist shelf
+    json vs Flattenable
+widget
+    packing
+    make dirty rects more granular (eg, hiding SystemBar doesn't reflow entire page)
+spinners
 flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
-SDL is not greyscale
 do settings apply before or after layout?
     better definition around what AttrSizeAbs, etc mean
     are absolute font sizes really absolute while in the layout?
 
-0.1.0
+0.1.1
 testing
 valgrind...
 survive purgatory.sh
+read an entire book on kobo
+
+0.2.0
+suspend
+
+
 
 
 
@@ -50,14 +70,14 @@ device specific:
         - suspend / resume
         - touch input
         - home, power button
+        - wireless
+    resurrect non-fb output
 
 layout:
     - pagination
         - discrete pages vs scrollable (makes no sense on e-ink)
     - margins
     - FreeType:
-        - glyph cache
-            - FTC_Manager_New
         - integrate into RenderFd for real word wrap
     - option to build some fonts into the binary for easy install
     - images
@@ -104,6 +124,7 @@ per-user:
         - way to share metadata about the book (tweet / ... ?)
 
 features:
+    - clock
     - live links (eg: table of contents)
     - ability to compile-out large features
     - search
@@ -152,4 +173,3 @@ bluesky:
     - RSS
     - other free content
     - ...
-

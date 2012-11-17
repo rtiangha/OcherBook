@@ -75,7 +75,7 @@ public:
 
 protected:
     void push(unsigned int opType, unsigned int op, unsigned int arg);
-    void pushPtr(void *ptr);
+    void pushPtr(void* ptr);
 
     void pushTextAttr(TextAttr attr, uint8_t arg);
     void popTextAttr(unsigned int n=1);
@@ -89,7 +89,7 @@ protected:
     void flushText();
 
     /** Ensure m_data can hold n additional bytes */
-    char *checkAlloc(unsigned int n);
+    char* checkAlloc(unsigned int n);
 
     clc::Buffer m_data;
     unsigned int m_dataLen;
@@ -97,11 +97,10 @@ protected:
     int nl;
     int ws;
     int pre;
-    clc::Buffer *m_text;
+    clc::Buffer* m_text;
     unsigned int m_textLen;
 
     static const unsigned int chunk = 1024;
 };
 
 #endif
-

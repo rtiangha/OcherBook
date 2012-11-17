@@ -88,6 +88,9 @@ class EventLoop
 {
 public:
     virtual ~EventLoop() {}
+    /**
+     * @return 0 got event, -1 error
+     */
     virtual int wait(struct OcherEvent* evt) = 0;
     /**
      * @return -1 handled, -2 pass on, >=0 done

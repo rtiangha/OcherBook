@@ -1,5 +1,5 @@
-#include "ocher/ux/ncurses/FactoryNC.h"
 #include "ocher/ocher.h"
+#include "ocher/ux/ncurses/FactoryNC.h"
 
 
 UX_DRIVER_REGISTER(Curses);
@@ -40,5 +40,3 @@ Renderer* UiFactoryCurses::getRenderer()
 {
     return m_renderer;
 }
-
-

@@ -2,11 +2,15 @@
 #define OCHER_OPTIONS_H
 
 struct Options {
-    Options() : verbose(0), inFd(0), outFd(1) {}
+    Options() :
+        verbose(0),
+        files(0),
+        inFd(0),
+        outFd(1) {}
 
     int verbose;
 
-    const char **files;
+    const char** files;
 
     int inFd;
     int outFd;

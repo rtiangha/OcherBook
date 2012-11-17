@@ -78,18 +78,18 @@ void RenderCurses::popAttrs()
     applyAttrs(-1);
 }
 
-int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit)
+int RenderCurses::outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit)
 {
-    int len = b->size();
-    const unsigned char *start = (const unsigned char*)b->data();
-    const unsigned char *p = start;
+    unsigned int len = b->size();
+    const unsigned char* start = (const unsigned char*)b->data();
+    const unsigned char* p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;
     p += strOffset;
 
     do {
-        int w = m_width - m_x;
+        unsigned int w = m_width - m_x;
 
         // If at start of line, eat spaces
         if (m_x == 0) {
@@ -100,17 +100,17 @@ int RenderCurses::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doB
         }
 
         // How many chars should go out on this line?
-        const unsigned char *nl = 0;
-        int n = w;
+        const unsigned char* nl = 0;
+        unsigned int n = w;
         if (w >= len) {
             n = len;
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
         } else {
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
             if (!nl) {
                 // don't break words
                 if (!isspace(*(p+n-1)) && !isspace(*(p+n))) {
-                    unsigned char *space = (unsigned char*)memrchr(p, ' ', n);
+                    unsigned char* space = (unsigned char*)memrchr(p, ' ', n);
                     if (space) {
                         nl = space;
                     }
@@ -164,7 +164,7 @@ int RenderCurses::render(Pagination* pagination, unsigned int pageNum, bool doBl
     }
 
     const unsigned int N = m_layout.size();
-    const char *raw = m_layout.data();
+    const char* raw = m_layout.data();
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i+2 <= N);
@@ -237,7 +237,7 @@ int RenderCurses::render(Pagination* pagination, unsigned int pageNum, bool doBl
                     case Layout::CmdOutputStr: {
                         clc::Log::trace("ocher.render.ncurses", "OpCmd CmdOutputStr");
                         ASSERT(i + sizeof(clc::Buffer*) <= N);
-                        clc::Buffer *str = *(clc::Buffer**)(raw+i);
+                        clc::Buffer* str = *(clc::Buffer**)(raw+i);
                         ASSERT(strOffset <= str->size());
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;

@@ -6,12 +6,11 @@
 #endif
 
 #include "clc/support/Logger.h"
-
 #include "ocher/ocher.h"
 #include "ocher/device/Device.h"
 
 
-Device *device;
+Device* device;
 
 void initDevice()
 {
@@ -44,4 +43,3 @@ clc::Buffer Device::getBuildDate()
     clc::Buffer date(__DATE__);
     return date;
 }
-

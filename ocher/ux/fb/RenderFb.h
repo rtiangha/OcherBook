@@ -2,8 +2,8 @@
 #define OCHER_FB_RENDER_H
 
 #include "ocher/ux/Renderer.h"
+#include "ocher/ux/fb/FontEngine.h"
 
-class FreeType;
 class FrameBuffer;
 class Pagination;
 
@@ -11,21 +11,21 @@ class Pagination;
 class RenderFb : public Renderer
 {
 public:
-    RenderFb(FreeType *ft, FrameBuffer *fb);
+    RenderFb(FrameBuffer* fb);
 
     bool init();
     void deinit();
 
-    int outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit);
     int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
 protected:
-    FreeType* m_ft;
+    int outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit);
+    void applyAttrs();
+
+    FontEngine m_fe;
     FrameBuffer* m_fb;
-    int m_col;
     int m_penX;
     int m_penY;
-    uint8_t m_lineHeight;
 
     void pushAttrs();
     void applyAttrs(int i);
@@ -36,5 +36,3 @@ protected:
 };
 
 #endif
-
-

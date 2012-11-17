@@ -14,10 +14,10 @@
 class UnzipCache
 {
 public:
-    UnzipCache(const char* zipFilename, const char *password=0);
+    UnzipCache(const char* zipFilename, const char* password=0);
     ~UnzipCache();
 
-    TreeFile* getFile(const char *filename, const char *relative=0);
+    TreeFile* getFile(const char* filename, const char* relative=0);
     TreeDirectory* getRoot() { return m_root; }
 
 protected:
@@ -29,7 +29,7 @@ protected:
      *      if the extraction failed)
      * @return -1 error, 0 did not match, 1 matched and extracted, 2 matched uniquely, quit now
      */
-    int unzipFile(const char *pattern, clc::Buffer *matchedName);
+    int unzipFile(const char* pattern, clc::Buffer* matchedName);
 
     /**
      * Unzips file(s) that match the pattern into the TreeDirectory.
@@ -37,7 +37,7 @@ protected:
      * @param matchedNames  If not NULL, extracted pathnames are appended
      * @return -1 stopped due to error, else number matched
      */
-    int unzip(const char *pattern, std::list<clc::Buffer> *matchedNames);
+    int unzip(const char* pattern, std::list<clc::Buffer>* matchedNames);
 
     unzFile m_uf;
     TreeDirectory* m_root;
@@ -47,4 +47,3 @@ protected:
 
 
 #endif
-

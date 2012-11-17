@@ -7,7 +7,6 @@
 #include "mxml.h"
 
 #include "clc/data/Buffer.h"
-
 #include "ocher/fmt/Format.h"
 #include "ocher/fmt/epub/UnzipCache.h"
 
@@ -21,14 +20,14 @@ struct EpubItem
 class Epub : public Format
 {
 public:
-    Epub(const char* epubFilename, const char *password=0);
+    Epub(const char* epubFilename, const char* password=0);
     virtual ~Epub() {}
 
     clc::Buffer m_epubVersion;
     clc::Buffer m_uid;
 
-    clc::Buffer getFile(const char *filename) {
-        TreeFile *f = m_zip.getFile(filename, m_contentPath.c_str());
+    clc::Buffer getFile(const char* filename) {
+        TreeFile* f = m_zip.getFile(filename, m_contentPath.c_str());
         clc::Buffer b;
         if (f) {
             b = f->data;
@@ -38,12 +37,12 @@ public:
 
     int getSpineItemByIndex(unsigned int i, clc::Buffer &item);
     int getManifestItemById(unsigned int i, clc::Buffer &item);
-    int getContentByHref(const char *href, clc::Buffer &item);
+    int getContentByHref(const char* href, clc::Buffer &item);
 
     /**
      * Parses XML. Caller must call mxml_delete.
      */
-    mxml_node_t *parseXml(clc::Buffer &xml);
+    mxml_node_t* parseXml(clc::Buffer &xml);
 
 protected:
     TreeFile* findSpine();
@@ -57,4 +56,3 @@ protected:
 
 
 #endif
-

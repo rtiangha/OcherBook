@@ -2,7 +2,6 @@
 #define OCHER_FMT_H
 
 #include "clc/data/Buffer.h"
-
 #include "ocher/shelf/Meta.h"
 
 
@@ -18,7 +17,6 @@ public:
     clc::Buffer m_author;
 };
 
-Fmt detectFormat(const char* file);
+Fmt detectFormat(const char* file, Encoding* encoding);
 
 #endif
-

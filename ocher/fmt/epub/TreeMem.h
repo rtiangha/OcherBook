@@ -22,9 +22,9 @@ class TreeDirectory
 public:
     TreeDirectory(clc::Buffer& _name) : name(_name) {}
     ~TreeDirectory() {
-        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); i++)
+        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); ++i)
             delete *i;
-        for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); i++)
+        for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i)
             delete *i;
     }
 
@@ -34,7 +34,7 @@ public:
     std::list<TreeFile*> files;
 
     TreeFile* createFile(clc::Buffer& _name, clc::Buffer& _data) {
-        TreeFile *file = getFile(_name);
+        TreeFile* file = getFile(_name);
         if (! file) {
             file = new TreeFile(_name, _data);
             files.push_back(file);
@@ -42,7 +42,7 @@ public:
         return file;
     }
     TreeDirectory* createDirectory(clc::Buffer& _name) {
-        TreeDirectory *dir = getDirectory(_name);
+        TreeDirectory* dir = getDirectory(_name);
         if (! dir) {
             dir = new TreeDirectory(_name);
             subdirs.push_back(dir);
@@ -51,21 +51,21 @@ public:
     }
 
     TreeFile* getFile(const clc::Buffer& _name) const {
-        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); i++) {
+        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); ++i) {
             if ((*i)->name == _name)
                 return *i;
         }
         return 0;
     }
     TreeFile* getFile(const char* _name) const {
-        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); i++) {
+        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); ++i) {
             if ((*i)->name == _name)
                 return *i;
         }
         return 0;
     }
     TreeDirectory* getDirectory(const clc::Buffer& _name) const {
-        for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); i++) {
+        for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
             if ((*i)->name == _name)
                 return *i;
         }
@@ -75,13 +75,13 @@ public:
         const char* slash = strchr(_name, '/');
         if (slash) {
             size_t len = slash - _name;
-            for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); i++) {
+            for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
                 if ((*i)->name.length() == len && strncmp((*i)->name.c_str(), _name, len) == 0) {
                     return (*i)->findFile(slash+1);
                 }
             }
         } else {
-            for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); i++) {
+            for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); ++i) {
                 if ((*i)->name == _name) {
                     return (*i);
                 }
@@ -93,4 +93,3 @@ public:
 
 
 #endif
-

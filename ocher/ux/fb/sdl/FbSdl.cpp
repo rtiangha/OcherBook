@@ -6,6 +6,7 @@
 
 #include "ocher/ux/fb/sdl/FbSdl.h"
 
+#define LOG_NAME "ocher.sdl"
 
 // Ocher's Rect is chosen to match SDL's.
 #define TO_SDL_RECT(r) ((SDL_Rect*)(r))
@@ -26,23 +27,35 @@ FbSdl::~FbSdl()
 bool FbSdl::init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        const char *err = SDL_GetError();
-        clc::Log::error("ocher.sdl", "SDL_Init failed: %s", err);
+        const char* err = SDL_GetError();
+        clc::Log::error(LOG_NAME, "SDL_Init failed: %s", err);
         return false;
     }
 
+    SDL_Color colors[256];
+    for (unsigned int i = 0; i < 256; ++i) {
+        colors[i].r = colors[i].g = colors[i].b = i;
+    }
+
     // TODO:  store window size in user settings
-    m_screen = SDL_SetVideoMode(600, 800, 8, SDL_SWSURFACE);
+    m_screen = SDL_SetVideoMode(600, 800, 8, SDL_SWSURFACE | SDL_HWPALETTE);
     if (! m_screen) {
-        const char *err = SDL_GetError();
-        clc::Log::error("ocher.sdl", "SDL_SetVideoMode failed: %s", err);
+        const char* err = SDL_GetError();
+        clc::Log::error(LOG_NAME, "SDL_SetVideoMode failed: %s", err);
         SDL_Quit();
         return false;
     }
+    SDL_SetPalette(m_screen, SDL_LOGPAL|SDL_PHYSPAL, colors, 0, 256);
     m_mustLock = SDL_MUSTLOCK(m_screen);
     setBg(0xff, 0xff, 0xff);
     clear();
     m_sdl = 1;
+
+    bbox.x = bbox.y = 0;
+    bbox.w = width();
+    bbox.h = height();
+    clc::Log::info(LOG_NAME, "fb %d %d %d %d", bbox.x, bbox.y, bbox.w, bbox.h);
+
     return true;
 }
 
@@ -80,7 +93,7 @@ unsigned int FbSdl::dpi()
 
 void FbSdl::clear()
 {
-    clc::Log::debug("ocher.sdl", "clear");
+    clc::Log::debug(LOG_NAME, "clear");
     SDL_FillRect(m_screen, NULL, m_bgColor);
     SDL_UpdateRect(m_screen, 0, 0, 0, 0);
 }
@@ -109,26 +122,36 @@ void FbSdl::vline(int x, int y1, int y2)
     line(x, y1, x, y2);
 }
 
-void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
+void FbSdl::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
-    clc::Log::trace("ocher.sdl", "blit %d %d %d %d", x, y, w, h);
-
-    const int fbw = width();
-    if (x + w >= fbw) {
-        if (x >= fbw)
-            return;
-        w = fbw - x;
+    clc::Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
+    Rect clip;
+    if (userClip) {
+        clip = *userClip;
+    } else {
+        clip.x = clip.y = 0;
+        clip.w = width();
+        clip.h = height();
     }
-    if (x < 0) {
+
+    const int maxX = clip.x + clip.w - 1;
+    const int minX = clip.x;
+    if (x + w >= maxX) {
+        if (x >= maxX)
+            return;
+        w = maxX - x;
+    }
+    if (x < minX) {
         // TODO
     }
-    const int fbh = height();
-    if (y + h >= fbh) {
-        if (y >= fbh)
+    const int maxY = clip.y + clip.h - 1;
+    const int minY = clip.y;
+    if (y + h >= maxY) {
+        if (y >= maxY)
             return;
-        h = fbh - y;
+        h = maxY - y;
     }
-    if (y < 0) {
+    if (y < minY) {
         // TODO
     }
 
@@ -137,13 +160,16 @@ void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
             return;
         }
     }
-    clc::Log::trace("ocher.sdl", "blit clipped %d %d %d %d", x, y, w, h);
+    clc::Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
     for (int i = 0; i < h; ++i) {
         unsigned char* dst = ((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x;
+#if 0
         for (int ix = 0; ix < w; ++ix) {
-            p[ix] = ~p[ix];
+            dst[ix] &= p[ix];
         }
+#else
         memcpy(dst, p, w);
+#endif
         y++;
         p = p + w;
     }
@@ -154,7 +180,7 @@ void FbSdl::blit(unsigned char *p, int x, int y, int w, int h)
 
 int FbSdl::update(Rect* r, bool /*full*/)
 {
-    clc::Log::debug("ocher.sdl", "update");
+    clc::Log::debug(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
     SDL_UpdateRects(m_screen, 1, (SDL_Rect*)r);
     return 0;
 }

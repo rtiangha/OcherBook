@@ -1,12 +1,11 @@
 #include "clc/storage/File.h"
-
 #include "ocher/fmt/Format.h"
 
 
-Fmt detectFormat(const char* file)
+Fmt detectFormat(const char* file, Encoding* encoding)
 {
     Fmt format = OCHER_FMT_UNKNOWN;
-    Encoding encoding = OCHER_ENC_UNKNOWN;
+    *encoding = OCHER_ENC_UNKNOWN;
 
     clc::File f;
     if (f.setTo(file) == 0) {
@@ -18,23 +17,23 @@ Fmt detectFormat(const char* file)
             int skip;
             if (r >= 3 && buf[0] == 0xef && buf[1] == 0xbb && buf[2] == 0xbf) {
                 skip = 3;
-                encoding = OCHER_ENC_UTF8;
+                *encoding = OCHER_ENC_UTF8;
             } else if (r >= 4 && buf[0] == 0xff && buf[1] == 0xfe && (buf[2] || buf[3])) {
                 skip = 2;
-                encoding = OCHER_ENC_UTF16LE;
+                *encoding = OCHER_ENC_UTF16LE;
             } else if (r >= 4 && buf[0] == 0xfe && buf[1] == 0xff && (buf[2] || buf[3])) {
                 skip = 2;
-                encoding = OCHER_ENC_UTF16BE;
+                *encoding = OCHER_ENC_UTF16BE;
             } else if (r >= 4 && buf[0] == 0xff && buf[1] == 0xfe && !buf[2] && !buf[3]) {
                 skip = 4;
-                encoding = OCHER_ENC_UTF32LE;
+                *encoding = OCHER_ENC_UTF32LE;
             } else if (4 >= 4 && !buf[0] && !buf[1] && buf[2] == 0xfe && buf[3] == 0xff) {
                 skip = 4;
-                encoding = OCHER_ENC_UTF32BE;
+                *encoding = OCHER_ENC_UTF32BE;
             } else {
                 // Recommended for UTF8 to not have BOM.  UTF8 also handles plain ascii.
                 skip = 0;
-                encoding = OCHER_ENC_UTF8;
+                *encoding = OCHER_ENC_UTF8;
             }
 
             char buf2[512];
@@ -76,4 +75,3 @@ Fmt detectFormat(const char* file)
 
     return format;
 }
-

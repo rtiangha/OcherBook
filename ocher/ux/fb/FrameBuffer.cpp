@@ -1,25 +1,51 @@
 #include "ocher/ux/fb/FrameBuffer.h"
-#include "ocher/ux/fb/RleBitmap.h"
 
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #define max(a,b) (((a) > (b)) ? (a) : (b))
 
+void Rect::unionRect(Rect* r)
+{
+    if (! valid()) {
+        *this = *r;
+        return;
+    }
+    if (! r->valid()) {
+        return;
+    }
+    if (r->x < x)
+        x = r->x;
+    if (r->y < y)
+        y = r->y;
+    int x1 = x + w;
+    int x2 = r->x + r->w;
+    if (x2 > x1)
+        w = max(x1, x2) - x;
+    int y1 = y + h;
+    int y2 = r->y + r->h;
+    if (y2 > y1)
+        h = max(y1, y2) - y;
+}
+
 void Rect::unionRects(Rect* r1, Rect* r2)
 {
+    if (! r1->valid()) {
+        *this = *r2;
+        return;
+    }
+    if (! r2->valid()) {
+        *this = *r1;
+        return;
+    }
     x = min(r1->x, r2->x);
     y = min(r1->y, r2->y);
     int x1 = r1->x + r1->w;
     int x2 = r2->x + r2->w;
-    w = x - max(x1, x2);
+    w = max(x1, x2) - x;
     int y1 = r1->y + r1->h;
     int y2 = r2->y + r2->h;
-    h = y - max(y1, y2);
+    h = max(y1, y2) - h;
 }
-
-//void FrameBuffer::blit(RleBitmap* rle, int x, int y)
-//{
-//}
 
 void FrameBuffer::line(int x0, int y0, int x1, int y1)
 {
@@ -76,5 +102,15 @@ void FrameBuffer::roundRect(Rect* r, unsigned int radius)
     vline(r->x+r->w-1, r->y+radius, r->y+r->h-1-radius);
     if (radius > 1) {
         // TODO
+    }
+}
+
+void FrameBuffer::blitGlyphs(Glyph** glyphs, Pos* pen, const Rect* clip)
+{
+    for (unsigned int i = 0; glyphs[i]; ++i) {
+        Glyph* g = glyphs[i];
+        blit(g->bitmap, pen->x+g->offsetX, pen->y-g->offsetY, g->w, g->h, clip);
+        pen->x += g->advanceX;
+        pen->y += g->advanceY;
     }
 }

@@ -29,7 +29,7 @@ void initCrash()
 void initLog()
 {
     static clc::LogAppenderCFile appender(stderr);
-    clc::Logger *l = clc::Log::get("");
+    clc::Logger* l = clc::Log::get("");
     l->setAppender(&appender);
     if (opt.verbose < 0)
         l->setLevel(clc::Log::Fatal);
@@ -50,7 +50,7 @@ void initSettings()
     settings.load();
 }
 
-void usage(const char *msg)
+void usage(const char* msg)
 {
     printf(
         "OcherBook  Copyright (C) 2012 Chuck Coffing  <clc@alum.mit.edu>\n"
@@ -84,7 +84,7 @@ void usage(const char *msg)
 
 clc::List drivers;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     bool listDrivers = false;
     const char* driverName = 0;
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
     initSettings();
 
     for (unsigned int i = 0; i < drivers.size(); ++i) {
-        UiFactory *factory = (UiFactory*)drivers.get(i);
+        UiFactory* factory = (UiFactory*)drivers.get(i);
 
         if (listDrivers) {
             printf("\t%s\n", factory->getName());
@@ -183,12 +183,10 @@ int main(int argc, char **argv)
     g_ft = uiFactory->getFontEngine();
     g_loop = uiFactory->getLoop();
     Controller c;
-    g_cont = &c;
     c.run();
 
     uiFactory->deinit();
 
     return 0;
 }
-
 

@@ -1,6 +1,9 @@
-#ifndef OCHER_KOBO_BATTERY_H
-#define OCHER_KOBO_BATTERY_H
+#ifndef OCHER_DEV_BATTERY_H
+#define OCHER_DEV_BATTERY_H
 
+/**
+ *  Reads the battery status.
+ */
 class Battery
 {
 public:
@@ -12,11 +15,11 @@ public:
         Unknown
     };
 
-    int readAll();
-    virtual int readCapacity(); // { m_percent = 0; return 0; }
-    virtual int readStatus(); // { m_status = Unknown; return 0; }
+    int readAll();      ///< @return 0 if all read, else -1
+    int readCapacity(); ///< @return 0 if read, else -1
+    int readStatus();   ///< @return 0 if read, else -1
 
-    int m_percent;  // 0..100 or -1 if unknown
+    int m_percent;      ///< @return 0..100 or -1 if unknown
     Status m_status;
 };
 

@@ -4,6 +4,7 @@
 #include "ocher/ux/Factory.h"
 #include "ocher/ux/ncurses/RenderCurses.h"
 
+
 class UiFactoryCurses : public UiFactory
 {
 public:
@@ -19,8 +20,7 @@ public:
 protected:
     RenderCurses* m_renderer;
     WINDOW* m_scr;
-    CDKSCREEN *m_screen;
+    CDKSCREEN* m_screen;
 };
 
 #endif
-

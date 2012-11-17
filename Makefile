@@ -44,6 +44,7 @@ endif
 
 # Common CFLAGS applied everywhere
 CFLAGS?=
+INCS+=-I. -Ibuild
 ifeq ($(OCHER_DEBUG),1)
 	CFLAGS+=-O0 -g -DDEBUG
 else
@@ -63,7 +64,7 @@ endif
 ifeq ($(OCHER_TARGET),haiku)
 	MINIZIP_CFLAGS+=-DUSE_FILE32API
 endif
-CFLAGS+=-I. -Ibuild -DSINGLE_THREADED
+CFLAGS+=-DSINGLE_THREADED
 CFLAGS_COMMON:=$(CFLAGS)
 ifneq ($(OCHER_TARGET),haiku)
 	CFLAGS+=-std=c99
@@ -229,6 +230,7 @@ OCHER_OBJS = \
 	ocher/fmt/Format.o \
 	ocher/fmt/Layout.o \
 	ocher/shelf/Meta.o \
+	ocher/shelf/Shelf.o \
 	ocher/ocher.o \
 	ocher/settings/Settings.o \
 	ocher/ux/Controller.o \
@@ -276,6 +278,7 @@ OCHER_OBJS += \
 	ocher/ux/fb/FactoryFb.o \
 	ocher/ux/fb/FrameBuffer.o \
 	ocher/ux/fb/FreeType.o \
+	ocher/ux/fb/FontEngine.o \
 	ocher/ux/fb/SystemBar.o \
 	ocher/ux/fb/RenderFb.o \
 	ocher/ux/fb/Widgets.o
@@ -338,6 +341,9 @@ $(BUILD_DIR)/ocher: $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) $(OCHER_OBJS)
 	$(MSG) "LINK	$@"
 	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) -o $@ $(OCHER_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
 
+ocher_clean:
+	rm -f $(OCHER_OBJS) $(BUILD_DIR)/ocher
+
 
 #################### test
 
@@ -348,13 +354,16 @@ clctest: $(CLC_OBJS) $(UNITTESTCPP_LIB)
 ochertest:
 	# TODO
 
-test: clctest ochertest
+cppcheck:
+	cppcheck --check-config $(INCS) ocher/ 2> build/cppcheck.log
+	cppcheck --std=posix --max-configs=100 --enable=all --suppress=cstyleCast $(INCS) ocher/ 2>> build/cppcheck.log
+
+test: clctest ochertest cppcheck
 
 
 ####################
 
-clean: zlib_clean freetype_clean mxml_clean ocher_config_clean unittestpp_clean
-	rm -f $(OCHER_OBJS) $(BUILD_DIR)/ocher
+clean: zlib_clean freetype_clean mxml_clean ocher_config_clean ocher_clean unittestpp_clean
 
 dist: ocher
 	tar -C $(BUILD_DIR) -Jcf ocher-`uname -s`-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz ocher

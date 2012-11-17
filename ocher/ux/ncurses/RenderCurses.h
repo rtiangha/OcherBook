@@ -15,7 +15,7 @@ public:
     bool init(WINDOW* scr, CDKSCREEN* m_screen);
     int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
-    int outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit);
 
 protected:
     WINDOW* m_scr;
@@ -39,4 +39,3 @@ protected:
 };
 
 #endif
-

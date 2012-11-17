@@ -5,6 +5,10 @@
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/Event.h"
 
+#define WIDGET_HIDDEN 1
+#define WIDGET_OWNED  2
+#define WIDGET_DIRTY  4
+
 
 class Widget : public EventHandler
 {
@@ -13,8 +17,16 @@ public:
     virtual ~Widget();
 
     void addChild(Widget* child);
+    void addChild(Widget& child);
 
-    virtual void draw(Pos* pos) = 0;
+    void dirty();
+    void hide() { m_flags |= WIDGET_HIDDEN; }
+    void show() { m_flags &= ~WIDGET_HIDDEN; }
+
+    /**
+     * @return Rectangle unioning all dirty rects (this and children), or !valid rect if all clean
+     */
+    virtual Rect draw(Pos* pos) = 0;
 
     int eventReceived(struct OcherEvent* evt);
     virtual int evtKey(struct OcherEvent*) { return -1; }
@@ -23,14 +35,16 @@ public:
     virtual int evtDevice(struct OcherEvent*) { return -1; }
 
     Rect m_rect;
-protected:
-    void drawChildren(Pos* pos);
-
     unsigned int m_flags;
+protected:
+    /**
+     * @return Rectangle unioning all dirty rects, or !valid rect if all clean
+     */
+    Rect drawChildren(Pos* pos);
+
     Widget* m_parent;
     clc::List m_children;
-    //focus
-    //hidden
+    // TODO focus
 };
 
 class Canvas : public Widget
@@ -39,9 +53,10 @@ public:
     Canvas();
     ~Canvas() {}
 
-    void draw(Pos* pos);
+    void refresh();
 
 protected:
+    Rect draw(Pos* pos);
 };
 
 #define OWF_CLOSE 1
@@ -52,7 +67,7 @@ public:
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window();
 
-    virtual void draw(Pos* pos);
+    virtual Rect draw(Pos* pos);
     virtual void drawBorder(Rect* rect);
     virtual void drawTitle(Rect* rect);
     virtual void drawBg(Rect* rect);
@@ -63,7 +78,7 @@ public:
     uint32_t m_bgColor;
     uint32_t m_borderColor;
     uint8_t m_borderWidth;
-    uint32_t m_flags;
+    uint32_t m_winflags;
 protected:
     char* m_title;
     // border style:  none, simple, raised
@@ -78,7 +93,7 @@ public:
 
     void setLabel(const char* label);
 
-    virtual void draw(Pos* pos);
+    virtual Rect draw(Pos* pos);
     virtual void drawBorder(Rect* rect);
     virtual void drawLabel(Rect* rect);
 
@@ -139,7 +154,10 @@ public:
     Icon(int x, int y, unsigned int w, unsigned int h);
     virtual ~Icon() {}
 
-    virtual void draw(Pos*) {}
+    virtual Rect draw(Pos*) {
+        Rect r(-1, -1, 0, 0);
+        return r;
+    }
 };
 
 #if 0

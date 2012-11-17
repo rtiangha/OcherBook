@@ -10,7 +10,7 @@ class BatteryIcon : public Icon
 public:
     BatteryIcon(int x, int y, Battery& battery);
 
-    void draw(Pos* pos);
+    Rect draw(Pos* pos);
 
     Battery& m_battery;
 };

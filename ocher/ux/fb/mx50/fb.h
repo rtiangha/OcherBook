@@ -23,7 +23,7 @@ public:
     void pset(int x, int y);
     void hline(int x1, int y, int x2);
     inline void vline(int x, int y1, int y2) { line(x, y1, x, y2); }
-    void blit(unsigned char *p, int x, int y, int w, int h);
+    void blit(unsigned char* p, int x, int y, int w, int h, const Rect* clip);
     void fillRect(Rect* r);
     int update(Rect* r, bool full);
 
@@ -38,7 +38,7 @@ public:
 
 protected:
     int m_fd;
-    char *m_fb;
+    char* m_fb;
     size_t m_fbSize;
     int m_marker;
     struct fb_var_screeninfo vinfo;
@@ -49,4 +49,3 @@ protected:
 };
 
 #endif
-

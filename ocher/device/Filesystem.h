@@ -8,7 +8,7 @@ public:
     Filesystem();
     ~Filesystem();
 
-    const char **m_libraries;
+    const char** m_libraries;
     char* m_home;
     char* m_settings;
 };

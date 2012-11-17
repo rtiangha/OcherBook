@@ -9,7 +9,7 @@ class HomeActivity
 public:
     HomeActivity();
 
-    Activity run();
+    Activity run(UiBits& ui);
 };
 
 #endif

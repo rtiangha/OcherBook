@@ -15,6 +15,8 @@
 #include "ocher/ux/Pagination.h"
 #include "ocher/ux/fd/RenderFd.h"
 
+#define LOG_NAME "ocher.render.fd"
+
 
 // TODO:  margins (not the same as margins for fb?)
 // TODO:  if isatty: SIGWINCH
@@ -34,7 +36,7 @@ bool RendererFd::init()
     m_height = 0;
     if (isatty(m_fd) == -1) {
         if (errno == EBADF) {
-            clc::Log::error("ocher.renderer.fd", "bad file descriptor");
+            clc::Log::error(LOG_NAME, "bad file descriptor");
             return false;
         } else {
             m_isTty = 0;
@@ -102,18 +104,18 @@ void RendererFd::popAttrs()
     applyAttrs(-1);
 }
 
-int RendererFd::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit)
+int RendererFd::outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit)
 {
-    int len = b->size();
-    const unsigned char *start = (const unsigned char*)b->data();
-    const unsigned char *p = start;
+    unsigned int len = b->size();
+    const unsigned char* start = (const unsigned char*)b->data();
+    const unsigned char* p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;
     p += strOffset;
 
     do {
-        int w = m_width - m_x;
+        unsigned int w = m_width - m_x;
 
         // If at start of line, eat spaces
         if (m_x == 0) {
@@ -124,17 +126,17 @@ int RendererFd::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBli
         }
 
         // How many chars should go out on this line?
-        const unsigned char *nl = 0;
-        int n = w;
+        const unsigned char* nl = 0;
+        unsigned int n = w;
         if (w >= len) {
             n = len;
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
         } else {
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
             if (!nl) {
                 // don't break words
                 if (!isspace(*(p+n-1)) && !isspace(*(p+n))) {
-                    unsigned char *space = (unsigned char*)memrchr(p, ' ', n);
+                    unsigned char* space = (unsigned char*)memrchr(p, ' ', n);
                     if (space) {
                         nl = space;
                     }
@@ -169,7 +171,7 @@ int RendererFd::outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBli
 
 int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
-    clc::Log::info("ocher.renderer.fd", "render page %u %u", pageNum, doBlit);
+    clc::Log::info(LOG_NAME, "render page %u %u", pageNum, doBlit);
     m_x = 0;
     m_y = 0;
     if (m_height) {
@@ -184,12 +186,12 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
     } else if (! pagination->get(pageNum-1, &layoutOffset, &strOffset)) {
         // Previous page not already paginated?
         // Perhaps at end of book?
-        clc::Log::error("ocher.renderer.fd", "page %u not found", pageNum);
+        clc::Log::error(LOG_NAME, "page %u not found", pageNum);
         return -1;
     }
 
     const unsigned int N = m_layout.size();
-    const char *raw = m_layout.data();
+    const char* raw = m_layout.data();
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i+2 <= N);
@@ -201,7 +203,7 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
         unsigned int arg = code & 0xff;
         switch (opType) {
             case Layout::OpPushTextAttr:
-                clc::Log::debug("ocher.renderer.fd", "OpPushTextAttr");
+                clc::Log::debug(LOG_NAME, "OpPushTextAttr");
                 switch (op) {
                     case Layout::AttrBold:
                         pushAttrs();
@@ -228,13 +230,13 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                         pushAttrs();
                         break;
                     default:
-                        clc::Log::error("ocher.renderer.fd", "unknown OpPushTextAttr");
+                        clc::Log::error(LOG_NAME, "unknown OpPushTextAttr");
                         ASSERT(0);
                         break;
                 }
                 break;
             case Layout::OpPushLineAttr:
-                clc::Log::debug("ocher.renderer.fd", "OpPushLineAttr");
+                clc::Log::debug(LOG_NAME, "OpPushLineAttr");
                 switch (op) {
                     case Layout::LineJustifyLeft:
                         break;
@@ -245,7 +247,7 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                     case Layout::LineJustifyRight:
                         break;
                     default:
-                        clc::Log::error("ocher.renderer.fd", "unknown OpPushLineAttr");
+                        clc::Log::error(LOG_NAME, "unknown OpPushLineAttr");
                         ASSERT(0);
                         break;
                 }
@@ -253,32 +255,32 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
             case Layout::OpCmd:
                 switch (op) {
                     case Layout::CmdPopAttr:
-                        clc::Log::trace("ocher.renderer.fd", "OpCmd CmdPopAttr");
+                        clc::Log::trace(LOG_NAME, "OpCmd CmdPopAttr");
                         if (arg == 0)
                             arg = 1;
                         while (arg--)
                             popAttrs();
                         break;
                     case Layout::CmdOutputStr: {
-                        clc::Log::trace("ocher.renderer.fd", "OpCmd CmdOutputStr");
+                        clc::Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
                         ASSERT(i + sizeof(clc::Buffer*) <= N);
-                        clc::Buffer *str = *(clc::Buffer**)(raw+i);
+                        clc::Buffer* str = *(clc::Buffer**)(raw+i);
                         ASSERT(strOffset <= str->size());
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;
                         if (breakOffset >= 0) {
                             pagination->set(pageNum, i-2, breakOffset);
-                            clc::Log::debug("ocher.renderer.fd", "page %u break", pageNum);
+                            clc::Log::debug(LOG_NAME, "page %u break", pageNum);
                             return 0;
                         }
                         i += sizeof(clc::Buffer*);
                         break;
                     }
                     case Layout::CmdForcePage:
-                        clc::Log::trace("ocher.renderer.fd", "OpCmd CmdForcePage");
+                        clc::Log::trace(LOG_NAME, "OpCmd CmdForcePage");
                         break;
                     default:
-                        clc::Log::error("ocher.renderer.fd", "unknown OpCmd");
+                        clc::Log::error(LOG_NAME, "unknown OpCmd");
                         ASSERT(0);
                         break;
                 }
@@ -288,12 +290,12 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
             case Layout::OpImage:
                 break;
             default:
-                clc::Log::error("ocher.renderer.fd", "unknown op type");
+                clc::Log::error(LOG_NAME, "unknown op type");
                 ASSERT(0);
                 break;
 
         };
     }
-    clc::Log::debug("ocher.renderer.fd", "page %u done", pageNum);
+    clc::Log::debug(LOG_NAME, "page %u done", pageNum);
     return 1;
 }

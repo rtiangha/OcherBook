@@ -1,3 +1,4 @@
+#include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/fb/FactoryFb.h"
 #include "ocher/ocher.h"
 
@@ -13,9 +14,9 @@ UiFactoryFb::UiFactoryFb() :
 bool UiFactoryFb::init()
 {
     // Derived init must have set m_fb.
-    m_ft = new FreeType(m_fb);
+    m_ft = new FreeType(m_fb->dpi());
     if (m_ft->init()) {
-        m_render = new RenderFb(m_ft, m_fb);
+        m_render = new RenderFb(m_fb);
         if (m_render->init()) {
             return true;
         }

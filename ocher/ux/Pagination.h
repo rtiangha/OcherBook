@@ -37,7 +37,7 @@ protected:
         /** @todo to handle large epubs on small machines, may need to break up
          * the layout per spine index */
         //unsigned int spineIndex;
-        unsigned int layoutOffset;
+        unsigned int layoutOffset;    /* TODO xxx  this is uninitialized */
         unsigned int strOffset;
         /* TODO attrs */
     };
@@ -48,4 +48,3 @@ protected:
 
 
 #endif
-

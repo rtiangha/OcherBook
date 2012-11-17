@@ -7,11 +7,10 @@
 class Text : public Format
 {
 public:
-    Text(const char *filename);
+    Text(const char* filename);
     virtual ~Text() {}
 
     clc::Buffer m_text;
 };
 
 #endif
-

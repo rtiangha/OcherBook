@@ -1,18 +1,18 @@
 #ifndef OCHER_UX_FACTORY_H
 #define OCHER_UX_FACTORY_H
 
+#include "ocher/shelf/Shelf.h"
 #include "ocher/ux/Renderer.h"
-#include "ocher/ux/Controller.h"
+#include "ocher/ux/fb/FrameBuffer.h"
+#include "ocher/ux/fb/FreeType.h"
+
 
 class EventLoop;
-class FreeType;
-class FrameBuffer;
 
-// for ease of access
+extern EventLoop* g_loop;
 extern FrameBuffer* g_fb;
 extern FreeType* g_ft;
-extern EventLoop* g_loop;
-extern Controller* g_cont;
+extern Shelf* g_shelf;
 
 class UiFactory
 {
@@ -41,4 +41,3 @@ public:
 extern UiFactory* uiFactory;
 
 #endif
-

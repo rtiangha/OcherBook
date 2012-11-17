@@ -2,7 +2,6 @@
 
 #include "clc/support/Debug.h"
 #include "clc/support/Logger.h"
-
 #include "ocher/fmt/Layout.h"
 
 
@@ -22,7 +21,7 @@ Layout::~Layout()
 {
     // Walk the bytecode and delete embedded strings
     const unsigned int N = m_data.size();
-    const char *raw = m_data.data();
+    const char* raw = m_data.data();
     for (unsigned int i = 0; i < N; ) {
         uint16_t code = *(uint16_t*)(raw+i);
         i += 2;
@@ -43,28 +42,28 @@ clc::Buffer Layout::unlock()
     return m_data;
 }
 
-char *Layout::checkAlloc(unsigned int n)
+char* Layout::checkAlloc(unsigned int n)
 {
     if (m_dataLen + n > m_data.size()) {
         m_data.unlockBuffer(m_data.size());
         m_data.lockBuffer(m_dataLen + n + chunk);
     }
-    char *p = m_data.c_str() + m_dataLen;
+    char* p = m_data.c_str() + m_dataLen;
     m_dataLen += n;
     return p;
 }
 
 void Layout::push(unsigned int opType, unsigned int op, unsigned int arg)
 {
-    char *p = checkAlloc(2);
+    char* p = checkAlloc(2);
     uint16_t i = (opType<<12) | (op<<8) | arg;
     *(uint16_t*)p = i;
 }
 
-void Layout::pushPtr(void *ptr)
+void Layout::pushPtr(void* ptr)
 {
     int n = sizeof(ptr);
-    char *p = checkAlloc(n);
+    char* p = checkAlloc(n);
     *((char**)p) = (char*)ptr;
 }
 
@@ -136,4 +135,3 @@ void Layout::flushText()
         m_textLen = 0;
     }
 }
-

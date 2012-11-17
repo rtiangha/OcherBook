@@ -1,6 +1,9 @@
 #ifndef OCHER_UX_ACTIVITY_H
 #define OCHER_UX_ACTIVITY_H
 
+#include "ocher/device/Battery.h"
+#include "ocher/ux/fb/BatteryIcon.h"
+#include "ocher/ux/fb/SystemBar.h"
 #include "ocher/ux/fb/Widgets.h"
 
 
@@ -10,17 +13,34 @@ enum Activity {
     ACTIVITY_READ,
     ACTIVITY_LIBRARY,
     ACTIVITY_SETTINGS,
+
+    ACTIVITY_PREVIOUS,
     ACTIVITY_QUIT,
 };
 
 
+/**
+ * Optional backdrop, available to all Activities.
+ */
 class OcherCanvas : public Canvas
 {
 public:
     OcherCanvas();
     ~OcherCanvas();
 
-    void draw(Pos* pos=0);
+    Rect draw(Pos* pos=0);
+};
+
+/**
+ * Optional shared UI components, available to all Activities.
+ */
+class UiBits
+{
+public:
+    UiBits() : m_systemBar(m_battery) {}
+
+    Battery m_battery;
+    SystemBar m_systemBar;
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include "ocher/fmt/epub/Css.h"
 
+
 CssParser::CssParser()
 {
 }
@@ -17,7 +18,7 @@ CssParser::parseElements()
 
 CssRule* CssParser::parseString(clc::Buffer &b)
 {
-    const char *p = b.c_str();
+    const char* p = b.c_str();
 
     clc::Buffer tmp;
 
@@ -54,5 +55,3 @@ CssRule* CssParser::parseString(clc::Buffer &b)
     }
 
 }
-
-

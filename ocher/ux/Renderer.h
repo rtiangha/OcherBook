@@ -18,7 +18,7 @@ public:
     int em : 1;  ///< emphasize/italics
     int pad : 2;
     uint8_t pts;   ///< text points
-};
+} __attribute__((packed));
 
 
 /**

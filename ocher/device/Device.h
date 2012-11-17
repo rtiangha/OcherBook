@@ -26,7 +26,7 @@ public:
 /**
  * The device singleton
  */
-extern Device *device;
+extern Device* device;
 
 void initDevice();
 

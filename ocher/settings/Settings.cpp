@@ -33,7 +33,7 @@ void Settings::load()
     while (!s.isEof()) {
         line = s.readLine(false, 1024);
 
-        const char *p = line.c_str();
+        const char* p = line.c_str();
         size_t n = line.size();
 
         // TODO

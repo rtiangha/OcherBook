@@ -12,7 +12,7 @@ public:
     bool init();
     int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
-    int outputWrapped(clc::Buffer *b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit);
 
 protected:
     int m_isTty;
@@ -38,4 +38,3 @@ protected:
 };
 
 #endif
-

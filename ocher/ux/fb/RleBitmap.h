@@ -5,20 +5,25 @@
 
 
 /**
- * Used to store internal images.  Currently limited to 7bpp
+ * Used to store simple images, such as line drawings.
+ * Two consecutive identical bytes indicate a run; the next byte indicates how
+ * many additional such bytes follow (0-255).
  */
 class RleBitmap
 {
 public:
     RleBitmap();
 
-    void setTo(uint8_t* p, uint16_t w, uint16_t h);
+    /**
+     * Imports the uncompressed buffer.
+     */
+    void compress(uint8_t* p, unsigned int len);
 
-    void copyFrom(uint8_t* p, uint16_t w, uint16_t h);
 
     void resetUnpack();
 
     /**
+     * Unpacks the next
      */
     int unpackNext(uint8_t* c);
 
@@ -31,4 +36,3 @@ protected:
 };
 
 #endif
-

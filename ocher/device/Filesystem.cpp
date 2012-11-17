@@ -41,11 +41,11 @@ static bool getKnownFolder(int id, clc::Buffer& d)
 static bool getKnownFolderVista(const GUID& id, clc::Buffer& d)
 {
     bool success = false;
-    typedef HRESULT (STDAPICALLTYPE * SHGetKnownFolderPathFN)(
+    typedef HRESULT (STDAPICALLTYPE* SHGetKnownFolderPathFN)(
         const GUID & rfid,
         DWORD dwFlags,
         HANDLE hToken,
-        PWSTR *ppszPath);
+        PWSTR* ppszPath);
     HMODULE lib = LoadLibrary("Shell32.dll");
     do {
         if (! lib)
@@ -101,9 +101,9 @@ static clc::Buffer settingsDir()
 #elif defined(__HAIKU__)
     dir = "/boot/home/config/settings";
 #else
-    const char *e = getenv("HOME");
+    const char* e = getenv("HOME");
     if (!e) {
-        struct passwd *p = getpwuid(getuid());
+        struct passwd* p = getpwuid(getuid());
         if (p) {
             e = p->pw_dir;
         } else {

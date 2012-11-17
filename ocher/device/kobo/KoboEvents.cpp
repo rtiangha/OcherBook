@@ -6,8 +6,9 @@
 
 #include "clc/support/Debug.h"
 #include "clc/support/Logger.h"
-
 #include "ocher/device/kobo/KoboEvents.h"
+
+#define LOG_NAME "ocher.dev.KoboEvents"
 
 
 /*
@@ -82,13 +83,13 @@ int KoboEvents::wait(struct OcherEvent* evt)
 
     int r = select(nfds + 1, &rdfds, 0, 0, 0);
     if (r == -1) {
-        clc::Log::error("ocher.kobo", "select: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "select: %s", strerror(errno));
         return -1;
     } else if (r == 0) {
-        clc::Log::error("ocher.kobo", "select: timeout");
+        clc::Log::error(LOG_NAME, "select: timeout");
         return -1;
     } else {
-        clc::Log::debug("ocher.kobo", "select: awake");
+        clc::Log::debug(LOG_NAME, "select: awake");
 
         while (1) {
             struct KoboButtonEvent kevt;
@@ -126,7 +127,7 @@ int KoboEvents::wait(struct OcherEvent* evt)
                 break;
             } else if (r >= (int)sizeof(struct input_event)) {
                 for (int i = 0; i < r / (int)sizeof(struct input_event); i++) {
-                    clc::Log::info("ocher.kobo", "type %d code %d value %d", kevt[i].type,
+                    clc::Log::debug(LOG_NAME, "type %d code %d value %d", kevt[i].type,
                             kevt[i].code, kevt[i].value);
                     if (kevt[i].type == EV_SYN) {
                         return 0;
@@ -135,8 +136,10 @@ int KoboEvents::wait(struct OcherEvent* evt)
                         uint16_t code = kevt[i].code;
                         if (code == ABS_X) {
                             evt->mouse.x = kevt[i].value;
+                            clc::Log::info(LOG_NAME, "abs mouse X %u", evt->mouse.x);
                         } else if (code == ABS_Y) {
                             evt->mouse.y = kevt[i].value;
+                            clc::Log::info(LOG_NAME, "abs mouse Y %u", evt->mouse.y);
                         } else if (code == ABS_PRESSURE) {
                             evt->subtype = kevt[i].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
                         }
@@ -149,5 +152,3 @@ int KoboEvents::wait(struct OcherEvent* evt)
     }
     return -1;
 }
-
-

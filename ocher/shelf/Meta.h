@@ -26,9 +26,13 @@ enum Fmt {
 class BookRecord
 {
 public:
-    BookRecord() : lastPage(0) {}
+    BookRecord() : lastPage(0), touched(0), isShortList(0) {}
 
     int lastPage;  // TODO:  can't use page number; varies by device/settings
+
+    time_t touched;
+
+    int isShortList;
 
     // TODO: dates
     // TODO: highlights

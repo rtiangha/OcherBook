@@ -18,6 +18,8 @@
 #include "ocher/ux/fb/mx50/fb.h"
 #include "ocher/settings/Settings.h"
 
+#define LOG_NAME "ocher.mx50"
+
 
 // Kobo Touch: MX508
 // http://mediaz.googlecode.com/svn-history/r19/trunk/ReaderZ/native/einkfb/einkfb.c
@@ -33,22 +35,22 @@ Mx50Fb::Mx50Fb() :
 
 bool Mx50Fb::init()
 {
-    const char *dev = "/dev/fb0";
+    const char* dev = "/dev/fb0";
     m_fd = open(dev, O_RDWR);
     if (m_fd == -1) {
-        clc::Log::error("ocher.mx50", "Failed to open %s: %s", dev, strerror(errno));
+        clc::Log::error(LOG_NAME, "Failed to open %s: %s", dev, strerror(errno));
         goto fail;
     }
 
     // Get fixed screen information
     if (ioctl(m_fd, FBIOGET_FSCREENINFO, &finfo) == -1) {
-        clc::Log::error("ocher.mx50", "Failed to get fixed screen info: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "Failed to get fixed screen info: %s", strerror(errno));
         goto fail1;
     }
 
     // Get variable screen information
     if (ioctl(m_fd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
-        clc::Log::error("ocher.mx50", "Failed to get variable screen info: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "Failed to get variable screen info: %s", strerror(errno));
         goto fail1;
     }
 
@@ -58,25 +60,31 @@ bool Mx50Fb::init()
     // 0 is landscape right handed, 3 is portrait
     vinfo.rotate = 3;
     if (ioctl(m_fd, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
-        clc::Log::error("ocher.mx50", "Failed to set variable screen info: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "Failed to set variable screen info: %s", strerror(errno));
         goto fail1;
     }
 
-    clc::Log::info("ocher.mx50", "virtual %dx%d", vinfo.xres_virtual, vinfo.yres_virtual);
+    clc::Log::info(LOG_NAME, "virtual %dx%d", vinfo.xres_virtual, vinfo.yres_virtual);
     // Figure out the size of the screen in bytes
     m_fbSize = vinfo.xres_virtual * vinfo.yres_virtual * vinfo.bits_per_pixel / 8;
 
     // Map the device to memory
     m_fb = (char*)mmap(0, m_fbSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
     if (m_fb == MAP_FAILED) {
-        clc::Log::error("ocher.mx50", "mmap: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "mmap: %s", strerror(errno));
         goto fail1;
     }
 
     setBg(0xff, 0xff, 0xff);
     clear();
     update(NULL, true);
-    clc::Log::info("ocher.mx50", "initialized");
+    clc::Log::info(LOG_NAME, "initialized");
+
+    bbox.x = bbox.y = 0;
+    bbox.w = width();
+    bbox.h = height();
+    clc::Log::info(LOG_NAME, "fb %d %d %d %d", bbox.x, bbox.y, bbox.w, bbox.h);
+
     return true;
 
 fail1:
@@ -140,51 +148,48 @@ inline void Mx50Fb::hline(int x1, int y, int x2)
 
 void Mx50Fb::fillRect(Rect* r)
 {
-    int y2 = r->y + r->h - 1;
+    int y2 = r->y + r->h;
     for (int y = r->y; y < y2; ++y) {
         hline(r->x, y, r->x+r->w-1);
     }
 }
 
-static void invcpy(unsigned char *dst, unsigned char *src, size_t n)
+void Mx50Fb::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
-#if 0
-    // Assuming src is word aligned.
-    // dst may not be aligned.
-
-#else
-    // TODO  invert then memcpy is total hack.  do it right:
-    // respect alignment, invert while copying.  (Or is it possible
-    // to have FreeType output inverted?)
-    for (size_t i = 0; i < n; ++i) {
-        src[i] = ~src[i];
+    clc::Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
+    Rect clip;
+    if (userClip) {
+        clip = *userClip;
+    } else {
+        clip.x = clip.y = 0;
+        clip.w = width();
+        clip.h = height();
     }
-    memcpy(dst, src, n);
-#endif
-}
 
-void Mx50Fb::blit(unsigned char *p, int x, int y, int w, int h)
-{
-    clc::Log::trace("ocher.mx50", "blit");
-    const int fbw = width();
-    if (x >= fbw)
-        return;
-    const int fbh = height();
-    if (y >= fbh)
-        return;
-    if (x < 0) {
+    const int maxX = clip.x + clip.w - 1;
+    const int minX = clip.x;
+    if (x + w >= maxX) {
+        if (x >= maxX)
+            return;
+        w = maxX - x;
+    }
+    if (x < minX) {
         // TODO
     }
-    if (x + w >= fbw)
-        w = fbw - x;
-    if (y < 0) {
+    const int maxY = clip.y + clip.h - 1;
+    const int minY = clip.y;
+    if (y + h >= maxY) {
+        if (y >= maxY)
+            return;
+        h = maxY - y;
+    }
+    if (y < minY) {
         // TODO
     }
-    if (y + h >= fbh)
-        h = fbh - y;
 
+    clc::Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
     for (int i = 0; i < h; ++i) {
-        invcpy(((unsigned char*)m_fb) + y*vinfo.xres_virtual + x, p, w);
+        memcpy(((unsigned char*)m_fb) + y*vinfo.xres_virtual + x, p, w);
         y++;
         p = p + w;
     }
@@ -203,6 +208,7 @@ int Mx50Fb::update(Rect* r, bool full)
         m_clears = 0;
         full = true;
     }
+    clc::Log::debug(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
 
     struct mxcfb_update_data region;
 
@@ -217,7 +223,7 @@ int Mx50Fb::update(Rect* r, bool full)
     region.flags = 0;
 
     if (ioctl(m_fd, MXCFB_SEND_UPDATE, &region) == -1) {
-        clc::Log::error("ocher.mx50", "MXCFB_SEND_UPDATE(%d, %d, %d, %d, %d): %s",
+        clc::Log::error(LOG_NAME, "MXCFB_SEND_UPDATE(%d, %d, %d, %d, %d): %s",
                 r->x, r->y, r->w, r->h, m_marker, strerror(errno));
     }
     return m_marker;
@@ -226,7 +232,7 @@ int Mx50Fb::update(Rect* r, bool full)
 void Mx50Fb::waitUpdate(int marker)
 {
     if (ioctl(m_fd, MXCFB_WAIT_FOR_UPDATE_COMPLETE, &marker) == -1) {
-        clc::Log::error("ocher.mx50", "MXCFB_WAIT_FOR_UPDATE_COMPLETE(%d): %s", marker, strerror(errno));
+        clc::Log::error(LOG_NAME, "MXCFB_WAIT_FOR_UPDATE_COMPLETE(%d): %s", marker, strerror(errno));
     }
 }
 
@@ -237,7 +243,7 @@ void Mx50Fb::setPixelFormat()
     screen_info.grayscale = GRAYSCALE_8BIT;
     int retval = ioctl(m_fd, FBIOPUT_VSCREENINFO, &screen_info);
     if (retval)
-        clc::Log::error("ocher.mx50", "FBIOPUT_VSCREENINFO: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "FBIOPUT_VSCREENINFO: %s", strerror(errno));
 }
 
 void Mx50Fb::setAutoUpdateMode(bool autoUpdate)
@@ -246,7 +252,7 @@ void Mx50Fb::setAutoUpdateMode(bool autoUpdate)
     mode = autoUpdate ? AUTO_UPDATE_MODE_AUTOMATIC_MODE : AUTO_UPDATE_MODE_REGION_MODE;
     int retval = ioctl(m_fd, MXCFB_SET_AUTO_UPDATE_MODE, &mode);
     if (retval)
-        clc::Log::error("ocher.mx50", "MXCFB_SET_AUTO_UPDATE_MODE(%d): %s", mode, strerror(errno));
+        clc::Log::error(LOG_NAME, "MXCFB_SET_AUTO_UPDATE_MODE(%d): %s", mode, strerror(errno));
 }
 
 void Mx50Fb::setUpdateScheme()
@@ -255,6 +261,5 @@ void Mx50Fb::setUpdateScheme()
 //    screen_info.scheme = UPDATE_SCHEME_SNAPSHOT;
     int retval = ioctl(m_fd, MXCFB_SET_UPDATE_SCHEME, &screen_info);
     if (retval)
-        clc::Log::error("ocher.mx50", "MXCFB_SET__UPDATE_SCHEME: %s", strerror(errno));
+        clc::Log::error(LOG_NAME, "MXCFB_SET__UPDATE_SCHEME: %s", strerror(errno));
 }
-
