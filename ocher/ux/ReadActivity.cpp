@@ -190,13 +190,17 @@ Activity ReadActivity::run()
     m_pageNum = meta->record.activePage;
     clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
     dirty();
+
+    // TODO:  yuck, rewrite this
     while (1) {
         refresh();
+        g_loop->flush();
 
-        // TODO  convert to g_loop->poll(this);
         struct OcherEvent evt;
-        if (g_loop->wait(&evt) == 0) {
-            int r = eventReceived(&evt);
+        int r = g_loop->wait(&evt);
+        g_fb->sync();
+        if (r == 0) {
+            r = eventReceived(&evt);
             if (r >= 0)
                 break;
         }

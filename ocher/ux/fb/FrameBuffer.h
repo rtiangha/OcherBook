@@ -56,6 +56,11 @@ public:
     void blitGlyphs(Glyph** glyphs, Pos* pen, const Rect* clip=0);
 
     virtual int update(Rect* r, bool full=false) = 0;
+
+    /**
+     * Ensures that all prior updates have completed.
+     */
+    virtual void sync() {}
 };
 
 #endif

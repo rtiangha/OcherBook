@@ -200,9 +200,6 @@ int Mx50Fb::update(Rect* r, bool full)
         r = &_r;
     }
     clc::Log::info(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
-    if (m_marker)
-        waitUpdate(m_marker);
-
     struct mxcfb_update_data region;
 
     region.update_region.left = r->x;
@@ -219,7 +216,13 @@ int Mx50Fb::update(Rect* r, bool full)
         clc::Log::error(LOG_NAME, "MXCFB_SEND_UPDATE(%d, %d, %d, %d, %d): %s",
                 r->x, r->y, r->w, r->h, m_marker, strerror(errno));
     }
+
     return m_marker;
+}
+
+void Mx50Fb::sync()
+{
+    waitUpdate(m_marker);
 }
 
 void Mx50Fb::waitUpdate(int marker)

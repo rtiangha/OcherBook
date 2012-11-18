@@ -27,7 +27,9 @@ Serial          : 0000000000000000
 */
 
 
-KoboEvents::KoboEvents()
+KoboEvents::KoboEvents() :
+    kevtHead(0),
+    kevtTail(0)
 {
     // TODO handle failures
     m_buttonFd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
@@ -38,9 +40,7 @@ KoboEvents::KoboEvents()
 KoboEvents::~KoboEvents()
 {
 #if 0
-    interrupt();
     write(m_pipe[1], "", 1);
-    join();
 #endif
     close(m_pipe[0]);
     close(m_pipe[1]);
@@ -64,6 +64,11 @@ struct KoboButtonEvent {
     uint16_t res4;
 };
 
+void KoboEvents::flush()
+{
+    kevtHead = kevtTail = 0;
+}
+
 int KoboEvents::wait(struct OcherEvent* evt)
 {
     memset(evt, 0, sizeof(*evt));
@@ -81,7 +86,13 @@ int KoboEvents::wait(struct OcherEvent* evt)
     if (nfds < m_pipe[0])
         nfds = m_pipe[0];
 
-    int r = select(nfds + 1, &rdfds, 0, 0, 0);
+    int r;
+    if (kevtHead == kevtTail) {
+        r = select(nfds + 1, &rdfds, 0, 0, 0);
+    } else {
+        r = 1;
+    }
+
     if (r == -1) {
         clc::Log::error(LOG_NAME, "select: %s", strerror(errno));
         return -1;
@@ -92,22 +103,22 @@ int KoboEvents::wait(struct OcherEvent* evt)
         clc::Log::debug(LOG_NAME, "select: awake");
 
         while (1) {
-            struct KoboButtonEvent kevt;
-            r = read(m_buttonFd, &kevt, sizeof(kevt));
+            struct KoboButtonEvent kbe;
+            r = read(m_buttonFd, &kbe, sizeof(kbe));
             if (r == -1) {
                 if (errno == EINTR)
                     continue;
                 ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
                 break;
-            } else if (r == sizeof(kevt)) {
-                if (kevt.button == 0x66) {
+            } else if (r == sizeof(kbe)) {
+                if (kbe.button == 0x66) {
                     evt->type = OEVT_KEY;
-                    evt->subtype = kevt.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                    evt->subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
                     evt->key.key = OEVTK_HOME;
                     return 0;
-                } else if (kevt.button == 0x74) {
+                } else if (kbe.button == 0x74) {
                     evt->type = OEVT_KEY;
-                    evt->subtype = kevt.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                    evt->subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
                     evt->key.key = OEVTK_POWER;
                     return 0;
                 }
@@ -118,35 +129,75 @@ int KoboEvents::wait(struct OcherEvent* evt)
 
         // http://www.kernel.org/doc/Documentation/input/event-codes.txt
         while (1) {
-            struct input_event kevt[64];
-            r = read(m_touchFd, &kevt, sizeof(struct input_event)*64);
-            if (r == -1) {
-                if (errno == EINTR)
-                    continue;
-                ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
-                break;
-            } else if (r >= (int)sizeof(struct input_event)) {
-                for (int i = 0; i < r / (int)sizeof(struct input_event); i++) {
-                    clc::Log::debug(LOG_NAME, "type %d code %d value %d", kevt[i].type,
-                            kevt[i].code, kevt[i].value);
-                    if (kevt[i].type == EV_SYN) {
-                        return 0;
-                    } else if (kevt[i].type == EV_ABS) {
-                        evt->type = OEVT_MOUSE;
-                        uint16_t code = kevt[i].code;
-                        if (code == ABS_X) {
-                            evt->mouse.x = kevt[i].value;
-                            clc::Log::info(LOG_NAME, "abs mouse X %u", evt->mouse.x);
-                        } else if (code == ABS_Y) {
-                            evt->mouse.y = kevt[i].value;
-                            clc::Log::info(LOG_NAME, "abs mouse Y %u", evt->mouse.y);
-                        } else if (code == ABS_PRESSURE) {
-                            evt->subtype = kevt[i].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
+            const unsigned int N = 64;
+            STATIC_ASSERT(sizeof(kevt) == N*sizeof(struct input_event));
+
+            if (kevtHead == kevtTail) {
+                while (1) {
+                    unsigned int head, tail, slots;
+                    head = kevtHead;
+                    tail = kevtTail;
+                    if (tail < head)
+                        tail += N;
+                    slots = N - (tail - head);
+                    if (tail + slots > N)
+                        slots = N - tail;
+
+                    if (slots) {
+                        clc::Log::info(LOG_NAME, "reading %u events at offset %u", slots, tail);
+                        r = read(m_touchFd, &kevt[tail], sizeof(struct input_event)*slots);
+                        if (r == -1) {
+                            if (errno == EINTR)
+                                continue;
+                            ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
+                            clc::Log::info(LOG_NAME, "read 0 events");
+                            break;
                         }
+                        unsigned int n = r / sizeof(struct input_event);
+                        clc::Log::info(LOG_NAME, "read %u events", n);
+
+                        kevtTail += n;
+                        if (kevtTail > N)
+                            kevtTail = 0;
+                    }
+                    break;
+                }
+            }
+
+            int syn = 0;
+            while (1) {
+                if (kevtHead == kevtTail) {
+                    kevtHead = kevtTail = 0;  // Allow maximal read next time
+                    clc::Log::info(LOG_NAME, "empty");
+                    return -1;
+                }
+
+                clc::Log::info(LOG_NAME, "type %d code %d value %d", kevt[kevtHead].type,
+                        kevt[kevtHead].code, kevt[kevtHead].value);
+                if (kevt[kevtHead].type == EV_SYN) {
+                    syn = 1;
+                } else if (kevt[kevtHead].type == EV_ABS) {
+                    // TODO:  orientation is unexpected; fiddle vinfo.rotate
+                    evt->type = OEVT_MOUSE;
+                    uint16_t code = kevt[kevtHead].code;
+                    if (code == ABS_X) {
+                        evt->mouse.y = kevt[kevtHead].value;
+                    } else if (code == ABS_Y) {
+                        evt->mouse.x = 600-kevt[kevtHead].value;
+                    } else if (code == ABS_PRESSURE) {
+                        evt->subtype = kevt[kevtHead].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
                     }
                 }
-            } else {
-                break;
+
+                kevtHead++;
+                if (kevtHead > N)
+                    kevtHead = 0;
+
+                if (syn) {
+                    clc::Log::info(LOG_NAME, "mouse %u, %u %s", evt->mouse.x, evt->mouse.y,
+                            evt->subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
+                    return 0;
+                }
             }
         }
     }

@@ -167,7 +167,6 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
     int r = 1;
     const unsigned int N = m_layout.size();
     const char* raw = m_layout.data();
-    Rect fullPage(0, 0, m_fb->width(), m_fb->height());
     ASSERT(layoutOffset < N);
 
     applyAttrs();
@@ -307,7 +306,5 @@ done:
             chars, ms, (unsigned int)(chars*1000/ms),
             (unsigned int)(totalChars*1000/(totalUSec/1000)));
 #endif
-    if (doBlit)
-        m_fb->update(&fullPage, false);
     return r;
 }

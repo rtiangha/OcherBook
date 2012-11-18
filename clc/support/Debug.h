@@ -44,19 +44,10 @@ public:
 
 
 #if DEBUG
-    #define ASSERT(E)  do{if(!(E)) clc::Debugger::asserted(__FILE__, __LINE__, #E);}while(0)
 
-    #define ASSERT_WITH_MESSAGE(E, msg) \
-                       do{if(!(E)) clc::Debugger::asserted(__FILE__, __LINE__, msg);}while(0)
-
-    #define DEBUG_ONLY(arg)  arg
-
-#else
-    #define ASSERT(E)                    (void)0
-    #define ASSERT_WITH_MESSAGE(E, msg)  (void)0
-    #define DEBUG_ONLY(x)
-#endif
-
+#define ASSERT(E)  do{if(!(E)) clc::Debugger::asserted(__FILE__, __LINE__, #E);}while(0)
+#define ASSERT_WITH_MESSAGE(E, msg) \
+                   do{if(!(E)) clc::Debugger::asserted(__FILE__, __LINE__, msg);}while(0)
 /**
  *  STATIC_ASSERT is a compile-time check that can be used to
  *  verify static expressions such as: STATIC_ASSERT(sizeof(int64) == 8);
@@ -68,5 +59,12 @@ public:
         };                                              \
     } while (0)
 
+#else
 
-#endif  /* _DEBUG_H */
+#define ASSERT(E)                    (void)0
+#define ASSERT_WITH_MESSAGE(E, msg)  (void)0
+#define STATIC_ASSERT(x) (void)0
+
+#endif
+
+#endif

@@ -1,9 +1,8 @@
 PRIORITIZE BASED ON GETTING ON KOBO FOR REAL ASAP
 
 0.0.8 - test on kobo
-fix events: FIFO
-serialize kobo refreshes -- wait on prior to complete
-too many fb updates
+getting pressure 0 events with no x,y
+flush events not quite working
 fix wrapping bug in FontEngine::renderString
 fonts are oversized
 periodically do full refresh

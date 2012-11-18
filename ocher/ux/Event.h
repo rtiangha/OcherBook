@@ -93,6 +93,10 @@ public:
      */
     virtual int wait(struct OcherEvent* evt) = 0;
     /**
+     * Flushes any queued events
+     */
+    virtual void flush() {}
+    /**
      * @return -1 handled, -2 pass on, >=0 done
      */
     int run(EventHandler* handler);

@@ -26,6 +26,7 @@ public:
     void blit(unsigned char* p, int x, int y, int w, int h, const Rect* clip);
     void fillRect(Rect* r);
     int update(Rect* r, bool full);
+    void sync();
 
     /**
      * @param marker  Waits on the specified update, or -1 for all
