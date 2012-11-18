@@ -1,4 +1,5 @@
 #include "clc/support/Debug.h"
+#include "clc/support/Logger.h"
 #include "ocher/shelf/Meta.h"
 #include "ocher/shelf/Shelf.h"
 
@@ -22,12 +23,13 @@ void Shelf::markActive(Meta* meta)
 {
     size_t i = m_meta.indexOf(meta);
     ASSERT(i != clc::List::NotFound);
-    m_meta.swapItems(0, i);
+    m_meta.moveItem(i, 0);
 }
 
 void Shelf::select(Meta* meta)
 {
     m_selected = meta;
+    clc::Log::info(LOG_NAME, "Selected %s", meta->title.c_str());
 }
 
 Meta* Shelf::selected()
@@ -38,4 +40,3 @@ Meta* Shelf::selected()
 void Shelf::updateShortList()
 {
 }
-
