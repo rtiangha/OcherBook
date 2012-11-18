@@ -22,13 +22,14 @@ enum Fmt {
     OCHER_FMT_HTML,
 };
 
-// TODO: per-user
+/**
+ */
 class BookRecord
 {
 public:
-    BookRecord() : lastPage(0), touched(0), isShortList(0) {}
+    BookRecord() : activePage(0), touched(0), isShortList(0) {}
 
-    int lastPage;  // TODO:  can't use page number; varies by device/settings
+    int activePage;  // TODO:  can't use page number; varies by device/settings
 
     time_t touched;
 
@@ -40,6 +41,10 @@ public:
     // TODO: notes
 };
 
+/**
+ * Metadata associated with each book.  This is the root object for each e-book that
+ * the format, the layout, metadata, user's reading record, etc.
+ */
 class Meta
 {
 public:
@@ -65,4 +70,3 @@ public:
 };
 
 #endif
-

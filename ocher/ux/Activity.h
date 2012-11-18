@@ -3,6 +3,7 @@
 
 #include "ocher/device/Battery.h"
 #include "ocher/ux/fb/BatteryIcon.h"
+#include "ocher/ux/fb/NavBar.h"
 #include "ocher/ux/fb/SystemBar.h"
 #include "ocher/ux/fb/Widgets.h"
 
@@ -41,7 +42,7 @@ public:
 
     Battery m_battery;
     SystemBar m_systemBar;
+    NavBar m_navBar;
 };
 
 #endif
-

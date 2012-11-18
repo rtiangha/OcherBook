@@ -12,7 +12,9 @@
 #include "ocher/ux/Factory.h"
 
 #define LOG_NAME "ocher.render.fb"
+#ifdef DEBUG
 #define CPS_STATS
+#endif
 
 
 RenderFb::RenderFb(FrameBuffer* fb) :
@@ -98,9 +100,6 @@ int RenderFb::outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit)
             bbox.y -= m_fe.m_cur.ascender;
             bbox.h = m_fe.m_cur.lineHeight;
             /* TODO save bounding box + glyphs for selection */
-            //if (p[0] == 't' && p[1] == 'h' && p[2] == 'e') {
-            //    m_fb->rect(&bbox);
-            //}
 
             // Fits; render it and advance
             if (doBlit) {

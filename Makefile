@@ -88,7 +88,7 @@ FREEFONT_URL=http://ftp.gnu.org/gnu/freefont/$(FREEFONT_FILE)
 FREEFONT_TGZ=$(DL_DIR)/$(FREEFONT_FILE)
 
 fonts:
-	@[ -e $(FREEFONT_TGZ) ] || (echo -e "Please download $(FREEFONT_URL) to $(DL_DIR)" ; exit 1)
+	@[ -e $(FREEFONT_TGZ) ] || (echo "Please download $(FREEFONT_URL) to $(DL_DIR)" ; exit 1)
 	@mkdir -p $(BUILD_DIR)
 	tar -zxf $(FREEFONT_TGZ) -C $(BUILD_DIR)
 
@@ -279,6 +279,7 @@ OCHER_OBJS += \
 	ocher/ux/fb/FrameBuffer.o \
 	ocher/ux/fb/FreeType.o \
 	ocher/ux/fb/FontEngine.o \
+	ocher/ux/fb/NavBar.o \
 	ocher/ux/fb/SystemBar.o \
 	ocher/ux/fb/RenderFb.o \
 	ocher/ux/fb/Widgets.o

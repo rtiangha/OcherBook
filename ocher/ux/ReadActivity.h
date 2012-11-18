@@ -30,6 +30,7 @@ protected:
     Meta* meta;
     unsigned int m_pageNum;
     int atEnd;
+    unsigned int m_clears;
 };
 
 #endif

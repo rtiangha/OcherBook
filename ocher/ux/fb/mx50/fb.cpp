@@ -14,9 +14,7 @@
 #include <linux/mxcfb.h>
 
 #include "clc/support/Logger.h"
-
 #include "ocher/ux/fb/mx50/fb.h"
-#include "ocher/settings/Settings.h"
 
 #define LOG_NAME "ocher.mx50"
 
@@ -28,8 +26,7 @@ Mx50Fb::Mx50Fb() :
     m_fd(-1),
     m_fb(0),
     m_fbSize(0),
-    m_marker(-1),
-    m_clears(settings.fullRefreshPages)
+    m_marker(0)
 {
 }
 
@@ -78,7 +75,6 @@ bool Mx50Fb::init()
     setBg(0xff, 0xff, 0xff);
     clear();
     update(NULL, true);
-    clc::Log::info(LOG_NAME, "initialized");
 
     bbox.x = bbox.y = 0;
     bbox.w = width();
@@ -129,7 +125,6 @@ void Mx50Fb::setBg(uint8_t r, uint8_t b, uint8_t g)
 
 void Mx50Fb::clear()
 {
-    ++m_clears;
     memset(m_fb, m_bgColor, m_fbSize);
 }
 
@@ -204,11 +199,9 @@ int Mx50Fb::update(Rect* r, bool full)
         _r.h = height();
         r = &_r;
     }
-    if (m_clears > settings.fullRefreshPages) {
-        m_clears = 0;
-        full = true;
-    }
-    clc::Log::debug(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
+    clc::Log::info(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
+    if (m_marker)
+        waitUpdate(m_marker);
 
     struct mxcfb_update_data region;
 

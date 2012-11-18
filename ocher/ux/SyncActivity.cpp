@@ -28,12 +28,11 @@ Rect SyncCanvas::draw(Pos*)
 {
     Rect drawn;
     if (m_flags & WIDGET_DIRTY) {
+        clc::Log::info(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         g_fb->setFg(0xff, 0xff, 0xff);
         g_fb->fillRect(&m_rect);
         drawn = m_rect;
-
-
     } else {
         drawn.setInvalid();
     }
@@ -83,7 +82,7 @@ SyncActivity::SyncActivity()
 
 Activity SyncActivity::run()
 {
-    clc::Log::debug(LOG_NAME, "run");
+    clc::Log::info(LOG_NAME, "run");
     SyncCanvas c;
     c.refresh();
 

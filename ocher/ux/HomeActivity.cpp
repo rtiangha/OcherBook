@@ -28,8 +28,8 @@ protected:
 HomeCanvas::HomeCanvas()
 {
     float ratio = 1.6;
-    int dx = m_rect.w/30;
-    int dy = m_rect.h/34;
+    int dx = m_rect.w/32;
+    int dy = m_rect.h/36;
 
     books[0].x = m_rect.w/15;
     books[0].y = m_rect.h/5;
@@ -53,6 +53,8 @@ HomeCanvas::HomeCanvas()
 
     books[4] = books[3];
     books[4].x += books[3].w + dx;
+    books[4].w -= 2*dx;
+    books[4].h = books[4].w*ratio;
 }
 
 HomeCanvas::~HomeCanvas()
@@ -74,7 +76,13 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 continue;
             }
             if (books[i].contains((Pos*)&evt->mouse)) {
-                clc::Log::debug(LOG_NAME, "book %d selected %p", i, meta);
+                clc::Log::info(LOG_NAME, "book %d selected %p", i, meta);
+                Rect r = books[i];
+                r.inset(-2);
+                g_fb->roundRect(&r, 3);
+                r.inset(-1);
+                g_fb->roundRect(&r, 4);
+                g_fb->update(&r);
                 g_shelf->select(meta);
                 return 0;
             }
@@ -90,15 +98,15 @@ Rect HomeCanvas::draw(Pos*)
     drawn.setInvalid();
 
     if (m_flags & WIDGET_DIRTY) {
+        clc::Log::info(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         drawn = m_rect;
 
         g_fb->setFg(0xff, 0xff, 0xff);
         g_fb->fillRect(&m_rect);
+        g_fb->setFg(0, 0, 0);
 
         FontEngine fe;
-
-        g_fb->setFg(0, 0, 0);
         fe.setSize(12);
         fe.apply();
         Rect r;
@@ -122,8 +130,12 @@ Rect HomeCanvas::draw(Pos*)
 
         fe.setSize(18);
         fe.apply();
-        pos.x = 270; pos.y = 100;
+        pos.x = 0; pos.y = 100;
+        fe.renderString("HOME", 4, &pos, &g_fb->bbox, FE_NOBLIT);
+        pos.x >>= 1;
+        pos.x = (g_fb->width()>>1) - pos.x;
         fe.renderString("HOME", 4, &pos, &g_fb->bbox, 0);
+
         fe.setSize(14);
         fe.apply();
         pos.x = 10; pos.y = 650;
@@ -141,10 +153,14 @@ HomeActivity::HomeActivity()
 
 Activity HomeActivity::run(UiBits& ui)
 {
-    clc::Log::debug(LOG_NAME, "run");
+    clc::Log::info(LOG_NAME, "run");
     HomeCanvas c;
+
+    ui.m_systemBar.m_sep = false;
+    ui.m_systemBar.m_title.clear();
     ui.m_systemBar.show();
     c.addChild(ui.m_systemBar);
+
     c.refresh();
     g_loop->run(&c);
 

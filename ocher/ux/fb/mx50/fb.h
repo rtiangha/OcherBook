@@ -40,10 +40,9 @@ protected:
     int m_fd;
     char* m_fb;
     size_t m_fbSize;
-    int m_marker;
+    unsigned int m_marker;
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
-    unsigned int m_clears;
     uint8_t m_fgColor;
     uint8_t m_bgColor;
 };

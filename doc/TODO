@@ -1,10 +1,12 @@
 PRIORITIZE BASED ON GETTING ON KOBO FOR REAL ASAP
 
 0.0.8 - test on kobo
-test on kobo
-fonts are oversized
-2nd book crashes
+fix events: FIFO
+serialize kobo refreshes -- wait on prior to complete
+too many fb updates
 fix wrapping bug in FontEngine::renderString
+fonts are oversized
+periodically do full refresh
 
 0.0.9 - UI round 2
 fix close button in SDL
@@ -21,6 +23,21 @@ ReadActivity
     text size is unreliable
     page numbers
     title on system bar
+resources:
+    left arrow
+    right arrow
+    wrench
+    font
+    navigation
+    clock
+    network
+    battery
+    X close
+    FF
+    RW
+    back
+    circle scrubber / slider
+    folded page
 RLE
     RLE compress/decompress
     build step

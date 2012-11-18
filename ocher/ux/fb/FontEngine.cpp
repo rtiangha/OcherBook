@@ -172,7 +172,7 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
     d.bold = m_cur.bold;
     d.italic = m_cur.italic;
 
-    bbox->w = bbox->h = 0;
+    bbox->w = 0;
     unsigned int i = 0;
     for (const char* end = p+len; p < end; ) {
         p += utf8ToUtf32(p, &d.c);
@@ -197,8 +197,8 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
         // TODO:  how to guarantee cache is big enough: refcount chars per line?  or "big" LRU?
         glyphs[i++] = g;
         bbox->w += g->advanceX;
-        // TODO: h
     }
+    bbox->h = m_cur.lineHeight;
     glyphs[i] = 0;
 }
 
@@ -244,7 +244,6 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
             if (pen->y >= r->h - m_cur.descender)
                 return p - str;
             bbox.y -= m_cur.ascender;
-            bbox.h = m_cur.lineHeight;
             /* TODO save bounding box + glyphs for selection */
 
             // Fits; render it and advance

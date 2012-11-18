@@ -9,6 +9,7 @@
 #include "ocher/fmt/text/LayoutText.h"
 #include "ocher/fmt/text/Text.h"
 #endif
+#include "ocher/settings/Settings.h"
 #include "ocher/shelf/Meta.h"
 #include "ocher/ux/Controller.h"
 #include "ocher/ux/Factory.h"
@@ -21,18 +22,24 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key.key == OEVTK_HOME) {
+            clc::Log::info(LOG_NAME, "home");
             m_next = ACTIVITY_HOME;
+            // TODO  visually turn page down
             return 0;
         } else if (evt->key.key == OEVTK_LEFT || evt->key.key == OEVTK_UP || evt->key.key == OEVTK_PAGEUP) {
-            clc::Log::debug(LOG_NAME, "back from page %d", m_pageNum);
+            clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
+                m_ui.m_systemBar.hide();
+                m_ui.m_navBar.hide();
                 dirty();
             }
         } else if (evt->key.key == OEVTK_RIGHT || evt->key.key == OEVTK_DOWN || evt->key.key == OEVTK_PAGEDOWN) {
-            clc::Log::debug(LOG_NAME, "forward from page %d", m_pageNum);
+            clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (! atEnd) {
                 m_pageNum++;
+                m_ui.m_systemBar.hide();
+                m_ui.m_navBar.hide();
                 dirty();
             }
         }
@@ -44,28 +51,38 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
 int ReadActivity::evtMouse(struct OcherEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_CLICKED || evt->subtype == OEVT_MOUSE1_DOWN) {
-        int sby = m_ui.m_systemBar.m_rect.h;
-        int sbh = m_ui.m_systemBar.m_flags & WIDGET_HIDDEN;
-        if (evt->mouse.y <= sby && !sbh) {
-            clc::Log::debug(LOG_NAME, "interact system bar");
-            // TODO interact
-        } else if (evt->mouse.y <= sby && sbh) {
-            clc::Log::debug(LOG_NAME, "show system bar");
-            m_ui.m_systemBar.show();
-            dirty();
-        } else if (evt->mouse.y > sby && !sbh) {
-            clc::Log::debug(LOG_NAME, "hide system bar");
-            m_ui.m_systemBar.hide();
-            dirty();
-        } else if (evt->mouse.x < g_fb->width()/2) {
-            if (m_pageNum > 0) {
-                m_pageNum--;
-                dirty();
+        if (m_ui.m_systemBar.m_rect.contains((Pos*)&evt->mouse) ||
+                m_ui.m_navBar.m_rect.contains((Pos*)&evt->mouse)) {
+            if (m_ui.m_systemBar.m_flags & WIDGET_HIDDEN) {
+                clc::Log::info(LOG_NAME, "show system bar");
+                m_ui.m_systemBar.show();
+                g_fb->update(&m_ui.m_systemBar.m_rect);
+                m_ui.m_navBar.show();
+                g_fb->update(&m_ui.m_navBar.m_rect);
+            } else {
+                clc::Log::info(LOG_NAME, "interact bar");
+                // TODO interact
             }
         } else {
-            if (!atEnd) {
-                m_pageNum++;
+            if (! (m_ui.m_systemBar.m_flags & WIDGET_HIDDEN)) {
+                clc::Log::info(LOG_NAME, "hide system bar");
+                m_ui.m_systemBar.hide();
+                m_ui.m_navBar.hide();
                 dirty();
+            } else {
+                if (evt->mouse.x < g_fb->width()/2) {
+                    if (m_pageNum > 0) {
+                        clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
+                        m_pageNum--;
+                        dirty();
+                    }
+                } else {
+                    if (!atEnd) {
+                        clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
+                        m_pageNum++;
+                        dirty();
+                    }
+                }
             }
         }
         return -1;
@@ -74,7 +91,8 @@ int ReadActivity::evtMouse(struct OcherEvent* evt)
 }
 
 ReadActivity::ReadActivity(UiBits& ui) :
-    m_ui(ui)
+    m_ui(ui),
+    m_clears(settings.fullRefreshPages)
 {
 }
 
@@ -84,6 +102,11 @@ Rect ReadActivity::draw(Pos*)
     drawn.setInvalid();
 
     if (m_flags & WIDGET_DIRTY) {
+        //if (++m_clears > settings.fullRefreshPages) {
+        //    m_clears = 0;
+        //    full = true;
+        //}
+        clc::Log::info(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         drawn = m_rect;
         atEnd = renderer->render(&meta->m_pagination, m_pageNum, true);
@@ -95,14 +118,13 @@ Rect ReadActivity::draw(Pos*)
 
 Activity ReadActivity::run()
 {
-    clc::Log::debug(LOG_NAME, "run");
+    clc::Log::info(LOG_NAME, "run");
     meta = g_shelf->selected();
     if (!meta) {
         clc::Log::error(LOG_NAME, "No book selected");
         return ACTIVITY_HOME;
     }
     clc::Log::debug(LOG_NAME, "selected %p", meta);
-    g_shelf->markActive(meta);
 
     // TODO:  rework Layout constructors to have separate init due to scoping
     Layout* layout = 0;
@@ -156,9 +178,18 @@ Activity ReadActivity::run()
     }
 #endif
 
+    m_ui.m_systemBar.m_sep = true;
+    m_ui.m_systemBar.m_title = meta->title;
     m_ui.m_systemBar.hide();
     addChild(m_ui.m_systemBar);
-    m_pageNum = 0;
+
+    m_ui.m_navBar.hide();
+    addChild(m_ui.m_navBar);
+
+    g_shelf->markActive(meta);
+    m_pageNum = meta->record.activePage;
+    clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
+    dirty();
     while (1) {
         refresh();
 
@@ -170,6 +201,8 @@ Activity ReadActivity::run()
                 break;
         }
     }
+    clc::Log::info(LOG_NAME, "Quitting on page %u", m_pageNum);
+    meta->record.activePage = m_pageNum;
 
     delete layout;
 
