@@ -1,5 +1,8 @@
-#include "clc/support/Logger.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
+#include "clc/support/Logger.h"
 #include "ocher_config.h"
 #ifdef OCHER_EPUB
 #include "ocher/fmt/epub/Epub.h"
@@ -26,6 +29,40 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
             m_next = ACTIVITY_HOME;
             // TODO  visually turn page down
             return 0;
+        } else if (evt->key.key == OEVTK_POWER) {
+
+            // TODO  testing code; harden and move elsewhere because this is a system-wide event
+            FontEngine fe;
+            Rect r = g_fb->bbox;
+            g_fb->clear();
+
+            fe.setSize(18);
+            fe.apply();
+            Pos p;
+            p.x = 0;
+            p.y = r.h/2;
+            fe.renderString("Sleeping", 8, &p, &r, FE_NOBLIT);
+            p.x >>= 1;
+            p.x = (r.w>>1) - p.x;
+            fe.renderString("Sleeping", 8, &p, &r, 0);
+
+            g_fb->update(&r);
+            g_fb->sync();
+            sleep(1); // TODO seems hackish but sync doesn't wait long enough!
+
+            const char* pwr = "/sys/power/state";
+            int fd = open(pwr, O_WRONLY);
+            if (fd == -1) {
+                clc::Log::error(LOG_NAME, "%s: %s", pwr, strerror(errno));
+            } else {
+                write(fd, "mem", 3);
+                close(fd);
+                sleep(1);  // TODO seems hackish
+            }
+
+            g_fb->clear();
+            dirty();
+
         } else if (evt->key.key == OEVTK_LEFT || evt->key.key == OEVTK_UP || evt->key.key == OEVTK_PAGEUP) {
             clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
