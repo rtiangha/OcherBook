@@ -11,7 +11,7 @@
 
 #################### Tuneables
 
-DL_DIR=dl
+DL_DIR=third-party
 BUILD_DIR=build
 
 include ocher.config
@@ -44,7 +44,7 @@ endif
 
 # Common CFLAGS applied everywhere
 CFLAGS?=
-INCS+=-I. -Ibuild
+INCS+=-I. -I$(BUILD_DIR)
 ifeq ($(OCHER_DEBUG),1)
 	CFLAGS+=-O0 -g -DDEBUG
 else
@@ -152,6 +152,12 @@ mxml_clean:
 	cd $(MXML_DIR) && $(MAKE) clean || true
 
 
+#################### tinyxml2
+
+INCS+=-Ithird-party/tinyxml2
+VPATH+=third-party/tinyxml2
+
+
 #################### UnitTest++
 
 UNITTESTCPP_ROOT = test/unittest-cpp/UnitTest++/
@@ -222,6 +228,7 @@ CLC_OBJS = \
 	clc/support/Debug.o \
 	clc/support/Logger.o \
 
+#	$(BUILD_DIR)/tinyxml2.o
 OCHER_OBJS = \
 	$(CLC_OBJS) \
 	ocher/device/Device.o \
@@ -282,6 +289,7 @@ OCHER_OBJS += \
 	ocher/ux/fb/NavBar.o \
 	ocher/ux/fb/SystemBar.o \
 	ocher/ux/fb/RenderFb.o \
+	ocher/ux/fb/RleBitmap.o \
 	ocher/ux/fb/Widgets.o
 endif
 
@@ -356,8 +364,8 @@ ochertest:
 	# TODO
 
 cppcheck:
-	cppcheck --check-config $(INCS) ocher/ 2> build/cppcheck.log
-	cppcheck --std=posix --max-configs=100 --enable=all --suppress=cstyleCast $(INCS) ocher/ 2>> build/cppcheck.log
+	cppcheck --check-config $(INCS) ocher/ 2> $(BUILD_DIR)/cppcheck.log
+	cppcheck --std=posix --max-configs=100 --enable=all --suppress=cstyleCast $(INCS) ocher/ 2>> $(BUILD_DIR)/cppcheck.log
 
 test: clctest ochertest cppcheck
 
@@ -370,8 +378,8 @@ dist: ocher
 	tar -C $(BUILD_DIR) -Jcf ocher-`uname -s`-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz ocher
 
 dist-src: clean
-	git status clc dl doc ocher
-	tar -Jcf ocher-src-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz Makefile README clc dl doc ocher
+	git status clc $(DL_DIR) doc ocher
+	tar -Jcf ocher-src-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz Makefile README clc $(DL_DIR) doc ocher
 
 doc:
 	cd ocher && doxygen ../doc/Doxyfile

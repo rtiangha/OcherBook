@@ -1,6 +1,10 @@
 #include <stdio.h>
 
+#ifdef TINYXML
+#include "tinyxml.h"
+#else
 #include "mxml.h"
+#endif
 
 #include "clc/storage/Path.h"
 #include "clc/support/Logger.h"
@@ -38,14 +42,22 @@ TreeFile* Epub::findSpine()
         // TODO: release mimetype from UnzipCache
     }
 
+#ifdef TINYXML
+    XMLDocument tree;
+#else
     mxml_node_t* tree = 0;
+#endif
     const char* fullPath = 0;
     TreeFile* container = m_zip.getFile("META-INF/container.xml");
     if (! container) {
         clc::Log::error(LOG_NAME, "Missing 'META-INF/container.xml'");
     } else {
         stripUtf8Bom(container->data);
+#ifdef TINYXML
+        tree.Parse(container->data.c_str());
+#else
         tree = mxmlLoadString(NULL, container->data.c_str(), MXML_IGNORE_CALLBACK);
+#endif
         // Must be a "rootfiles" element, with one or more "rootfile" children.
         // First "rootfile" is the default. [OCF 3.0 2.5.1]
         mxml_node_t* rootfile = mxmlFindPath(tree, "container/rootfiles/rootfile");
@@ -121,8 +133,10 @@ void Epub::parseSpine(TreeFile* spineFile)
             if (node->type == MXML_ELEMENT) {
                 if (strcasecmp(name, "dc:title") == 0) {
                     clc::Log::debug(LOG_NAME, "Found dc:title");
+                    //m_title = mxmlGetNextSibling(node)->value.opaque;
                 } else if (strcasecmp(name, "dc:creator") == 0) {
                     // dc:creator opf:file-as="" opf:role="aut"></dc:creator>
+                    //m_author = mxmlGetNextSibling(node)->value.opaque;
                 } else if (strcasecmp(name, "dc:language") == 0) {
                     // <dc:language>en-US</dc:language>
                 }
