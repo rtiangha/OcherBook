@@ -60,9 +60,7 @@ void SyncActivity::processFile(const char* file)
                 Meta* m = new Meta;
                 m->format = format;
                 m->relPath = file;
-                // TODO: loadMeta
-                m->title = file; //TODO
-                m->author = "Some Author";  //TODO
+                loadMeta(m);
                 g_shelf->add(m);
             }
         } else if (S_ISDIR(s.st_mode)) {

@@ -1,6 +1,7 @@
+#include "ocher_config.h"
 #include "clc/storage/File.h"
-
 #include "ocher/shelf/Meta.h"
+#include "ocher/fmt/Format.h"
 
 
 Meta::Meta() :
@@ -24,3 +25,27 @@ const char* Meta::fmtToStr(Fmt fmt)
     }
 }
 
+void loadMeta(Meta* meta)
+{
+    switch (meta->format) {
+        case OCHER_FMT_TEXT: {
+            Text text(meta->relPath);
+            // TODO
+            meta->title = meta->relPath;
+            meta->author = "?";
+            break;
+        }
+        case OCHER_FMT_EPUB: {
+#ifdef OCHER_EPUB
+            Epub epub(meta->relPath);
+            meta->title = epub.m_title;
+            meta->author = epub.m_author;
+#endif
+            break;
+        }
+        default:
+            meta->title = meta->relPath;
+            meta->author = "?";
+            break;
+    }
+}

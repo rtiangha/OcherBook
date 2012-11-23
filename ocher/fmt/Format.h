@@ -19,4 +19,7 @@ public:
 
 Fmt detectFormat(const char* file, Encoding* encoding);
 
+#include "ocher/fmt/text/Text.h"
+#include "ocher/fmt/epub/Epub.h"
+
 #endif

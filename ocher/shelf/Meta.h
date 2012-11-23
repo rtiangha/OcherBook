@@ -69,4 +69,6 @@ public:
     BookRecord record;   // TODO:  per-user
 };
 
+void loadMeta(Meta* meta);
+
 #endif
