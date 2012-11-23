@@ -118,10 +118,17 @@ Rect HomeCanvas::draw(Pos*)
             g_fb->roundRect(&r, 1);
 
             Meta* meta = (Meta*)g_shelf->m_meta.itemAt(i);
-            pos.x = 0;
-            pos.y = fe.m_cur.ascender;
-            r.inset(2);
-            fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_XCLIP);
+            if (! meta) {
+                r.inset(2);
+                g_fb->setFg(0xd0, 0xd0, 0xd0);
+                g_fb->fillRect(&r);
+                g_fb->setFg(0, 0, 0);
+            } else {
+                pos.x = 0;
+                pos.y = fe.m_cur.ascender;
+                r.inset(2);
+                fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_XCLIP);
+            }
         }
 
         // TODO  shortlist
