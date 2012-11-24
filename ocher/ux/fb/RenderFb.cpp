@@ -167,7 +167,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
     int r = 1;
     const unsigned int N = m_layout.size();
     const char* raw = m_layout.data();
-    ASSERT(layoutOffset < N);
+    ASSERT(layoutOffset <= N);
 
     applyAttrs();
 #ifdef CPS_STATS
@@ -304,7 +304,7 @@ done:
     clc::Log::debug(LOG_NAME, "page %u %s; %u chars in %u ms, %u cps, avg %u cps", pageNum,
             r == 0 ? "break" : "done",
             chars, ms, (unsigned int)(chars*1000/ms),
-            (unsigned int)(totalChars*1000/(totalUSec/1000)));
+            (unsigned int)(totalChars*1000/((totalUSec<1000?1000:totalUSec)/1000)));
 #endif
     return r;
 }
