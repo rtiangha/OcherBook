@@ -103,11 +103,11 @@ Canvas::Canvas() :
 {
 }
 
-void Canvas::refresh()
+void Canvas::refresh(bool full)
 {
     Rect drawn = draw(0);
     if (drawn.valid())
-        g_fb->update(&drawn);
+        g_fb->update(&drawn, full);
 }
 
 Rect Canvas::draw(Pos*)

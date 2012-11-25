@@ -53,7 +53,7 @@ public:
     Canvas();
     ~Canvas() {}
 
-    void refresh();
+    void refresh(bool full=false);
 
 protected:
     Rect draw(Pos* pos);

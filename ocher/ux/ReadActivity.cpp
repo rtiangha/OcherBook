@@ -128,7 +128,7 @@ int ReadActivity::evtMouse(struct OcherEvent* evt)
 
 ReadActivity::ReadActivity(UiBits& ui) :
     m_ui(ui),
-    m_clears(settings.fullRefreshPages)
+    m_pagesSinceRefresh(0)
 {
 }
 
@@ -138,13 +138,10 @@ Rect ReadActivity::draw(Pos*)
     drawn.setInvalid();
 
     if (m_flags & WIDGET_DIRTY) {
-        //if (++m_clears > settings.fullRefreshPages) {
-        //    m_clears = 0;
-        //    full = true;
-        //}
         clc::Log::info(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         drawn = m_rect;
+        m_pagesSinceRefresh++;
         atEnd = renderer->render(&meta->m_pagination, m_pageNum, true);
     }
     Rect d2 = drawChildren(m_rect.pos());
@@ -227,9 +224,13 @@ Activity ReadActivity::run()
     clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
     dirty();
 
-    // TODO:  yuck, rewrite this
     while (1) {
-        refresh();
+        if (m_pagesSinceRefresh >= settings.fullRefreshPages) {
+            m_pagesSinceRefresh = 0;
+            refresh(true);
+        } else {
+            refresh(false);
+        }
 
         struct OcherEvent evt;
         g_fb->sync();
