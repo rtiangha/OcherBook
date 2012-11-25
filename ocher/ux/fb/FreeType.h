@@ -16,6 +16,7 @@ public:
 
     bool init();
 
+    bool setFace(int i, int b);
     void setSize(unsigned int points);
     int getDescender() { return m_face->size->metrics.descender >> 6; }
     int getAscender() { return m_face->size->metrics.ascender >> 6; }

@@ -20,6 +20,8 @@ protected:
     int m_pipe[2];
 
     struct input_event kevt[64];
+    struct OcherEvent m_evt;
+
     unsigned int kevtHead;  ///< offset of first event in the FIFO
     unsigned int kevtTail;  ///< offset of first empty slot (== head when empty)
 };

@@ -7,7 +7,6 @@
 #include "clc/support/Logger.h"
 #include "clc/support/LogAppenders.h"
 
-#include "ocher_config.h"
 #include "ocher/device/Device.h"
 #include "ocher/settings/Options.h"
 #include "ocher/settings/Settings.h"
@@ -72,8 +71,8 @@ void usage(const char* msg)
         "                     a font renderer driving a hardware device.\n"
         "   --driver <driver> Use a specific driver.\n"
         "\n"
-        "Multiple files and/or directories may be specified.\n"
-        "Directories will be recursed.\n"
+        "Multiple files and/or directories may be specified, and will override any\n"
+        "platform specific search paths.  Directories will be searched recursively.\n"
         "\n"
     );
     exit(msg ? 0 : 1);

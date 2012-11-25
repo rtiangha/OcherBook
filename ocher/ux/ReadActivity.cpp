@@ -3,7 +3,6 @@
 #include <fcntl.h>
 
 #include "clc/support/Logger.h"
-#include "ocher_config.h"
 #ifdef OCHER_EPUB
 #include "ocher/fmt/epub/Epub.h"
 #include "ocher/fmt/epub/LayoutEpub.h"
@@ -231,11 +230,11 @@ Activity ReadActivity::run()
     // TODO:  yuck, rewrite this
     while (1) {
         refresh();
-        g_loop->flush();
 
         struct OcherEvent evt;
-        int r = g_loop->wait(&evt);
         g_fb->sync();
+        g_loop->flush();
+        int r = g_loop->wait(&evt);
         if (r == 0) {
             r = eventReceived(&evt);
             if (r >= 0)

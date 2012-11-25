@@ -3,6 +3,13 @@ output devices.  It focuses on creating a good (and portable) ebook reading
 experience, but not necessarily the complete software stack.  For example, for
 expediency it may reuse the existing kernel on ereaders.
 
+To get the code:
+
+    git clone git@github.com:ccoffing/OcherBook.git
+    cd OcherBook
+    git submodule init
+    git submodule update
+
 To get started, look in the doc directory, and/or "make help".
 
 To see what platforms are supported and to what degree, look in doc/platforms/.
@@ -10,6 +17,4 @@ To see what platforms are supported and to what degree, look in doc/platforms/.
 See also:
 OcherBook                   http://ccoffing.net/tech/proj/ocherbook
 Hacking the Kobo Touch      http://ccoffing.net/tech/embedded/kobo
-
-THIS IS STILL PROOF-OF-CONCEPT.
 

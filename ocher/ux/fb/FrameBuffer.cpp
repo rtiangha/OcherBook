@@ -1,8 +1,39 @@
+#include <stddef.h>
+#include <stdint.h>
+
 #include "ocher/ux/fb/FrameBuffer.h"
 
 
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #define max(a,b) (((a) > (b)) ? (a) : (b))
+
+void invert(void* p, size_t n)
+{
+    uint8_t* p1 = (uint8_t*)p;
+    while (((ptrdiff_t)p1 & 3) && n) {
+        *p1 = ~*p1;
+        ++p1;
+        --n;
+    }
+
+    uint32_t* p4 = (uint32_t*)p1;
+    size_t n4 = n >> 2;
+    for (size_t i = 0; i < n4; ++i) {
+        p4[i] = ~p4[i];
+    }
+
+    for (size_t i = n & ~3; i < n; ++i) {
+        p1[i] = ~p1[i];
+    }
+}
+
+void dim(void* p, size_t n)
+{
+    uint8_t* p1 = (uint8_t*)p;
+    for (size_t i = 0; i < n; ++i) {
+        p1[i] >>= 1;
+    }
+}
 
 void Rect::unionRect(Rect* r)
 {

@@ -5,7 +5,6 @@
 #include <errno.h>
 
 #include "clc/support/Logger.h"
-#include "ocher_config.h"
 #include "ocher/device/Battery.h"
 
 #define LOG_NAME "ocher.battery"

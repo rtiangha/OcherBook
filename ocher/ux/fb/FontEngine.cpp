@@ -9,41 +9,6 @@
 #define LOG_NAME "ocher.ux.FontEngine"
 
 
-#if 0
-/**
- * Similar to memcpy
- * @param dst  Alpha bitmap
- * @param color  Color to apply to alpha of dst + src
- */
-void* alphamemcpy(uint8_t* dst, const uint8_t* src, size_t n, uint8_t color);
-
-static void invcpy(unsigned char* dst, unsigned char* src, size_t n)
-{
-#if 0
-    // Assuming src is word aligned.
-    // dst may not be aligned.
-
-#else
-    // TODO  invert then memcpy is total hack.  do it right:
-    // respect alignment, invert while copying.  (Or is it possible
-    // to have FreeType output inverted?)
-    for (size_t i = 0; i < n; ++i) {
-        src[i] = ~src[i];
-    }
-    memcpy(dst, src, n);
-#endif
-}
-#endif
-
-void invert(void* _p, size_t n)
-{
-    // TODO: optimize: words, ...
-    unsigned char* p = (unsigned char*)_p;
-    for (size_t i = 0; i < n; ++i) {
-        p[i] = ~p[i];
-    }
-}
-
 GlyphCache::GlyphCache()
 {
 }
@@ -142,16 +107,13 @@ void FontEngine::apply()
         if (m_cur.faceId != m_next.faceId) {
             /*TODO*/;
         }
-        if (m_cur.points != m_next.points) {
+        if (m_cur.italic != m_next.italic || m_cur.bold != m_next.bold) {
+            g_ft->setFace(m_next.italic, m_next.bold);
+            g_ft->setSize(m_next.points);
+        } else if (m_cur.points != m_next.points) {
             g_ft->setSize(m_next.points);
         }
         if (m_cur.underline != m_next.underline) {
-            /*TODO*/;
-        }
-        if (m_cur.bold != m_next.bold) {
-            /*TODO*/;
-        }
-        if (m_cur.italic != m_next.italic) {
             /*TODO*/;
         }
         m_cur = m_next;

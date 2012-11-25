@@ -6,44 +6,51 @@ RleBitmap::RleBitmap() :
 {
 }
 
-void RleBitmap::compress(uint8_t* p, unsigned int len)
+void RleBitmap::pack(uint8_t* u, unsigned int len, uint8_t* p)
 {
-    uint8_t count = 0;
-    uint8_t runOf = ~*p;  // only set when count != 0
+    unsigned int count = 0;
+    uint8_t runOf;
     for (unsigned int i = 0; i < len; ++i) {
-        if (p[i] == runOf) {
-            while (count < 255 && i < len) {
-                ++i;
-                if (p[i] == runOf)
-
-            }
-        } else {
-        }
-
-        if (count) {
-            if (p[i] == runOf && count < 255) {
-                count++;
-            } else {
-                out(count);
+        if (! count) {
+            runOf = u[i];
+            ++count;
+        } else if (runOf != u[i] || count == 257) {
+            *p++ = runOf;
+            if (--count) {
+                *p++ = runOf;
+                *p++ = --count;
                 count = 0;
-                --i;
             }
-        } else if (p[i] == runOf) {
-            out(p[i]);
-            count++;
+            runOf = u[i];
         } else {
-            g
+            ++count;
         }
     }
-
+    if (count) {
+        *p++ = runOf;
+        if (--count) {
+            *p++ = runOf;
+            *p++ = --count;
+        }
+    }
 }
 
-void RleBitmap::resetUnpack()
+int RleBitmap::unpack(uint8_t* u, unsigned int len)
 {
-    m_off = 0;
-}
+    unsigned int count = 0;
+    uint8_t runOf;
+    for (unsigned int i = 0; i < len && m_off < m_len; ) {
+        if (! count) {
+            runOf = m_p[m_off++];
+            ++count;
+        } else if (count == 1) {
+            if (runOf != m_p[m_off++]) {
 
-int RleBitmap::unpackNext(uint8_t* c)
-{
-    
+            }
+
+
+
+        }
+    }
+    return 0;
 }

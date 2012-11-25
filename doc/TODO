@@ -1,13 +1,12 @@
 PRIORITIZE BASED ON GETTING ON KOBO FOR REAL ASAP
 
 0.0.8 - test on kobo
-getting pressure 0 events with no x,y
-flush events not quite working
-fix wrapping bug in FontEngine::renderString
-fonts are oversized
-periodically do full refresh
+no title is a regression; filename is better
 
 0.0.9 - UI round 2
+periodically do full refresh
+work on Makefile
+    font getter
 fix close button in SDL
 FontEngine
     FontEngine is more of a layout engine...
@@ -16,12 +15,13 @@ FontEngine
     FE::renderString should return bbox or bboxes
     layout by line, to do centering
     single global instance
+    font families
 HomeActivity
     real titles / authors
+        convert to tinyxml2
+            vpath
 ReadActivity
-    text size is unreliable
     page numbers
-    title on system bar
 resources:
     left arrow
     right arrow
@@ -65,15 +65,17 @@ do settings apply before or after layout?
     better definition around what AttrSizeAbs, etc mean
     are absolute font sizes really absolute while in the layout?
 
-0.1.1
+0.1.1 - Hardening
 testing
 valgrind...
 survive purgatory.sh
 read an entire book on kobo
 
-0.2.0
-suspend
+0.1.2 - Targeting / Packaging
+update docs with kobo-touch, kobo-mini, kobo-glo
 
+0.2.0
+epub correctness
 
 
 

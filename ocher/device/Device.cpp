@@ -1,9 +1,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#ifdef OCHER_TARGET_KOBO
-#include <linux/input.h>
-#endif
 
 #include "clc/support/Logger.h"
 #include "ocher/ocher.h"

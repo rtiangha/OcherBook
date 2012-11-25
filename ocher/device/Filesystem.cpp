@@ -125,9 +125,9 @@ Filesystem::Filesystem() :
     m_libraries(0)
 {
 #ifdef OCHER_TARGET_KOBO
-    m_libraries = new char*[3];
-    m_libraries[0] = "/mnt/onboard";
-    m_libraries[1] = "/mnt/sd";
+    m_libraries = new const char*[3];
+    m_libraries[0] = "/mnt/sd";
+    m_libraries[1] = "/mnt/onboard";
     m_libraries[2] = 0;
     m_home = "/mnt/onboard/.ocher";
     m_settings = "/mnt/onboard/.ocher/settings";

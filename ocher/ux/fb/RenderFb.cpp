@@ -21,13 +21,14 @@ RenderFb::RenderFb(FrameBuffer* fb) :
     m_fb(fb),
     m_penX(settings.marginLeft),
     m_penY(settings.marginTop),
-    ai(1)
+    ai(0)
 {
 }
 
 bool RenderFb::init()
 {
-    m_fe.setSize(settings.fontPoints);
+    memset(&a[ai], 0, sizeof(a[ai]));
+    a[ai].pts = settings.fontPoints;
     return true;
 }
 
@@ -141,6 +142,7 @@ void RenderFb::applyAttrs()
     m_fe.setBold(a[ai].b);
     m_fe.setUnderline(a[ai].ul);
     m_fe.setItalic(a[ai].em);
+    m_fe.apply();
 }
 
 int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
@@ -260,7 +262,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 #ifdef CPS_STATS
                         chars += str->length();  // miscounts UTF8...
 #endif
-                        clc::Log::trace(LOG_NAME, "output (%d pts%s%s) %d bytes", a[ai].pts, a[ai].b?" bold":"",
+                        clc::Log::info(LOG_NAME, "output (%d pts%s%s) %d bytes", a[ai].pts, a[ai].b?" bold":"",
                                 a[ai].em?" italics":"", str->length());
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;

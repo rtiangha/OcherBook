@@ -1,8 +1,13 @@
 #ifndef OCHER_FRAMEBUFFER_H
 #define OCHER_FRAMEBUFFER_H
 
+#include <stddef.h>
+
 #include "ocher/ux/fb/FbTypes.h"
 
+
+void invert(void* p, size_t n);
+void dim(void* p, size_t n);
 
 class FrameBuffer
 {
@@ -21,6 +26,7 @@ public:
     virtual void clear() = 0;
     virtual void rect(Rect* rect);
     virtual void fillRect(Rect* r) = 0;
+    virtual void byLine(Rect* r, void(*fn)(void* p, size_t n)) = 0;
     virtual void roundRect(Rect* rect, unsigned int radius);
 
     /**

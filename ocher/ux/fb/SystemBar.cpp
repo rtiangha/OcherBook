@@ -26,6 +26,8 @@ void SystemBar::drawContent(Rect* r)
     if (m_title.length()) {
         FontEngine fe;
         fe.setSize(10);
+        fe.setItalic(1);
+        fe.setBold(0);
         fe.apply();
         Pos pos;
         pos.x = 0; pos.y = fe.m_cur.ascender + 2;

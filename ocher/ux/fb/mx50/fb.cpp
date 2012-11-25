@@ -149,9 +149,18 @@ void Mx50Fb::fillRect(Rect* r)
     }
 }
 
+void Mx50Fb::byLine(Rect* r, void(*fn)(void* p, size_t n))
+{
+    int y2 = r->y + r->h;
+    for (int y = r->y; y < y2; ++y) {
+        fn(((unsigned char*)m_fb) + y*vinfo.xres_virtual + r->x, r->w);
+    }
+}
+
 void Mx50Fb::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
     clc::Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
+    int rectWidth = w;
     Rect clip;
     if (userClip) {
         clip = *userClip;
@@ -186,7 +195,7 @@ void Mx50Fb::blit(unsigned char* p, int x, int y, int w, int h, const Rect* user
     for (int i = 0; i < h; ++i) {
         memcpy(((unsigned char*)m_fb) + y*vinfo.xres_virtual + x, p, w);
         y++;
-        p = p + w;
+        p += rectWidth;
     }
 }
 
@@ -215,6 +224,8 @@ int Mx50Fb::update(Rect* r, bool full)
     if (ioctl(m_fd, MXCFB_SEND_UPDATE, &region) == -1) {
         clc::Log::error(LOG_NAME, "MXCFB_SEND_UPDATE(%d, %d, %d, %d, %d): %s",
                 r->x, r->y, r->w, r->h, m_marker, strerror(errno));
+    } else {
+        clc::Log::info(LOG_NAME, "update %d started", m_marker);
     }
 
     return m_marker;
@@ -229,6 +240,8 @@ void Mx50Fb::waitUpdate(int marker)
 {
     if (ioctl(m_fd, MXCFB_WAIT_FOR_UPDATE_COMPLETE, &marker) == -1) {
         clc::Log::error(LOG_NAME, "MXCFB_WAIT_FOR_UPDATE_COMPLETE(%d): %s", marker, strerror(errno));
+    } else {
+        clc::Log::info(LOG_NAME, "update %d done", marker);
     }
 }
 

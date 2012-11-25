@@ -17,21 +17,18 @@ public:
     /**
      * Imports the uncompressed buffer.
      */
-    void compress(uint8_t* p, unsigned int len);
-
-
-    void resetUnpack();
+    static void pack(uint8_t* u, unsigned int len, uint8_t* p);
 
     /**
-     * Unpacks the next
+     * Unpacks the next chunk (scanline?)
      */
-    int unpackNext(uint8_t* c);
+    int unpack(uint8_t* d, unsigned int len);
+
+    inline void resetUnpack() { m_off = 0; }
 
 protected:
-    bool m_del;
     uint8_t* m_p;
-    uint16_t m_w;
-    uint16_t m_h;
+    unsigned int m_len;  ///< Length of packed data
     unsigned int m_off;  ///< Offset of next byte to unpack
 };
 

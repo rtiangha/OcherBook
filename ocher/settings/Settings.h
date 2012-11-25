@@ -46,6 +46,7 @@ struct Settings {
     // icons
 
     // filesystem point(s)
+    clc::Buffer fontRoot;
 };
 
 extern Settings settings;

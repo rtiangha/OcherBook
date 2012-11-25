@@ -1,4 +1,3 @@
-#include "ocher_config.h"
 #include "clc/storage/File.h"
 #include "ocher/shelf/Meta.h"
 #include "ocher/fmt/Format.h"

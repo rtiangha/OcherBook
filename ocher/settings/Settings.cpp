@@ -21,6 +21,11 @@ Settings::Settings() :
     marginLeft(10),
     marginRight(10)
 {
+#ifdef OCHER_TARGET_KOBO
+    fontRoot = "/tmp";
+#else
+    fontRoot = "build";
+#endif
 }
 
 void Settings::load()

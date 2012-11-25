@@ -71,7 +71,7 @@ ifneq ($(OCHER_TARGET),haiku)
 endif
 
 # Additional CFLAGS for ocher
-OCHER_CFLAGS=-Wall -W -Wformat=2 -Wno-write-strings -Wshadow
+OCHER_CFLAGS=--include $(BUILD_DIR)/ocher_config.h -Wall -W -Wformat=2 -Wno-write-strings -Wshadow
 ifeq ($(OCHER_DEV),1)
 	OCHER_CFLAGS+=-Werror
 endif

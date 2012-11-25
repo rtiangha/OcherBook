@@ -1,10 +1,19 @@
 #include <ctype.h>
 
 #include "clc/support/Logger.h"
+#include "ocher/settings/Settings.h"
 #include "ocher/ux/fb/FreeType.h"
 
 #define LOG_NAME "ocher.freetype"
 
+
+
+static const char* ttfFiles[] = {
+    "DejaVuSerif.ttf",
+    "DejaVuSerif-Italic.ttf",
+    "DejaVuSerif-Bold.ttf",
+    "DejaVuSerif-BoldItalic.ttf",
+};
 
 FreeType::FreeType(unsigned int dpi) :
     m_lib(0),
@@ -25,8 +34,18 @@ bool FreeType::init()
         clc::Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
         return false;
     }
+    return setFace(0, 0);
+}
 
-    r = FT_New_Face(m_lib, "FreeSans.otf", 0, &m_face);
+bool FreeType::setFace(int i, int b)
+{
+    clc::Buffer file = settings.fontRoot;
+    i = i ? 1 : 0;
+    b = b ? 1 : 0;
+    file += "/";
+    file += ttfFiles[i+b*2];
+
+    int r = FT_New_Face(m_lib, file.c_str(), 0, &m_face);
     if (r || !m_face) {
         clc::Log::error(LOG_NAME, "FT_New_Face failed: %d", r);
         return false;

@@ -105,6 +105,14 @@ void FbSdl::fillRect(Rect* _r)
     SDL_FillRect(m_screen, r, m_fgColor);
 }
 
+void FbSdl::byLine(Rect* r, void(*fn)(void* p, size_t n))
+{
+    int y2 = r->y + r->h;
+    for (int y = r->y; y < y2; ++y) {
+        fn(((unsigned char*)m_screen->pixels) + y*m_screen->pitch + r->x, r->w);
+    }
+}
+
 inline void FbSdl::pset(int x, int y)
 {
     *(((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x) = m_fgColor;
@@ -125,6 +133,7 @@ void FbSdl::vline(int x, int y1, int y2)
 void FbSdl::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
     clc::Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
+    int rectWidth = w;
     Rect clip;
     if (userClip) {
         clip = *userClip;
@@ -163,15 +172,9 @@ void FbSdl::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userC
     clc::Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
     for (int i = 0; i < h; ++i) {
         unsigned char* dst = ((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x;
-#if 0
-        for (int ix = 0; ix < w; ++ix) {
-            dst[ix] &= p[ix];
-        }
-#else
         memcpy(dst, p, w);
-#endif
         y++;
-        p = p + w;
+        p += rectWidth;
     }
     if (m_mustLock) {
         SDL_UnlockSurface(m_screen);

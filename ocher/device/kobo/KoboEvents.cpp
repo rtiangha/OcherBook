@@ -35,6 +35,8 @@ KoboEvents::KoboEvents() :
     m_buttonFd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
     m_touchFd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
     pipe(m_pipe);
+
+    memset(&m_evt, 0, sizeof(m_evt));
 }
 
 KoboEvents::~KoboEvents()
@@ -67,6 +69,13 @@ struct KoboButtonEvent {
 void KoboEvents::flush()
 {
     kevtHead = kevtTail = 0;
+//    struct KoboButtonEvent kbe;
+//    while (read(m_buttonFd, &kbe, sizeof(kbe)) > 0)
+//        ;
+    struct input_event evt;
+    while (read(m_touchFd, &evt, sizeof(evt)) > 0)
+        ;
+    clc::Log::info(LOG_NAME, "flushed");
 }
 
 int KoboEvents::wait(struct OcherEvent* evt)
@@ -144,17 +153,17 @@ int KoboEvents::wait(struct OcherEvent* evt)
                         slots = N - tail;
 
                     if (slots) {
-                        clc::Log::info(LOG_NAME, "reading %u events at offset %u", slots, tail);
+                        clc::Log::debug(LOG_NAME, "reading %u events at offset %u", slots, tail);
                         r = read(m_touchFd, &kevt[tail], sizeof(struct input_event)*slots);
                         if (r == -1) {
                             if (errno == EINTR)
                                 continue;
                             ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
-                            clc::Log::info(LOG_NAME, "read 0 events");
+                            clc::Log::debug(LOG_NAME, "read 0 events");
                             break;
                         }
                         unsigned int n = r / sizeof(struct input_event);
-                        clc::Log::info(LOG_NAME, "read %u events", n);
+                        clc::Log::debug(LOG_NAME, "read %u events", n);
 
                         kevtTail += n;
                         if (kevtTail > N)
@@ -168,7 +177,7 @@ int KoboEvents::wait(struct OcherEvent* evt)
             while (1) {
                 if (kevtHead == kevtTail) {
                     kevtHead = kevtTail = 0;  // Allow maximal read next time
-                    clc::Log::info(LOG_NAME, "empty");
+                    clc::Log::debug(LOG_NAME, "empty");
                     return -1;
                 }
 
@@ -178,14 +187,14 @@ int KoboEvents::wait(struct OcherEvent* evt)
                     syn = 1;
                 } else if (kevt[kevtHead].type == EV_ABS) {
                     // TODO:  orientation is unexpected; fiddle vinfo.rotate
-                    evt->type = OEVT_MOUSE;
+                    m_evt.type = OEVT_MOUSE;
                     uint16_t code = kevt[kevtHead].code;
                     if (code == ABS_X) {
-                        evt->mouse.y = kevt[kevtHead].value;
+                        m_evt.mouse.y = kevt[kevtHead].value;
                     } else if (code == ABS_Y) {
-                        evt->mouse.x = 600-kevt[kevtHead].value;
+                        m_evt.mouse.x = 600-kevt[kevtHead].value;
                     } else if (code == ABS_PRESSURE) {
-                        evt->subtype = kevt[kevtHead].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
+                        m_evt.subtype = kevt[kevtHead].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
                     }
                 }
 
@@ -194,8 +203,9 @@ int KoboEvents::wait(struct OcherEvent* evt)
                     kevtHead = 0;
 
                 if (syn) {
-                    clc::Log::info(LOG_NAME, "mouse %u, %u %s", evt->mouse.x, evt->mouse.y,
-                            evt->subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
+                    clc::Log::info(LOG_NAME, "mouse %u, %u %s", m_evt.mouse.x, m_evt.mouse.y,
+                            m_evt.subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
+                    *evt = m_evt;
                     return 0;
                 }
             }
