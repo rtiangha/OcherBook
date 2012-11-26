@@ -47,4 +47,8 @@ void loadMeta(Meta* meta)
             meta->author = "?";
             break;
     }
+
+    // TODO:  Hack: use filename until epub parser can pull out the real title.
+    char* path = strrchr(meta->relPath.c_str(), '/');
+    meta->title = path ? path+1 : meta->relPath.c_str();
 }
