@@ -67,6 +67,7 @@ static bool getKnownFolderVista(const GUID& id, clc::Buffer& d)
 }
 #endif
 
+#ifndef OCHER_TARGET_KOBO
 static clc::Buffer settingsDir()
 {
     clc::Buffer dir;
@@ -118,6 +119,7 @@ static clc::Buffer settingsDir()
 #endif
     return dir;
 }
+#endif
 
 Filesystem fs;
 
@@ -133,12 +135,12 @@ Filesystem::Filesystem() :
     m_settings = "/mnt/onboard/.ocher/settings";
 #else
     clc::Buffer s = settingsDir();
-    m_home = strdup(s.c_str());
 #if defined(_WIN32) || defined(__HAIKU__) || defined(__APPLE__)
     clc::Path::join(s, "OcherBook");
 #else
     clc::Path::join(s, ".OcherBook");
 #endif
+    m_home = strdup(s.c_str());
     ::mkdir(s.c_str(), 0775);
     clc::Path::join(s, "settings");
     m_settings = strdup(s.c_str());
@@ -147,10 +149,7 @@ Filesystem::Filesystem() :
 
 Filesystem::~Filesystem()
 {
-#ifdef OCHER_TARGET_KOBO
-#elif defined(_WIN32)
-#elif defined(__HAIKU__)
-#else
+#ifndef OCHER_TARGET_KOBO
     free(m_home);
     free(m_settings);
 #endif

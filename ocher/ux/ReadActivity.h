@@ -30,7 +30,7 @@ protected:
     Meta* meta;
     unsigned int m_pageNum;
     int atEnd;
-    int m_pagesSinceRefresh;
+    unsigned int m_pagesSinceRefresh;
 };
 
 #endif
