@@ -87,6 +87,7 @@ protected:
     void outputNl();
     void outputBr();
     void flushText();
+    void outputPageBreak();
 
     /** Ensure m_data can hold n additional bytes */
     char* checkAlloc(unsigned int n);

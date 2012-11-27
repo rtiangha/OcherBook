@@ -135,3 +135,8 @@ void Layout::flushText()
         m_textLen = 0;
     }
 }
+
+void Layout::outputPageBreak()
+{
+    push(OpCmd, CmdForcePage, 0);
+}

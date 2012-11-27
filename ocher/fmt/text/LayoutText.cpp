@@ -16,6 +16,9 @@ LayoutText::LayoutText(Text* text) : m_text(text)
                 continue;
             } else
                 sawNl = 1;
+        } else if (raw[i] == '\f') {
+            outputPageBreak();
+            continue;
         } else {
             sawNl = 0;
         }

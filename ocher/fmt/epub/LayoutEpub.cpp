@@ -90,6 +90,7 @@ void LayoutEpub::append(mxml_node_t* tree)
     if (body) {
         // mxmlFindPath returns the first child node.  Ok, so processSiblings.
         processSiblings(body);
+        outputPageBreak();
     } else {
         clc::Log::warn(LOG_NAME, "no body");
     }

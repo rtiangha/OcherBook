@@ -276,7 +276,9 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
                     }
                     case Layout::CmdForcePage:
                         clc::Log::trace(LOG_NAME, "OpCmd CmdForcePage");
-                        break;
+                        pagination->set(pageNum, i, 0);
+                        r = 0;
+                        goto done;
                     default:
                         clc::Log::error(LOG_NAME, "unknown OpCmd");
                         ASSERT(0);
