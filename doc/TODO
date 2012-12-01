@@ -1,59 +1,33 @@
-PRIORITIZE BASED ON GETTING ON KOBO FOR REAL ASAP
+0.0.9 -
+boot menu
+how to reach non-top-5 books?  implement LibraryActivity
+usage of FEs can't be interleaved because they set state on a single FT (cause of wacky fonts?)
+wait for mouse-up before acting
 
-0.0.8 - test on kobo
-no title is a regression; filename is better
+0.1.0 - Release
+docs for kobo-touch
+    kill kobo's animation on startup
+post kobo binaries
 
-0.0.9 - UI round 2
-periodically do full refresh
-work on Makefile
-    font getter
-fix close button in SDL
-FontEngine
-    FontEngine is more of a layout engine...
-    convert from RenderFb::outputWrapped to FontEngine::renderString
-    use FontEngine::renderString on widgets (buttons, ...)
-    FE::renderString should return bbox or bboxes
-    layout by line, to do centering
-    single global instance
-    font families
-HomeActivity
-    real titles / authors
-        convert to tinyxml2
-            vpath
+0.1.1 - Hardening
+survive purgatory.sh
+Pagination.cpp:35 uninit
+read an entire book on kobo; rank annoyances
+post updated kobo binaries
+
+
+0.2
 ReadActivity
     page numbers
-resources:
-    left arrow
-    right arrow
-    wrench
-    font
-    navigation
-    clock
-    network
-    battery
-    X close
-    FF
-    RW
-    back
-    circle scrubber / slider
-    folded page
-RLE
-    RLE compress/decompress
-    build step
-battery
-    RLE images
+epub correctness, round 1
 
-0.1.0 - UI round 3
-fonts
-    selection
-        italic, bold faces
-        sans, serif
-    improved font metrics:
-        subpixel rendering
-        kerning
-integrate libjpeg, libpng
-HomeActivity
-    cover art
+
+flush font cache when entering HOME
+lazy-load books
+pop up menus
+docs for kobo-mini, kobo-glo
+font size does not always pop correctly
+Show/hide SystemBar causes page to shift
 persist shelf
     json vs Flattenable
 widget
@@ -64,41 +38,75 @@ flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
 do settings apply before or after layout?
     better definition around what AttrSizeAbs, etc mean
     are absolute font sizes really absolute while in the layout?
+work on Makefile
+    font getter
+HomeActivity
+    real titles / authors
+        convert to tinyxml2
+            vpath
+integrate libjpeg, libpng
+HomeActivity
+    cover art
+fonts
+    layout by line, to do centering
+    justify:  full, right
+    FE: each usage of FE should have its own context
+    FE: build some higher-level abstractions
+    convert from RenderFb::outputWrapped to FontEngine::renderString
+    FE::renderString should return bbox or bboxes
+    font path, scan ttf files, font families, ...
+    font preferences
+    improved font metrics:
+        subpixel rendering
+        kerning
+resources:
+    left / right arrows
+    wrench
+    font
+    navigation
+    clock
+    network
+    battery
+    X close
+    FF / RW
+    back
+    circle scrubber / slider
+    folded page
+RLE
+    RLE compress/decompress
+    build step to compress images
+battery
+    RLE images
+portability:
+    resurrect non-fb output
+    fix close button in SDL
+no database; deal with books coming and going dynamically (NFS support!)
 
-0.1.1 - Hardening
-testing
-valgrind...
-survive purgatory.sh
-read an entire book on kobo
+----------------------
 
-0.1.2 - Targeting / Packaging
-update docs with kobo-touch, kobo-mini, kobo-glo
-
-0.2.0
-epub correctness
-
-
-
+FEATURES
 
 device specific:
     - abstractions:
         - filesystem
     - Kobo:
-        - framebuffer
-        - suspend / resume
-        - touch input
-        - home, power button
+        + framebuffer
+        + suspend / resume
+            - filter resume events?
+        + touch input
+        + home, power button
         - wireless
-    resurrect non-fb output
 
 layout:
     - pagination
         - discrete pages vs scrollable (makes no sense on e-ink)
     - margins
-    - FreeType:
-        - integrate into RenderFd for real word wrap
+    + FreeType
     - option to build some fonts into the binary for easy install
     - images
+
+navigation:
+    - live links (eg: table of contents)
 
 build system:
     - config system (current ocher.config is a mess)
@@ -124,6 +132,7 @@ formats:
     - test UTF8 throughout
     - epub
         - CSS
+    - rtf
     - text
     - markdown
     - ...
@@ -143,7 +152,6 @@ per-user:
 
 features:
     - clock
-    - live links (eg: table of contents)
     - ability to compile-out large features
     - search
     - bookmarks
@@ -153,6 +161,7 @@ features:
     - geek features:
         - options to validate epubs?
         - wirelessly sync with epubs on home server
+        - wirelessly pick book off home server; caches locally while reading
     - organization:
         - consider separate use cases:
             - using ereader primarily vs synchronizing with server
