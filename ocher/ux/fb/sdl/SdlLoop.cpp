@@ -59,7 +59,7 @@ int SdlLoop::wait(struct OcherEvent* evt)
             evt->mouse.x = event.button.x;
             evt->mouse.y = event.button.y;
             if (event.button.button == SDL_BUTTON_LEFT) {
-                evt->subtype = OEVT_MOUSE1_CLICKED;  // TODO hack... just follow SDL
+                evt->subtype = OEVT_MOUSE1_DOWN;
             }
             break;
         }

@@ -47,6 +47,11 @@ struct Settings {
 
     // filesystem point(s)
     clc::Buffer fontRoot;
+
+    // UI scaling
+    int smallSpace;
+    int medSpace;
+    int largeSpace;
 };
 
 extern Settings settings;

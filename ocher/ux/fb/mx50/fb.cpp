@@ -100,6 +100,12 @@ unsigned int Mx50Fb::width()
     return 600;
 }
 
+unsigned int Mx50Fb::dpi()
+{
+    // Kobo Touch: 600x800; ~7" diagonal
+    return 140;
+}
+
 Mx50Fb::~Mx50Fb()
 {
     if (m_fd != -1) {

@@ -1,8 +1,6 @@
 0.0.9 -
-boot menu
-how to reach non-top-5 books?  implement LibraryActivity
+improve LibraryActivity
 usage of FEs can't be interleaved because they set state on a single FT (cause of wacky fonts?)
-wait for mouse-up before acting
 
 0.1.0 - Release
 docs for kobo-touch
@@ -22,6 +20,8 @@ ReadActivity
 epub correctness, round 1
 
 
+bitwise-or fonts onto FB to handle italics, kerning
+make UI scalable to other res
 flush font cache when entering HOME
 lazy-load books
 pop up menus

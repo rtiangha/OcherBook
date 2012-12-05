@@ -26,7 +26,7 @@ void Controller::run()
                 a = m_readActivity.run();
                 break;
             case ACTIVITY_LIBRARY:
-                a = m_libraryActivity.run();
+                a = m_libraryActivity.run(ui);
                 break;
             case ACTIVITY_SETTINGS:
                 a = m_settingsActivity.run();

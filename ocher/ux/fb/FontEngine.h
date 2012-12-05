@@ -9,7 +9,6 @@
  */
 struct GlyphFace
 {
-    // TODO: bitfield
     uint8_t faceId;
     uint8_t points;
     uint8_t underline;
@@ -54,6 +53,8 @@ public:
     FontEngine();
     ~FontEngine();
 
+    static void scanForFonts();  // TODO move to FreeType?
+
     void setFont();
     void setSize(unsigned int points);
     void setBold(int b);
@@ -76,17 +77,19 @@ public:
      * @param pen  Position of starting baseline, relative to r.  Updated.
      * @param r  Containing rectangle (possibly clip rectangle)
      * @param flags
-     *      BLIT   Actually blit to framebuffer, vs just measuring
-     *      WRAP   Word wrap?
-     *      XCLIP  Render clipped char, or Stop if char does not fit.  N/A if WRAP.
-     *      YCLIP  Render clipped char, or Stop if char does not fit.
+     *      NOBLIT   Don't blit to framebuffer, just measure
+     *      WRAP     Word wrap?
+     *      XCLIP    Render clipped char, or stop if char does not fit.  N/A if WRAP.
+     *      YCLIP    Render clipped char, or stop if char does not fit.
+     *      XCENTER  Centers horizontally within the rect.  Currently incompatible with WRAP.
      * @return offset of first unrendered character (==len if all fit).  May also stop early if len
      *      splits a multi-byte character.
      */
-#define FE_NOBLIT 1
-#define FE_WRAP   2
-#define FE_XCLIP  4
-#define FE_YCLIP  8
+#define FE_NOBLIT   1
+#define FE_WRAP     2
+#define FE_XCLIP    4
+#define FE_YCLIP    8
+#define FE_XCENTER 16
     unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags);
 
     GlyphCache m_cache;

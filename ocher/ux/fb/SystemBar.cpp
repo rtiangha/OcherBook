@@ -31,9 +31,6 @@ void SystemBar::drawContent(Rect* r)
         fe.apply();
         Pos pos;
         pos.x = 0; pos.y = fe.m_cur.ascender + 2;
-        fe.renderString(m_title.c_str(), m_title.length(), &pos, &g_fb->bbox, FE_NOBLIT);
-        pos.x >>= 1;
-        pos.x = (g_fb->width()>>1) - pos.x;
-        fe.renderString(m_title.c_str(), m_title.length(), &pos, &g_fb->bbox, 0);
+        fe.renderString(m_title.c_str(), m_title.length(), &pos, &g_fb->bbox, FE_XCENTER);
     }
 }

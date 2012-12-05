@@ -42,6 +42,22 @@ FontEngine::~FontEngine()
 {
 }
 
+void FontEngine::scanForFonts()
+{
+    const char* search;
+    if (settings.fontRoot.length() == 0)
+        search = ".";
+    else
+        search = settings.fontRoot.c_str();
+
+    const char* p = search;
+    const char* colon;
+    colon = strchr(p, ':');
+    if (colon) {
+        // TODO
+    }
+}
+
 static int utf8ToUtf32(const char* _p, uint32_t* u32)
 {
     const unsigned char* p = (const unsigned char*)_p;
@@ -164,6 +180,7 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
     glyphs[i] = 0;
 }
 
+// TODO:  return array of arrays of glyphs, and starting pos for each array
 unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags)
 {
     const char* p = str;
@@ -216,10 +233,16 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
                 }
             } else {
                 Pos dst;
-                dst.x = pen->x + r->x;
+                int xOffset = 0;
+                if (flags & FE_XCENTER) {
+                    for (unsigned int i = 0; glyphs[i]; ++i)
+                        xOffset += glyphs[i]->advanceX;
+                    xOffset = r->w/2 - (xOffset>>1);
+                }
+                dst.x = pen->x + r->x + xOffset;
                 dst.y = pen->y + r->y;
                 g_fb->blitGlyphs(glyphs, &dst, r);
-                pen->x = dst.x - r->x;
+                pen->x = dst.x - r->x - xOffset;
                 pen->y = dst.y - r->y;
             }
             p += w;

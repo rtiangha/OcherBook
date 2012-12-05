@@ -1,0 +1,94 @@
+#include "ocher/ux/Factory.h"
+#include "ocher/ux/Activity.h"
+
+
+class SelectCanvas : public Canvas
+{
+public:
+    SelectCanvas();
+
+    int evtMouse(struct OcherEvent*);
+    Rect draw(Pos* pos);
+
+protected:
+    void highlight(int i);
+    Rect apps[2];
+};
+
+SelectCanvas::SelectCanvas()
+{
+    float ratio = 1.6;
+    int w = g_fb->width();
+    int h = g_fb->height();
+
+    // Calc nice percentage widths, then calc height proportionally, then center vertically.
+    apps[0].x = w / 10;
+    apps[0].w = w / 10 * 3;
+    apps[0].h = apps[0].w * ratio;
+    apps[0].y = (h - apps[0].h) / 2;
+    apps[1].x = apps[0].x + w / 2;
+    apps[1].w = apps[0].w;
+    apps[1].h = apps[0].h;
+    apps[1].y = apps[0].y;
+}
+
+void SelectCanvas::highlight(int i)
+{
+    Rect r = apps[i];
+    for (int n = 0; n < 4; ++n) {
+        r.inset(-1);
+        g_fb->rect(&r);
+    }
+    g_fb->update(&r);
+    g_fb->sync();
+}
+
+int SelectCanvas::evtMouse(struct OcherEvent* evt)
+{
+    if (evt->subtype == OEVT_MOUSE1_UP) {
+        Pos* pos = (Pos*)&evt->mouse;
+        if (apps[0].contains(pos)) {
+            highlight(0);
+            return 0;
+        } else if (apps[1].contains(pos)) {
+            highlight(1);
+            exit(1);
+        }
+    }
+    return -1;
+}
+
+Rect SelectCanvas::draw(Pos*)
+{
+    Rect r = g_fb->bbox;
+
+    g_fb->setFg(0xff, 0xff, 0xff);
+    g_fb->fillRect(&r);
+
+    g_fb->setFg(0, 0, 0);
+    FontEngine fe;
+    fe.setSize(16);
+    fe.setItalic(1);
+    fe.apply();
+    Pos pos;
+    for (int i = 0; i < 2; ++i) {
+        r = apps[i];
+        g_fb->rect(&r);
+        r.inset(-1);
+        g_fb->roundRect(&r, 1);
+
+        const char* label = i == 0 ? "OcherBook" : "Kobo" /* or "Nickel" ? */ ;
+        pos.x = 0;
+        pos.y = r.y + r.h/2;
+        fe.renderString(label, strlen(label), &pos, &g_fb->bbox, FE_XCENTER);
+    }
+
+    return g_fb->bbox;
+}
+
+void runBootMenu()
+{
+    SelectCanvas c;
+    c.refresh();
+    g_loop->run(&c);
+}

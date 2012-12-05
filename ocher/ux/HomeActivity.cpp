@@ -20,12 +20,15 @@ public:
 
     Rect draw(Pos* pos);
 
+    Activity m_nextActivity;
+
 protected:
 #define NUM_CLUSTER_BOOKS 5
     Rect books[NUM_CLUSTER_BOOKS];
 };
 
-HomeCanvas::HomeCanvas()
+HomeCanvas::HomeCanvas() :
+    m_nextActivity(ACTIVITY_READ)
 {
     float ratio = 1.6;
     int dx = m_rect.w/32;
@@ -68,14 +71,15 @@ int HomeCanvas::evtKey(struct OcherEvent*)
 
 int HomeCanvas::evtMouse(struct OcherEvent* evt)
 {
-    if (evt->subtype == OEVT_MOUSE1_CLICKED || evt->subtype == OEVT_MOUSE1_DOWN) {
+    if (evt->subtype == OEVT_MOUSE1_UP) {
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
             Meta* meta = (Meta*)g_shelf->m_meta.itemAt(i);
             if (!meta) {
                 clc::Log::debug(LOG_NAME, "book %d has no meta", i);
                 continue;
             }
-            if (books[i].contains((Pos*)&evt->mouse)) {
+            Pos* pos = (Pos*)&evt->mouse;
+            if (books[i].contains(pos)) {
                 clc::Log::info(LOG_NAME, "book %d selected %p", i, meta);
                 Rect r = books[i];
                 r.inset(-2);
@@ -84,6 +88,11 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 g_fb->roundRect(&r, 4);
                 g_fb->update(&r);
                 g_shelf->select(meta);
+                m_nextActivity = ACTIVITY_READ;
+                return 0;
+            } else if (pos->y > 650 /* TODO convert to labels */) {
+                // TODO:  For now, clicking on shortlist takes you to library.  Need popup menus.
+                m_nextActivity = ACTIVITY_LIBRARY;
                 return 0;
             }
         }
@@ -113,6 +122,7 @@ Rect HomeCanvas::draw(Pos*)
         Pos pos;
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
             r = books[i];
+            r.inset(-1);
             g_fb->rect(&r);
             r.inset(-1);
             g_fb->roundRect(&r, 1);
@@ -138,10 +148,7 @@ Rect HomeCanvas::draw(Pos*)
         fe.setSize(18);
         fe.apply();
         pos.x = 0; pos.y = 100;
-        fe.renderString("HOME", 4, &pos, &g_fb->bbox, FE_NOBLIT);
-        pos.x >>= 1;
-        pos.x = (g_fb->width()>>1) - pos.x;
-        fe.renderString("HOME", 4, &pos, &g_fb->bbox, 0);
+        fe.renderString("HOME", 4, &pos, &g_fb->bbox, FE_XCENTER);
 
         fe.setSize(14);
         fe.apply();
@@ -150,6 +157,18 @@ Rect HomeCanvas::draw(Pos*)
     }
     Rect d2 = drawChildren(m_rect.pos());
     drawn.unionRect(&d2);
+
+#if 0
+    g_fb->byLine(&g_fb->bbox, dim);
+    Rect popup(25, 200, 550, 400);
+    g_fb->rect(&popup);
+    popup.inset(1);
+    g_fb->rect(&popup);
+    popup.inset(1);
+    g_fb->setFg(0xff, 0xff, 0xff);
+    g_fb->fillRect(&popup);
+#endif
+
     return drawn;
 }
 
@@ -171,6 +190,6 @@ Activity HomeActivity::run(UiBits& ui)
     c.refresh();
     g_loop->run(&c);
 
-    return ACTIVITY_READ;
+    return c.m_nextActivity;
 }
 

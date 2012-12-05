@@ -203,15 +203,12 @@ void Window::drawContent(Rect*)
 
 
 Button::Button(int x, int y, unsigned int w, unsigned int h) :
-    Widget(x, y, w, h),
-    m_label(0)
+    Widget(x, y, w, h)
 {
 }
 
 Button::~Button()
 {
-    if (m_label)
-        free(m_label);
 }
 
 Rect Button::draw(Pos* pos)
@@ -238,8 +235,13 @@ void Button::drawBorder(Rect* rect)
 
 void Button::drawLabel(Rect* rect)
 {
-    if (m_label) {
-        // TODO
+    if (m_label.length()) {
+        FontEngine fe;
+        fe.setSize(14);
+        fe.apply();
+        Pos pos;
+        pos.x = 0; pos.y = m_rect.h / 2;
+        fe.renderString(m_label.c_str(), m_label.length(), &pos, &m_rect, FE_XCENTER);
     }
 }
 

@@ -9,10 +9,10 @@
 
 
 static const char* ttfFiles[] = {
-    "DejaVuSerif.ttf",
-    "DejaVuSerif-Italic.ttf",
-    "DejaVuSerif-Bold.ttf",
-    "DejaVuSerif-BoldItalic.ttf",
+    "liberation/LiberationSerif-Regular.ttf",
+    "liberation/LiberationSerif-Italic.ttf",
+    "liberation/LiberationSerif-Bold.ttf",
+    "liberation/LiberationSerif-BoldItalic.ttf",
 };
 
 FreeType::FreeType(unsigned int dpi) :
@@ -47,7 +47,7 @@ bool FreeType::setFace(int i, int b)
 
     int r = FT_New_Face(m_lib, file.c_str(), 0, &m_face);
     if (r || !m_face) {
-        clc::Log::error(LOG_NAME, "FT_New_Face failed: %d", r);
+        clc::Log::error(LOG_NAME, "FT_New_Face(\"%s\") failed: %d", file.c_str(), r);
         return false;
     }
     return true;

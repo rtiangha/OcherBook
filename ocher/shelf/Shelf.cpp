@@ -6,6 +6,10 @@
 #define LOG_NAME "ocher.shelf"
 
 
+Shelf shelf;
+Shelf* g_shelf = &shelf;
+
+
 Shelf::~Shelf()
 {
     size_t n = m_meta.countItems();

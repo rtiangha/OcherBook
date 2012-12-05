@@ -2,6 +2,7 @@
 #define OCHER_FB_WIDGETS_H
 
 #include "clc/data/List.h"
+#include "clc/data//Buffer.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/Event.h"
 
@@ -102,7 +103,7 @@ protected:
     int evtMouse(struct OcherEvent*);
 
     int border;
-    char* m_label;
+    clc::Buffer m_label;
     //icon;
 };
 

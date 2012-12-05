@@ -231,24 +231,25 @@ CLC_OBJS = \
 #	$(BUILD_DIR)/tinyxml2.o
 OCHER_OBJS = \
 	$(CLC_OBJS) \
+	ocher/device/Battery.o \
 	ocher/device/Device.o \
 	ocher/device/Filesystem.o \
-	ocher/device/Battery.o \
 	ocher/fmt/Format.o \
 	ocher/fmt/Layout.o \
-	ocher/shelf/Meta.o \
-	ocher/shelf/Shelf.o \
 	ocher/ocher.o \
 	ocher/settings/Settings.o \
+	ocher/shelf/Meta.o \
+	ocher/shelf/Shelf.o \
+	ocher/ux/Activity.o \
 	ocher/ux/Controller.o \
 	ocher/ux/Event.o \
 	ocher/ux/Factory.o \
-	ocher/ux/Pagination.o \
-	ocher/ux/Renderer.o \
-	ocher/ux/Activity.o \
-	ocher/ux/ReadActivity.o \
-	ocher/ux/LibraryActivity.o \
 	ocher/ux/HomeActivity.o \
+	ocher/ux/LibraryActivity.o \
+	ocher/ux/OcherBoot.o \
+	ocher/ux/Pagination.o \
+	ocher/ux/ReadActivity.o \
+	ocher/ux/Renderer.o \
 	ocher/ux/SettingsActivity.o \
 	ocher/ux/SyncActivity.o
 

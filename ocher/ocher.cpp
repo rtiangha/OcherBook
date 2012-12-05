@@ -16,6 +16,7 @@
 struct Options opt;
 
 UiFactory* uiFactory;
+extern void runBootMenu();
 
 
 void initCrash()
@@ -62,6 +63,7 @@ void usage(const char* msg)
       // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
         "Usage:  ocher [OPTIONS]... [FILE]...\n"
         "\n"
+        "-b,--boot            Present boot menu; nonzero exit means run other firmware.\n"
         "-f,--flatten         Flatten (do not show to user) the directory heirarchy.\n"
         "-t,--test            Test (validate) the epubs rather than view.\n"
         "-h,--help            Help.\n"
@@ -86,10 +88,12 @@ clc::List drivers;
 int main(int argc, char** argv)
 {
     bool listDrivers = false;
+    bool bootMenu = false;
     const char* driverName = 0;
 
     struct option long_options[] =
     {
+        {"boot",         no_argument,       0,'b'},
         {"flatten",      no_argument,       0,'f'},
         {"help",         no_argument,       0,'h'},
         {"quiet",        no_argument,       0,'q'},
@@ -104,11 +108,14 @@ int main(int argc, char** argv)
         // getopt_long stores the option index here.
         int option_index = 0;
 
-        int c = getopt_long(argc, argv, "d:fhtvq", long_options, &option_index);
+        int c = getopt_long(argc, argv, "d:bfhtvq", long_options, &option_index);
         if (c == -1)
             break;
         switch (c) {
             case 0:
+                break;
+            case 'b':
+                bootMenu = true;
                 break;
             case 'v':
                 opt.verbose++;
@@ -181,6 +188,11 @@ int main(int argc, char** argv)
     g_fb = uiFactory->getFrameBuffer();
     g_ft = uiFactory->getFontEngine();
     g_loop = uiFactory->getLoop();
+
+    if (bootMenu) {
+        runBootMenu();
+    }
+
     Controller c;
     c.run();
 

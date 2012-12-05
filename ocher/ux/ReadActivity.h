@@ -23,7 +23,7 @@ protected:
 
     UiBits& m_ui;
 
-    Activity m_next;
+    Activity m_nextActivity;
 
     clc::Buffer m_layout;
     Renderer* renderer;

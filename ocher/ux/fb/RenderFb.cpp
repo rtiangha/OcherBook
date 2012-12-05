@@ -262,7 +262,7 @@ int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 #ifdef CPS_STATS
                         chars += str->length();  // miscounts UTF8...
 #endif
-                        clc::Log::info(LOG_NAME, "output (%d pts%s%s) %d bytes", a[ai].pts, a[ai].b?" bold":"",
+                        clc::Log::debug(LOG_NAME, "output (%d pts%s%s) %d bytes", a[ai].pts, a[ai].b?" bold":"",
                                 a[ai].em?" italics":"", str->length());
                         int breakOffset = outputWrapped(str, strOffset, doBlit);
                         strOffset = 0;

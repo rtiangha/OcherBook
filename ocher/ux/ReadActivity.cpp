@@ -25,7 +25,7 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key.key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
-            m_next = ACTIVITY_HOME;
+            m_nextActivity = ACTIVITY_HOME;
             // TODO  visually turn page down
             return 0;
         } else if (evt->key.key == OEVTK_POWER) {
@@ -40,10 +40,7 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
             Pos p;
             p.x = 0;
             p.y = r.h/2;
-            fe.renderString("Sleeping", 8, &p, &r, FE_NOBLIT);
-            p.x >>= 1;
-            p.x = (r.w>>1) - p.x;
-            fe.renderString("Sleeping", 8, &p, &r, 0);
+            fe.renderString("Sleeping", 8, &p, &r, FE_XCENTER);
 
             g_fb->update(&r);
             g_fb->sync();
@@ -86,7 +83,7 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
 
 int ReadActivity::evtMouse(struct OcherEvent* evt)
 {
-    if (evt->subtype == OEVT_MOUSE1_CLICKED || evt->subtype == OEVT_MOUSE1_DOWN) {
+    if (evt->subtype == OEVT_MOUSE1_UP) {
         if (m_ui.m_systemBar.m_rect.contains((Pos*)&evt->mouse) ||
                 m_ui.m_navBar.m_rect.contains((Pos*)&evt->mouse)) {
             if (m_ui.m_systemBar.m_flags & WIDGET_HIDDEN) {
@@ -247,5 +244,5 @@ Activity ReadActivity::run()
 
     delete layout;
 
-    return m_next;
+    return m_nextActivity;
 }

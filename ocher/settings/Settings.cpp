@@ -19,12 +19,16 @@ Settings::Settings() :
     marginTop(10),
     marginBottom(10),
     marginLeft(10),
-    marginRight(10)
+    marginRight(10),
+    smallSpace(10),
+    medSpace(15),
+    largeSpace(30)
 {
 #ifdef OCHER_TARGET_KOBO
-    fontRoot = "/tmp";
+    fontRoot = "/usr/local/Trolltech/QtEmbedded-4.6.2-arm/lib/fonts";
 #else
-    fontRoot = "build";
+    // TODO fontRoot = ".:/usr/share/fonts/truetype/ttf-dejavu";
+    fontRoot = "/usr/share/fonts/truetype/";
 #endif
 }
 

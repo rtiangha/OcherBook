@@ -15,7 +15,7 @@ public:
 
     unsigned int height();
     unsigned int width();
-    unsigned int dpi() { return 170; }  // Kobo Touch -- measure it yourself!
+    unsigned int dpi();
 
     void setFg(uint8_t r, uint8_t b, uint8_t g);
     void setBg(uint8_t r, uint8_t b, uint8_t g);
