@@ -8,6 +8,8 @@
 
 void invert(void* p, size_t n);
 void dim(void* p, size_t n);
+void memAnd(void* dst, const void* src, size_t n);
+void memOr(void* dst, const void* src, size_t n);
 
 class FrameBuffer
 {

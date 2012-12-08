@@ -170,10 +170,10 @@ void FbSdl::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userC
         }
     }
     clc::Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
+    unsigned char* dst = ((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x;
     for (int i = 0; i < h; ++i) {
-        unsigned char* dst = ((unsigned char*)m_screen->pixels) + y*m_screen->pitch + x;
-        memcpy(dst, p, w);
-        y++;
+        memAnd(dst, p, w);
+        dst += m_screen->pitch;
         p += rectWidth;
     }
     if (m_mustLock) {

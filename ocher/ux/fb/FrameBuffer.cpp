@@ -35,6 +35,24 @@ void dim(void* p, size_t n)
     }
 }
 
+void memAnd(void* dst, const void* src, size_t n)
+{
+    uint8_t* d = (uint8_t*)dst;
+    const uint8_t* s = (uint8_t*)src;
+    while (n--) {
+        *d++ &= *s++;
+    }
+}
+
+void memOr(void* dst, const void* src, size_t n)
+{
+    uint8_t* d = (uint8_t*)dst;
+    const uint8_t* s = (uint8_t*)src;
+    while (n--) {
+        *d++ |= *s++;
+    }
+}
+
 void Rect::unionRect(Rect* r)
 {
     if (! valid()) {

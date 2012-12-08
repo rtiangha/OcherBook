@@ -198,9 +198,10 @@ void Mx50Fb::blit(unsigned char* p, int x, int y, int w, int h, const Rect* user
     }
 
     clc::Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
+    unsigned char* dst = ((unsigned char*)m_fb) + y*vinfo.xres_virtual + x;
     for (int i = 0; i < h; ++i) {
-        memcpy(((unsigned char*)m_fb) + y*vinfo.xres_virtual + x, p, w);
-        y++;
+        memAnd(dst, p, w);
+        dst += vinfo.xres_virtual;
         p += rectWidth;
     }
 }
