@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "ocher/ux/Factory.h"
 #include "ocher/ux/Activity.h"
 
@@ -70,17 +72,19 @@ Rect SelectCanvas::draw(Pos*)
     fe.setSize(16);
     fe.setItalic(1);
     fe.apply();
+
     Pos pos;
     for (int i = 0; i < 2; ++i) {
         r = apps[i];
         g_fb->rect(&r);
         r.inset(-1);
         g_fb->roundRect(&r, 1);
+        r.inset(2);
 
         const char* label = i == 0 ? "OcherBook" : "Kobo" /* or "Nickel" ? */ ;
         pos.x = 0;
-        pos.y = r.y + r.h/2;
-        fe.renderString(label, strlen(label), &pos, &g_fb->bbox, FE_XCENTER);
+        pos.y = r.h/2;
+        fe.renderString(label, strlen(label), &pos, &r, FE_XCENTER);
     }
 
     return g_fb->bbox;
@@ -88,6 +92,14 @@ Rect SelectCanvas::draw(Pos*)
 
 void runBootMenu()
 {
+#ifdef OCHER_TARGET_KOBO
+    // Kobo rc scripts start animate.sh, which shows an animation while nickel is starting.
+    // Kill that here (so it doesn't overlay the boot menu) to simplify installation steps.
+    // TODO: Remove when more closely integrated.
+    system("killall on-animator.sh");
+    sleep(1);
+#endif
+
     SelectCanvas c;
     c.refresh();
     g_loop->run(&c);
