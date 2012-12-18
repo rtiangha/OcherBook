@@ -36,8 +36,8 @@ TreeFile* Epub::findSpine()
         stripUtf8Bom(mimetype->data);
         if (mimetype->data.length() < 20 ||
                 strncmp(mimetype->data.c_str(), "application/epub+zip", 20)) {
-            clc::Log::warn(LOG_NAME, "'/mimetype' has incorrect value: '%s' (%d)",
-                    mimetype->data.c_str(), mimetype->data.length());
+            clc::Log::warn(LOG_NAME, "'/mimetype' has incorrect value: '%s' (%u)",
+                    mimetype->data.c_str(), (unsigned int)mimetype->data.length());
         }
         // TODO: release mimetype from UnzipCache
     }

@@ -120,31 +120,31 @@ public:
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void log(const char* name, Log::Level, const char* fmt, ...);
+    static void log(const char* name, Log::Level, const char* fmt, ...) __attribute__((format(printf, 3, 4)));
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void trace(const char* name, const char* fmt, ...);
+    static void trace(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void debug(const char* name, const char* fmt, ...);
+    static void debug(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void info(const char* name, const char* fmt, ...);
+    static void info(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void warn(const char* name, const char* fmt, ...);
+    static void warn(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void error(const char* name, const char* fmt, ...);
+    static void error(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      */
-    static void fatal(const char* name, const char* fmt, ...);
+    static void fatal(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
 protected:
     static Loggers loggers;
@@ -239,27 +239,27 @@ public:
 
     /**
      */
-    void trace(const char* fmt, ...);
+    void trace(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      */
-    void debug(const char* fmt, ...);
+    void debug(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      */
-    void info(const char* fmt, ...);
+    void info(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      */
-    void warn(const char* fmt, ...);
+    void warn(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      */
-    void error(const char* fmt, ...);
+    void error(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      */
-    void fatal(const char* fmt, ...);
+    void fatal(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
 protected:
     /**
