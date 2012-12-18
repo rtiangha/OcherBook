@@ -806,6 +806,24 @@ Buffer::ICompare(const char* string, size_t len) const
     return strncasecmp(c_str(), safestr(string), len);
 }
 
+int Buffer::endsWith(const char* suffix)
+{
+    size_t len = strlen(suffix);
+    if (length() >= len && strcmp(c_str() + length() - len, suffix) == 0) {
+        return 1;
+    }
+    return 0;
+}
+
+int Buffer::endsWithI(const char* suffix)
+{
+    size_t len = strlen(suffix);
+    if (length() >= len && strcasecmp(c_str() + length() - len, suffix) == 0) {
+        return 1;
+    }
+    return 0;
+}
+
 
 size_t
 Buffer::FindFirst(const Buffer& string) const

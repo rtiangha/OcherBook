@@ -196,6 +196,8 @@ public:
      *  Compares two C strings, case insensitive, at most the first len characters.
      */
     int         ICompare(const char* string, size_t len) const;
+    int endsWith(const char* suffix);
+    int endsWithI(const char* suffix);
 
     // Searching
     size_t        FindFirst(const Buffer& string) const;
