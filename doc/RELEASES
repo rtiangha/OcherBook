@@ -1,10 +1,16 @@
-Next planned release:
+0.1.0 xxx, released xxx
 
-0.1.0
-- Compiles on Kobo, Linux, Haiku, Windows (via Cygwin)
-- Parses epub, text
-- Outputs to Kobo, SDL, ncurses, file descriptor
-- Rudimentary pagination of output
-- Rudimentary input to control book selection and next/prev page
-- Rudimentary stress-testing framework
+Release requirements:
+- Supported targets: Kobo and SDL on Linux
+- Test on all platforms; update doc/platforms.
+- Post kobo binaries.
+
+Features:
+- Supported on Kobo Touch and Linux/SDL (may work elsewhere).
+- Optional bootloader allows user to select between OcherBook and Kobo's
+  native Nickel at startup, for safer end-user testing.
+- Parses epub and text.
+- Pluggable e-book formats and output devices.
+- Browse books by filename.
+- Sleep mode.
 

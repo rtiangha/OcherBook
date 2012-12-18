@@ -1,202 +1,33 @@
-0.0.9 -
-improve LibraryActivity
-usage of FEs can't be interleaved because they set state on a single FT (cause of wacky fonts?)
-
-0.1.0 - Release
-docs for kobo-touch
-    kill kobo's animation on startup
-post kobo binaries
-
-0.1.1 - Hardening
-survive purgatory.sh
-Pagination.cpp:35 uninit
-read an entire book on kobo; rank annoyances
-post updated kobo binaries
-
-
-0.2
-ReadActivity
-    page numbers
-epub correctness, round 1
-
-
-bitwise-or fonts onto FB to handle italics, kerning
 make UI scalable to other res
-flush font cache when entering HOME
-lazy-load books
-pop up menus
-docs for kobo-mini, kobo-glo
+    make SDL window resizable
 font size does not always pop correctly
 Show/hide SystemBar causes page to shift
+
+improve startup time:  don't parse so much to get metadata
+flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
 persist shelf
     json vs Flattenable
+no database; deal with books coming and going dynamically (NFS support!)
+
+pop up menus
 widget
     packing
     make dirty rects more granular (eg, hiding SystemBar doesn't reflow entire page)
-spinners
-flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
+g_fb->bbox vs m_rect
+
 do settings apply before or after layout?
     better definition around what AttrSizeAbs, etc mean
     are absolute font sizes really absolute while in the layout?
-work on Makefile
-    font getter
-HomeActivity
-    real titles / authors
-        convert to tinyxml2
-            vpath
-integrate libjpeg, libpng
-HomeActivity
-    cover art
+settings:
+    date format
+    user's name
+
 fonts
     layout by line, to do centering
     justify:  full, right
-    FE: each usage of FE should have its own context
     FE: build some higher-level abstractions
-    convert from RenderFb::outputWrapped to FontEngine::renderString
-    FE::renderString should return bbox or bboxes
     font path, scan ttf files, font families, ...
     font preferences
-    improved font metrics:
-        subpixel rendering
-        kerning
-resources:
-    left / right arrows
-    wrench
-    font
-    navigation
-    clock
-    network
-    battery
-    X close
-    FF / RW
-    back
-    circle scrubber / slider
-    folded page
-RLE
-    RLE compress/decompress
-    build step to compress images
-battery
-    RLE images
-portability:
-    resurrect non-fb output
-    fix close button in SDL
-no database; deal with books coming and going dynamically (NFS support!)
 
-----------------------
-
-FEATURES
-
-device specific:
-    - abstractions:
-        - filesystem
-    - Kobo:
-        + framebuffer
-        + suspend / resume
-            - filter resume events?
-        + touch input
-        + home, power button
-        - wireless
-
-layout:
-    - pagination
-        - discrete pages vs scrollable (makes no sense on e-ink)
-    - margins
-    + FreeType
-    - option to build some fonts into the binary for easy install
-    - images
-
-navigation:
-    - live links (eg: table of contents)
-
-build system:
-    - config system (current ocher.config is a mess)
-    - modularize
-    - detect platform, etc...
-    - download tool
-    - include kobo linux headers, for easier build
-    - option to build-in all resources (fonts, icons, ...)
-
-renderers:
-    - user able to interrupt any long-running layout action
-        - SDL seems to block signals by default
-    - fd
-    - ncurses
-    - sdl
-    - kobo mx50
-    - ...
-    - generic text printing routines
-        - make FreeType optional (genericise as FontEngine)
-
-formats:
-    - probe file type
-    - test UTF8 throughout
-    - epub
-        - CSS
-    - rtf
-    - text
-    - markdown
-    - ...
-
-per-user:
-    - all user record with optional OpenSSL-compatible encryption
-    - keep personal log of books read (title, author, date, notes, ...)?
-    - reading wish list
-    - ability to export per-use stats
-    - annotations
-    - settings
-        - fonts
-        - past settings (these settings suck, want to undo)
-        - ability to force settings (book can't change margins, font size, ...)
-        - start / stop date of reading book
-        - way to share metadata about the book (tweet / ... ?)
-
-features:
-    - clock
-    - ability to compile-out large features
-    - search
-    - bookmarks
-    - annotations
-    - dictionary
-    - time / date / calendar view
-    - geek features:
-        - options to validate epubs?
-        - wirelessly sync with epubs on home server
-        - wirelessly pick book off home server; caches locally while reading
-    - organization:
-        - consider separate use cases:
-            - using ereader primarily vs synchronizing with server
-        - ways of grouping / searching (author, genre, read/haven't read, ...)
-        - how to attach metadata to each book?
-
-harden:
-    - test harness
-    - valgrind across many epubs
-    - huge fonts crash
-    - stress-test airbag_fd
-    - non-linux platforms hang in global ctor realloc
-    - guerilla testing
-    - general strategy for OOM
-
-cleanup:
-    - remove exceptions from File
-    - allow std::bad_alloc?
-    - clean up Path/File to be simpler, more posix-like
-
-docs:
-    - document complete walk-through of installing, recovery, etc
-    - built-in links to free ebooks?
-
-reader features:
-    - pan
-    - zoom
-    - flip
-
-metadata:
-    - cache metadata in dotfiles beside the epub
-
-translations
-
-bluesky:
-    - RSS
-    - other free content
-    - ...
+remove exceptions from File
+clean up Path/File to be simpler, more posix-like

@@ -1,0 +1,88 @@
+device specific:
+    - Kobo:
+        - suspend / resume (0.1)
+        - wireless
+
+layout:
+    - pagination (0.1)
+    - margins (0.1)
+    - uses FreeType (0.1)
+    - images
+    - option to build some fonts into the binary for easy install
+
+navigation:
+    - live links (eg: table of contents)
+    - scrubber
+    - search
+
+build system:
+    - config system
+    - modular
+        - ability to compile-out features
+    - detect platform, etc...
+    - download tool
+    - include kobo linux headers, for easier build
+    - option to build-in all resources (fonts, icons, ...)
+
+renderers:
+    - output via kobo mx50 (0.1)
+    - output via sdl (0.1)
+    - output via fd
+    - output via ncurses
+    - user able to interrupt any long-running layout action
+
+formats:
+    - epub
+    - rtf
+    - text
+    - markdown
+    - ...
+
+per-user:
+    - all user record with optional OpenSSL-compatible encryption
+    - keep personal log of books read (title, author, date, notes, ...)?
+    - reading wish list
+    - ability to export per-use stats
+    - annotations
+    - bookmarks
+    - settings
+        - fonts
+        - past settings (these settings suck, want to undo)
+        - ability to force settings (book can't change margins, font size, ...)
+        - start / stop date of reading book
+        - way to share metadata about the book (tweet / ... ?)
+        - localization (date format...)
+        - user name (personalized sleep screen...)
+
+features:
+    - clock
+    - time / date / calendar view
+    - dictionary
+    - geek features:
+        - options to validate epubs?
+        - wirelessly sync with epubs on home server
+        - wirelessly pick book off home server; caches locally while reading
+    - organization:
+        - consider separate use cases:
+            - using ereader primarily vs synchronizing with server
+        - ways of grouping / searching (author, genre, read/haven't read, ...)
+        - how to attach metadata to each book?
+
+docs:
+    - built-in links to free ebooks?
+
+view features:
+    - pan
+    - zoom
+    - flip
+
+metadata:
+    - cache metadata in dotfiles beside the epub
+
+translations
+
+bluesky:
+    - RSS
+    - other free content
+    - ...
+
