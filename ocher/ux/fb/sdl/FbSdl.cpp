@@ -183,6 +183,13 @@ void FbSdl::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userC
 
 int FbSdl::update(Rect* r, bool /*full*/)
 {
+    Rect _r;
+    if (!r) {
+        _r.x = _r.y = 0;
+        _r.w = width();
+        _r.h = height();
+        r = &_r;
+    }
     clc::Log::debug(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
     SDL_UpdateRects(m_screen, 1, (SDL_Rect*)r);
     return 0;

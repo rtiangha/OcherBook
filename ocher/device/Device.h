@@ -20,6 +20,12 @@ public:
 
     void reboot() {}
 
+    /**
+     * Puts the device in a low power state until ??? TODO.
+     * Returns when awake.
+     */
+    void sleep();
+
     Filesystem fs;
 };
 
@@ -31,4 +37,3 @@ extern Device* device;
 void initDevice();
 
 #endif
-

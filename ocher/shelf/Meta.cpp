@@ -52,3 +52,12 @@ void loadMeta(Meta* meta)
     char* path = strrchr(meta->relPath.c_str(), '/');
     meta->title = path ? path+1 : meta->relPath.c_str();
 }
+
+unsigned int Meta::percentRead()
+{
+    if (pages == 0)
+        return 0;
+    if (record.activePage > pages)
+        return 100;
+    return record.activePage * 100 / pages;
+}

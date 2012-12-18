@@ -29,7 +29,7 @@ class BookRecord
 public:
     BookRecord() : activePage(0), touched(0), isShortList(0) {}
 
-    int activePage;  // TODO:  can't use page number; varies by device/settings
+    unsigned int activePage;  // TODO:  can't use page number; varies by device/settings
 
     time_t touched;
 
@@ -67,6 +67,8 @@ public:
     unsigned int pages; // is this even meaningful?
 
     BookRecord record;   // TODO:  per-user
+
+    unsigned int percentRead();
 };
 
 void loadMeta(Meta* meta);

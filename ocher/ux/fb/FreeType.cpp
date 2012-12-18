@@ -9,10 +9,18 @@
 
 
 static const char* ttfFiles[] = {
+    // TODO
+#ifdef OCHER_TARGET_KOBO
+    "Delima.ttf",
+    "Delima-Italic.ttf",
+    "Delima-Bold.ttf",
+    "Delima-BoldItalic.ttf",
+#else
     "liberation/LiberationSerif-Regular.ttf",
     "liberation/LiberationSerif-Italic.ttf",
     "liberation/LiberationSerif-Bold.ttf",
     "liberation/LiberationSerif-BoldItalic.ttf",
+#endif
 };
 
 FreeType::FreeType(unsigned int dpi) :

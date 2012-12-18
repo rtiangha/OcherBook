@@ -13,7 +13,7 @@
 class LibraryCanvas : public Canvas
 {
 public:
-    LibraryCanvas(UiBits& ui);
+    LibraryCanvas(UiBits& ui, clc::List& meta);
     ~LibraryCanvas();
 
     int evtKey(struct OcherEvent*);
@@ -21,24 +21,31 @@ public:
 
     Rect draw(Pos* pos);
 
-    Activity m_nextActivity;
-
 protected:
     UiBits& m_ui;
-#define NUM_BOOKS 30
-    Rect books[NUM_BOOKS];
+    clc::List m_meta;
+#define BOOKS_PER_PAGE 15
+    Rect* m_bookRects;
     int itemHeight;
-    int itemsPerPage;
-    unsigned int pageNum;
+    unsigned int m_booksPerPage;
+    unsigned int m_pages;
+    unsigned int m_pageNum;
 };
 
-LibraryCanvas::LibraryCanvas(UiBits& ui) :
-    m_ui(ui)
+LibraryCanvas::LibraryCanvas(UiBits& ui, clc::List& meta) :
+    m_ui(ui),
+    m_meta(meta),
+    m_pageNum(0)
 {
+    // TODO calc this
+    m_booksPerPage = BOOKS_PER_PAGE;
+    m_bookRects = new Rect[m_booksPerPage];
+    m_pages = (m_meta.size() + m_booksPerPage - 1) / m_booksPerPage;
 }
 
 LibraryCanvas::~LibraryCanvas()
 {
+    delete[] m_bookRects;
 }
 
 int LibraryCanvas::evtKey(struct OcherEvent* evt)
@@ -46,24 +53,51 @@ int LibraryCanvas::evtKey(struct OcherEvent* evt)
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key.key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
-            m_nextActivity = ACTIVITY_HOME;
-            return 0;
+            return ACTIVITY_HOME;
+        } else if (evt->key.key == OEVTK_LEFT || evt->key.key == OEVTK_UP || evt->key.key == OEVTK_PAGEUP) {
+            clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
+            if (m_pageNum > 0) {
+                m_pageNum--;
+                dirty();
+            }
+            return -1;
+        } else if (evt->key.key == OEVTK_RIGHT || evt->key.key == OEVTK_DOWN || evt->key.key == OEVTK_PAGEDOWN) {
+            clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
+            if (m_pageNum+1 < m_pages) {
+                m_pageNum++;
+                dirty();
+            }
+            return -1;
         }
-        // TODO
     }
-    return -1;
+    return -2;
 }
 
 int LibraryCanvas::evtMouse(struct OcherEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
-        for (unsigned int i = 0; i < NUM_BOOKS; i++) {
-            Pos* pos = (Pos*)&evt->mouse;
-            if (books[i].contains(pos)) {
-                Meta* meta = (Meta*)g_shelf->m_meta.get(i);
+        Pos* pos = (Pos*)&evt->mouse;
+        for (unsigned int i = 0; i < m_booksPerPage; i++) {
+            Meta* meta = (Meta*)m_meta.get(i + m_pageNum*m_booksPerPage);
+            if (!meta)
+                break;
+            if (m_bookRects[i].contains(pos)) {
                 g_shelf->select(meta);
-                m_nextActivity = ACTIVITY_READ;
-                return 0;
+                return ACTIVITY_READ;
+            }
+        }
+        // TODO buttons
+        if (pos->x < 300) {
+            clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
+            if (m_pageNum > 0) {
+                m_pageNum--;
+                dirty();
+            }
+        } else {
+            clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
+            if (m_pageNum+1 < m_pages) {
+                m_pageNum++;
+                dirty();
             }
         }
     }
@@ -72,33 +106,59 @@ int LibraryCanvas::evtMouse(struct OcherEvent* evt)
 
 Rect LibraryCanvas::draw(Pos*)
 {
-    g_fb->setFg(0xff, 0xff, 0xff);
-    g_fb->fillRect(&m_rect);
-    g_fb->setFg(0, 0, 0);
+    Rect drawn;
+    drawn.setInvalid();
 
-    FontEngine fe;
-    fe.setSize(10);
-    fe.apply();
+    if (m_flags & WIDGET_DIRTY) {
+        clc::Log::info(LOG_NAME, "draw");
+        m_flags &= ~WIDGET_DIRTY;
+        drawn = m_rect;
 
-    Rect r = g_fb->bbox;
-    Pos pos;
-    pos.x = 0;
-    pos.y = m_ui.m_systemBar.m_rect.y + settings.largeSpace;
-    unsigned int N = g_shelf->m_meta.size();
-    for (unsigned int i = 0; i < N && i < NUM_BOOKS; ++i) {
-        Meta* meta = (Meta*)g_shelf->m_meta.get(i);
+        g_fb->setFg(0xff, 0xff, 0xff);
+        g_fb->fillRect(&m_rect);
+        g_fb->setFg(0, 0, 0);
 
-        books[i].x = settings.medSpace;
-        books[i].w = r.w - settings.medSpace*2;
-        books[i].y = pos.y;
-        books[i].h = fe.m_cur.lineHeight;
-        pos.x = books[i].x;
-        pos.y = books[i].y + fe.m_cur.ascender;
-        fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_XCLIP);
-        pos.y = books[i].y + fe.m_cur.lineHeight;
+        FontEngine fe;
+        Rect r = g_fb->bbox;
+        Pos pos;
+
+        fe.setSize(10);
+        fe.apply();
+        clc::Buffer str;
+        str.format("PG. %u OF %u", m_pageNum+1, m_pages);
+        pos.x = 0;
+        pos.y = r.h - settings.smallSpace - fe.m_cur.descender;
+        fe.renderString(str.c_str(), str.length(), &pos, &r, FE_XCENTER);
+        int maxY = pos.y - fe.m_cur.ascender;
+
+        pos.x = 0;
+        pos.y = m_ui.m_systemBar.m_rect.y + settings.largeSpace;
+        for (unsigned int i = 0; i < m_booksPerPage; ++i) {
+            Meta* meta = (Meta*)m_meta.get(i + m_pageNum*m_booksPerPage);
+            if (!meta)
+                break;
+
+            // TODO... br, # pages, type, ...
+
+            m_bookRects[i].x = settings.medSpace;
+            m_bookRects[i].w = r.w - settings.medSpace*2;
+            m_bookRects[i].y = pos.y;
+            m_bookRects[i].h = fe.m_cur.lineHeight*2;
+            fe.setSize(12);
+            fe.apply();
+            pos.x = m_bookRects[i].x;
+            pos.y = m_bookRects[i].y + 5 + fe.m_cur.ascender;
+            fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_XCLIP);
+            pos.x = 0;
+            pos.y += fe.m_cur.lineHeight;
+            fe.setSize(10);
+            fe.apply();
+            str.format("%u%% read", meta->percentRead());
+            fe.renderString(str.c_str(), str.length(), &pos, &r, FE_XCLIP);
+        }
     }
 
-    return r;
+    return drawn;
 }
 
 
@@ -106,16 +166,28 @@ Activity LibraryActivity::run(UiBits& ui)
 {
     clc::Log::info(LOG_NAME, "run");
 
-    LibraryCanvas c(ui);
+    LibraryCanvas c(ui, g_shelf->m_meta);
 
     ui.m_systemBar.m_sep = false;
     ui.m_systemBar.m_title = "LIBRARY";
     ui.m_systemBar.show();
     c.addChild(ui.m_systemBar);
 
-    c.refresh();
-    g_loop->run(&c);
+    int r;
+    while (1) {
+        c.refresh();
 
-    return c.m_nextActivity;
+        struct OcherEvent evt;
+        g_fb->sync();
+        g_loop->flush();
+        r = g_loop->wait(&evt);
+        if (r == 0) {
+            r = c.eventReceived(&evt);
+            if (r >= 0)
+                break;
+        }
+    }
+
+    return (Activity)r;
 }
 

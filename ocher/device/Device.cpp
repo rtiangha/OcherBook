@@ -1,10 +1,14 @@
-#include <fcntl.h>
-#include <errno.h>
 #include <unistd.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "clc/support/Logger.h"
 #include "ocher/ocher.h"
 #include "ocher/device/Device.h"
+
+#define LOG_NAME "ocher.dev"
 
 
 Device* device;
@@ -39,4 +43,19 @@ clc::Buffer Device::getBuildDate()
 {
     clc::Buffer date(__DATE__);
     return date;
+}
+
+void Device::sleep()
+{
+#ifdef __linux__
+    const char* pwr = "/sys/power/state";
+    int fd = open(pwr, O_WRONLY);
+    if (fd == -1) {
+        clc::Log::error(LOG_NAME, "%s: %s", pwr, strerror(errno));
+    } else {
+        write(fd, "mem", 3);
+        close(fd);
+        ::sleep(1);  // TODO seems hackish, but don't want to return before enters sleep state
+    }
+#endif
 }

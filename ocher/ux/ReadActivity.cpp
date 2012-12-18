@@ -1,7 +1,3 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
 #include "clc/support/Logger.h"
 #ifdef OCHER_EPUB
 #include "ocher/fmt/epub/Epub.h"
@@ -25,40 +21,8 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key.key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
-            m_nextActivity = ACTIVITY_HOME;
             // TODO  visually turn page down
-            return 0;
-        } else if (evt->key.key == OEVTK_POWER) {
-
-            // TODO  testing code; harden and move elsewhere because this is a system-wide event
-            FontEngine fe;
-            Rect r = g_fb->bbox;
-            g_fb->clear();
-
-            fe.setSize(18);
-            fe.apply();
-            Pos p;
-            p.x = 0;
-            p.y = r.h/2;
-            fe.renderString("Sleeping", 8, &p, &r, FE_XCENTER);
-
-            g_fb->update(&r);
-            g_fb->sync();
-            sleep(1); // TODO seems hackish but sync doesn't wait long enough!
-
-            const char* pwr = "/sys/power/state";
-            int fd = open(pwr, O_WRONLY);
-            if (fd == -1) {
-                clc::Log::error(LOG_NAME, "%s: %s", pwr, strerror(errno));
-            } else {
-                write(fd, "mem", 3);
-                close(fd);
-                sleep(1);  // TODO seems hackish
-            }
-
-            g_fb->clear();
-            dirty();
-
+            return ACTIVITY_HOME;
         } else if (evt->key.key == OEVTK_LEFT || evt->key.key == OEVTK_UP || evt->key.key == OEVTK_PAGEUP) {
             clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
@@ -67,6 +31,7 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
                 m_ui.m_navBar.hide();
                 dirty();
             }
+            return -1;
         } else if (evt->key.key == OEVTK_RIGHT || evt->key.key == OEVTK_DOWN || evt->key.key == OEVTK_PAGEDOWN) {
             clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (! atEnd) {
@@ -75,8 +40,8 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
                 m_ui.m_navBar.hide();
                 dirty();
             }
+            return -1;
         }
-        return -1;
     }
     return -2;
 }
@@ -156,6 +121,9 @@ Activity ReadActivity::run()
     }
     clc::Log::debug(LOG_NAME, "selected %p", meta);
 
+    g_fb->clear();
+    g_fb->update(NULL);
+
     // TODO:  rework Layout constructors to have separate init due to scoping
     Layout* layout = 0;
     clc::Buffer memLayout;
@@ -197,14 +165,18 @@ Activity ReadActivity::run()
     renderer->set(memLayout);
 
     // Optionally, run through all pages without blitting to get an accurate
-    // page count.
-#if 0
-    for (int m_pageNum = 0; ; m_pageNum++) {
-        clc::Log::info(LOG_NAME, "Paginating page %d", m_pageNum);
-        int r = renderer->render(&meta->m_pagination, m_pageNum, false);
+    // page count.  Alternative is to do some sort of "idealize" page layout that might be faster.
+#if 1
+    if (meta->m_pagination.numPages() == 0) {
+        for (int pageNum = 0; ; pageNum++) {
+            clc::Log::info(LOG_NAME, "Paginating page %d", pageNum);
+            int r = renderer->render(&meta->m_pagination, pageNum, false);
 
-        if (r != 0)
-            break;
+            if (r != 0) {
+                meta->pages = pageNum + 1;
+                break;
+            }
+        }
     }
 #endif
 
@@ -221,6 +193,7 @@ Activity ReadActivity::run()
     clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
     dirty();
 
+    int r;
     while (1) {
         if (m_pagesSinceRefresh >= settings.fullRefreshPages) {
             m_pagesSinceRefresh = 0;
@@ -232,7 +205,7 @@ Activity ReadActivity::run()
         struct OcherEvent evt;
         g_fb->sync();
         g_loop->flush();
-        int r = g_loop->wait(&evt);
+        r = g_loop->wait(&evt);
         if (r == 0) {
             r = eventReceived(&evt);
             if (r >= 0)
@@ -244,5 +217,5 @@ Activity ReadActivity::run()
 
     delete layout;
 
-    return m_nextActivity;
+    return (Activity)r;
 }

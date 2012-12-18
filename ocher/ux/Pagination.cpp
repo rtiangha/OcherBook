@@ -35,7 +35,8 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
     if (mapping->layoutOffset != layoutOffset || mapping->strOffset != strOffset) {
         mapping->layoutOffset = layoutOffset;
         mapping->strOffset = strOffset;
-        m_numPages = pageNum + 1;
+        if (m_numPages <= pageNum)
+            m_numPages = pageNum + 1;
         clc::Log::debug(LOG_NAME, "set page %u breaks at layoutOffset %u strOffset %u", pageNum, layoutOffset, strOffset);
     }
 }

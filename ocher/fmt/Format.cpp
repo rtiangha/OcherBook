@@ -56,9 +56,14 @@ Fmt detectFormat(const char* file, Encoding* encoding)
                 }
 
                 // Unrecognized formatting?  Call it plain text.
-                if (format == OCHER_FMT_UNKNOWN)
-                    format = OCHER_FMT_TEXT;
+                if (format == OCHER_FMT_UNKNOWN) {
+                    size_t len = strlen(file);
+                    if (len >= 4 && strcasecmp(file + len - 4, ".txt") == 0) {
+                        format = OCHER_FMT_TEXT;
+                    }
+                }
 
+#if 0
                 // But if more than a few binary chars, it's an unknown format.
                 int bin = 0;
                 for (i = 0; i < r; ++i) {
@@ -69,6 +74,7 @@ Fmt detectFormat(const char* file, Encoding* encoding)
                 }
                 if (bin > 1)
                     format = OCHER_FMT_UNKNOWN;
+#endif
             }
         }
     }

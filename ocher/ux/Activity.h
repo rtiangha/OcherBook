@@ -29,6 +29,11 @@ public:
     OcherCanvas();
     ~OcherCanvas();
 
+    int evtKey(struct OcherEvent* evt);
+    int evtMouse(struct OcherEvent* evt);
+    int evtApp(struct OcherEvent* evt);
+    int evtDevice(struct OcherEvent* evt);
+
     Rect draw(Pos* pos=0);
 };
 

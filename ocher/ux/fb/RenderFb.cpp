@@ -131,6 +131,12 @@ int RenderFb::outputWrapped(clc::Buffer* b, unsigned int strOffset, bool doBlit)
             }
             if (m_penY >= (int)m_fb->height() - settings.marginBottom - m_fe.m_cur.descender)
                 return p - start;
+        } else {
+            if (*p == '\n') {
+                p++;
+                len--;
+            }
+            wordWrapped = false;
         }
     } while (len > 0);
     return -1;  // think of this as "failed to cross page boundary"
@@ -147,7 +153,7 @@ void RenderFb::applyAttrs()
 
 int RenderFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
-    clc::Log::info(LOG_NAME, "render page %u %u", pageNum, doBlit);
+    clc::Log::info(LOG_NAME, "%s page %u of %u", doBlit?"render":"layout", pageNum, pagination->numPages());
     // TODO reapply font settings before relying on font metrics
     m_penX = settings.marginLeft;
     m_penY = settings.marginTop + m_fe.m_cur.ascender;
@@ -305,7 +311,7 @@ done:
     unsigned int ms = usec/1000;
     if (ms == 0)
         ms = 1;
-    clc::Log::debug(LOG_NAME, "page %u %s; %u chars in %u ms, %u cps, avg %u cps", pageNum,
+    clc::Log::info(LOG_NAME, "page %u %s; %u chars in %u ms, %u cps, avg %u cps", pageNum,
             r == 0 ? "break" : "done",
             chars, ms, (unsigned int)(chars*1000/ms),
             (unsigned int)(totalChars*1000/((totalUSec<1000?1000:totalUSec)/1000)));

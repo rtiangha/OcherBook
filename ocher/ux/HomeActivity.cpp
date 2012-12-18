@@ -1,5 +1,6 @@
 #include "clc/support/Logger.h"
 
+#include "ocher/settings/Settings.h"
 #include "ocher/shelf/Meta.h"
 #include "ocher/ux/Factory.h"
 #include "ocher/ux/HomeActivity.h"
@@ -20,33 +21,32 @@ public:
 
     Rect draw(Pos* pos);
 
-    Activity m_nextActivity;
-
 protected:
 #define NUM_CLUSTER_BOOKS 5
     Rect books[NUM_CLUSTER_BOOKS];
+    Rect shortlist[5];
+    float coverRatio;
 };
 
 HomeCanvas::HomeCanvas() :
-    m_nextActivity(ACTIVITY_READ)
+    coverRatio(1.6)
 {
-    float ratio = 1.6;
     int dx = m_rect.w/32;
     int dy = m_rect.h/36;
 
     books[0].x = m_rect.w/15;
     books[0].y = m_rect.h/5;
     books[0].w = m_rect.w/2.8;
-    books[0].h = books[0].w*ratio;
+    books[0].h = books[0].w*coverRatio;;
 
     books[1].x = books[0].x + books[0].w + dx;
     books[1].y = m_rect.h/6;
     books[1].w = m_rect.w/4;
-    books[1].h = books[1].w*ratio;
+    books[1].h = books[1].w*coverRatio;;
 
     books[2].x = books[1].x + books[1].w + dx;
     books[2].w = m_rect.w/5;
-    books[2].h = books[2].w*ratio;
+    books[2].h = books[2].w*coverRatio;;
     books[2].y = books[1].y + books[1].h - books[2].h;
 
     books[3].x = books[1].x;
@@ -57,7 +57,7 @@ HomeCanvas::HomeCanvas() :
     books[4] = books[3];
     books[4].x += books[3].w + dx;
     books[4].w -= 2*dx;
-    books[4].h = books[4].w*ratio;
+    books[4].h = books[4].w*coverRatio;;
 }
 
 HomeCanvas::~HomeCanvas()
@@ -88,12 +88,10 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 g_fb->roundRect(&r, 4);
                 g_fb->update(&r);
                 g_shelf->select(meta);
-                m_nextActivity = ACTIVITY_READ;
-                return 0;
+                return ACTIVITY_READ;
             } else if (pos->y > 650 /* TODO convert to labels */) {
                 // TODO:  For now, clicking on shortlist takes you to library.  Need popup menus.
-                m_nextActivity = ACTIVITY_LIBRARY;
-                return 0;
+                return ACTIVITY_LIBRARY;
             }
         }
         clc::Log::debug(LOG_NAME, "no book under click @ %d,%d", evt->mouse.x, evt->mouse.y);
@@ -141,19 +139,41 @@ Rect HomeCanvas::draw(Pos*)
             }
         }
 
-        // TODO  shortlist
-        //
-        //g_fb->hline(0, ...);
-
         fe.setSize(18);
         fe.apply();
         pos.x = 0; pos.y = 100;
-        fe.renderString("HOME", 4, &pos, &g_fb->bbox, FE_XCENTER);
+        fe.renderString("HOME", 4, &pos, &m_rect, FE_XCENTER);
 
+        // Shortlist
         fe.setSize(14);
         fe.apply();
-        pos.x = 10; pos.y = 650;
-        fe.renderString("Shortlist", 9, &pos, &g_fb->bbox, 0);
+        pos.x = books[0].x; pos.y = 650;
+        fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
+        pos.y += fe.m_cur.descender + settings.smallSpace;
+        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+        pos.y++;
+        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+        {
+            Rect sl;
+            // TODO
+        }
+
+        // TODO simplify, abstract into labels
+        {
+            fe.setSize(12);
+            fe.setItalic(1);
+            fe.apply();
+            Rect lbox;
+            lbox.x = 0;
+            lbox.y = 650;
+            Glyph* glyphs[13];
+            const char* text = "Browse all...";
+            fe.plotString(text, strlen(text), &glyphs[0], &lbox);
+            pos.x = m_rect.w - books[0].x - lbox.w;
+            pos.y = lbox.y;
+            fe.renderString(text, strlen(text), &pos, &m_rect, 0);
+        }
+
     }
     Rect d2 = drawChildren(m_rect.pos());
     drawn.unionRect(&d2);
@@ -187,9 +207,7 @@ Activity HomeActivity::run(UiBits& ui)
     ui.m_systemBar.show();
     c.addChild(ui.m_systemBar);
 
-    c.refresh();
-    g_loop->run(&c);
-
-    return c.m_nextActivity;
+    c.refresh(true);
+    return (Activity)g_loop->run(&c);
 }
 

@@ -30,10 +30,10 @@ public:
     virtual Rect draw(Pos* pos) = 0;
 
     int eventReceived(struct OcherEvent* evt);
-    virtual int evtKey(struct OcherEvent*) { return -1; }
-    virtual int evtMouse(struct OcherEvent*) { return -1; }
-    virtual int evtApp(struct OcherEvent*) { return -1; }
-    virtual int evtDevice(struct OcherEvent*) { return -1; }
+    virtual int evtKey(struct OcherEvent*) { return -2; }
+    virtual int evtMouse(struct OcherEvent*) { return -2; }
+    virtual int evtApp(struct OcherEvent*) { return -2; }
+    virtual int evtDevice(struct OcherEvent*) { return -2; }
 
     Rect m_rect;
     unsigned int m_flags;

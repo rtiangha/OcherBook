@@ -261,6 +261,12 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
             }
             if (pen->y >= r->h - m_cur.descender)
                 return p - str;
+        } else {
+            if (*p == '\n') {
+                p++;
+                len--;
+            }
+            wordWrapped = false;
         }
     } while (len > 0);
     return -1;  // think of this as "failed to cross page boundary"

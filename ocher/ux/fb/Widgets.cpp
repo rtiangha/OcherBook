@@ -1,8 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "clc/support/Logger.h"
 #include "ocher/ux/fb/Widgets.h"
 #include "ocher/ux/Factory.h"
+
+#define LOG_NAME "ocher.widgets"
 
 static const unsigned int borderWidth = 2;
 static const unsigned int roundRadius = 1;
@@ -68,30 +71,31 @@ Rect Widget::drawChildren(Pos* pos)
 
 int Widget::eventReceived(struct OcherEvent* evt)
 {
-    int r;
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        // TODO: filter mouse by child coords, keys by focus, etc
-        r = ((Widget*)m_children.get(i))->eventReceived(evt);
-        if (r == 0)
-            return 0;
+    int r = -2;
+
+    // TODO: filter mouse by child coords, keys by focus, etc
+
+    // Global events are handled top-down
+    if (evt->type == OEVT_APP) {
+        r = evtApp(evt);
+    } else if (evt->type == OEVT_DEVICE) {
+        r = evtDevice(evt);
     }
-    r = -1;
-    switch (evt->type) {
-        case OEVT_KEY: {
-            r = evtKey(evt);
-            break;
+
+    if (r == -2) {
+        for (unsigned int i = 0; i < m_children.size(); ++i) {
+            r = ((Widget*)m_children.get(i))->eventReceived(evt);
+            if (r != -2)
+                break;
         }
-        case OEVT_MOUSE: {
-            r = evtMouse(evt);
-            break;
-        }
-        case OEVT_APP: {
-            r = evtApp(evt);
-            break;
-        }
-        case OEVT_DEVICE: {
-            r = evtDevice(evt);
-            break;
+
+        // Positional events are handled leaf-first
+        if (r == -2) {
+            if (evt->type == OEVT_KEY) {
+                r = evtKey(evt);
+            } else if (evt->type == OEVT_MOUSE) {
+                r = evtMouse(evt);
+            }
         }
     }
     return r;
@@ -105,6 +109,7 @@ Canvas::Canvas() :
 
 void Canvas::refresh(bool full)
 {
+    clc::Log::debug(LOG_NAME, "refresh");
     Rect drawn = draw(0);
     if (drawn.valid())
         g_fb->update(&drawn, full);
@@ -247,12 +252,12 @@ void Button::drawLabel(Rect* rect)
 
 int Button::evtKey(struct OcherEvent*)
 {
-    return -1;
+    return -2;
 }
 
 int Button::evtMouse(struct OcherEvent*)
 {
-    return -1;
+    return -2;
 }
 
 
