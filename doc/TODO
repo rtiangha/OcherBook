@@ -31,3 +31,12 @@ fonts
 
 remove exceptions from File
 clean up Path/File to be simpler, more posix-like
+
+first-run routine:
+    select language
+
+low battery
+usb plugged in
+
+series
+kebubs

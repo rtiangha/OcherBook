@@ -76,6 +76,7 @@ ifeq ($(OCHER_DEV),1)
 	OCHER_CFLAGS+=-Werror
 endif
 OCHER_CFLAGS+=-DOCHER_MAJOR=$(OCHER_MAJOR) -DOCHER_MINOR=$(OCHER_MINOR) -DOCHER_PATCH=$(OCHER_PATCH)
+OCHER_VER=$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH)
 
 default: ocher
 
@@ -88,8 +89,8 @@ FREEFONT_URL=http://ftp.gnu.org/gnu/freefont/$(FREEFONT_FILE)
 FREEFONT_TGZ=$(DL_DIR)/$(FREEFONT_FILE)
 
 fonts:
-	@[ -e $(FREEFONT_TGZ) ] || (echo "Please download $(FREEFONT_URL) to $(DL_DIR)" ; exit 1)
-	@mkdir -p $(BUILD_DIR)
+	$(QUIET)[ -e $(FREEFONT_TGZ) ] || (echo "Please download $(FREEFONT_URL) to $(DL_DIR)" ; exit 1)
+	$(QUIET)mkdir -p $(BUILD_DIR)
 	tar -zxf $(FREEFONT_TGZ) -C $(BUILD_DIR)
 
 
@@ -102,7 +103,7 @@ FREETYPE_DEFS=-I$(FREETYPE_DIR)/include
 FREETYPE_LIB=$(FREETYPE_DIR)/objs/.libs/libfreetype.a
 
 $(FREETYPE_LIB):
-	@mkdir -p $(BUILD_DIR)
+	$(QUIET)mkdir -p $(BUILD_DIR)
 	tar -zxf $(FREETYPE_TGZ) -C $(BUILD_DIR)
 	cd $(FREETYPE_DIR) && GNUMAKE=$(MAKE) CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC) ./configure --without-bzip2 --disable-shared --host i686-linux
 	cd $(FREETYPE_DIR) && $(MAKE)
@@ -119,7 +120,7 @@ ZLIB_DIR=$(BUILD_DIR)/zlib-$(ZLIB_VER)
 ZLIB_LIB=$(ZLIB_DIR)/libz.a
 
 $(ZLIB_LIB):
-	@mkdir -p $(BUILD_DIR)
+	$(QUIET)mkdir -p $(BUILD_DIR)
 	tar -zxf $(ZLIB_TGZ) -C $(BUILD_DIR)
 	cd $(ZLIB_DIR) && CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC) ./configure --static
 	cd $(ZLIB_DIR) && $(MAKE)
@@ -141,7 +142,7 @@ MXML_DIR=$(BUILD_DIR)/mxml-$(MXML_VER)
 MXML_LIB=$(MXML_DIR)/libmxml.a
 
 $(MXML_LIB):
-	@mkdir -p $(BUILD_DIR)
+	$(QUIET)mkdir -p $(BUILD_DIR)
 	tar -zxf $(MXML_TGZ) -C $(BUILD_DIR)
 	cd $(MXML_DIR) && CFLAGS="$(CFLAGS_COMMON -O3)" CC=$(CC) ./configure --host i686-linux
 	cd $(MXML_DIR) && $(MAKE) libmxml.a
@@ -373,17 +374,30 @@ test: clctest ochertest cppcheck
 
 ####################
 
-clean: zlib_clean freetype_clean mxml_clean ocher_config_clean ocher_clean unittestpp_clean
-
+ifeq ($(OCHER_TARGET),kobo)
 dist: ocher
-	tar -C $(BUILD_DIR) -Jcf ocher-`uname -s`-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz ocher
+	mkdir -p $(BUILD_DIR)/dist/usr/local/ocher
+	cp $(BUILD_DIR)/ocher $(BUILD_DIR)/dist/usr/local/ocher/
+	tar -zvcf $(BUILD_DIR)/ocher-$(OCHER_VER).tgz -C $(BUILD_DIR)/dist/ .
+else
+dist: ocher
+	echo "no dist rule for this target; look in $(BUILD_DIR) for build artifacts"
+	exit 1
+endif
 
 dist-src: clean
 	git status clc $(DL_DIR) doc ocher
-	tar -Jcf ocher-src-$(OCHER_MAJOR).$(OCHER_MINOR).$(OCHER_PATCH).tar.xz Makefile README clc $(DL_DIR) doc ocher
+	tar --numeric-owner -Jcf $(BUILD_DIR)/ocher-src-$(OCHER_VER).tar.xz Makefile README airbag-fd clc $(DL_DIR) doc ocher
+
+
+####################
+
+clean: zlib_clean freetype_clean mxml_clean ocher_config_clean ocher_clean unittestpp_clean
+	rm -rf $(BUILD_DIR)/dist/
 
 doc:
-	cd ocher && doxygen ../doc/Doxyfile
+	$(QUIET)which dot || (echo "Please install the graphviz package, or unset HAVE_DOT in doc/Doxyfile"; exit 1)
+	$(QUIET)cd ocher && doxygen ../doc/Doxyfile
 
 help:
 	@echo "Edit ocher.config with your desired settings, then 'make'."
@@ -395,4 +409,5 @@ help:
 	@echo "	test		Build and run the unit tests"
 	@echo "	doc		Run Doxygen"
 	@echo "	dist		Build distribution packages"
+	@echo "	dist-src	Build distribution source packages"
 

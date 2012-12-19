@@ -1,0 +1,12 @@
+This tar file will "root" your Kobo, enabling telnet and ftp access for
+further modifications.
+
+Copy the tgz to /mnt/onboard/.kobo/, sync/eject, and reboot your Kobo.
+
+For background details, see
+http://www.uscoffings.net/clc/tech/embedded/kobo-touch/#access
+
+Tested on 1.9.x firmwares, but if it goes bad, see
+http://www.uscoffings.net/clc/tech/embedded/kobo-touch/#recovery
+
+TODO:  2.x reqires some change to not break wireless....

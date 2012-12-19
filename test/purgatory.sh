@@ -14,6 +14,10 @@ LIBRARY=/pool/Library/books
 if [ -n "$1" ]; then
     LIBRARY="$1"
 fi
+if [ ! -d "$1" ]; then
+    echo "Usage:  $0 <dir-with-books>"
+    exit 1
+fi
 
 N=0
 M=0
