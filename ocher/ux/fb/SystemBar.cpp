@@ -1,11 +1,12 @@
 #include "ocher/ux/Factory.h"
 #include "ocher/ux/fb/SystemBar.h"
+#include "ocher/settings/Settings.h"
 
 
 SystemBar::SystemBar(Battery& battery) :
-    Window(0, 0, g_fb->width(), 26 /* TODO */),
+    Window(0, 0, g_fb->width(), 30 /* TODO */),
     m_sep(false),
-    m_batteryIcon(1, 1, battery)
+    m_batteryIcon(settings.smallSpace, 0, battery)
 {
     m_borderWidth = 0;
     addChild(&m_batteryIcon);

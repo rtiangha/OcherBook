@@ -130,7 +130,7 @@ void FbSdl::vline(int x, int y1, int y2)
     line(x, y1, x, y2);
 }
 
-void FbSdl::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
+void FbSdl::blit(const unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
     clc::Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
     int rectWidth = w;

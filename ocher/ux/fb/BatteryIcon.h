@@ -5,7 +5,7 @@
 #include "ocher/device/Battery.h"
 
 
-class BatteryIcon : public Icon
+class BatteryIcon : public Widget
 {
 public:
     BatteryIcon(int x, int y, Battery& battery);

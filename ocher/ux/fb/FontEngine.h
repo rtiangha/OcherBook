@@ -19,6 +19,7 @@ struct GlyphFace
     int16_t ascender;
     int16_t descender;
     int16_t lineHeight;
+    int16_t underlinePos;
 } __attribute__((packed));
 
 struct GlyphDescr
@@ -75,13 +76,14 @@ public:
      * @param str  Data to render
      * @param len
      * @param pen  Position of starting baseline, relative to r.  Updated.
-     * @param r  Containing rectangle (possibly clip rectangle)
+     * @param r  Render relative to containing rectangle (possibly clip rectangle)
      * @param flags
      *      NOBLIT   Don't blit to framebuffer, just measure
      *      WRAP     Word wrap?
      *      XCLIP    Render clipped char, or stop if char does not fit.  N/A if WRAP.
      *      YCLIP    Render clipped char, or stop if char does not fit.
      *      XCENTER  Centers horizontally within the rect.  Currently incompatible with WRAP.
+     * @param bbox Bounding box containing all output
      * @return offset of first unrendered character (==len if all fit).  May also stop early if len
      *      splits a multi-byte character.
      */
@@ -90,7 +92,8 @@ public:
 #define FE_XCLIP    4
 #define FE_YCLIP    8
 #define FE_XCENTER 16
-    unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags);
+    unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags,
+            Rect* bbox=0);
 
     GlyphCache m_cache;
 };

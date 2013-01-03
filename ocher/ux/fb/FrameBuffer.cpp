@@ -35,6 +35,17 @@ void dim(void* p, size_t n)
     }
 }
 
+void fade(void* p, size_t n)
+{
+    uint8_t* p1 = (uint8_t*)p;
+    for (size_t i = 0; i < n; ++i) {
+        if (p1[i] & 0x80)
+            p1[i] >>= 1;
+        else
+            p1[i] <<= 1;
+    }
+}
+
 void memAnd(void* dst, const void* src, size_t n)
 {
     uint8_t* d = (uint8_t*)dst;

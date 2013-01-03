@@ -8,7 +8,7 @@
 #define BWIDTH 25   // width  of battery bounding box
 
 BatteryIcon::BatteryIcon(int x, int y, Battery& battery) :
-    Icon(x, y, BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
+    Widget(x, y, 30, 30), //BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
     m_battery(battery)
 {
 }
@@ -20,16 +20,17 @@ Rect BatteryIcon::draw(Pos* pos)
 
     if (! (m_flags & WIDGET_DIRTY)) {
         // not bothering with children...
-        Rect drawn(-1, -1, 0, 0);
+        Rect drawn;
+        drawn.setInvalid();
         return drawn;
     }
     m_flags &= ~WIDGET_DIRTY;
 
     g_fb->setFg(0xff, 0xff, 0xff);
     g_fb->fillRect(&rect);
+    rect.y += 6;
+    rect.h -= 12;
     g_fb->setFg(0, 0, 0);
-    rect.y += 2;
-    rect.h -= 4;
     g_fb->rect(&rect);
     rect.inset(2);
     int percent = m_battery.m_percent;

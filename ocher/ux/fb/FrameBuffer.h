@@ -8,6 +8,7 @@
 
 void invert(void* p, size_t n);
 void dim(void* p, size_t n);
+void fade(void* p, size_t n);
 void memAnd(void* dst, const void* src, size_t n);
 void memOr(void* dst, const void* src, size_t n);
 
@@ -57,7 +58,7 @@ public:
      * Clips to the framebuffer and blits.
      * @param p  'w' x 'h' bitmap.  Matches the bpp of the framebuffer.
      */
-    virtual void blit(unsigned char* p, int x, int y, int w, int h, const Rect* clip=0) = 0;
+    virtual void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip=0) = 0;
 
     /**
      */

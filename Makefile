@@ -292,7 +292,8 @@ OCHER_OBJS += \
 	ocher/ux/fb/SystemBar.o \
 	ocher/ux/fb/RenderFb.o \
 	ocher/ux/fb/RleBitmap.o \
-	ocher/ux/fb/Widgets.o
+	ocher/ux/fb/Widgets.o \
+	ocher/resources/Bitmaps.o
 endif
 
 ifeq ($(OCHER_UI_SDL),1)

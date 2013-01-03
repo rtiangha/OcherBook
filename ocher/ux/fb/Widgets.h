@@ -25,6 +25,7 @@ public:
     void show() { m_flags &= ~WIDGET_HIDDEN; }
 
     /**
+     * @param pos  Absolute position to draw at
      * @return Rectangle unioning all dirty rects (this and children), or !valid rect if all clean
      */
     virtual Rect draw(Pos* pos) = 0;
@@ -35,6 +36,7 @@ public:
     virtual int evtApp(struct OcherEvent*) { return -2; }
     virtual int evtDevice(struct OcherEvent*) { return -2; }
 
+    // TODO: abs or rel?
     Rect m_rect;
     unsigned int m_flags;
 protected:
@@ -149,16 +151,24 @@ class Label : public Widget
 };
 #endif
 
+class Bitmap
+{
+public:
+    Bitmap(int _w, int _h, const unsigned char* _bmp) : w(_w), h(_h), bmp(_bmp) {}
+    int w;
+    int h;
+    const unsigned char* bmp;
+};
+
 class Icon : public Widget
 {
 public:
-    Icon(int x, int y, unsigned int w, unsigned int h);
+    Icon(int x, int y, Bitmap* _bmp) : Widget(x, y, _bmp->w, _bmp->h), bmp(_bmp) {}
     virtual ~Icon() {}
 
-    virtual Rect draw(Pos*) {
-        Rect r(-1, -1, 0, 0);
-        return r;
-    }
+    virtual Rect draw(Pos* pos);
+
+    Bitmap* bmp;
 };
 
 #if 0

@@ -22,31 +22,32 @@ public:
     Rect draw(Pos* pos);
 
 protected:
+    float coverRatio;
 #define NUM_CLUSTER_BOOKS 5
     Rect books[NUM_CLUSTER_BOOKS];
     Rect shortlist[5];
-    float coverRatio;
+    Rect m_browseLabel;
 };
 
 HomeCanvas::HomeCanvas() :
     coverRatio(1.6)
 {
-    int dx = m_rect.w/32;
-    int dy = m_rect.h/36;
+    int dx = settings.smallSpace;
+    int dy = settings.smallSpace;
 
     books[0].x = m_rect.w/15;
     books[0].y = m_rect.h/5;
     books[0].w = m_rect.w/2.8;
-    books[0].h = books[0].w*coverRatio;;
+    books[0].h = books[0].w*coverRatio;
 
     books[1].x = books[0].x + books[0].w + dx;
     books[1].y = m_rect.h/6;
     books[1].w = m_rect.w/4;
-    books[1].h = books[1].w*coverRatio;;
+    books[1].h = books[1].w*coverRatio;
 
     books[2].x = books[1].x + books[1].w + dx;
     books[2].w = m_rect.w/5;
-    books[2].h = books[2].w*coverRatio;;
+    books[2].h = books[2].w*coverRatio;
     books[2].y = books[1].y + books[1].h - books[2].h;
 
     books[3].x = books[1].x;
@@ -57,7 +58,7 @@ HomeCanvas::HomeCanvas() :
     books[4] = books[3];
     books[4].x += books[3].w + dx;
     books[4].w -= 2*dx;
-    books[4].h = books[4].w*coverRatio;;
+    books[4].h = books[4].w*coverRatio;
 }
 
 HomeCanvas::~HomeCanvas()
@@ -72,13 +73,13 @@ int HomeCanvas::evtKey(struct OcherEvent*)
 int HomeCanvas::evtMouse(struct OcherEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
+        Pos* pos = (Pos*)&evt->mouse;
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
-            Meta* meta = (Meta*)g_shelf->m_meta.itemAt(i);
+            Meta* meta = (Meta*)g_library->m_meta.itemAt(i);
             if (!meta) {
                 clc::Log::debug(LOG_NAME, "book %d has no meta", i);
                 continue;
             }
-            Pos* pos = (Pos*)&evt->mouse;
             if (books[i].contains(pos)) {
                 clc::Log::info(LOG_NAME, "book %d selected %p", i, meta);
                 Rect r = books[i];
@@ -87,14 +88,14 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 r.inset(-1);
                 g_fb->roundRect(&r, 4);
                 g_fb->update(&r);
-                g_shelf->select(meta);
+                g_library->select(meta);
                 return ACTIVITY_READ;
-            } else if (pos->y > 650 /* TODO convert to labels */) {
-                // TODO:  For now, clicking on shortlist takes you to library.  Need popup menus.
-                return ACTIVITY_LIBRARY;
             }
         }
-        clc::Log::debug(LOG_NAME, "no book under click @ %d,%d", evt->mouse.x, evt->mouse.y);
+        if (m_browseLabel.contains(pos)) {
+            return ACTIVITY_LIBRARY;
+        }
+        // TODO: look at shortlist
     }
     return -1;
 }
@@ -124,14 +125,14 @@ Rect HomeCanvas::draw(Pos*)
             g_fb->rect(&r);
             r.inset(-1);
             g_fb->roundRect(&r, 1);
+            r.inset(2);
 
-            Meta* meta = (Meta*)g_shelf->m_meta.itemAt(i);
-            if (! meta) {
-                r.inset(2);
-                g_fb->setFg(0xd0, 0xd0, 0xd0);
-                g_fb->fillRect(&r);
-                g_fb->setFg(0, 0, 0);
-            } else {
+            Meta* meta = (Meta*)g_library->m_meta.itemAt(i);
+            uint8_t c = meta ? 0xf0 : 0xd0;
+            g_fb->setFg(c, c, c);
+            g_fb->fillRect(&r);
+            g_fb->setFg(0, 0, 0);
+            if (meta) {
                 pos.x = 0;
                 pos.y = fe.m_cur.ascender;
                 r.inset(2);
@@ -147,16 +148,9 @@ Rect HomeCanvas::draw(Pos*)
         // Shortlist
         fe.setSize(14);
         fe.apply();
-        pos.x = books[0].x; pos.y = 650;
+        pos.x = books[0].x;
+        pos.y = books[3].y + books[3].h + fe.m_cur.ascender + settings.smallSpace;
         fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
-        pos.y += fe.m_cur.descender + settings.smallSpace;
-        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
-        pos.y++;
-        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
-        {
-            Rect sl;
-            // TODO
-        }
 
         // TODO simplify, abstract into labels
         {
@@ -165,13 +159,24 @@ Rect HomeCanvas::draw(Pos*)
             fe.apply();
             Rect lbox;
             lbox.x = 0;
-            lbox.y = 650;
+            lbox.y = pos.y;
             Glyph* glyphs[13];
             const char* text = "Browse all...";
             fe.plotString(text, strlen(text), &glyphs[0], &lbox);
+            // TODO  right justify against lbox (remove plotString call); get bbox returned
             pos.x = m_rect.w - books[0].x - lbox.w;
-            pos.y = lbox.y;
-            fe.renderString(text, strlen(text), &pos, &m_rect, 0);
+            fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
+            m_browseLabel.inset(-settings.smallSpace);
+        }
+
+        pos.y += fe.m_cur.underlinePos + settings.smallSpace;
+        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+        pos.y++;
+        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+
+        {
+            Rect sl;
+            // TODO shortlist Shelf
         }
 
     }

@@ -6,6 +6,7 @@
 #include "ocher/ux/LibraryActivity.h"
 #include "ocher/ux/fb/FontEngine.h"
 #include "ocher/ux/fb/Widgets.h"
+#include "ocher/resources/Bitmaps.h"
 
 #define LOG_NAME "ocher.ux.Library"
 
@@ -24,7 +25,7 @@ public:
 protected:
     UiBits& m_ui;
     clc::List m_meta;
-#define BOOKS_PER_PAGE 15
+#define BOOKS_PER_PAGE 12
     Rect* m_bookRects;
     int itemHeight;
     unsigned int m_booksPerPage;
@@ -41,6 +42,16 @@ LibraryCanvas::LibraryCanvas(UiBits& ui, clc::List& meta) :
     m_booksPerPage = BOOKS_PER_PAGE;
     m_bookRects = new Rect[m_booksPerPage];
     m_pages = (m_meta.size() + m_booksPerPage - 1) / m_booksPerPage;
+
+    ui.m_systemBar.m_sep = false;
+    ui.m_systemBar.m_title = "LIBRARY";
+    ui.m_systemBar.show();
+    addChild(ui.m_systemBar);
+    addChild(new Icon(settings.medSpace + settings.largeSpace,
+                m_rect.h - settings.medSpace - bmpLeftArrow.h, &bmpLeftArrow));
+    addChild(new Icon(m_rect.w - (settings.medSpace + settings.largeSpace + bmpRightArrow.w),
+                m_rect.h - settings.medSpace - bmpRightArrow.h, &bmpRightArrow));
+
 }
 
 LibraryCanvas::~LibraryCanvas()
@@ -82,7 +93,7 @@ int LibraryCanvas::evtMouse(struct OcherEvent* evt)
             if (!meta)
                 break;
             if (m_bookRects[i].contains(pos)) {
-                g_shelf->select(meta);
+                g_library->select(meta);
                 return ACTIVITY_READ;
             }
         }
@@ -119,43 +130,47 @@ Rect LibraryCanvas::draw(Pos*)
         g_fb->setFg(0, 0, 0);
 
         FontEngine fe;
-        Rect r = g_fb->bbox;
+        clc::Buffer str;
         Pos pos;
+        Rect clip = g_fb->bbox;
 
         fe.setSize(10);
         fe.apply();
-        clc::Buffer str;
         str.format("PG. %u OF %u", m_pageNum+1, m_pages);
         pos.x = 0;
-        pos.y = r.h - settings.smallSpace - fe.m_cur.descender;
-        fe.renderString(str.c_str(), str.length(), &pos, &r, FE_XCENTER);
-        int maxY = pos.y - fe.m_cur.ascender;
+        pos.y = clip.h - settings.smallSpace - fe.m_cur.descender;
+        fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCENTER);
+// TODO        int maxY = pos.y - fe.m_cur.ascender;
 
-        pos.x = 0;
-        pos.y = m_ui.m_systemBar.m_rect.y + settings.largeSpace;
+        clip.y = m_ui.m_systemBar.m_rect.y + m_ui.m_systemBar.m_rect.h + settings.medSpace;
+        clip.x = settings.medSpace;
+        clip.w -= settings.medSpace*2;
         for (unsigned int i = 0; i < m_booksPerPage; ++i) {
             Meta* meta = (Meta*)m_meta.get(i + m_pageNum*m_booksPerPage);
             if (!meta)
                 break;
 
-            // TODO... br, # pages, type, ...
-
-            m_bookRects[i].x = settings.medSpace;
-            m_bookRects[i].w = r.w - settings.medSpace*2;
-            m_bookRects[i].y = pos.y;
-            m_bookRects[i].h = fe.m_cur.lineHeight*2;
             fe.setSize(12);
             fe.apply();
-            pos.x = m_bookRects[i].x;
-            pos.y = m_bookRects[i].y + 5 + fe.m_cur.ascender;
-            fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_XCLIP);
             pos.x = 0;
-            pos.y += fe.m_cur.lineHeight;
+            pos.y = settings.smallSpace + fe.m_cur.ascender;
+            fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &clip, FE_XCLIP);
+            pos.x = 0;
+            pos.y = settings.smallSpace + fe.m_cur.ascender + fe.m_cur.lineHeight;
+
             fe.setSize(10);
             fe.apply();
-            str.format("%u%% read", meta->percentRead());
-            fe.renderString(str.c_str(), str.length(), &pos, &r, FE_XCLIP);
+            str.format("%u%% read   |   %s", meta->percentRead(), meta->fmtToStr(meta->format));
+            fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCLIP);
+
+            m_bookRects[i] = clip;
+            m_bookRects[i].h = pos.y + fe.m_cur.descender + settings.smallSpace;
+            clip.y = m_bookRects[i].y + m_bookRects[i].h;
+
+            g_fb->hline(clip.x, clip.y, clip.w);
         }
+
+        drawChildren(m_rect.pos());
     }
 
     return drawn;
@@ -166,12 +181,7 @@ Activity LibraryActivity::run(UiBits& ui)
 {
     clc::Log::info(LOG_NAME, "run");
 
-    LibraryCanvas c(ui, g_shelf->m_meta);
-
-    ui.m_systemBar.m_sep = false;
-    ui.m_systemBar.m_title = "LIBRARY";
-    ui.m_systemBar.show();
-    c.addChild(ui.m_systemBar);
+    LibraryCanvas c(ui, g_library->m_meta);
 
     int r;
     while (1) {

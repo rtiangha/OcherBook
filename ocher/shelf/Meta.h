@@ -23,17 +23,19 @@ enum Fmt {
 };
 
 /**
+ * User-specific and book-specific metadata.
  */
 class BookRecord
 {
 public:
-    BookRecord() : activePage(0), touched(0), isShortList(0) {}
+    BookRecord() : activePage(0), touched(0) {}
 
     unsigned int activePage;  // TODO:  can't use page number; varies by device/settings
 
+    void touch();
     time_t touched;
 
-    int isShortList;
+    // TODO: tags
 
     // TODO: dates
     // TODO: highlights
@@ -42,8 +44,11 @@ public:
 };
 
 /**
- * Metadata associated with each book.  This is the root object for each e-book that
- * the format, the layout, metadata, user's reading record, etc.
+ * Metadata associated with each book.  This is the root object for each e-book such as
+ * the format, the layout, metadata, user's reading record, etc.  Note the separation between
+ * book-specific and user-specific data.
+ *
+ * TODO: refcounted by views (Shelf)?
  */
 class Meta
 {
@@ -66,7 +71,7 @@ public:
     Pagination m_pagination;
     unsigned int pages; // is this even meaningful?
 
-    BookRecord record;   // TODO:  per-user
+    BookRecord record;
 
     unsigned int percentRead();
 };

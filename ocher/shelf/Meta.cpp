@@ -1,7 +1,14 @@
+#include <time.h>
+
 #include "clc/storage/File.h"
 #include "ocher/shelf/Meta.h"
 #include "ocher/fmt/Format.h"
 
+
+void BookRecord::touch()
+{
+    touched = time(NULL);
+}
 
 Meta::Meta() :
     format(OCHER_FMT_UNKNOWN),

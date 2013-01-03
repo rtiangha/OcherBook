@@ -114,7 +114,7 @@ Rect ReadActivity::draw(Pos*)
 Activity ReadActivity::run()
 {
     clc::Log::info(LOG_NAME, "run");
-    meta = g_shelf->selected();
+    meta = g_library->selected();
     if (!meta) {
         clc::Log::error(LOG_NAME, "No book selected");
         return ACTIVITY_HOME;
@@ -188,7 +188,7 @@ Activity ReadActivity::run()
     m_ui.m_navBar.hide();
     addChild(m_ui.m_navBar);
 
-    g_shelf->markActive(meta);
+    meta->record.touch();
     m_pageNum = meta->record.activePage;
     clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
     dirty();

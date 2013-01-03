@@ -17,7 +17,7 @@ struct Settings {
     unsigned int minutesUntilSleep;
     int sleepShowBook;  ///< When sleeping, show latest book cover?
 
-    unsigned int minutesUntilPowerOff;  ///< idle min until poweroff (lower bound by mintilsleep)
+    unsigned int minutesUntilPowerOff;  ///< idle min until poweroff (lower bound by minutesUntilSleep)
 
     clc::Buffer sleepHtml;
     clc::Buffer powerOffHtml;
@@ -27,7 +27,7 @@ struct Settings {
     //language
 
     clc::Buffer wirelessSsid;
-    int wirelessAirplaneMode;  ///< Only turn on wireless on-demand?
+    int wirelessAirplaneMode;  ///< Ask before turning on wireless
     
     unsigned int fullRefreshPages;
 
@@ -52,6 +52,8 @@ struct Settings {
     int smallSpace;
     int medSpace;
     int largeSpace;
+
+    // home page arrangement
 };
 
 extern Settings settings;

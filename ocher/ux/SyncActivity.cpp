@@ -61,7 +61,7 @@ void SyncActivity::processFile(const char* file)
                 m->format = format;
                 m->relPath = file;
                 loadMeta(m);
-                g_shelf->add(m);
+                g_library->add(m);
             }
         } else if (S_ISDIR(s.st_mode)) {
             clc::Buffer name;

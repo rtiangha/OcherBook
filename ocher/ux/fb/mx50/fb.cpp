@@ -163,7 +163,7 @@ void Mx50Fb::byLine(Rect* r, void(*fn)(void* p, size_t n))
     }
 }
 
-void Mx50Fb::blit(unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
+void Mx50Fb::blit(const unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
     clc::Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
     int rectWidth = w;

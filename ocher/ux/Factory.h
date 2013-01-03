@@ -12,7 +12,7 @@ class EventLoop;
 extern EventLoop* g_loop;
 extern FrameBuffer* g_fb;
 extern FreeType* g_ft;
-extern Shelf* g_shelf;
+extern Library* g_library;
 
 class UiFactory
 {

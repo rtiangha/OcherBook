@@ -137,6 +137,7 @@ void FontEngine::apply()
         m_cur.descender = g_ft->getDescender();
         m_cur.bearingY = m_cur.ascender;  /* TODO */
         m_cur.lineHeight = g_ft->getLineHeight();
+        m_cur.underlinePos = g_ft->getUnderlinePos();
         dirty = 0;
     }
 }
@@ -166,9 +167,6 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
             }
 
             invert(g->bitmap, g->w * g->h);
-            /* TODO underline; may have to enlarge bitmap */
-            //if () {
-            //}
             m_cache.put(&d, g);
         }
 
@@ -181,11 +179,13 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
 }
 
 // TODO:  return array of arrays of glyphs, and starting pos for each array
-unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags)
+// or callback:  str, offset, len, bbox
+unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags, Rect* bbox)
 {
     const char* p = str;
     bool wordWrapped = false;
-    Rect bbox;
+    if (bbox)
+        bbox->setInvalid();
 
     if (! (flags & FE_YCLIP) && pen->y >= r->h - m_cur.descender) {
         return 0;
@@ -210,20 +210,22 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
                 ++w;
 
             Glyph* glyphs[w+1];
-            bbox.x = pen->x;
-            bbox.y = pen->y;
-            plotString(p, w, glyphs, &bbox);
+            Rect wordBox;
+            wordBox.x = pen->x;
+            wordBox.y = pen->y;
+            plotString(p, w, glyphs, &wordBox);
             if (flags & FE_WRAP &&  // want wrap
-                    pen->x + bbox.w > r->w &&  // but wouldn't fit on this line
-                    bbox.w <= r->w) {  // but would fit on next
-                bbox.x = pen->x = 0;
+                    pen->x + wordBox.w > r->w &&  // but wouldn't fit on this line
+                    wordBox.w <= r->w) {  // but would fit on next
+                wordBox.x = pen->x = 0;
                 pen->y += m_cur.lineHeight;
-                bbox.y = pen->y;
+                wordBox.y = pen->y;
             }
             if (pen->y >= r->h - m_cur.descender)
                 return p - str;
-            bbox.y -= m_cur.ascender;
-            /* TODO save bounding box + glyphs for selection */
+            wordBox.y -= m_cur.ascender;
+            if (bbox)
+                bbox->unionRect(&wordBox);
 
             // Fits; render it and advance
             if (flags & FE_NOBLIT) {
@@ -269,6 +271,6 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
             wordWrapped = false;
         }
     } while (len > 0);
-    return -1;  // think of this as "failed to cross page boundary"
+    return -1;  // TODO
 }
 

@@ -56,7 +56,8 @@ void Widget::dirty()
 Rect Widget::drawChildren(Pos* pos)
 {
     const size_t N = m_children.size();
-    Rect drawn(-1, -1, 0, 0);
+    Rect drawn;
+    drawn.setInvalid();
     if (N) {
         for (unsigned int i = 0; i < N; ++i) {
             Widget* w = (Widget*)m_children.get(i);
@@ -261,8 +262,12 @@ int Button::evtMouse(struct OcherEvent*)
 }
 
 
-Icon::Icon(int x, int y, unsigned int w, unsigned int h) :
-    Widget(x, y, w, h)
-{
+Rect Icon::draw(Pos* pos) {
+    g_fb->blit(bmp->bmp, pos->x + m_rect.x, pos->y + m_rect.y, bmp->w, bmp->h);
+#if 0
+    if (! m_isActive) {
+        g_fb->byLine(&m_rect, lighten);
+    }
+#endif
+    return m_rect;
 }
-

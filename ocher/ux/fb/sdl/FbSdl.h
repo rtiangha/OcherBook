@@ -24,7 +24,7 @@ public:
     void pset(int x, int y);
     void hline(int x1, int y, int x2);
     void vline(int x, int y1, int y2);
-    void blit(unsigned char* p, int x, int y, int w, int h, const Rect* clip);
+    void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip);
     void fillRect(Rect* r);
     void byLine(Rect* r, void(*fn)(void* p, size_t n));
     int update(Rect* r, bool full=false);
