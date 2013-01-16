@@ -294,18 +294,21 @@ uint32_t File::read(Buffer& s, uint32_t numBytes, uint32_t offset)
 
 void File::readRest(Buffer& s)
 {
-    uint64_t pos = position();
-    uint64_t len = size();
-    if (pos < len) {
-        // TODO:  loop for each size_t chunk
-        size_t toRead = len - pos;
-        ssize_t offset = s.length();
-        char* buffer = s.lockBuffer(offset + toRead);
-        size_t r = fread(buffer + offset, 1, toRead, m_fd);
-        s.unlockBuffer(offset + r);
-        if (r != toRead && ferror(m_fd))
-            throw IOException("fread", EIO);
-    }
+    // Tempting to query size and prealloc that much, but some files in /proc claim 0 size.
+    const uint32_t maxChunk = 16384;
+    uint32_t offset = s.length();
+    uint32_t received = 0;
+    do {
+        char* buffer = s.lockBuffer(offset+maxChunk);
+        try {
+            received = read(buffer+offset, maxChunk);
+        } catch(...) {
+            s.unlockBuffer(offset);
+            throw;
+        }
+        offset += received;
+        s.unlockBuffer(offset);
+    } while (received == maxChunk);
 }
 
 void File::write(const char* buf, uint32_t numBytes)

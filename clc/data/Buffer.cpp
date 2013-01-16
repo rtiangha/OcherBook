@@ -41,7 +41,7 @@ min_clamp0(size_t num1, size_t num2)
 
 
 // helper function, massages given pointer into a legal c-string:
-static inline const char *
+static inline const char*
 safestr(const char* str)
 {
     return str ? str : "";
@@ -136,7 +136,7 @@ public:
                 fBufferSize *= 2;
 
             size_t* newBuffer = NULL;
-            newBuffer = (size_t *)realloc(fBuffer, fBufferSize * sizeof(size_t));
+            newBuffer = (size_t*)realloc(fBuffer, fBufferSize * sizeof(size_t));
             if (newBuffer == NULL)
                 throw std::bad_alloc();
 
@@ -203,8 +203,8 @@ Buffer::countChars() const
 {
     size_t count = 0;
 
-    const char *start = m_data;
-    const char *end = m_data + length();
+    const char* start = m_data;
+    const char* end = m_data + length();
 
     while (start++ != end) {
         count++;
@@ -244,7 +244,7 @@ Buffer::operator=(char c)
 Buffer&
 Buffer::formatList(const char* fmt, va_list argList)
 {
-#ifdef __NetBSD__   // TODO:  HAVE_VASPRINTF
+#if defined(__USE_GNU) || defined(BSD)
     char* buf;
     vasprintf(&buf, fmt, argList);
     size_t len = strlen(buf);
@@ -281,10 +281,10 @@ Buffer::format(const char* fmt, ...)
 Buffer&
 Buffer::appendFormatList(const char* fmt, va_list argList)
 {
-#ifdef __NetBSD__   // TODO:  HAVE_VASPRINTF
+#if defined(__USE_GNU) || defined(BSD)
     char* buf;
     vasprintf(&buf, fmt, argList);
-    _DoAppend(buf, strlen(buf) - 1);
+    _DoAppend(buf, strlen(buf));
     free(buf);
 #else
     va_list argList2;
@@ -858,8 +858,8 @@ Buffer::FindFirst(const char* string, size_t fromOffset) const
 size_t
 Buffer::FindFirst(char c) const
 {
-    const char *start = c_str();
-    const char *end = c_str() + length();
+    const char* start = c_str();
+    const char* end = c_str() + length();
 
     // Scans the string until we found the
     // character, or we reach the string's start
@@ -877,8 +877,8 @@ Buffer::FindFirst(char c) const
 size_t
 Buffer::FindFirst(char c, size_t fromOffset) const
 {
-    const char *start = c_str() + min_clamp0(fromOffset, length());
-    const char *end = c_str() + length();
+    const char* start = c_str() + min_clamp0(fromOffset, length());
+    const char* end = c_str() + length();
 
     // Scans the string until we found the
     // character, or we reach the string's start
@@ -926,8 +926,8 @@ Buffer::FindLast(const char* string, size_t beforeOffset) const
 size_t
 Buffer::FindLast(char c) const
 {
-    const char *start = c_str();
-    const char *end = c_str() + length();
+    const char* start = c_str();
+    const char* end = c_str() + length();
 
     // Scans the string backwards until we found
     // the character, or we reach the string's start
@@ -945,8 +945,8 @@ Buffer::FindLast(char c) const
 size_t
 Buffer::FindLast(char c, size_t beforeOffset) const
 {
-    const char *start = c_str();
-    const char *end = c_str() + min_clamp0(beforeOffset, length());
+    const char* start = c_str();
+    const char* end = c_str() + min_clamp0(beforeOffset, length());
 
     // Scans the string backwards until we found
     // the character, or we reach the string's start
@@ -1552,7 +1552,7 @@ Buffer::fork()
 char*
 Buffer::_Alloc(size_t len, bool adoptReferenceCount)
 {
-    char* newData = (char *)malloc(len + kPrivateDataOffset + 1);
+    char* newData = (char*)malloc(len + kPrivateDataOffset + 1);
     if (! newData)
         throw std::bad_alloc();
 
@@ -1579,7 +1579,7 @@ Buffer::_Realloc(size_t len)
 
     int32_t oldReferenceCount = refCount();
     ASSERT(oldReferenceCount == -1 || oldReferenceCount == 1);  // Must be unsharable or unshared
-    char *dataPtr = m_data - kPrivateDataOffset;
+    char* dataPtr = m_data - kPrivateDataOffset;
 
     dataPtr = (char*)realloc(dataPtr, len + kPrivateDataOffset + 1);
     if (! dataPtr)
@@ -1703,7 +1703,7 @@ size_t
 Buffer::_ShortFindAfter(const char* string, size_t /*len*/) const
 {
     // TODO  honor len
-    const char *ptr = strstr(c_str(), string);
+    const char* ptr = strstr(c_str(), string);
 
     if (ptr != NULL)
         return ptr - c_str();
@@ -1716,7 +1716,7 @@ size_t
 Buffer::_FindAfter(const char* string, size_t offset, size_t /*strlen*/) const
 {
     // TODO  honor len
-    const char *ptr = strstr(c_str() + offset, string);
+    const char* ptr = strstr(c_str() + offset, string);
 
     if (ptr != NULL)
         return ptr - c_str();
@@ -1729,7 +1729,7 @@ size_t
 Buffer::_IFindAfter(const char* string, size_t offset, size_t /*strlen*/) const
 {
     // TODO  honor len
-    const char *ptr = strcasestr(c_str() + offset, string);
+    const char* ptr = strcasestr(c_str() + offset, string);
 
     if (ptr != NULL)
         return ptr - c_str();
@@ -1741,7 +1741,7 @@ Buffer::_IFindAfter(const char* string, size_t offset, size_t /*strlen*/) const
 size_t
 Buffer::_FindBefore(const char* string, size_t offset, size_t strlen) const
 {
-    const char *ptr = m_data + offset - strlen;
+    const char* ptr = m_data + offset - strlen;
 
     while (ptr >= m_data) {
         if (!memcmp(ptr, string, strlen))
@@ -1755,7 +1755,7 @@ Buffer::_FindBefore(const char* string, size_t offset, size_t strlen) const
 size_t
 Buffer::_IFindBefore(const char* string, size_t offset, size_t strlen) const
 {
-    char *ptr1 = m_data + offset - strlen;
+    char* ptr1 = m_data + offset - strlen;
 
     while (ptr1 >= m_data) {
         if (!strncasecmp(ptr1, string, strlen))
@@ -1872,9 +1872,9 @@ Buffer::_ReplaceAtPositions(const PosVect* positions, size_t searchLength,
         return;
     }
 
-    char *newData = _Alloc(newLength);
-    char *oldString = m_data;
-    char *newString = newData;
+    char* newData = _Alloc(newLength);
+    char* oldString = m_data;
+    char* newString = newData;
     size_t lastPos = 0;
 
     for (size_t i = 0; i < count; ++i) {
@@ -1928,14 +1928,14 @@ ICompare(const Buffer &string1, const Buffer &string2)
 
 
 int
-Compare(const Buffer *string1, const Buffer *string2)
+Compare(const Buffer* string1, const Buffer* string2)
 {
     return strcmp(string1->c_str(), string2->c_str());
 }
 
 
 int
-ICompare(const Buffer *string1, const Buffer *string2)
+ICompare(const Buffer* string1, const Buffer* string2)
 {
     return strcasecmp(string1->c_str(), string2->c_str());
 }

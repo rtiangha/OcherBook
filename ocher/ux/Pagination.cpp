@@ -18,7 +18,8 @@ Pagination::~Pagination()
 void Pagination::flush()
 {
     m_numPages = 0;
-    // TODO: delete
+    while (m_pages.size())
+        delete (PageMapping*)m_pages.remove();
 }
 
 void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned int strOffset /* TODO attrs */)

@@ -170,7 +170,6 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
             m_cache.put(&d, g);
         }
 
-        // TODO:  how to guarantee cache is big enough: refcount chars per line?  or "big" LRU?
         glyphs[i++] = g;
         bbox->w += g->advanceX;
     }

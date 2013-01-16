@@ -31,7 +31,6 @@ class IOException : public Exception
 public:
     IOException(char const* _what="") throw() : Exception(_what), fn(0), err(0) {}
     IOException(char const* _fn, int e) throw() : Exception("IOException"), fn(_fn), err(e) {}
-    // TODO:  istream or ostream pointer
     const char* fn;
     int err;
 };

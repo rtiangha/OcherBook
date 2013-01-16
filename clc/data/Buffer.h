@@ -7,10 +7,10 @@
 #include <stdint.h>
 
 #ifdef USE_CLC_MEMRCHR
-static inline void *memrchr(const void *s, int c, size_t n) {
+static inline void* memrchr(const void* s, int c, size_t n) {
     while (n-- > 0) {
         if ((int)(*((const char*)s)+n) == c)
-            return (void*)(((const char *)s)+n);
+            return (void*)(((const char*)s)+n);
     };
     return 0;
 }
@@ -61,8 +61,6 @@ public:
     size_t max_size() const { return ((size_t)-1) - sizeof(size_t) - 4; }
     size_t size() const { return length(); }
     bool empty() const { return length() == 0; }
-    // TODO: void resize(size_t n, char c=0);
-    // TODO: assign
 
     /**
      *  "Forks" the string, so that it is guaranteed to not share any data with any other strings.
@@ -324,7 +322,7 @@ private:
 
     // Escape
     Buffer&    _DoCharacterEscape(const char* string,
-                    const char *setOfCharsToEscape, char escapeChar);
+                    const char* setOfCharsToEscape, char escapeChar);
     Buffer&    _DoCharacterDeescape(const char* string, char escapeChar);
 
     // Replace
@@ -362,7 +360,7 @@ int ICompare(const Buffer* a, const Buffer* b);
 inline size_t
 Buffer::length() const
 {
-    return *(((size_t *)m_data) - 1);
+    return *(((size_t*)m_data) - 1);
 }
 
 
@@ -468,42 +466,42 @@ Buffer::operator!=(const char* string) const
 
 
 inline bool
-operator<(const char *str, const Buffer &string)
+operator<(const char* str, const Buffer &string)
 {
     return string > str;
 }
 
 
 inline bool
-operator<=(const char *str, const Buffer &string)
+operator<=(const char* str, const Buffer &string)
 {
     return string >= str;
 }
 
 
 inline bool
-operator==(const char *str, const Buffer &string)
+operator==(const char* str, const Buffer &string)
 {
     return string == str;
 }
 
 
 inline bool
-operator>(const char *str, const Buffer &string)
+operator>(const char* str, const Buffer &string)
 {
     return string < str;
 }
 
 
 inline bool
-operator>=(const char *str, const Buffer &string)
+operator>=(const char* str, const Buffer &string)
 {
     return string <= str;
 }
 
 
 inline bool
-operator!=(const char *str, const Buffer &string)
+operator!=(const char* str, const Buffer &string)
 {
     return string != str;
 }

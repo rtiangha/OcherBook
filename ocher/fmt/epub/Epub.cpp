@@ -39,7 +39,6 @@ TreeFile* Epub::findSpine()
             clc::Log::warn(LOG_NAME, "'/mimetype' has incorrect value: '%s' (%u)",
                     mimetype->data.c_str(), (unsigned int)mimetype->data.length());
         }
-        // TODO: release mimetype from UnzipCache
     }
 
 #ifdef TINYXML
@@ -87,7 +86,6 @@ TreeFile* Epub::findSpine()
             clc::Log::error(LOG_NAME, "Missing spine '%s'", fullPath);
         else
             clc::Log::trace(LOG_NAME, "Found spine '%s'", fullPath);
-        // TODO: release container from UnzipCache
     }
     if (tree)
         mxmlDelete(tree);
@@ -120,7 +118,6 @@ void Epub::parseSpine(TreeFile* spineFile)
         clc::Log::trace(LOG_NAME, "Found 'package' type %d", package->type);
         m_uid = _mxmlElementGetAttr(package, "unique-identifier");
         m_epubVersion = _mxmlElementGetAttr(package, "version");
-        // TODO
     }
 
     mxml_node_t* metadata = mxmlFindPath(tree, "package/metadata");

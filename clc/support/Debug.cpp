@@ -16,8 +16,6 @@ int Debugger::enter()
     volatile int r = 0;
 #ifdef HAVE_BUILTIN_TRAP
     __builtin_trap();
-#elif defined(__BEOS__) || defined(__HAIKU__)
-    // TODO
 #else
     *((volatile int*)0) = 1;
 #endif
@@ -58,7 +56,6 @@ int Debugger::asserted(char const* file, int line, char const* expr)
 
 void Debugger::nameThread(const char* name)
 {
-    (void)name;
 #if DEBUG
 #if defined(__linux__)
     prctl(PR_SET_NAME, (unsigned long)name);

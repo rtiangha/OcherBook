@@ -50,17 +50,6 @@ protected:
     FILE* m_f;
 };
 
-
-/**
- *  Appender that collects messages in memory, and can optionally flush them to another
- *  appender.
- */
-class LogAppenderMemory : public LogAppender
-{
-public:
-    // TODO
-};
-
 }
 
 #endif

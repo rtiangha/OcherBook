@@ -228,40 +228,6 @@ bool startsWith(Buffer& haystack, Buffer const& needle)
         memcmp(haystack.c_str(), needle.c_str(), needle.length()) == 0;
 }
 
-#if 0
-void capitalizeEachWord(Buffer& s)
-{
-    size_t len = s.length();
-
-    // TODO:  Lock to avoid repeated refcount checks?
-    //		should there be a simplified lock (lock existing length)?
-    if (len > 0) {
-        s.fork();
-        size_t count = 0;
-        do {
-            // Find the first alphabetical character...
-            for (; count < len; count++) {
-                if (isalpha(m_data[count])) {
-                    // ...found! Convert it to uppercase.
-                    m_data[count] = toupper(s.c_str()+count);
-                    count++;
-                    break;
-                }
-            }
-
-            // Now find the first non-alphabetical character,
-            // and meanwhile, turn to lowercase all the alphabetical ones
-            for (; count < len; count++) {
-                if (isalpha(s.c_str()+count))
-                    m_data[count] = tolower(m_data[count]);
-                else
-                    break;
-            }
-        } while (count < len);
-    }
-}
-#endif
-
 }
 }
 
