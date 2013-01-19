@@ -361,28 +361,36 @@ static const char* demangle(const char *mangled)
     return mangled;
 }
 
-#if defined(__cplusplus)
-extern "C"
-#endif
-void airbag_symbol(int fd, void *pc)
+static void _airbag_symbol(int fd, void *pc, const char *sname, void *saddr)
 {
     int printed = 0;
 #if !defined(DISABLE_DLADDR)
     Dl_info info;
     if (dladdr(pc, &info)) {
-        int offset = (ptrdiff_t)pc - (ptrdiff_t)info.dli_saddr;
-        airbag_printf(fd, "%s(%s+0x%x)[%x]", info.dli_fname, demangle(info.dli_sname), offset, pc);
+        int offset;
+        if (info.dli_sname && info.dli_saddr) {
+            sname = info.dli_sname;
+            saddr = info.dli_saddr;
+        } else if (!sname || !saddr) {  /* dladdr and heuristic both failed; offset from start of so */
+            sname = "";
+            saddr = info.dli_fbase;
+        }
+        offset = (ptrdiff_t)pc - (ptrdiff_t)saddr;
+        airbag_printf(fd, "%s[%x](%s+%x)[%x]", info.dli_fname, info.dli_fbase, demangle(sname), offset, pc);
         printed = 1;
     }
 #endif
-#if defined(__arm__)
     if (!printed) {
-        /* TODO: -mpoke-function-name */
+        airbag_printf(fd, "%s(+0)[%x]", unknown, pc);
     }
+}
+
+#if defined(__cplusplus)
+extern "C"
 #endif
-    if (!printed) {
-        airbag_printf(fd, "%s(%s)[%x]", unknown, unknown, pc);
-    }
+void airbag_symbol(int fd, void *pc)
+{
+    _airbag_symbol(fd, pc, 0, 0);
 }
 
 #ifdef USE_GCC_UNWIND
@@ -410,6 +418,41 @@ static _Unwind_Reason_Code backtrace_helper(struct _Unwind_Context *ctx, void *a
 }
 #endif
 
+#ifdef __arm__
+/*
+ * Search for function name embedded via gcc's -mpoke-function-name.
+ * addr should point near the top of the function.
+ * If found, populates fname and returns pointer to start of function.
+ */
+static void *getPokedFnName(int fd, uint32_t addr, char *fname)
+{
+    unsigned int i;
+    void *faddr = 0;
+    addr &= ~3;
+    /* GCC man page suggests len is at "pc - 12", but prologue can vary, so scan back */
+    for (i = 0; i < 16; ++i) {
+        uint32_t len;
+        addr -= 4;
+        if (load32((void*)addr, &len) == 0 && (len&0xffffff00) == 0xff000000) {
+            uint32_t offset;
+            len &= 0xff;
+            faddr = (void*)(addr + 4);
+            addr -= len;
+            for (offset = 0; offset < len; ++offset) {
+                uint8_t c;
+                if (load8((void*)(addr + offset), &c))
+                    break;
+                fname[offset] = c;
+            }
+            fname[offset] = 0;
+            airbag_printf(fd, "%sFound poked function name: %s[%x]\n", comment, fname, faddr);
+            break;
+        }
+    }
+    return faddr;
+}
+#endif
+
 static int airbag_walkstack(int fd, void **buffer, int *repeat, int size, ucontext_t *uc)
 {
     memset(repeat, 0, sizeof(int)*size);
@@ -432,7 +475,7 @@ static int airbag_walkstack(int fd, void **buffer, int *repeat, int size, uconte
 
     /* Scanning to find the size of the current stack frame */
     raOffset = stackSize = 0;
-    for (addr = pc; !raOffset | !stackSize; --addr) {
+    for (addr = pc; !raOffset || !stackSize; --addr) {
         uint32_t v;
         if (load32(addr, &v)) {
             airbag_printf(fd, "%sText at %x is not mapped; trying prior frame pointer.\n", comment, addr);
@@ -505,16 +548,13 @@ backward:
     uint32_t fp = MCTXREG(uc, 14);
     uint32_t lr = MCTXREG(uc, 17);
     int depth = 0;
-
-    buffer[depth++] = (void*)pc;
-    airbag_printf(fd, "%s", comment);
-    airbag_symbol(fd, (void*)pc);
-    airbag_printf(fd, "\n");
+    char fname[257];
 
     if (pc&3 || load32((void*)pc, NULL)) {
         airbag_printf(fd, "%sCalled through bad function pointer; assuming PC <- LR.\n", comment);
         pc = MCTX_PC(uc) = lr;
     }
+    buffer[depth] = (void*)pc;
 
     /* Heuristic for gcc-generated code:
      *  - Know PC, FP for current frame.
@@ -522,8 +562,10 @@ backward:
      *  - Sometimes there's a prior push instruction to account for.
      *  - Load registers from start of frame based on the push instruction(s).
      *  - Leaf functions might not push LR.
+     * TODO: what if lr&3 or priorPc&3
+     * TODO: return heuristic fname faddr?
      */
-    while (depth < size) {
+    while (++depth < size) {
         /*
          * CondOp-PUSWLRn--Register-list---
          * 1110100???101101????????????????
@@ -534,7 +576,9 @@ backward:
         const uint32_t stmMask = 0xfe3f0000;
         int found = 0;
         int i;
+
         airbag_printf(fd, "%sSearching frame %u (FP=%x, PC=%x)\n", comment, depth-1, fp, pc);
+
         for (i = 0; i < 8192 && !found; ++i) {
             uint32_t instr, instr2;
             if (load32((void*)(pc-i*4), &instr2)) {
@@ -542,17 +586,18 @@ backward:
                 return depth;
             }
             if ((instr2 & (stmMask | (1<<11))) == (stmBits | (1<<11))) {
-                int pushes = 0, dir, pre;
+                void *faddr = 0;
                 uint32_t priorPc = lr;  /* If LR was pushed, will find and use that.  For now assume leaf function. */
                 uint32_t priorFp;
                 found = 1;
                 i++;
                 if (load32((void*)(pc-i*4), &instr) == 0 && (instr & stmMask) == stmBits) {
-                    int regNum;
+                    int pushes, dir, pre, regNum;
 checkStm:
+                    pushes = 0;
                     dir = (instr & (1<<23)) ? 1 : -1;  /* U bit: increment or decrement? */
                     pre = (instr & (1<<24)) ? 1 : 0;  /* P bit: pre  TODO */
-                    airbag_printf(fd, "%sPC-%2x[%8x]: %8x stm%s%s sp!\n", comment, i*4, pc-i*4, instr,
+                    airbag_printf(fd, "%sPC-%02x[%8x]: %8x stm%s%s sp!\n", comment, i*4, pc-i*4, instr,
                             pre==1?"f":"e", dir==1?"a":"d");
                     for (regNum = 15; regNum >= 0; --regNum) {
                         if (instr & (1<<regNum)) {
@@ -562,13 +607,19 @@ checkStm:
                                         fp+pushes*4*dir, termBt);
                                 return depth;
                             }
-                            airbag_printf(fd, "%sFP%s%2x[%8x]: %8x {%s}\n", dir==1?"+":"-", comment, pushes*4,
+                            airbag_printf(fd, "%sFP%s%02x[%8x]: %8x {%s}\n", comment, dir==1?"+":"-", pushes*4,
                                     fp+pushes*4*dir, reg, mctxRegNames[gregOffset + regNum]);
                             pushes++;
                             if (regNum == 11)
                                 priorFp = reg;
                             else if (regNum == 14)
                                 priorPc = reg;
+                            else if (regNum == 15) {
+                                /* When built with -mpoke-function-name, PC is also pushed in the
+                                 * function prologue so that [FP] points near the top of the function
+                                 * and the poked name can be found. */
+                                faddr = getPokedFnName(fd, reg, fname);
+                            }
                         }
                     }
                 }
@@ -578,6 +629,9 @@ checkStm:
                     instr2 = 0;
                     goto checkStm;
                 }
+                airbag_printf(fd, "%s%s ", comment, depth == 1 ? "Crashed at" : "Called from");
+                _airbag_symbol(fd, (void*)pc, fname, faddr);
+                airbag_printf(fd, "\n");
                 pc = priorPc;
                 fp = priorFp;
             }
@@ -586,15 +640,11 @@ checkStm:
         if (! found) {
             airbag_printf(fd, "%sFailed to find prior stack frame; %s.\n", comment, termBt);
             break;
-        } else {
-            if (buffer[depth-1] == (void*)pc)
-                repeat[depth-1] ++;
-            else
-                buffer[depth++] = (void*)pc;
-            airbag_printf(fd, "%s", comment);
-            airbag_symbol(fd, (void*)pc);
-            airbag_printf(fd, "\n");
         }
+        if (buffer[depth-1] == (void*)pc)
+            repeat[depth-1] ++;
+        else
+            buffer[depth] = (void*)pc;
     }
     return depth;
 #elif defined(USE_GCC_UNWIND)
@@ -643,14 +693,16 @@ checkStm:
             return arg.cnt != -1 ? arg.cnt : 0;
         }
     }
+    return 0;
 #elif !defined(DISABLE_BACKTRACE)
     /*
      * Not preferred, because no way to explicitly start at failing PC, doesn't handle
      * bad PC, doesn't handle blown stack, etc.
      */
     return backtrace(buffer, size);
-#endif
+#else
     return 0;
+#endif
 }
 
 
@@ -825,16 +877,14 @@ static void sigHandler(int sigNum, siginfo_t *si, void *ucontext)
 #endif
     airbag_printf(fd, "%sCode:\n", section);
     for (addr = startPc; addr < endPc; ++addr) {
-        if (addr != startPc) {
-            if (width > 70) {
-                airbag_printf(fd, "\n");
-                width = 0;
-            } else
-                width += airbag_printf(fd, " ");
+        if (width > 70) {
+            airbag_printf(fd, "\n");
+            width = 0;
         }
         if (width == 0) {
             airbag_printf(fd, "%x: ", addr);
         }
+        width += airbag_printf(fd, (const uint8_t*)addr == pc ? ">" : " ");
 #if defined(__x86_64__) || defined(__i386__)
         uint8_t b;
         uint8_t invalid = load8(addr, &b);
@@ -895,6 +945,11 @@ static int initCrashHandlers()
 
     sigset_t sigset;
     sigemptyset(&sigset);
+    sigaddset(&sigset, SIGABRT);
+    sigaddset(&sigset, SIGBUS);
+    sigaddset(&sigset, SIGILL);
+    sigaddset(&sigset, SIGSEGV);
+    sigaddset(&sigset, SIGFPE);
 
     struct sigaction sa;
     sa.sa_sigaction = sigHandler;
@@ -913,9 +968,8 @@ static int initCrashHandlers()
 
 static void deinitCrashHandlers()
 {
-    sigset_t sigset;
     struct sigaction sa;
-
+    sigset_t sigset;
     sigemptyset(&sigset);
 
     sa.sa_handler = SIG_DFL;
