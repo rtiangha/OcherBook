@@ -59,7 +59,7 @@ Naming
 ======
 
 Naming scheme follows Java standard:
-MyClass, myMethod, MY_DEFINE, m_member, ...
+MyClass, myMethod, MY_DEFINE, m_privateMember, ...
 
 
 Debugging

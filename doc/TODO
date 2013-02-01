@@ -1,6 +1,12 @@
 Shelf (sorted/filtered/stacked views) to populate HomeActivity's shortlist
-github issues....
+test bootloader on kobo
+write install walkthrough
+downloadable builds
 
+clean up object model:
+BatteryIcon should be a Icon
+
+font search path
 LibraryActivity
     nav buttons - impl as Widgets; fade disabled
 make UI scalable to other res
@@ -45,4 +51,4 @@ low battery warning
 usb plugged in
 
 series
-kebubs
+kepubs

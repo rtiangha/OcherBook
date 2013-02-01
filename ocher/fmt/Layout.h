@@ -1,7 +1,8 @@
 #ifndef OCHER_LAYOUT_H
 #define OCHER_LAYOUT_H
 
-/** @file Rough layout of a book.
+/** @file
+ * Rough layout of a book.
  */
 
 #include "clc/data/Buffer.h"
