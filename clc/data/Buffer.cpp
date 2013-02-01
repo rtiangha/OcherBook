@@ -184,6 +184,31 @@ Buffer::Buffer(const Buffer& string)
     }
 }
 
+Buffer::Buffer(int, const char* fmt, ...)
+{
+    va_list argList;
+    va_start(argList, fmt);
+#if defined(__USE_GNU) || defined(BSD)
+    char* buf;
+    vasprintf(&buf, fmt, argList);
+    size_t len = strlen(buf);
+    _Init(buf, len);
+    free(buf);
+#else
+    va_list argList2;
+#if defined(__va_copy) && !defined(va_copy)
+#define va_copy __va_copy
+#endif
+    va_copy(argList2, argList);
+    int len = vsnprintf(NULL, 0, fmt, argList2) + 1;  // measure,
+    va_end(argList2);
+    char* buf = (char*)alloca(len);
+    int printed = vsnprintf(buf, len, fmt, argList);  // format,
+    ASSERT(printed+1 == len); (void)printed;
+    _Init(buf, len-1);  // copy
+#endif
+    va_end(argList);
+}
 
 Buffer::Buffer(const char* string, size_t len)
 {
@@ -252,9 +277,6 @@ Buffer::formatList(const char* fmt, va_list argList)
     free(buf);
 #else
     va_list argList2;
-#if defined(__va_copy) && !defined(va_copy)
-#define va_copy __va_copy
-#endif
     va_copy(argList2, argList);
     int len = vsnprintf(NULL, 0, fmt, argList2) + 1;  // measure,
     va_end(argList2);

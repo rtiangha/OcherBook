@@ -47,6 +47,7 @@ public:
     Buffer(const char* string);
     Buffer(const char* string, size_t maxLength);
     Buffer(const Buffer& string);
+    Buffer(int dummy, const char* fmt, ...);
     ~Buffer();
 
     // Drop-in for std::string:
