@@ -18,6 +18,7 @@
 
 int ReadActivity::evtKey(struct OcherEvent* evt)
 {
+    UiBits& ui = m_controller->ui;
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key.key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
@@ -27,8 +28,8 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
             clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
-                m_ui.m_systemBar.hide();
-                m_ui.m_navBar.hide();
+                ui.m_systemBar.hide();
+                ui.m_navBar.hide();
                 dirty();
             }
             return -1;
@@ -36,8 +37,8 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
             clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (! atEnd) {
                 m_pageNum++;
-                m_ui.m_systemBar.hide();
-                m_ui.m_navBar.hide();
+                ui.m_systemBar.hide();
+                ui.m_navBar.hide();
                 dirty();
             }
             return -1;
@@ -48,24 +49,25 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
 
 int ReadActivity::evtMouse(struct OcherEvent* evt)
 {
+    UiBits& ui = m_controller->ui;
     if (evt->subtype == OEVT_MOUSE1_UP) {
-        if (m_ui.m_systemBar.m_rect.contains((Pos*)&evt->mouse) ||
-                m_ui.m_navBar.m_rect.contains((Pos*)&evt->mouse)) {
-            if (m_ui.m_systemBar.m_flags & WIDGET_HIDDEN) {
+        if (ui.m_systemBar.m_rect.contains((Pos*)&evt->mouse) ||
+                ui.m_navBar.m_rect.contains((Pos*)&evt->mouse)) {
+            if (ui.m_systemBar.m_flags & WIDGET_HIDDEN) {
                 clc::Log::info(LOG_NAME, "show system bar");
-                m_ui.m_systemBar.show();
-                g_fb->update(&m_ui.m_systemBar.m_rect);
-                m_ui.m_navBar.show();
-                g_fb->update(&m_ui.m_navBar.m_rect);
+                ui.m_systemBar.show();
+                g_fb->update(&ui.m_systemBar.m_rect);
+                ui.m_navBar.show();
+                g_fb->update(&ui.m_navBar.m_rect);
             } else {
                 clc::Log::info(LOG_NAME, "interact bar");
                 // TODO interact
             }
         } else {
-            if (! (m_ui.m_systemBar.m_flags & WIDGET_HIDDEN)) {
+            if (! (ui.m_systemBar.m_flags & WIDGET_HIDDEN)) {
                 clc::Log::info(LOG_NAME, "hide system bar");
-                m_ui.m_systemBar.hide();
-                m_ui.m_navBar.hide();
+                ui.m_systemBar.hide();
+                ui.m_navBar.hide();
                 dirty();
             } else {
                 if (evt->mouse.x < g_fb->width()/2) {
@@ -88,8 +90,8 @@ int ReadActivity::evtMouse(struct OcherEvent* evt)
     return -2;
 }
 
-ReadActivity::ReadActivity(UiBits& ui) :
-    m_ui(ui),
+ReadActivity::ReadActivity(Controller* c) :
+    m_controller(c),
     m_pagesSinceRefresh(0)
 {
 }
@@ -114,7 +116,7 @@ Rect ReadActivity::draw(Pos*)
 Activity ReadActivity::run()
 {
     clc::Log::info(LOG_NAME, "run");
-    meta = g_library->selected();
+    meta = m_controller->ctx.selected;
     if (!meta) {
         clc::Log::error(LOG_NAME, "No book selected");
         return ACTIVITY_HOME;
@@ -180,13 +182,13 @@ Activity ReadActivity::run()
     }
 #endif
 
-    m_ui.m_systemBar.m_sep = true;
-    m_ui.m_systemBar.m_title = meta->title;
-    m_ui.m_systemBar.hide();
-    addChild(m_ui.m_systemBar);
+    m_controller->ui.m_systemBar.m_sep = true;
+    m_controller->ui.m_systemBar.m_title = meta->title;
+    m_controller->ui.m_systemBar.hide();
+    addChild(m_controller->ui.m_systemBar);
 
-    m_ui.m_navBar.hide();
-    addChild(m_ui.m_navBar);
+    m_controller->ui.m_navBar.hide();
+    addChild(m_controller->ui.m_navBar);
 
     meta->record.touch();
     m_pageNum = meta->record.activePage;

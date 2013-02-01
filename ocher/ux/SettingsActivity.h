@@ -7,9 +7,11 @@
 class SettingsActivity
 {
 public:
-    SettingsActivity();
+    SettingsActivity(Controller* c);
 
     Activity run();
+
+    Controller* m_controller;
 };
 
 #endif

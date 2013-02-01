@@ -9,10 +9,13 @@ class Meta;
 class LibraryActivity
 {
 public:
-    LibraryActivity() {}
+    LibraryActivity(Controller* c) : m_controller(c) {}
     ~LibraryActivity() {}
 
-    Activity run(UiBits& ui);
+    Activity run();
+
+protected:
+    Controller* m_controller;
 };
 
 

@@ -7,9 +7,12 @@
 class HomeActivity
 {
 public:
-    HomeActivity();
+    HomeActivity(Controller* c);
 
-    Activity run(UiBits& ui);
+    Activity run();
+
+protected:
+    Controller* m_controller;
 };
 
 #endif

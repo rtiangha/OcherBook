@@ -8,6 +8,8 @@
 #include "ocher/ux/fb/Widgets.h"
 
 
+class Controller;
+
 enum Activity {
     ACTIVITY_SYNC,
     ACTIVITY_HOME,

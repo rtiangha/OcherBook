@@ -3,51 +3,96 @@
 
 #include "clc/data/List.h"
 
+
 class Meta;
 
 /**
- * A Shelf is a filtered, sorted, read-only "view" of other Shelves (or as a base case, the
- * global Library).
+ * A grouping of books (physical or logical).  Groups are both both subject and observer (groups
+ * can potentially aggregate and filter other groups).
  */
-class Shelf
+class GroupOfBooks
+{
+public:
+    virtual ~GroupOfBooks() {}
+
+    void attach(GroupOfBooks* observer);
+    void detach(GroupOfBooks* observer);
+    void notify();
+
+    // TODO: updateMetadata vs updateMembership ?
+    virtual void update(GroupOfBooks*) {}
+    virtual const clc::List& getList() const = 0;
+
+protected:
+    clc::List m_observers;
+};
+
+
+/**
+ * A Shelf is a filtered, sorted, "view" of other GroupOfBooks.
+ */
+class Shelf : public GroupOfBooks
 {
 public:
     Shelf();
     ~Shelf();
 
-    // refresh: check, re-trigger filter
+    enum SortKeys {
+        ByAuthor,
+        By
+    };
 
-    // track underlying sources
+    /**
+     * Shelves watch other GroupOfBooks and must implement update().
+     */
+    virtual void update(GroupOfBooks* changed) = 0;
 
-    // set/remove tags, ...: re-trigger filter and observers
-
-    // filter on tags
-
-    // when changing, invalidate observers and trigger then to refilter
+#if 0
+    addFilterTag();
+    removeFilterTag();
+    sort();
+    clearSort();
+#endif
 };
 
+
 /**
- * The Library contains references to all of the user's books.  It is a specialization of Shelf in
- * that it has no backing sources; it owns the books.
+ * The Library contains references to all of the user's books.  Unlike the Shelf, it owns the
+ * actual books.
  */
-class Library : public Shelf
+class Library : public GroupOfBooks
 {
 public:
-    Library() : m_selected(0) {}
+    Library() {}
     ~Library();
-
-    // TODO shelf
 
     /**
      * Adds the metadata to the Library.  Ownership is transferred.
+     * Caller should call notify() when done adding.
      */
     void add(Meta*);
 
-    void select(Meta*);
-    Meta* selected();
-    Meta* m_selected;
+    const clc::List& getList() const { return m_meta; }
 
+protected:
     clc::List m_meta;
+};
+
+
+/**
+ */
+class ShortList : public Shelf
+{
+public:
+    ShortList(GroupOfBooks* base) : m_base(base) { m_base->attach(this); }
+    ~ShortList() { m_base->detach(this); }
+
+    void update(GroupOfBooks* changed);
+    const clc::List& getList() const { return m_meta; }
+
+protected:
+    clc::List m_meta;
+    GroupOfBooks* m_base;
 };
 
 #endif

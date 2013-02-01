@@ -1,12 +1,13 @@
 #include "clc/support/Logger.h"
 
+#include "ocher/resources/Bitmaps.h"
 #include "ocher/settings/Settings.h"
 #include "ocher/shelf/Meta.h"
+#include "ocher/ux/Controller.h"
 #include "ocher/ux/Factory.h"
 #include "ocher/ux/LibraryActivity.h"
 #include "ocher/ux/fb/FontEngine.h"
 #include "ocher/ux/fb/Widgets.h"
-#include "ocher/resources/Bitmaps.h"
 
 #define LOG_NAME "ocher.ux.Library"
 
@@ -14,7 +15,7 @@
 class LibraryCanvas : public Canvas
 {
 public:
-    LibraryCanvas(UiBits& ui, clc::List& meta);
+    LibraryCanvas(Controller* c);
     ~LibraryCanvas();
 
     int evtKey(struct OcherEvent*);
@@ -23,8 +24,9 @@ public:
     Rect draw(Pos* pos);
 
 protected:
+    Controller* m_controller;
     UiBits& m_ui;
-    clc::List m_meta;
+    const clc::List& m_library;
 #define BOOKS_PER_PAGE 12
     Rect* m_bookRects;
     int itemHeight;
@@ -33,20 +35,21 @@ protected:
     unsigned int m_pageNum;
 };
 
-LibraryCanvas::LibraryCanvas(UiBits& ui, clc::List& meta) :
-    m_ui(ui),
-    m_meta(meta),
+LibraryCanvas::LibraryCanvas(Controller* c) :
+    m_controller(c),
+    m_ui(c->ui),
+    m_library(c->ctx.library.getList()),
     m_pageNum(0)
 {
     // TODO calc this
     m_booksPerPage = BOOKS_PER_PAGE;
     m_bookRects = new Rect[m_booksPerPage];
-    m_pages = (m_meta.size() + m_booksPerPage - 1) / m_booksPerPage;
+    m_pages = (m_library.size() + m_booksPerPage - 1) / m_booksPerPage;
 
-    ui.m_systemBar.m_sep = false;
-    ui.m_systemBar.m_title = "LIBRARY";
-    ui.m_systemBar.show();
-    addChild(ui.m_systemBar);
+    m_ui.m_systemBar.m_sep = false;
+    m_ui.m_systemBar.m_title = "LIBRARY";
+    m_ui.m_systemBar.show();
+    addChild(m_ui.m_systemBar);
     addChild(new Icon(settings.medSpace + settings.largeSpace,
                 m_rect.h - settings.medSpace - bmpLeftArrow.h, &bmpLeftArrow));
     addChild(new Icon(m_rect.w - (settings.medSpace + settings.largeSpace + bmpRightArrow.w),
@@ -89,11 +92,11 @@ int LibraryCanvas::evtMouse(struct OcherEvent* evt)
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos* pos = (Pos*)&evt->mouse;
         for (unsigned int i = 0; i < m_booksPerPage; i++) {
-            Meta* meta = (Meta*)m_meta.get(i + m_pageNum*m_booksPerPage);
+            Meta* meta = (Meta*)m_library.get(i + m_pageNum*m_booksPerPage);
             if (!meta)
                 break;
             if (m_bookRects[i].contains(pos)) {
-                g_library->select(meta);
+                m_controller->ctx.selected = meta;
                 return ACTIVITY_READ;
             }
         }
@@ -146,7 +149,7 @@ Rect LibraryCanvas::draw(Pos*)
         clip.x = settings.medSpace;
         clip.w -= settings.medSpace*2;
         for (unsigned int i = 0; i < m_booksPerPage; ++i) {
-            Meta* meta = (Meta*)m_meta.get(i + m_pageNum*m_booksPerPage);
+            Meta* meta = (Meta*)m_library.get(i + m_pageNum*m_booksPerPage);
             if (!meta)
                 break;
 
@@ -177,11 +180,11 @@ Rect LibraryCanvas::draw(Pos*)
 }
 
 
-Activity LibraryActivity::run(UiBits& ui)
+Activity LibraryActivity::run()
 {
     clc::Log::info(LOG_NAME, "run");
 
-    LibraryCanvas c(ui, g_library->m_meta);
+    LibraryCanvas c(m_controller);
 
     int r;
     while (1) {

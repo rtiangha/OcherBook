@@ -11,7 +11,7 @@ class Renderer;
 class ReadActivity : public Canvas
 {
 public:
-    ReadActivity(UiBits& ui);
+    ReadActivity(Controller* c);
 
     Activity run();
 
@@ -21,7 +21,7 @@ protected:
 
     Rect draw(Pos* pos);
 
-    UiBits& m_ui;
+    Controller* m_controller;
 
     clc::Buffer m_layout;
     Renderer* renderer;

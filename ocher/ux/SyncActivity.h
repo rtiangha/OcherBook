@@ -7,11 +7,13 @@
 class SyncActivity
 {
 public:
-    SyncActivity();
+    SyncActivity(Controller* c);
 
     Activity run();
 
 protected:
+    Controller* m_controller;
+
     void processFiles(const char** files);
     void processFile(const char* file);
 };

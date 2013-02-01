@@ -28,12 +28,14 @@ enum Fmt {
 class BookRecord
 {
 public:
-    BookRecord() : activePage(0), touched(0) {}
+    BookRecord() : activePage(0), touched(0), shortlist(0) {}
 
     unsigned int activePage;  // TODO:  can't use page number; varies by device/settings
 
     void touch();
     time_t touched;
+
+    int shortlist;
 
     // TODO: tags
 

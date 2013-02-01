@@ -2,6 +2,7 @@
 
 #include "ocher/settings/Settings.h"
 #include "ocher/shelf/Meta.h"
+#include "ocher/ux/Controller.h"
 #include "ocher/ux/Factory.h"
 #include "ocher/ux/HomeActivity.h"
 #include "ocher/ux/fb/FontEngine.h"
@@ -13,7 +14,7 @@
 class HomeCanvas : public Canvas
 {
 public:
-    HomeCanvas();
+    HomeCanvas(Context& ctx);
     ~HomeCanvas();
 
     int evtKey(struct OcherEvent*);
@@ -22,6 +23,7 @@ public:
     Rect draw(Pos* pos);
 
 protected:
+    Context& m_ctx;
     float coverRatio;
 #define NUM_CLUSTER_BOOKS 5
     Rect books[NUM_CLUSTER_BOOKS];
@@ -29,7 +31,8 @@ protected:
     Rect m_browseLabel;
 };
 
-HomeCanvas::HomeCanvas() :
+HomeCanvas::HomeCanvas(Context& ctx) :
+    m_ctx(ctx),
     coverRatio(1.6)
 {
     int dx = settings.smallSpace;
@@ -74,8 +77,9 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos* pos = (Pos*)&evt->mouse;
+        const clc::List& metas = m_ctx.library.getList();
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
-            Meta* meta = (Meta*)g_library->m_meta.itemAt(i);
+            Meta* meta = (Meta*)metas.itemAt(i);
             if (!meta) {
                 clc::Log::debug(LOG_NAME, "book %d has no meta", i);
                 continue;
@@ -88,7 +92,7 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 r.inset(-1);
                 g_fb->roundRect(&r, 4);
                 g_fb->update(&r);
-                g_library->select(meta);
+                m_ctx.selected = meta;
                 return ACTIVITY_READ;
             }
         }
@@ -119,6 +123,7 @@ Rect HomeCanvas::draw(Pos*)
         fe.apply();
         Rect r;
         Pos pos;
+        const clc::List& metas = m_ctx.library.getList();
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
             r = books[i];
             r.inset(-1);
@@ -127,7 +132,7 @@ Rect HomeCanvas::draw(Pos*)
             g_fb->roundRect(&r, 1);
             r.inset(2);
 
-            Meta* meta = (Meta*)g_library->m_meta.itemAt(i);
+            Meta* meta = (Meta*)metas.itemAt(i);
             uint8_t c = meta ? 0xf0 : 0xd0;
             g_fb->setFg(c, c, c);
             g_fb->fillRect(&r);
@@ -175,8 +180,9 @@ Rect HomeCanvas::draw(Pos*)
         g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
 
         {
+            const clc::List& shortList = m_ctx.shortList.getList();
             Rect sl;
-            // TODO shortlist Shelf
+            // TODO
         }
 
     }
@@ -198,19 +204,21 @@ Rect HomeCanvas::draw(Pos*)
 }
 
 
-HomeActivity::HomeActivity()
+HomeActivity::HomeActivity(Controller* c) :
+    m_controller(c)
 {
 }
 
-Activity HomeActivity::run(UiBits& ui)
+Activity HomeActivity::run()
 {
     clc::Log::info(LOG_NAME, "run");
-    HomeCanvas c;
+    HomeCanvas c(m_controller->ctx);
 
-    ui.m_systemBar.m_sep = false;
-    ui.m_systemBar.m_title.clear();
-    ui.m_systemBar.show();
-    c.addChild(ui.m_systemBar);
+    SystemBar& systemBar = m_controller->ui.m_systemBar;
+    systemBar.m_sep = false;
+    systemBar.m_title.clear();
+    systemBar.show();
+    c.addChild(systemBar);
 
     c.refresh(true);
     return (Activity)g_loop->run(&c);

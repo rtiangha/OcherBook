@@ -1,6 +1,7 @@
 #include "ocher/ux/SettingsActivity.h"
 
-SettingsActivity::SettingsActivity()
+SettingsActivity::SettingsActivity(Controller* c) :
+    m_controller(c)
 {
 }
 

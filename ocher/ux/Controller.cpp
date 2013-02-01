@@ -4,7 +4,11 @@
 
 
 Controller::Controller() :
-    m_readActivity(ui)
+    m_homeActivity(this),
+    m_libraryActivity(this),
+    m_readActivity(this),
+    m_settingsActivity(this),
+    m_syncActivity(this)
 {
 }
 
@@ -20,13 +24,13 @@ void Controller::run()
                 a = m_syncActivity.run();
                 break;
             case ACTIVITY_HOME:
-                a = m_homeActivity.run(ui);
+                a = m_homeActivity.run();
                 break;
             case ACTIVITY_READ:
                 a = m_readActivity.run();
                 break;
             case ACTIVITY_LIBRARY:
-                a = m_libraryActivity.run(ui);
+                a = m_libraryActivity.run();
                 break;
             case ACTIVITY_SETTINGS:
                 a = m_settingsActivity.run();

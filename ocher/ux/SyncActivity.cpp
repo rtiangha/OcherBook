@@ -44,6 +44,7 @@ void SyncActivity::processFiles(const char** files)
     for (const char* file = *files; file; file = *++files) {
         processFile(file);
     }
+    m_controller->ctx.library.notify();
 }
 
 void SyncActivity::processFile(const char* file)
@@ -61,7 +62,7 @@ void SyncActivity::processFile(const char* file)
                 m->format = format;
                 m->relPath = file;
                 loadMeta(m);
-                g_library->add(m);
+                m_controller->ctx.library.add(m);
             }
         } else if (S_ISDIR(s.st_mode)) {
             clc::Buffer name;
@@ -74,7 +75,8 @@ void SyncActivity::processFile(const char* file)
     }
 }
 
-SyncActivity::SyncActivity()
+SyncActivity::SyncActivity(Controller* c) :
+    m_controller(c)
 {
 }
 

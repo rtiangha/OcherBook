@@ -7,6 +7,18 @@
 #include "ocher/ux/SettingsActivity.h"
 #include "ocher/ux/SyncActivity.h"
 
+#include "ocher/shelf/Shelf.h"
+
+
+class Context
+{
+public:
+    Context() : shortList(&library), selected(0) {}
+    Library library;
+    ShortList shortList;
+
+    Meta* selected;
+};
 
 class Controller
 {
@@ -15,6 +27,7 @@ public:
 
     void run();
 
+    Context ctx;
     UiBits ui;
 
 protected:

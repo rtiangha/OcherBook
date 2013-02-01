@@ -6,6 +6,26 @@
 #define LOG_NAME "ocher.shelf"
 
 
+void GroupOfBooks::attach(GroupOfBooks* observer)
+{
+    m_observers.add(observer);
+}
+
+void GroupOfBooks::detach(GroupOfBooks* observer)
+{
+    m_observers.removeItem(observer);
+}
+
+void GroupOfBooks::notify()
+{
+    unsigned int n = m_observers.size();
+    for (unsigned int i = 0; i < n; ++i) {
+        GroupOfBooks* group = (GroupOfBooks*)m_observers.get(i);
+        group->update(this);
+    }
+}
+
+
 Shelf::Shelf()
 {
 }
@@ -14,9 +34,6 @@ Shelf::~Shelf()
 {
 }
 
-Library library;
-Library* g_library = &library;
-
 
 Library::~Library()
 {
@@ -24,6 +41,8 @@ Library::~Library()
     for (size_t i = 0; i < n; ++i) {
         delete (Meta*)m_meta.get(i);
     }
+
+    notify();
 }
 
 void Library::add(Meta* meta)
@@ -31,14 +50,17 @@ void Library::add(Meta* meta)
     m_meta.add(meta);
 }
 
-void Library::select(Meta* meta)
-{
-    m_selected = meta;
-    clc::Log::info(LOG_NAME, "Selected %s", meta->title.c_str());
-}
 
-Meta* Library::selected()
+void ShortList::update(GroupOfBooks* changed)
 {
-    return m_selected;
+    m_meta.clear();
+    const clc::List& books = changed->getList();
+    unsigned int n = books.size();
+    for (unsigned int i = 0; i < n; ++i) {
+        Meta* meta = (Meta*)books.get(i);
+        if (meta->record.shortlist) {
+            m_meta.add(meta);
+        }
+    }
 }
 
