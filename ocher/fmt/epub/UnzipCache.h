@@ -8,10 +8,18 @@
 #include "ocher/fmt/epub/TreeMem.h"
 
 
+class FileCache
+{
+public:
+    virtual ~FileCache() {}
+    virtual TreeFile* getFile(const char* filename, const char* relative=0) = 0;
+    virtual TreeDirectory* getRoot() = 0;
+};
+
 /**
  * Unzips zip files to memory on-demand, and caches the results.
  */
-class UnzipCache
+class UnzipCache : public FileCache
 {
 public:
     UnzipCache(const char* zipFilename, const char* password=0);
@@ -25,6 +33,7 @@ protected:
     void newCache();
 
     /**
+     * @param pattern  If NULL, extract all, otherwise extract only the named file(s).
      * @param matchedName  The actual name that matched pattern (even if pattern is NULL, and even
      *      if the extraction failed)
      * @return -1 error, 0 did not match, 1 matched and extracted, 2 matched uniquely, quit now

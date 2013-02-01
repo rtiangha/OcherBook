@@ -83,8 +83,6 @@ void usage(const char* msg)
 #define OPT_DRIVER 256
 #define OPT_LIST_DRIVERS 257
 
-clc::List drivers;
-
 int main(int argc, char** argv)
 {
     bool listDrivers = false;
@@ -184,15 +182,11 @@ int main(int argc, char** argv)
         usage("Please specify one or more files or directories.");
     }
 
-    // Populate globals for ease of access
-    g_fb = uiFactory->getFrameBuffer();
-    g_ft = uiFactory->getFontEngine();
-    g_loop = uiFactory->getLoop();
-
     if (bootMenu) {
         runBootMenu();
     }
 
+    uiFactory->populate();
     Controller c;
     c.run();
 

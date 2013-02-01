@@ -11,6 +11,7 @@
 class Format
 {
 public:
+    virtual ~Format() {}
     virtual void loadMeta(Meta*) {}
 
     clc::Buffer m_title;

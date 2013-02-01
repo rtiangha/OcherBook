@@ -20,14 +20,19 @@ struct EpubItem
 class Epub : public Format
 {
 public:
+    /**
+     */
+    Epub(FileCache* fileCache);
+    /**
+     */
     Epub(const char* epubFilename, const char* password=0);
-    virtual ~Epub() {}
+    ~Epub();
 
     clc::Buffer m_epubVersion;
     clc::Buffer m_uid;
 
     clc::Buffer getFile(const char* filename) {
-        TreeFile* f = m_zip.getFile(filename, m_contentPath.c_str());
+        TreeFile* f = m_zip->getFile(filename, m_contentPath.c_str());
         clc::Buffer b;
         if (f) {
             b = f->data;
@@ -48,7 +53,7 @@ protected:
     TreeFile* findSpine();
     void parseSpine(TreeFile* spine);
 
-    UnzipCache m_zip;
+    FileCache* m_zip;
     std::map<clc::Buffer, EpubItem> m_items;
     std::vector<clc::Buffer> m_spine;
     clc::Buffer m_contentPath;  ///< directory of full-path attr

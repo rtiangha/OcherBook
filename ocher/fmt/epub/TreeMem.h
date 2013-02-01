@@ -1,7 +1,9 @@
 #ifndef OCHER_FILETREE_H
 #define OCHER_FILETREE_H
 
-/** @file Represents a simple filesystem in memory. */
+/** @file
+ * Represents a simple filesystem in memory.
+ */
 
 #include <list>
 
@@ -10,9 +12,9 @@
 class TreeFile
 {
 public:
-    TreeFile(clc::Buffer& _name) : name(_name) {}
-    TreeFile(clc::Buffer& _name, clc::Buffer& _data) : name(_name), data(_data) {}
-    clc::Buffer name;
+    TreeFile(const clc::Buffer& _name) : name(_name) {}
+    TreeFile(const clc::Buffer& _name, clc::Buffer& _data) : name(_name), data(_data) {}
+    const clc::Buffer name;
     clc::Buffer data;
     // error
 };
@@ -20,7 +22,7 @@ public:
 class TreeDirectory
 {
 public:
-    TreeDirectory(clc::Buffer& _name) : name(_name) {}
+    TreeDirectory(const clc::Buffer& _name) : name(_name) {}
     ~TreeDirectory() {
         for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); ++i)
             delete *i;
@@ -33,7 +35,16 @@ public:
     std::list<TreeDirectory*> subdirs;
     std::list<TreeFile*> files;
 
-    TreeFile* createFile(clc::Buffer& _name, clc::Buffer& _data) {
+    TreeFile* createFilepp(const char* _name, const char* _data) {
+        clc::Buffer nameBuf(_name);
+        clc::Buffer dataBuf(_data);
+        return createFile(nameBuf, dataBuf);
+    }
+    TreeFile* createFilep(const char* _name, clc::Buffer _data) {
+        clc::Buffer nameBuf(_name);
+        return createFile(nameBuf, _data);
+    }
+    TreeFile* createFile(const clc::Buffer& _name, clc::Buffer& _data) {
         TreeFile* file = getFile(_name);
         if (! file) {
             file = new TreeFile(_name, _data);
@@ -41,7 +52,10 @@ public:
         }
         return file;
     }
-    TreeDirectory* createDirectory(clc::Buffer& _name) {
+    TreeDirectory* createDirectory(const char* _name) {
+        return createDirectory(clc::Buffer(_name));
+    }
+    TreeDirectory* createDirectory(const clc::Buffer& _name) {
         TreeDirectory* dir = getDirectory(_name);
         if (! dir) {
             dir = new TreeDirectory(_name);

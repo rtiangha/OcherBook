@@ -29,7 +29,7 @@ static bool stripUtf8Bom(clc::Buffer &data)
 
 TreeFile* Epub::findSpine()
 {
-    TreeFile* mimetype = m_zip.getFile("mimetype");
+    TreeFile* mimetype = m_zip->getFile("mimetype");
     if (!mimetype) {
         clc::Log::warn(LOG_NAME, "Missing '/mimetype'");
     } else {
@@ -47,7 +47,7 @@ TreeFile* Epub::findSpine()
     mxml_node_t* tree = 0;
 #endif
     const char* fullPath = 0;
-    TreeFile* container = m_zip.getFile("META-INF/container.xml");
+    TreeFile* container = m_zip->getFile("META-INF/container.xml");
     if (! container) {
         clc::Log::error(LOG_NAME, "Missing 'META-INF/container.xml'");
     } else {
@@ -81,7 +81,7 @@ TreeFile* Epub::findSpine()
 
     TreeFile* spine = 0;
     if (fullPath) {
-        spine = m_zip.getFile(fullPath);
+        spine = m_zip->getFile(fullPath);
         if (! spine)
             clc::Log::error(LOG_NAME, "Missing spine '%s'", fullPath);
         else
@@ -191,7 +191,7 @@ int Epub::getSpineItemByIndex(unsigned int i, clc::Buffer &item)
         clc::Buffer &idref = m_spine[i];
         std::map<clc::Buffer,EpubItem>::iterator it = m_items.find(idref);
         if (it != m_items.end()) {
-            TreeFile* f = m_zip.getFile((*it).second.href.c_str(), m_contentPath.c_str());
+            TreeFile* f = m_zip->getFile((*it).second.href.c_str(), m_contentPath.c_str());
             if (f) {
                 item = f->data;
                 return 0;
@@ -218,13 +218,27 @@ int Epub::getContentByHref(const char* href, clc::Buffer &item)
     return -1;
 }
 
-Epub::Epub(const char* filename, const char* password) :
-    m_zip(filename, password)
+Epub::Epub(FileCache* fileCache) :
+    m_zip(fileCache)
 {
     TreeFile* spine = findSpine();
     if (spine) {
         parseSpine(spine);
     }
+}
+
+Epub::Epub(const char* filename, const char* password) :
+    m_zip(new UnzipCache(filename, password))
+{
+    TreeFile* spine = findSpine();
+    if (spine) {
+        parseSpine(spine);
+    }
+}
+
+Epub::~Epub()
+{
+    delete m_zip;
 }
 
 mxml_node_t* Epub::parseXml(clc::Buffer &xml)

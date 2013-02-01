@@ -1,18 +1,31 @@
 #ifndef OCHER_UX_FACTORY_H
 #define OCHER_UX_FACTORY_H
 
+#include "clc/data/List.h"
+
 #include "ocher/shelf/Shelf.h"
 #include "ocher/ux/Renderer.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/fb/FreeType.h"
 
 
+#define UX_DRIVER_REGISTER(driver) \
+    class Register##driver { \
+    public: \
+        Register##driver() { drivers.add(new UiFactory##driver); } \
+    } reg##driver
+
 class EventLoop;
+
+/**
+ * The list of all user experience drivers.  All compiled-in drivers automatically register
+ * themselves here.
+ */
+extern clc::List drivers;
 
 extern EventLoop* g_loop;
 extern FrameBuffer* g_fb;
 extern FreeType* g_ft;
-extern Library* g_library;
 
 class UiFactory
 {
@@ -24,6 +37,8 @@ public:
      * @return True iff sucessfully initialized, else output msg
      */
     virtual bool init() = 0;
+
+    void populate();
 
     virtual void deinit() = 0;
 

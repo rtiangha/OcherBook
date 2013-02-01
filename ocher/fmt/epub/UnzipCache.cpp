@@ -95,8 +95,7 @@ int UnzipCache::unzipFile(const char* pattern, clc::Buffer* matchedName)
                 clc::Buffer name(start, p-start);
                 if (*p) {
                     root = root->createDirectory(name);
-                }
-                else {
+                } else {
                     tfile = root->createFile(name, buffer);
                     filename = name;
                     clc::Log::debug(LOG_NAME, "Creating file %s", filename.c_str());
