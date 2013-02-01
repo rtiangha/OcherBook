@@ -194,7 +194,7 @@ $(UNITTESTCPP_LIB): $(UNITTESTCPP_OBJS)
 	$(QUIET)$(AR) rs $(UNITTESTCPP_LIB) $(UNITTESTCPP_OBJS)
 
 unittestpp_clean:
-	rm -f $(UNITTESTCPP_OBJS)
+	rm -f $(UNITTESTCPP_OBJS) $(UNITTESTCPP_LIB)
 
 
 #################### OcherBook
@@ -205,7 +205,7 @@ ifeq ($(OCHER_DEBUG),1)
 else
 	OCHER_CFLAGS+=-DCLC_LOG_LEVEL=2
 endif
-OCHER_CXXFLAGS:=$(OCHER_CFLAGS) -fno-rtti
+OCHER_CXXFLAGS:=$(OCHER_CFLAGS)
 ifneq ($(OCHER_TARGET),haiku)
 	LD_FLAGS+=-lrt
 endif
@@ -237,7 +237,6 @@ OCHER_OBJS = \
 	ocher/device/Filesystem.o \
 	ocher/fmt/Format.o \
 	ocher/fmt/Layout.o \
-	ocher/ocher.o \
 	ocher/settings/Settings.o \
 	ocher/shelf/Meta.o \
 	ocher/shelf/Shelf.o \
@@ -253,6 +252,9 @@ OCHER_OBJS = \
 	ocher/ux/Renderer.o \
 	ocher/ux/SettingsActivity.o \
 	ocher/ux/SyncActivity.o
+
+OCHER_APP_OBJS = \
+	ocher/ocher.o
 
 ifeq ($(OCHER_TARGET),kobo)
 OCHER_OBJS += \
@@ -349,12 +351,12 @@ $(OCHER_OBJS): Makefile ocher.config | $(BUILD_DIR)/ocher_config.h
 	$(QUIET)$(CXX) -c $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) $*.cpp -o $@
 
 ocher: $(BUILD_DIR)/ocher
-$(BUILD_DIR)/ocher: $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) $(OCHER_OBJS)
+$(BUILD_DIR)/ocher: $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) $(OCHER_OBJS) $(OCHER_APP_OBJS)
 	$(MSG) "LINK	$@"
-	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) -o $@ $(OCHER_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
+	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) -o $@ $(OCHER_OBJS) $(OCHER_APP_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
 
 ocher_clean:
-	rm -f $(OCHER_OBJS) $(BUILD_DIR)/ocher
+	rm -f $(OCHER_OBJS) $(OCHER_APP_OBJS) $(BUILD_DIR)/ocher
 
 
 #################### test
@@ -363,14 +365,17 @@ clctest: $(CLC_OBJS) $(UNITTESTCPP_LIB)
 	$(MSG) "LINK	$@"
 	$(QUIET)$(CXX) $(CFLAGS_COMMON) clc/test/clcTestMain.cpp -I. -I$(UNITTESTCPP_ROOT)/src $^ -o $(BUILD_DIR)/$@ -L$(BUILD_DIR) -lrt -lpthread
 
-ochertest:
-	# TODO
+ochertest: ocher/test/OcherTest.cpp $(UNITTESTCPP_LIB) ocher
+	$(MSG) "LINK	$@"
+	$(QUIET)$(CXX) $(LD_FLAGS) $(OCHER_CFLAGS) -I. -I$(UNITTESTCPP_ROOT)/src $(FREETYPE_DEFS) -o $(BUILD_DIR)/$@ -L$(BUILD_DIR) $< $(UNITTESTCPP_LIB) $(OCHER_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) -lrt -lpthread
 
 cppcheck:
 	cppcheck --check-config $(INCS) ocher/ 2> $(BUILD_DIR)/cppcheck.log
 	cppcheck --std=posix --max-configs=100 --enable=all --suppress=cstyleCast $(INCS) ocher/ 2>> $(BUILD_DIR)/cppcheck.log
 
-test: clctest ochertest cppcheck
+test: clctest ochertest
+
+check: cppcheck
 
 
 ####################
@@ -407,7 +412,8 @@ help:
 	@echo "	clean		Clean"
 	@echo "	fonts		Download GPL fonts"
 	@echo "*	ocher		Build the e-reader software"
-	@echo "	test		Build and run the unit tests"
+	@echo "	test		Build the unit tests"
+	@echo "	check		Run static code analysis"
 	@echo "	doc		Run Doxygen"
 	@echo "	dist		Build distribution packages"
 	@echo "	dist-src	Build distribution source packages"
