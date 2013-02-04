@@ -1,6 +1,9 @@
 #include "clc/support/Debug.h"
+#include "clc/support/Logger.h"
 #include "ocher/ux/Controller.h"
 #include "ocher/ux/Factory.h"
+
+#define LOG_NAME "ocher.controller"
 
 
 Controller::Controller() :
@@ -16,7 +19,7 @@ void Controller::run()
 {
     Activity a = ACTIVITY_SYNC;
 
-    while (1) {
+    do {
         Activity prev = a;
 
         switch (a) {
@@ -36,15 +39,14 @@ void Controller::run()
                 a = m_settingsActivity.run();
                 break;
             default:
-                ASSERT(0);
+                a = prev;  // Error?
                 break;
         }
 
         if (a == ACTIVITY_PREVIOUS)
             a = prev;
-        else if (a == ACTIVITY_QUIT)
-            break;
-    }
+        clc::Log::info(LOG_NAME, "state %d -> %d", prev, a);
+    } while (a != ACTIVITY_QUIT);
 
     // TODO: sync state out
 }

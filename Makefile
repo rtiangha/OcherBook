@@ -52,6 +52,9 @@ else
 endif
 ifeq ($(OCHER_TARGET),kobo)
 	CFLAGS+=-Wno-psabi  # suppress "mangling of va_list has changed"
+ifeq ($(OCHER_DEBUG),1)
+	CFLAGS+=-mpoke-function-name
+endif
 endif
 MINIZIP_CFLAGS=-Wno-unused
 ifeq ($(OCHER_TARGET),freebsd)

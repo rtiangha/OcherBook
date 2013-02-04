@@ -124,7 +124,7 @@ Rect LibraryCanvas::draw(Pos*)
     drawn.setInvalid();
 
     if (m_flags & WIDGET_DIRTY) {
-        clc::Log::info(LOG_NAME, "draw");
+        clc::Log::debug(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         drawn = m_rect;
 

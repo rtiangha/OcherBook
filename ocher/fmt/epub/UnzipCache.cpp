@@ -98,7 +98,7 @@ int UnzipCache::unzipFile(const char* pattern, clc::Buffer* matchedName)
                 } else {
                     tfile = root->createFile(name, buffer);
                     filename = name;
-                    clc::Log::debug(LOG_NAME, "Creating file %s", filename.c_str());
+                    clc::Log::trace(LOG_NAME, "Creating file %s", filename.c_str());
                 }
             }
             if (! *p)
@@ -115,7 +115,7 @@ int UnzipCache::unzipFile(const char* pattern, clc::Buffer* matchedName)
         if (err != UNZ_OK) {
             clc::Log::error(LOG_NAME, "unzOpenCurrentFilePassword: %d", err);
         } else {
-            clc::Log::debug(LOG_NAME, "extracting: %s", pathname);
+            clc::Log::trace(LOG_NAME, "extracting: %s", pathname);
 
             do {
                 err = unzReadCurrentFile(m_uf, buf, buffer.size());

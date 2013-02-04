@@ -81,7 +81,7 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
             Meta* meta = (Meta*)metas.itemAt(i);
             if (!meta) {
-                clc::Log::debug(LOG_NAME, "book %d has no meta", i);
+                clc::Log::trace(LOG_NAME, "book %d has no meta", i);
                 continue;
             }
             if (books[i].contains(pos)) {
@@ -110,7 +110,7 @@ Rect HomeCanvas::draw(Pos*)
     drawn.setInvalid();
 
     if (m_flags & WIDGET_DIRTY) {
-        clc::Log::info(LOG_NAME, "draw");
+        clc::Log::debug(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         drawn = m_rect;
 
@@ -179,10 +179,23 @@ Rect HomeCanvas::draw(Pos*)
         pos.y++;
         g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
 
+        pos.x = books[0].x;
+        pos.y += settings.smallSpace;
+
         {
             const clc::List& shortList = m_ctx.shortList.getList();
-            Rect sl;
-            // TODO
+            int margin = books[0].x;
+
+            int h = m_rect.y + m_rect.h - pos.y - margin;
+            int w = h / coverRatio;
+            Rect sl(pos.x, pos.y, w, h);
+            while (sl.x + sl.w <= m_rect.w - margin) {
+                g_fb->roundRect(&sl, 2);
+                r.inset(-1);
+                g_fb->roundRect(&sl, 3);
+
+                sl.x += sl.w + settings.smallSpace;
+            }
         }
 
     }

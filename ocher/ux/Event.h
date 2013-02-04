@@ -81,6 +81,9 @@ struct OcherEvent
 class EventHandler
 {
 public:
+    /**
+     * @return -1 handled, -2 pass on, >=0 done
+     */
     virtual int eventReceived(struct OcherEvent* evt) = 0;
 };
 

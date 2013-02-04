@@ -28,7 +28,7 @@ Rect SyncCanvas::draw(Pos*)
 {
     Rect drawn;
     if (m_flags & WIDGET_DIRTY) {
-        clc::Log::info(LOG_NAME, "draw");
+        clc::Log::debug(LOG_NAME, "draw");
         m_flags &= ~WIDGET_DIRTY;
         g_fb->setFg(0xff, 0xff, 0xff);
         g_fb->fillRect(&m_rect);

@@ -75,7 +75,7 @@ void KoboEvents::flush()
     struct input_event evt;
     while (read(m_touchFd, &evt, sizeof(evt)) > 0)
         ;
-    clc::Log::info(LOG_NAME, "flushed");
+    clc::Log::debug(LOG_NAME, "flushed");
 }
 
 int KoboEvents::wait(struct OcherEvent* evt)
@@ -109,7 +109,7 @@ int KoboEvents::wait(struct OcherEvent* evt)
         clc::Log::error(LOG_NAME, "select: timeout");
         return -1;
     } else {
-        clc::Log::debug(LOG_NAME, "select: awake");
+        clc::Log::trace(LOG_NAME, "select: awake");
 
         while (1) {
             struct KoboButtonEvent kbe;
@@ -153,7 +153,7 @@ int KoboEvents::wait(struct OcherEvent* evt)
                         slots = N - tail;
 
                     if (slots) {
-                        clc::Log::debug(LOG_NAME, "reading %u events at offset %u", slots, tail);
+                        clc::Log::trace(LOG_NAME, "reading max %u events at offset %u", slots, tail);
                         r = read(m_touchFd, &kevt[tail], sizeof(struct input_event)*slots);
                         if (r == -1) {
                             if (errno == EINTR)
@@ -178,23 +178,28 @@ int KoboEvents::wait(struct OcherEvent* evt)
                 if (kevtHead == kevtTail) {
                     kevtHead = kevtTail = 0;  // Allow maximal read next time
                     clc::Log::debug(LOG_NAME, "empty");
-                    return -1;
+                    return 0;
                 }
 
-                clc::Log::info(LOG_NAME, "type %d code %d value %d", kevt[kevtHead].type,
+                clc::Log::debug(LOG_NAME, "type %d code %d value %d", kevt[kevtHead].type,
                         kevt[kevtHead].code, kevt[kevtHead].value);
                 if (kevt[kevtHead].type == EV_SYN) {
                     syn = 1;
                 } else if (kevt[kevtHead].type == EV_ABS) {
-                    // TODO:  orientation is unexpected; fiddle vinfo.rotate
                     m_evt.type = OEVT_MOUSE;
                     uint16_t code = kevt[kevtHead].code;
                     if (code == ABS_X) {
-                        m_evt.mouse.y = kevt[kevtHead].value;
+                        m_evt.mouse.x = kevt[kevtHead].value;
                     } else if (code == ABS_Y) {
-                        m_evt.mouse.x = 600-kevt[kevtHead].value;
+                        m_evt.mouse.y = kevt[kevtHead].value;
                     } else if (code == ABS_PRESSURE) {
-                        m_evt.subtype = kevt[kevtHead].value ? OEVT_MOUSE1_DOWN : OEVT_MOUSE1_UP;
+                        unsigned int pressure = kevt[kevtHead].value;
+                        if (pressure == 0)
+                            m_evt.subtype = OEVT_MOUSE1_UP;
+                        else {
+                            // TODO: 100 down, 101 drag
+                            m_evt.subtype = OEVT_MOUSE1_DOWN;
+                        }
                     }
                 }
 
@@ -203,9 +208,17 @@ int KoboEvents::wait(struct OcherEvent* evt)
                     kevtHead = 0;
 
                 if (syn) {
-                    clc::Log::info(LOG_NAME, "mouse %u, %u %s", m_evt.mouse.x, m_evt.mouse.y,
-                            m_evt.subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
                     *evt = m_evt;
+
+#if 1  // TODO: Why do down vs up coordinate systems differ??
+                    if (evt->subtype == OEVT_MOUSE1_DOWN) {
+                        evt->mouse.x = 600 - m_evt.mouse.y;
+                        evt->mouse.y = m_evt.mouse.x;
+                    }
+#endif
+
+                    clc::Log::info(LOG_NAME, "mouse %u, %u %s", evt->mouse.x, evt->mouse.y,
+                            evt->subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
                     return 0;
                 }
             }

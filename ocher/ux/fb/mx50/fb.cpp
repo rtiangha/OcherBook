@@ -44,6 +44,10 @@ bool Mx50Fb::init()
         clc::Log::error(LOG_NAME, "Failed to get fixed screen info: %s", strerror(errno));
         goto fail1;
     }
+    char id[sizeof(finfo.id)+1];
+    memcpy(id, finfo.id, sizeof(finfo.id));
+    id[sizeof(finfo.id)] = 0;
+    clc::Log::info(LOG_NAME, "id: %s", id);
 
     // Get variable screen information
     if (ioctl(m_fd, FBIOGET_VSCREENINFO, &vinfo) == -1) {
@@ -54,7 +58,7 @@ bool Mx50Fb::init()
     // Configure for what we actually want
     vinfo.bits_per_pixel = 8;
     vinfo.grayscale = 1;
-    // 0 is landscape right handed, 3 is portrait
+    // 0 is landscape right handed, 1 portait upside-down, 2 , 3 portrait
     vinfo.rotate = 3;
     if (ioctl(m_fd, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
         clc::Log::error(LOG_NAME, "Failed to set variable screen info: %s", strerror(errno));
@@ -254,10 +258,9 @@ void Mx50Fb::waitUpdate(int marker)
 
 void Mx50Fb::setPixelFormat()
 {
-    fb_var_screeninfo screen_info;
-    screen_info.bits_per_pixel = 8;
-    screen_info.grayscale = GRAYSCALE_8BIT;
-    int retval = ioctl(m_fd, FBIOPUT_VSCREENINFO, &screen_info);
+    vinfo.bits_per_pixel = 8;
+    vinfo.grayscale = GRAYSCALE_8BIT;
+    int retval = ioctl(m_fd, FBIOPUT_VSCREENINFO, &vinfo);
     if (retval)
         clc::Log::error(LOG_NAME, "FBIOPUT_VSCREENINFO: %s", strerror(errno));
 }
@@ -273,9 +276,10 @@ void Mx50Fb::setAutoUpdateMode(bool autoUpdate)
 
 void Mx50Fb::setUpdateScheme()
 {
-    fb_var_screeninfo screen_info;
-//    screen_info.scheme = UPDATE_SCHEME_SNAPSHOT;
-    int retval = ioctl(m_fd, MXCFB_SET_UPDATE_SCHEME, &screen_info);
+#if 0
+    vinfo.scheme = UPDATE_SCHEME_SNAPSHOT;
+    int retval = ioctl(m_fd, MXCFB_SET_UPDATE_SCHEME, &vinfo);
     if (retval)
         clc::Log::error(LOG_NAME, "MXCFB_SET__UPDATE_SCHEME: %s", strerror(errno));
+#endif
 }

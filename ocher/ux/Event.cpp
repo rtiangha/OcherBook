@@ -14,6 +14,6 @@ int EventLoop::run(EventHandler* handler)
         if (r >= 0)
             return r;
     }
-    return 0;
+    return -1;
 }
 

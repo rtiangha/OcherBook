@@ -182,11 +182,12 @@ int main(int argc, char** argv)
         usage("Please specify one or more files or directories.");
     }
 
+    uiFactory->populate();
+
     if (bootMenu) {
         runBootMenu();
     }
 
-    uiFactory->populate();
     Controller c;
     c.run();
 
