@@ -92,6 +92,7 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 r.inset(-1);
                 g_fb->roundRect(&r, 4);
                 g_fb->update(&r);
+                g_fb->sync();
                 m_ctx.selected = meta;
                 return ACTIVITY_READ;
             }
@@ -141,7 +142,7 @@ Rect HomeCanvas::draw(Pos*)
                 pos.x = 0;
                 pos.y = fe.m_cur.ascender;
                 r.inset(2);
-                fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_XCLIP);
+                fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_YCLIP | FE_WRAP);
             }
         }
 
@@ -190,9 +191,9 @@ Rect HomeCanvas::draw(Pos*)
             int w = h / coverRatio;
             Rect sl(pos.x, pos.y, w, h);
             while (sl.x + sl.w <= m_rect.w - margin) {
+                g_fb->roundRect(&sl, 1);
+                sl.inset(-1);
                 g_fb->roundRect(&sl, 2);
-                r.inset(-1);
-                g_fb->roundRect(&sl, 3);
 
                 sl.x += sl.w + settings.smallSpace;
             }

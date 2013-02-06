@@ -27,7 +27,7 @@ protected:
     Controller* m_controller;
     UiBits& m_ui;
     const clc::List& m_library;
-#define BOOKS_PER_PAGE 12
+#define BOOKS_PER_PAGE 11
     Rect* m_bookRects;
     int itemHeight;
     unsigned int m_booksPerPage;

@@ -28,8 +28,8 @@ Rect BatteryIcon::draw(Pos* pos)
 
     g_fb->setFg(0xff, 0xff, 0xff);
     g_fb->fillRect(&rect);
-    rect.y += 6;
-    rect.h -= 12;
+    rect.y += 8;
+    rect.h -= 16;
     g_fb->setFg(0, 0, 0);
     g_fb->rect(&rect);
     rect.inset(2);

@@ -251,6 +251,8 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
         }
 
         // Word-wrap or hard linefeed, but avoid the two back-to-back.
+        if (pen->x >= r->w && !(flags & FE_WRAP))
+            return p - str;
         if ((*p == '\n' && !wordWrapped) || pen->x >= r->w) {
             pen->x = 0;
             pen->y += m_cur.lineHeight;

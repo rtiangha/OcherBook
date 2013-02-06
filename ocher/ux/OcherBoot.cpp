@@ -103,4 +103,5 @@ void runBootMenu()
     SelectCanvas c;
     c.refresh();
     g_loop->run(&c);
+    g_fb->sync();
 }
