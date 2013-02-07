@@ -13,6 +13,4 @@ public:
     char* m_settings;
 };
 
-extern struct Filesystem fs;
-
 #endif

@@ -5,6 +5,7 @@
 #include "clc/support/LogAppenders.h"
 
 #include "ocher/settings/Options.h"
+#include "ocher/device/Device.h"
 #include "ocher/ux/Factory.h"
 
 #define PRINT_PROGRESS  printf("Testing %s::%s...\n", UnitTestSuite::GetSuiteName(), m_details.testName);fflush(stdout)
@@ -36,6 +37,7 @@ int main(int /*argc*/, char** argv)
 {
     resetUnitTestLoggers();
     resourcesDir = argv[1];
+    initDevice();
     uiFactory = (UiFactory*)drivers.get(0);
     uiFactory->init();
     uiFactory->populate();

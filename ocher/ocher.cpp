@@ -175,7 +175,7 @@ int main(int argc, char** argv)
     if (optind < argc) {
         opt.files = (const char**)&argv[optind];
     } else {
-        opt.files = fs.m_libraries;
+        opt.files = device->fs.m_libraries;
     }
     if (!opt.files || !opt.files[0]) {
         uiFactory->deinit();

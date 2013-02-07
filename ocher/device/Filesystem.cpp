@@ -121,8 +121,6 @@ static clc::Buffer settingsDir()
 }
 #endif
 
-Filesystem fs;
-
 Filesystem::Filesystem() :
     m_libraries(0)
 {

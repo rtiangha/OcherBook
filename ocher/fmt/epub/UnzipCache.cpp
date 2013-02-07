@@ -74,7 +74,7 @@ int UnzipCache::unzipFile(const char* pattern, clc::Buffer* matchedName)
             if (matchedName)
                 matchedName->setTo(pathname);
         } else if (r == FNM_NOMATCH) {
-            clc::Log::trace(LOG_NAME, "did not match %s to %s", pathname, pattern);
+            //clc::Log::trace(LOG_NAME, "did not match %s to %s", pathname, pattern);
             return 0;
         } else {
             clc::Log::error(LOG_NAME, "fnmatch: %s: error", pattern);
