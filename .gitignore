@@ -1,8 +1,9 @@
 *.o
 *.d
 *.a
+arm-2010q1
+doc/OcherBook/
 build/
-test/*.epub
-test/*.txt
+test/books/
 .svn
 
