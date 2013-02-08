@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <unistd.h>
 
 #include "airbag_fd/airbag_fd.h"
 
@@ -48,6 +49,22 @@ void initLog()
 void initSettings()
 {
     settings.load();
+}
+
+void initDebug()
+{
+    // Before proceeding with startup and initializing the framebuffer, check for a killswitch.
+    // Useful when needing to bail to native stack (such as OcherBook vs native stack init-ing
+    // framebuffer in incompatible ways).
+    for (int i = 0; ; ++i) {
+        const char* lib = device->fs.m_libraries[i];
+        if (! lib)
+            break;
+        clc::Buffer killswitch(1, "%s/%s", lib, ".ocherkill");
+        if (access(killswitch.c_str(), F_OK) == 0) {
+            exit(1);
+        }
+    }
 }
 
 void usage(const char* msg)
@@ -140,6 +157,7 @@ int main(int argc, char** argv)
     initLog();
     initDevice();
     initSettings();
+    initDebug();
 
     for (unsigned int i = 0; i < drivers.size(); ++i) {
         UiFactory* factory = (UiFactory*)drivers.get(i);
