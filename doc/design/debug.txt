@@ -1,6 +1,6 @@
 During development, OcherBook might be broken (incluing the boot menu), and you
 need to fall back to the stock firmware to easily recover control.
 
-To prevent OcherBoot startup, create a file ".ocherkill" in the root of any of
+To prevent OcherBoot startup, create a file ".ocher/kill" in the root of any of
 the "libraries" that OcherBook examines on startup.  In practice, this means
 create such a file on the SD card and insert it before rebooting.

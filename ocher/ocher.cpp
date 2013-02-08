@@ -60,8 +60,9 @@ void initDebug()
         const char* lib = device->fs.m_libraries[i];
         if (! lib)
             break;
-        clc::Buffer killswitch(1, "%s/%s", lib, ".ocherkill");
+        clc::Buffer killswitch(1, "%s/.ocher/kill", lib);
         if (access(killswitch.c_str(), F_OK) == 0) {
+            fprintf(stderr, "OcherBook exiting because of '.ocher/kill' killswitch\n");
             exit(1);
         }
     }
