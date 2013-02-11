@@ -1,27 +1,38 @@
-Shelf (sorted/filtered/stacked views) to populate HomeActivity's shortlist
-test bootloader on kobo
+signals
+inotify for card in Filesystem
+power button not working
+persist user state
+    json?
+sync adds multiple copies
+    database
+control LEDs
+bootloader prevents nickel from starting - garbled screen
+"make dist"
+    updated rcS
+networking
+    for now, store in config file
+    wpa_cli
+    link quality
 write install walkthrough
+clean up website
 downloadable builds
 
-clean up object model:
-BatteryIcon should be a Icon
 
+clean up object model:
+    LibraryActivity
+        nav buttons - impl as Widgets; fade disabled
+    BatteryIcon should be a Icon
 font search path
-LibraryActivity
-    nav buttons - impl as Widgets; fade disabled
 make UI scalable to other res
     make SDL window resizable
 font size does not always pop correctly
 Show/hide SystemBar causes page to shift
-
 improve startup time:  don't parse so much to get metadata
 flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
 persist shelf
     json vs Flattenable
-no database; deal with books coming and going dynamically (NFS support!)
-
-pop up menus
 widget
+    pop up menus
     packing
     make dirty rects more granular (eg, hiding SystemBar doesn't reflow entire page)
 g_fb->bbox vs m_rect
@@ -50,5 +61,4 @@ refresh battery
 low battery warning
 usb plugged in
 
-series
-kepubs
+group book series

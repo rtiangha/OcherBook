@@ -22,11 +22,17 @@ Modified GPLv2.
 See http://minixml.org/documentation.php/license.html#LICENSE
 
 FreeType:
-BSD with advertising clause or GPLv2.
+GPL2 (or BSD with advertising clause).
 See http://www.freetype.org/license.html
-Used in OcherBook as BSD with advertising clause
+
+libev
+GPL 2+ (and BSD).
+http://software.schmorp.de/pkg/libev.html
+
+Signals
+MIT license.
+https://github.com/pbhogan/Signals
 
 UnitTest++
 MIT license.
 http://unittest-cpp.sourceforge.net/
-
