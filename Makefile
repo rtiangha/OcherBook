@@ -44,7 +44,7 @@ endif
 
 # Common CFLAGS applied everywhere
 CFLAGS?=
-INCS+=-I. -I$(BUILD_DIR)
+INCS+=-I. -I$(BUILD_DIR) -Ithird-party
 ifeq ($(OCHER_DEBUG),1)
 	CFLAGS+=-O0 -g -DDEBUG
 else
@@ -115,6 +115,7 @@ freetype_clean:
 	cd $(FREETYPE_DIR) && $(MAKE) clean || true
 	rm -f $(FREETYPE_LIB)
 
+
 #################### Zlib
 
 ZLIB_VER=1.2.5
@@ -135,6 +136,25 @@ ZLIB_OBJS = \
 
 zlib_clean:
 	rm -f $(ZLIB_OBJS) $(ZLIB_LIB)
+
+
+#################### libev
+
+LIBEV_VER=4.11
+LIBEV_TGZ=$(DL_DIR)/libev-$(LIBEV_VER).tar.gz
+LIBEV_DIR=$(BUILD_DIR)/libev-$(LIBEV_VER)
+LIBEV_LIB=$(LIBEV_DIR)/.libs/libev.a
+
+$(LIBEV_LIB):
+	$(QUIET)mkdir -p $(BUILD_DIR)
+	tar -zxf $(LIBEV_TGZ) -C $(BUILD_DIR)
+	cd $(LIBEV_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure
+	cd $(LIBEV_DIR) && $(MAKE)
+
+INCS+=-I$(LIBEV_DIR)
+
+libev_clean:
+	rm -f $(LIBEV_OBJS) $(LIBEV_LIB)
 
 
 #################### miniXML
@@ -354,9 +374,9 @@ $(OCHER_OBJS): Makefile ocher.config | $(BUILD_DIR)/ocher_config.h
 	$(QUIET)$(CXX) -c $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) $*.cpp -o $@
 
 ocher: $(BUILD_DIR)/ocher
-$(BUILD_DIR)/ocher: $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) $(OCHER_OBJS) $(OCHER_APP_OBJS)
+$(BUILD_DIR)/ocher: $(LIBEV_LIB) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) $(OCHER_OBJS) $(OCHER_APP_OBJS)
 	$(MSG) "LINK	$@"
-	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) -o $@ $(OCHER_OBJS) $(OCHER_APP_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
+	$(QUIET)$(CXX) $(LD_FLAGS) $(CFLAGS_COMMON) $(OCHER_CXXFLAGS) -o $@ $(OCHER_OBJS) $(OCHER_APP_OBJS) $(LIBEV_LIB) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB)
 
 ocher_clean:
 	rm -f $(OCHER_OBJS) $(OCHER_APP_OBJS) $(BUILD_DIR)/ocher
@@ -370,7 +390,7 @@ clctest: $(CLC_OBJS) $(UNITTESTCPP_LIB)
 
 ochertest: ocher/test/OcherTest.cpp $(UNITTESTCPP_LIB) ocher
 	$(MSG) "LINK	$@"
-	$(QUIET)$(CXX) $(LD_FLAGS) $(OCHER_CFLAGS) -I. -I$(UNITTESTCPP_ROOT)/src $(FREETYPE_DEFS) -o $(BUILD_DIR)/$@ -L$(BUILD_DIR) $< $(UNITTESTCPP_LIB) $(OCHER_OBJS) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) -lrt -lpthread
+	$(QUIET)$(CXX) $(LD_FLAGS) $(OCHER_CFLAGS) -I. -I$(UNITTESTCPP_ROOT)/src $(FREETYPE_DEFS) -o $(BUILD_DIR)/$@ -L$(BUILD_DIR) $< $(UNITTESTCPP_LIB) $(OCHER_OBJS) $(LIBEV_LIB) $(ZLIB_LIB) $(FREETYPE_LIB) $(MXML_LIB) -lrt -lpthread
 
 cppcheck:
 	cppcheck --check-config $(INCS) ocher/ 2> $(BUILD_DIR)/cppcheck.log
