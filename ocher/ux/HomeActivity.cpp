@@ -11,32 +11,15 @@
 #define LOG_NAME "ocher.ux.Home"
 
 
-class HomeCanvas : public Canvas
-{
-public:
-    HomeCanvas(Context& ctx);
-    ~HomeCanvas();
-
-    int evtKey(struct OcherEvent*);
-    int evtMouse(struct OcherEvent*);
-
-    Rect draw(Pos* pos);
-
-protected:
-    Context& m_ctx;
-    float coverRatio;
-#define NUM_CLUSTER_BOOKS 5
-    Rect books[NUM_CLUSTER_BOOKS];
-    Rect shortlist[5];
-    Rect m_browseLabel;
-};
-
-HomeCanvas::HomeCanvas(Context& ctx) :
-    m_ctx(ctx),
+HomeActivity::HomeActivity(Controller* c) :
+    m_controller(c),
     coverRatio(1.6)
 {
-    int dx = settings.smallSpace;
-    int dy = settings.smallSpace;
+    SystemBar& systemBar = m_controller->ui.m_systemBar;
+    addChild(systemBar);
+
+    int dx = g_settings.smallSpace;
+    int dy = g_settings.smallSpace;
 
     books[0].x = m_rect.w/15;
     books[0].y = m_rect.h/5;
@@ -64,27 +47,27 @@ HomeCanvas::HomeCanvas(Context& ctx) :
     books[4].h = books[4].w*coverRatio;
 }
 
-HomeCanvas::~HomeCanvas()
+HomeActivity::~HomeActivity()
 {
 }
 
-int HomeCanvas::evtKey(struct OcherEvent*)
+int HomeActivity::evtKey(struct OcherKeyEvent*)
 {
     return -1;
 }
 
-int HomeCanvas::evtMouse(struct OcherEvent* evt)
+int HomeActivity::evtMouse(struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
-        Pos* pos = (Pos*)&evt->mouse;
-        const clc::List& metas = m_ctx.library.getList();
+        Pos pos(evt->x, evt->y);
+        const clc::List& metas = m_controller->ctx.library.getList();
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
             Meta* meta = (Meta*)metas.itemAt(i);
             if (!meta) {
                 clc::Log::trace(LOG_NAME, "book %d has no meta", i);
                 continue;
             }
-            if (books[i].contains(pos)) {
+            if (books[i].contains(&pos)) {
                 clc::Log::info(LOG_NAME, "book %d selected %p", i, meta);
                 Rect r = books[i];
                 r.inset(-2);
@@ -93,11 +76,11 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
                 g_fb->roundRect(&r, 4);
                 g_fb->update(&r);
                 g_fb->sync();
-                m_ctx.selected = meta;
+                m_controller->ctx.selected = meta;
                 return ACTIVITY_READ;
             }
         }
-        if (m_browseLabel.contains(pos)) {
+        if (m_browseLabel.contains(&pos)) {
             return ACTIVITY_LIBRARY;
         }
         // TODO: look at shortlist
@@ -105,7 +88,7 @@ int HomeCanvas::evtMouse(struct OcherEvent* evt)
     return -1;
 }
 
-Rect HomeCanvas::draw(Pos*)
+Rect HomeActivity::draw(Pos*)
 {
     Rect drawn;
     drawn.setInvalid();
@@ -124,7 +107,7 @@ Rect HomeCanvas::draw(Pos*)
         fe.apply();
         Rect r;
         Pos pos;
-        const clc::List& metas = m_ctx.library.getList();
+        const clc::List& metas = m_controller->ctx.library.getList();
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
             r = books[i];
             r.inset(-1);
@@ -155,7 +138,7 @@ Rect HomeCanvas::draw(Pos*)
         fe.setSize(14);
         fe.apply();
         pos.x = books[0].x;
-        pos.y = books[3].y + books[3].h + fe.m_cur.ascender + settings.smallSpace;
+        pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_settings.smallSpace;
         fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
 
         // TODO simplify, abstract into labels
@@ -172,19 +155,19 @@ Rect HomeCanvas::draw(Pos*)
             // TODO  right justify against lbox (remove plotString call); get bbox returned
             pos.x = m_rect.w - books[0].x - lbox.w;
             fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
-            m_browseLabel.inset(-settings.smallSpace);
+            m_browseLabel.inset(-g_settings.smallSpace);
         }
 
-        pos.y += fe.m_cur.underlinePos + settings.smallSpace;
+        pos.y += fe.m_cur.underlinePos + g_settings.smallSpace;
         g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
         pos.y++;
         g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
 
         pos.x = books[0].x;
-        pos.y += settings.smallSpace;
+        pos.y += g_settings.smallSpace;
 
         {
-            const clc::List& shortList = m_ctx.shortList.getList();
+            const clc::List& shortList = m_controller->ctx.shortList.getList();
             int margin = books[0].x;
 
             int h = m_rect.y + m_rect.h - pos.y - margin;
@@ -195,7 +178,7 @@ Rect HomeCanvas::draw(Pos*)
                 sl.inset(-1);
                 g_fb->roundRect(&sl, 2);
 
-                sl.x += sl.w + settings.smallSpace;
+                sl.x += sl.w + g_settings.smallSpace;
             }
         }
 
@@ -217,24 +200,17 @@ Rect HomeCanvas::draw(Pos*)
     return drawn;
 }
 
-
-HomeActivity::HomeActivity(Controller* c) :
-    m_controller(c)
+void HomeActivity::onAttached()
 {
-}
-
-Activity HomeActivity::run()
-{
-    clc::Log::info(LOG_NAME, "run");
-    HomeCanvas c(m_controller->ctx);
+    clc::Log::info(LOG_NAME, "attached");
 
     SystemBar& systemBar = m_controller->ui.m_systemBar;
     systemBar.m_sep = false;
     systemBar.m_title.clear();
     systemBar.show();
-    c.addChild(systemBar);
-
-    c.refresh(true);
-    return (Activity)g_loop->run(&c);
 }
 
+void HomeActivity::onDetached()
+{
+    clc::Log::info(LOG_NAME, "detached");
+}

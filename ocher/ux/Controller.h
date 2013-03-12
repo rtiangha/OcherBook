@@ -6,9 +6,9 @@
 #include "ocher/ux/ReadActivity.h"
 #include "ocher/ux/SettingsActivity.h"
 #include "ocher/ux/SyncActivity.h"
-
 #include "ocher/shelf/Shelf.h"
 
+class PowerSaver;
 
 class Context
 {
@@ -24,18 +24,24 @@ class Controller
 {
 public:
     Controller();
+    ~Controller();
+
+    void onDirChanged(const char* dir, const char* file);
 
     void run();
+    void setNextActivity(Activity a);
 
     Context ctx;
     UiBits ui;
 
 protected:
+    Activity m_activity;
     HomeActivity m_homeActivity;
     LibraryActivity m_libraryActivity;
     ReadActivity m_readActivity;
     SettingsActivity m_settingsActivity;
     SyncActivity m_syncActivity;
+    PowerSaver* m_powerSaver;
 };
 
 #endif

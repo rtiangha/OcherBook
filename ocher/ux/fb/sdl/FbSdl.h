@@ -3,6 +3,7 @@
 
 #include "SDL/SDL.h"
 
+#include "ocher/ux/fb/sdl/SdlLoop.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 
 
@@ -30,6 +31,7 @@ public:
     int update(Rect* r, bool full=false);
 
 protected:
+    SdlLoop m_loop;
     int m_sdl;
     SDL_Surface* m_screen;
     bool m_mustLock;

@@ -30,6 +30,7 @@ extern FreeType* g_ft;
 class UiFactory
 {
 public:
+    UiFactory();
     virtual ~UiFactory() {}
 
     /**
@@ -45,8 +46,6 @@ public:
     virtual const char* getName() = 0;
 
     virtual Renderer* getRenderer() = 0;
-
-    virtual EventLoop* getLoop() { return (EventLoop*)0; }
 
     virtual FrameBuffer* getFrameBuffer() { return (FrameBuffer*)0; }
 

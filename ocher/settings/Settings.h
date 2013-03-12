@@ -1,6 +1,8 @@
 #ifndef OCHER_SETTINGS_H
 #define OCHER_SETTINGS_H
 
+#include "clc/data/Buffer.h"
+
 // TODO:  conditionalize some settings based on platform?  so can maintain/
 // share a single settings files
 
@@ -56,6 +58,6 @@ struct Settings {
     // home page arrangement
 };
 
-extern Settings settings;
+extern Settings g_settings;
 
 #endif

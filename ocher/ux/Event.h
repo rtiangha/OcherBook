@@ -2,6 +2,10 @@
 #define OCHER_EVENT_H
 
 #include <stdint.h>
+#include <ev.h>
+
+#include "Signals/Signal.h"
+using namespace Gallant;
 
 
 #define OEVT_KEYPRESS           0
@@ -19,6 +23,7 @@
 
 struct OcherKeyEvent
 {
+    unsigned int subtype;
     uint32_t key;
 };
 
@@ -38,6 +43,8 @@ struct OcherKeyEvent
 
 struct OcherMouseEvent
 {
+    unsigned int subtype;  // up, down, ...
+    int buttons;
     uint16_t x;
     uint16_t y;
     uint16_t pressure;
@@ -49,6 +56,7 @@ struct OcherMouseEvent
 
 struct OcherDeviceEvent
 {
+    unsigned int subtype;
 };
 
 #define OEVT_APP_ACTIVATE       0
@@ -57,6 +65,7 @@ struct OcherDeviceEvent
 
 struct OcherAppEvent
 {
+    unsigned int subtype;
 };
 
 #define OEVT_NONE               0
@@ -66,10 +75,10 @@ struct OcherAppEvent
 #define OEVT_DEVICE             4
 
 // TODO: model after sdl more
+// TODO: timestamp
 struct OcherEvent
 {
     uint8_t type;
-    uint8_t subtype;
     union {
         struct OcherKeyEvent key;
         struct OcherMouseEvent mouse;
@@ -78,31 +87,31 @@ struct OcherEvent
     };
 };
 
-class EventHandler
-{
-public:
-    /**
-     * @return -1 handled, -2 pass on, >=0 done
-     */
-    virtual int eventReceived(struct OcherEvent* evt) = 0;
-};
-
 class EventLoop
 {
 public:
-    virtual ~EventLoop() {}
-    /**
-     * @return 0 got event, -1 error
-     */
-    virtual int wait(struct OcherEvent* evt) = 0;
-    /**
-     * Flushes any queued events
-     */
-    virtual void flush() {}
-    /**
-     * @return -1 handled, -2 pass on, >=0 done
-     */
-    int run(EventHandler* handler);
+    EventLoop();
+    ~EventLoop();
+
+    int run();
+    // flush(timestamp)
+
+    Signal1<struct OcherKeyEvent*> keyEvent;
+    Signal1<struct OcherMouseEvent*> mouseEvent;
+    Signal1<struct OcherAppEvent*> appEvent;
+    Signal1<struct OcherDeviceEvent*> deviceEvent;
+
+    struct ev_loop* evLoop;
+};
+
+/**
+ * Some other event source (something that does not easily plug into libev).
+ * Queues events and signals libev when ready.
+ */
+class EventSource
+{
+public:
+
 };
 
 #endif

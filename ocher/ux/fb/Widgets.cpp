@@ -10,7 +10,6 @@
 static const unsigned int borderWidth = 2;
 static const unsigned int roundRadius = 1;
 
-
 Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     m_rect(x, y, w, h),
     m_flags(WIDGET_DIRTY),
@@ -70,36 +69,24 @@ Rect Widget::drawChildren(Pos* pos)
     return drawn;
 }
 
-int Widget::eventReceived(struct OcherEvent* evt)
+int Widget::_onMouseEvent(struct OcherMouseEvent* evt)
 {
     int r = -2;
-
-    // TODO: filter mouse by child coords, keys by focus, etc
-
-    // Global events are handled top-down
-    if (evt->type == OEVT_APP) {
-        r = evtApp(evt);
-    } else if (evt->type == OEVT_DEVICE) {
-        r = evtDevice(evt);
+    for (unsigned int i = 0; i < m_children.size(); ++i) {
+        r = ((Widget*)m_children.get(i))->_onMouseEvent(evt);
+        if (r != -2)
+            break;
     }
 
     if (r == -2) {
-        for (unsigned int i = 0; i < m_children.size(); ++i) {
-            r = ((Widget*)m_children.get(i))->eventReceived(evt);
-            if (r != -2)
-                break;
-        }
-
-        // Positional events are handled leaf-first
-        if (r == -2) {
-            if (evt->type == OEVT_KEY) {
-                r = evtKey(evt);
-            } else if (evt->type == OEVT_MOUSE) {
-                r = evtMouse(evt);
-            }
-        }
+        r = evtMouse(evt);
     }
     return r;
+}
+
+void Widget::onMouseEvent(struct OcherMouseEvent* evt)
+{
+    _onMouseEvent(evt);
 }
 
 
@@ -107,6 +94,16 @@ Canvas::Canvas() :
     Widget(0, 0, g_fb->width(), g_fb->height())
 {
 }
+
+void Canvas::loop()
+{
+    g_loop->mouseEvent.Connect(this, &Widget::onMouseEvent);
+
+    g_loop->run();
+
+    g_loop->mouseEvent.Disconnect(this, &Widget::onMouseEvent);
+}
+
 
 void Canvas::refresh(bool full)
 {
@@ -117,6 +114,17 @@ void Canvas::refresh(bool full)
 }
 
 Rect Canvas::draw(Pos*)
+{
+    return drawChildren(m_rect.pos());
+}
+
+
+Panel::Panel() :
+    Widget(0, 0, g_fb->width(), g_fb->height())
+{
+}
+
+Rect Panel::draw(Pos*)
 {
     Rect drawn;
     if (m_flags & WIDGET_DIRTY) {
@@ -251,18 +259,19 @@ void Button::drawLabel(Rect* rect)
     }
 }
 
-int Button::evtKey(struct OcherEvent*)
+int Button::evtKey(struct OcherKeyEvent*)
 {
     return -2;
 }
 
-int Button::evtMouse(struct OcherEvent*)
+int Button::evtMouse(struct OcherMouseEvent*)
 {
     return -2;
 }
 
 
-Rect Icon::draw(Pos* pos) {
+Rect Icon::draw(Pos* pos)
+{
     g_fb->blit(bmp->bmp, pos->x + m_rect.x, pos->y + m_rect.y, bmp->w, bmp->h);
 #if 0
     if (! m_isActive) {

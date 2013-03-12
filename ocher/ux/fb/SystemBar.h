@@ -4,6 +4,7 @@
 #include "clc/data/Buffer.h"
 #include "ocher/ux/fb/Widgets.h"
 #include "ocher/ux/fb/BatteryIcon.h"
+#include "ocher/ux/fb/ClockIcon.h"
 
 
 class SystemBar : public Window
@@ -18,6 +19,7 @@ protected:
     void drawContent(Rect*);
 
     BatteryIcon m_batteryIcon;
+    ClockIcon m_clockIcon;
 };
 
 #endif

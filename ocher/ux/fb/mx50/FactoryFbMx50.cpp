@@ -20,7 +20,6 @@ bool UiFactoryFbMx50::init()
     if (fb->init()) {
         m_fb = fb;
         if (UiFactoryFb::init()) {
-            m_loop = new KoboEvents;
             return true;
         }
     }

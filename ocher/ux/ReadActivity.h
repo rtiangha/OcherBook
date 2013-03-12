@@ -16,8 +16,11 @@ public:
     Activity run();
 
 protected:
-    int evtKey(struct OcherEvent*);
-    int evtMouse(struct OcherEvent*);
+    int evtKey(struct OcherKeyEvent*);
+    int evtMouse(struct OcherMouseEvent*);
+
+    void onAttach();
+    void onDetach();
 
     Rect draw(Pos* pos);
 

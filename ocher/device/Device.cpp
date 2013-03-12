@@ -11,11 +11,11 @@
 #define LOG_NAME "ocher.dev"
 
 
-Device* device;
+Device* g_device;
 
 void initDevice()
 {
-    device = new Device();
+    g_device = new Device();
 }
 
 clc::Buffer Device::getMac()

@@ -8,7 +8,7 @@
 #include "clc/support/Logger.h"
 #include "ocher/device/kobo/KoboEvents.h"
 
-#define LOG_NAME "ocher.dev.KoboEvents"
+#define LOG_NAME "ocher.dev.kobo"
 
 
 /*
@@ -27,6 +27,40 @@ Serial          : 0000000000000000
 */
 
 
+static void buttonCb(struct ev_loop* loop, ev_io* watcher, int revents)
+{
+    KoboEvents* e = (KoboEvents*)watcher->data;
+
+}
+
+void KoboEvents::pollButton()
+{
+    while (1) {
+        struct KoboButtonEvent kbe;
+        r = read(m_buttonFd, &kbe, sizeof(kbe));
+        if (r == -1) {
+            if (errno == EINTR)
+                continue;
+            ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
+            break;
+        } else if (r == sizeof(kbe)) {
+            if (kbe.button == 0x66) {
+                evt->type = OEVT_KEY;
+                evt->subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                evt->key.key = OEVTK_HOME;
+                return 0;
+            } else if (kbe.button == 0x74) {
+                evt->type = OEVT_KEY;
+                evt->subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                evt->key.key = OEVTK_POWER;
+                return 0;
+            }
+        } else {
+            break;
+        }
+    }
+}
+
 KoboEvents::KoboEvents() :
     kevtHead(0),
     kevtTail(0)
@@ -34,19 +68,17 @@ KoboEvents::KoboEvents() :
     // TODO handle failures
     m_buttonFd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
     m_touchFd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
-    pipe(m_pipe);
+
+    ev_io_init(&m_buttonWatcher, buttonCb, m_buttonFd, EV_READ);
+    ev_io_init(&m_touchWatcher, touchCb, m_touchFd, EV_READ);
+    m_buttonWatcher.data = m_touchWatcher.data = this;
 
     memset(&m_evt, 0, sizeof(m_evt));
 }
 
 KoboEvents::~KoboEvents()
 {
-#if 0
-    write(m_pipe[1], "", 1);
-#endif
-    close(m_pipe[0]);
-    close(m_pipe[1]);
-
+    //ev_stop(
     if (m_buttonFd != -1) {
         close(m_buttonFd);
     }
@@ -91,9 +123,6 @@ int KoboEvents::wait(struct OcherEvent* evt)
     FD_SET(m_touchFd, &rdfds);
     if (nfds < m_touchFd)
         nfds = m_touchFd;
-    FD_SET(m_pipe[0], &rdfds);
-    if (nfds < m_pipe[0])
-        nfds = m_pipe[0];
 
     int r;
     if (kevtHead == kevtTail) {
@@ -111,30 +140,7 @@ int KoboEvents::wait(struct OcherEvent* evt)
     } else {
         clc::Log::trace(LOG_NAME, "select: awake");
 
-        while (1) {
-            struct KoboButtonEvent kbe;
-            r = read(m_buttonFd, &kbe, sizeof(kbe));
-            if (r == -1) {
-                if (errno == EINTR)
-                    continue;
-                ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
-                break;
-            } else if (r == sizeof(kbe)) {
-                if (kbe.button == 0x66) {
-                    evt->type = OEVT_KEY;
-                    evt->subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
-                    evt->key.key = OEVTK_HOME;
-                    return 0;
-                } else if (kbe.button == 0x74) {
-                    evt->type = OEVT_KEY;
-                    evt->subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
-                    evt->key.key = OEVTK_POWER;
-                    return 0;
-                }
-            } else {
-                break;
-            }
-        }
+        pollButton();
 
         // http://www.kernel.org/doc/Documentation/input/event-codes.txt
         while (1) {

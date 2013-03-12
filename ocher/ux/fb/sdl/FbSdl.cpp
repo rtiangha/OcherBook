@@ -4,6 +4,7 @@
 #include "clc/support/Logger.h"
 #include "clc/algorithm/Bitops.h"
 
+#include "ocher/ux/Factory.h"
 #include "ocher/ux/fb/sdl/FbSdl.h"
 
 #define LOG_NAME "ocher.sdl"
@@ -20,15 +21,21 @@ FbSdl::FbSdl() :
 
 FbSdl::~FbSdl()
 {
+    m_loop.stop();
     if (m_sdl)
         SDL_Quit();
 }
 
 bool FbSdl::init()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        const char* err = SDL_GetError();
-        clc::Log::error(LOG_NAME, "SDL_Init failed: %s", err);
+    clc::Monitor startupMonitor;
+    m_loop.start(g_loop, &startupMonitor);
+
+    startupMonitor.lock();
+    startupMonitor.wait();
+    m_screen = m_loop.getScreen();
+    startupMonitor.unlock();
+    if (! m_screen) {
         return false;
     }
 
@@ -37,14 +44,6 @@ bool FbSdl::init()
         colors[i].r = colors[i].g = colors[i].b = i;
     }
 
-    // TODO:  store window size in user settings
-    m_screen = SDL_SetVideoMode(600, 800, 8, SDL_SWSURFACE | SDL_HWPALETTE);
-    if (! m_screen) {
-        const char* err = SDL_GetError();
-        clc::Log::error(LOG_NAME, "SDL_SetVideoMode failed: %s", err);
-        SDL_Quit();
-        return false;
-    }
     SDL_SetPalette(m_screen, SDL_LOGPAL|SDL_PHYSPAL, colors, 0, 256);
     m_mustLock = SDL_MUSTLOCK(m_screen);
     setBg(0xff, 0xff, 0xff);

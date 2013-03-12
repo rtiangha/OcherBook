@@ -12,6 +12,8 @@ public:
 
     Rect draw(Pos* pos);
 
+    void onUpdate();
+
     Battery& m_battery;
 };
 

@@ -10,7 +10,7 @@
 #include "clc/support/Logger.h"
 #include "ocher/fmt/epub/Epub.h"
 
-#define LOG_NAME "ocher.fmt.epub"
+#define LOG_NAME "ocher.epub"
 
 
 static bool stripUtf8Bom(clc::Buffer &data)

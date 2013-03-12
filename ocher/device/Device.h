@@ -32,7 +32,7 @@ public:
 /**
  * The device singleton
  */
-extern Device* device;
+extern Device* g_device;
 
 void initDevice();
 

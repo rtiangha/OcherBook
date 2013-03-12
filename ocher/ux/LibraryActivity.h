@@ -6,18 +6,30 @@
 
 class Meta;
 
-class LibraryActivity
+class LibraryActivity : public Panel
 {
 public:
-    LibraryActivity(Controller* c) : m_controller(c) {}
-    ~LibraryActivity() {}
+    LibraryActivity(Controller* c);
+    ~LibraryActivity();
 
-    Activity run();
+    Rect draw(Pos* pos);
+
+    int evtKey(struct OcherKeyEvent*);
+    int evtMouse(struct OcherMouseEvent*);
 
 protected:
+    void onAttached();
+    void onDetached();
+
     Controller* m_controller;
+    UiBits& m_ui;
+    const clc::List& m_library;
+#define BOOKS_PER_PAGE 11
+    Rect* m_bookRects;
+    int itemHeight;
+    unsigned int m_booksPerPage;
+    unsigned int m_pages;
+    unsigned int m_pageNum;
 };
 
-
 #endif
-

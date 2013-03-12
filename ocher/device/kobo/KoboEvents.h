@@ -6,18 +6,20 @@
 #include "ocher/ux/Event.h"
 
 
-class KoboEvents : public EventLoop
+class KoboEvents
 {
 public:
     KoboEvents();
     ~KoboEvents();
+
     int wait(struct OcherEvent* evt);
     void flush();
 
 protected:
     int m_buttonFd;
+    struct ev_io m_buttonWatcher;
     int m_touchFd;
-    int m_pipe[2];
+    struct ev_io m_touchWatcher;
 
     struct input_event kevt[64];
     struct OcherEvent m_evt;

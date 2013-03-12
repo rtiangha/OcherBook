@@ -7,7 +7,7 @@
 #include "clc/support/Logger.h"
 #include "ocher/device/Battery.h"
 
-#define LOG_NAME "ocher.battery"
+#define LOG_NAME "ocher.dev.battery"
 #define BAT_PATH "/sys/devices/platform/pmic_battery.1/power_supply/mc13892_bat/"
 
 

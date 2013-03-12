@@ -30,7 +30,7 @@ Glyph* GlyphCache::get(GlyphDescr* f)
 FontEngine::FontEngine()
 {
     m_next.faceId = 0;
-    m_next.points = settings.fontPoints;
+    m_next.points = g_settings.fontPoints;
     m_next.underline = 0;
     m_next.bold = 0;
     m_next.italic = 0;
@@ -45,10 +45,10 @@ FontEngine::~FontEngine()
 void FontEngine::scanForFonts()
 {
     const char* search;
-    if (settings.fontRoot.length() == 0)
+    if (g_settings.fontRoot.length() == 0)
         search = ".";
     else
-        search = settings.fontRoot.c_str();
+        search = g_settings.fontRoot.c_str();
 
     const char* p = search;
     const char* colon;

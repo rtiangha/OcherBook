@@ -9,7 +9,7 @@ class SelectCanvas : public Canvas
 public:
     SelectCanvas();
 
-    int evtMouse(struct OcherEvent*);
+    int evtMouse(struct OcherMouseEvent*);
     Rect draw(Pos* pos);
 
 protected:
@@ -45,14 +45,14 @@ void SelectCanvas::highlight(int i)
     g_fb->sync();
 }
 
-int SelectCanvas::evtMouse(struct OcherEvent* evt)
+int SelectCanvas::evtMouse(struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
-        Pos* pos = (Pos*)&evt->mouse;
-        if (apps[0].contains(pos)) {
+        Pos pos(evt->x, evt->y);
+        if (apps[0].contains(&pos)) {
             highlight(0);
             return 0;
-        } else if (apps[1].contains(pos)) {
+        } else if (apps[1].contains(&pos)) {
             highlight(1);
             exit(1);
         }
@@ -101,7 +101,6 @@ void runBootMenu()
 #endif
 
     SelectCanvas c;
-    c.refresh();
-    g_loop->run(&c);
+    // TODO
     g_fb->sync();
 }

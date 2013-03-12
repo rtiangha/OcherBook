@@ -1,6 +1,14 @@
-signals
-inotify for card in Filesystem
+finish wiring events into libev, fire via signal/slot
+    Kobo
+    inotify for card in Filesystem
+    power saver
+    periodically refresh battery icon
+Controller
+    Activities: onAttached, onDetached
+ioc:
+    g_*
 power button not working
+
 persist user state
     json?
 sync adds multiple copies
@@ -57,7 +65,6 @@ clean up Path/File to be simpler, more posix-like
 first-run routine:
     select language
 
-refresh battery
 low battery warning
 usb plugged in
 

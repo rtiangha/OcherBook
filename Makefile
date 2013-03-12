@@ -271,6 +271,7 @@ OCHER_OBJS = \
 	ocher/ux/LibraryActivity.o \
 	ocher/ux/OcherBoot.o \
 	ocher/ux/Pagination.o \
+	ocher/ux/PowerSaver.o \
 	ocher/ux/ReadActivity.o \
 	ocher/ux/Renderer.o \
 	ocher/ux/SettingsActivity.o \
@@ -309,6 +310,7 @@ OCHER_UI_FB=$(shell [ "$(OCHER_UI_SDL)" = "1" ] || [ "$(OCHER_UI_MX50)" = "1" ] 
 ifeq ($(OCHER_UI_FB), 1)
 OCHER_OBJS += \
 	ocher/ux/fb/BatteryIcon.o \
+	ocher/ux/fb/ClockIcon.o \
 	ocher/ux/fb/FactoryFb.o \
 	ocher/ux/fb/FrameBuffer.o \
 	ocher/ux/fb/FreeType.o \

@@ -45,5 +45,8 @@ Rect BatteryIcon::draw(Pos* pos)
     return drawn;
 }
 
-
+void BatteryIcon::onUpdate()
+{
+    m_battery.readAll();
+}
 

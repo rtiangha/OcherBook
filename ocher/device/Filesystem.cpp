@@ -1,7 +1,9 @@
 #include "clc/storage/File.h"
 #include "clc/storage/Path.h"
+#include "clc/support/Logger.h"
 
 #include "ocher/device/Filesystem.h"
+#include "ocher/settings/Options.h"
 
 #include <stdlib.h>
 #ifdef _WIN32
@@ -13,7 +15,11 @@
 #if !defined(_WIN32) && !defined(__HAIKU__)
 #include <pwd.h>
 #endif
+#ifdef __linux__
+#include <sys/inotify.h>
+#endif
 
+#define LOG_NAME "ocher.dev.fs"
 
 #if _WIN32
 
@@ -154,3 +160,82 @@ Filesystem::~Filesystem()
     delete m_libraries;
 }
 
+void Filesystem::initWatches()
+{
+#ifdef __linux__
+    m_infd = inotify_init();
+    if (m_infd == -1) {
+        clc::Log::error(LOG_NAME, "inotify_init: %s", strerror(errno));
+        return;
+    }
+
+    for (int i = 0; ; ++i) {
+        const char* lib = opt.files[i]; //m_libraries[i];
+        if (! lib)
+            break;
+        int wd = inotify_add_watch(m_infd, lib, IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);
+        if (wd == -1) {
+            clc::Log::error(LOG_NAME, "inotify_add_watch(\"%s\"): %s", lib, strerror(errno));
+        }
+    }
+#endif
+}
+
+void Filesystem::deinitWatches()
+{
+#ifdef __linux__
+    close(m_infd);
+#endif
+}
+
+void Filesystem::fireEvents()
+{
+#ifdef __linux__
+    char buff[4096];
+    ssize_t len = read(m_infd, buff, sizeof(buff));
+    ssize_t i = 0;
+    while (i < len) {
+        struct inotify_event *pevent = (struct inotify_event *)&buff[i];
+
+        //if (pevent->len)
+        //  pevent->name);
+
+        if (pevent->mask & IN_ACCESS)
+            {} //" was read"
+        if (pevent->mask & IN_ATTRIB)
+            {} //" Metadata changed"
+        if (pevent->mask & IN_CLOSE_WRITE)
+            {} //" opened for writing was closed"
+        if (pevent->mask & IN_CLOSE_NOWRITE)
+            {} //" not opened for writing was closed"
+        if (pevent->mask & IN_CREATE)
+            {} //" created in watched directory"
+        if (pevent->mask & IN_DELETE)
+            {} //" deleted from watched directory"
+        if (pevent->mask & IN_DELETE_SELF)
+            {} //"Watched file/directory was itself deleted"
+        if (pevent->mask & IN_MODIFY)
+            {} //" was modified"
+        if (pevent->mask & IN_MOVE_SELF)
+            {} //"Watched file/directory was itself moved"
+        if (pevent->mask & IN_MOVED_FROM)
+            {} //" moved out of watched directory"
+        if (pevent->mask & IN_MOVED_TO)
+            {} //" moved into watched directory"
+        if (pevent->mask & IN_OPEN)
+            {} //" was opened"
+
+        /*
+           printf ("wd=%d mask=%d cookie=%d len=%d dir=%s\n",
+           pevent->wd, pevent->mask, pevent->cookie, pevent->len,
+           (pevent->mask & IN_ISDIR)?"yes":"no");
+
+           if (pevent->len) printf ("name=%s\n", pevent->name);
+           */
+
+        dirChanged(pevent->name, "");
+
+        i += sizeof(struct inotify_event) + pevent->len;
+    }
+#endif
+}

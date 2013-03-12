@@ -12,6 +12,9 @@ public:
     Activity run();
 
 protected:
+    void onAttached();
+    void onDetached();
+
     Controller* m_controller;
 
     void processFiles(const char** files);

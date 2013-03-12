@@ -24,6 +24,7 @@ Rect OcherCanvas::draw(Pos*)
         g_fb->setFg(0x80, 0x80, 0x80);
         g_fb->fillRect(&m_rect);
         drawn = m_rect;
+        // TODO draw background texture
     } else {
         drawn.setInvalid();
     }
@@ -32,7 +33,7 @@ Rect OcherCanvas::draw(Pos*)
 
 int OcherCanvas::evtKey(struct OcherEvent* evt)
 {
-    if (evt->subtype == OEVT_KEY_DOWN) {
+    if (evt->key.subtype == OEVT_KEY_DOWN) {
         if (evt->key.key == OEVTK_POWER) {
             FontEngine fe;
             Rect r = g_fb->bbox;
@@ -51,7 +52,7 @@ int OcherCanvas::evtKey(struct OcherEvent* evt)
             g_fb->sync();
             sleep(1); // TODO seems hackish but sync doesn't wait long enough!
 
-            device->sleep();
+            g_device->sleep();
 
             g_fb->clear();
             dirty();
@@ -69,7 +70,7 @@ int OcherCanvas::evtMouse(struct OcherEvent*)
 
 int OcherCanvas::evtApp(struct OcherEvent* evt)
 {
-    if (evt->subtype == OEVT_APP_CLOSE) {
+    if (evt->app.subtype == OEVT_APP_CLOSE) {
         return ACTIVITY_QUIT;
     }
     return -2;

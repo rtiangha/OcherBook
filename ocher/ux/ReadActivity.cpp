@@ -16,15 +16,17 @@
 #define LOG_NAME "ocher.ux.Read"
 
 
-int ReadActivity::evtKey(struct OcherEvent* evt)
+// TODO: if (m_pagesSinceRefresh >= settings.fullRefreshPages) {
+
+int ReadActivity::evtKey(struct OcherKeyEvent* evt)
 {
     UiBits& ui = m_controller->ui;
     if (evt->subtype == OEVT_KEY_DOWN) {
-        if (evt->key.key == OEVTK_HOME) {
+        if (evt->key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
             // TODO  visually turn page down
             return ACTIVITY_HOME;
-        } else if (evt->key.key == OEVTK_LEFT || evt->key.key == OEVTK_UP || evt->key.key == OEVTK_PAGEUP) {
+        } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
@@ -33,7 +35,7 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
                 dirty();
             }
             return -1;
-        } else if (evt->key.key == OEVTK_RIGHT || evt->key.key == OEVTK_DOWN || evt->key.key == OEVTK_PAGEDOWN) {
+        } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
             clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (! atEnd) {
                 m_pageNum++;
@@ -47,12 +49,12 @@ int ReadActivity::evtKey(struct OcherEvent* evt)
     return -2;
 }
 
-int ReadActivity::evtMouse(struct OcherEvent* evt)
+int ReadActivity::evtMouse(struct OcherMouseEvent* evt)
 {
     UiBits& ui = m_controller->ui;
     if (evt->subtype == OEVT_MOUSE1_UP) {
-        if (ui.m_systemBar.m_rect.contains((Pos*)&evt->mouse) ||
-                ui.m_navBar.m_rect.contains((Pos*)&evt->mouse)) {
+        Pos pos(evt->x, evt->y);
+        if (ui.m_systemBar.m_rect.contains(&pos) || ui.m_navBar.m_rect.contains(&pos)) {
             if (ui.m_systemBar.m_flags & WIDGET_HIDDEN) {
                 clc::Log::info(LOG_NAME, "show system bar");
                 ui.m_systemBar.show();
@@ -70,7 +72,7 @@ int ReadActivity::evtMouse(struct OcherEvent* evt)
                 ui.m_navBar.hide();
                 dirty();
             } else {
-                if (evt->mouse.x < g_fb->width()/2) {
+                if (evt->x < g_fb->width()/2) {
                     if (m_pageNum > 0) {
                         clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
                         m_pageNum--;
@@ -113,14 +115,11 @@ Rect ReadActivity::draw(Pos*)
     return drawn;
 }
 
-Activity ReadActivity::run()
+void ReadActivity::onAttach()
 {
-    clc::Log::info(LOG_NAME, "run");
+    clc::Log::info(LOG_NAME, "attach");
     meta = m_controller->ctx.selected;
-    if (!meta) {
-        clc::Log::error(LOG_NAME, "No book selected");
-        return ACTIVITY_HOME;
-    }
+    ASSERT(meta);
     clc::Log::debug(LOG_NAME, "selected %p", meta);
 
     g_fb->clear();
@@ -194,30 +193,12 @@ Activity ReadActivity::run()
     m_pageNum = meta->record.activePage;
     clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
     dirty();
+}
 
-    int r;
-    while (1) {
-        if (m_pagesSinceRefresh >= settings.fullRefreshPages) {
-            m_pagesSinceRefresh = 0;
-            refresh(true);
-        } else {
-            refresh(false);
-        }
-
-        struct OcherEvent evt;
-        g_fb->sync();
-        g_loop->flush();
-        r = g_loop->wait(&evt);
-        if (r == 0) {
-            r = eventReceived(&evt);
-            if (r >= 0)
-                break;
-        }
-    }
+void ReadActivity::onDetach()
+{
     clc::Log::info(LOG_NAME, "Quitting on page %u", m_pageNum);
     meta->record.activePage = m_pageNum;
 
-    delete layout;
-
-    return (Activity)r;
+    // TODO delete layout;
 }

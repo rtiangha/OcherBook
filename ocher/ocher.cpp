@@ -48,7 +48,7 @@ void initLog()
 
 void initSettings()
 {
-    settings.load();
+    g_settings.load();
 }
 
 void initDebug()
@@ -56,14 +56,16 @@ void initDebug()
     // Before proceeding with startup and initializing the framebuffer, check for a killswitch.
     // Useful when needing to bail to native stack (such as OcherBook vs native stack init-ing
     // framebuffer in incompatible ways).
-    for (int i = 0; ; ++i) {
-        const char* lib = device->fs.m_libraries[i];
-        if (! lib)
-            break;
-        clc::Buffer killswitch(1, "%s/.ocher/kill", lib);
-        if (access(killswitch.c_str(), F_OK) == 0) {
-            fprintf(stderr, "OcherBook exiting because of '.ocher/kill' killswitch\n");
-            exit(1);
+    if (g_device->fs.m_libraries) {
+        for (int i = 0; ; ++i) {
+            const char* lib = g_device->fs.m_libraries[i];
+            if (! lib)
+                break;
+            clc::Buffer killswitch(1, "%s/.ocher/kill", lib);
+            if (access(killswitch.c_str(), F_OK) == 0) {
+                fprintf(stderr, "OcherBook exiting because of '.ocher/kill' killswitch\n");
+                exit(1);
+            }
         }
     }
 }
@@ -194,7 +196,7 @@ int main(int argc, char** argv)
     if (optind < argc) {
         opt.files = (const char**)&argv[optind];
     } else {
-        opt.files = device->fs.m_libraries;
+        opt.files = g_device->fs.m_libraries;
     }
     if (!opt.files || !opt.files[0]) {
         uiFactory->deinit();
@@ -206,6 +208,8 @@ int main(int argc, char** argv)
     if (bootMenu) {
         runBootMenu();
     }
+
+    g_device->fs.initWatches();
 
     Controller c;
     c.run();

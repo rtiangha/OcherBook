@@ -3,7 +3,7 @@
 #include "ocher/device/Device.h"
 #include "ocher/settings/Settings.h"
 
-Settings settings;
+Settings g_settings;
 
 
 Settings::Settings() :
@@ -35,7 +35,7 @@ Settings::Settings() :
 void Settings::load()
 {
     clc::File s;
-    if (s.setTo(device->fs.m_settings) != 0)
+    if (s.setTo(g_device->fs.m_settings) != 0)
         return;
 
     clc::Buffer line;
@@ -51,7 +51,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    clc::File s(device->fs.m_settings, "w");
+    clc::File s(g_device->fs.m_settings, "w");
 
     clc::Buffer b;
 

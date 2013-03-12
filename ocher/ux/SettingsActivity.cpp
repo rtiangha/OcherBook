@@ -5,7 +5,3 @@ SettingsActivity::SettingsActivity(Controller* c) :
 {
 }
 
-Activity SettingsActivity::run()
-{
-    return ACTIVITY_HOME;
-}

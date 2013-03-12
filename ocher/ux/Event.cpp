@@ -1,19 +1,25 @@
+#include <ev.h>
 #include "clc/support/Logger.h"
 
 #include "ocher/ux/Event.h"
 
+#define LOG_NAME "ocher.evt"
 
-int EventLoop::run(EventHandler* handler)
+
+EventLoop::EventLoop()
 {
-    struct OcherEvent evt;
-    while (wait(&evt) == 0) {
-        if (evt.type == OEVT_NONE) {
-            continue;
-        }
-        int r = handler->eventReceived(&evt);
-        if (r >= 0)
-            return r;
-    }
-    return -1;
+    evLoop = EV_DEFAULT;
 }
 
+EventLoop::~EventLoop()
+{
+}
+
+int EventLoop::run()
+{
+    clc::Log::debug(LOG_NAME, "ev_run");
+    ev_run(evLoop, 0);
+    clc::Log::debug(LOG_NAME, "ev_run done");
+
+    return 0;
+}

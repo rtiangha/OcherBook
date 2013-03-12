@@ -6,10 +6,12 @@
 SystemBar::SystemBar(Battery& battery) :
     Window(0, 0, g_fb->width(), 30 /* TODO */),
     m_sep(false),
-    m_batteryIcon(settings.smallSpace, 0, battery)
+    m_batteryIcon(g_settings.smallSpace, 0, battery),
+    m_clockIcon(g_fb->width()- 50, 0)
 {
     m_borderWidth = 0;
-    addChild(&m_batteryIcon);
+    addChild(m_batteryIcon);
+    addChild(m_clockIcon);
 
     // TODO title label, centered
 }

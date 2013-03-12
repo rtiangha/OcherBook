@@ -9,7 +9,9 @@ class SettingsActivity
 public:
     SettingsActivity(Controller* c);
 
-    Activity run();
+protected:
+    void onAttached();
+    void onDetached();
 
     Controller* m_controller;
 };

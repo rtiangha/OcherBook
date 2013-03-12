@@ -11,13 +11,22 @@
 #define WIDGET_DIRTY  4
 
 
-class Widget : public EventHandler
+/**
+ * Base class for all UI widgets
+ */
+class Widget
 {
 public:
     Widget(int x, int y, unsigned int w, unsigned int h);
     virtual ~Widget();
 
+    /**
+     * Adds a child (transfers ownership).
+     */
     void addChild(Widget* child);
+    /**
+     * Adds a child (does not transfer ownership).
+     */
     void addChild(Widget& child);
 
     void dirty();
@@ -30,15 +39,24 @@ public:
      */
     virtual Rect draw(Pos* pos) = 0;
 
-    int eventReceived(struct OcherEvent* evt);
-    virtual int evtKey(struct OcherEvent*) { return -2; }
-    virtual int evtMouse(struct OcherEvent*) { return -2; }
-    virtual int evtApp(struct OcherEvent*) { return -2; }
-    virtual int evtDevice(struct OcherEvent*) { return -2; }
+    virtual int evtKey(struct OcherKeyEvent*) { return -2; }
+    virtual int evtMouse(struct OcherMouseEvent*) { return -2; }
+    virtual int evtApp(struct OcherAppEvent*) { return -2; }
+    virtual int evtDevice(struct OcherDeviceEvent*) { return -2; }
 
     // TODO: abs or rel?
     Rect m_rect;
     unsigned int m_flags;
+
+    virtual void onAttached() {}
+    virtual void onDetached() {}
+
+    /**
+     * @return -1 handled, -2 pass on, >=0 done
+     */
+    int _onMouseEvent(struct OcherMouseEvent*);
+    void onMouseEvent(struct OcherMouseEvent*);
+
 protected:
     /**
      * @return Rectangle unioning all dirty rects, or !valid rect if all clean
@@ -57,8 +75,17 @@ public:
     ~Canvas() {}
 
     void refresh(bool full=false);
+    Rect draw(Pos* pos);
 
-protected:
+    void loop();
+};
+
+class Panel : public Widget
+{
+public:
+    Panel();
+    ~Panel() {}
+
     Rect draw(Pos* pos);
 };
 
@@ -101,8 +128,8 @@ public:
     virtual void drawLabel(Rect* rect);
 
 protected:
-    int evtKey(struct OcherEvent*);
-    int evtMouse(struct OcherEvent*);
+    int evtKey(struct OcherKeyEvent*);
+    int evtMouse(struct OcherMouseEvent*);
 
     int border;
     clc::Buffer m_label;

@@ -6,8 +6,7 @@
 UiFactoryFb::UiFactoryFb() :
     m_fb(0),
     m_ft(0),
-    m_render(0),
-    m_loop(0)
+    m_render(0)
 {
 }
 

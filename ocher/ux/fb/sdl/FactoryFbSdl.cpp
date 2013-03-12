@@ -21,7 +21,6 @@ bool UiFactoryFbSdl::init()
     if (fbSdl->init()) {
         m_fb = fbSdl;
         if (UiFactoryFb::init()) {
-            m_loop = new SdlLoop;
             return true;
         }
     }

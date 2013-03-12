@@ -6,7 +6,7 @@
 #include "ocher/fmt/epub/TreeMem.h"
 #include "ocher/settings/Settings.h"
 
-#define LOG_NAME "ocher.fmt.epubLayout"
+#define LOG_NAME "ocher.epub"
 
 
 // TODO:  meta should be attached to the bytecode
@@ -48,7 +48,7 @@ void LayoutEpub::processNode(mxml_node_t* node)
             int inc = 3 - (name[1]-'0');
             if (inc < 0)
                 inc = 0;
-            pushTextAttr(AttrSizeAbs, settings.fontPoints+inc*2);
+            pushTextAttr(AttrSizeAbs, g_settings.fontPoints+inc*2);
             processSiblings(node->child);
             popTextAttr(2);
             outputNl();

@@ -47,7 +47,7 @@ bool FreeType::init()
 
 bool FreeType::setFace(int i, int b)
 {
-    clc::Buffer file = settings.fontRoot;
+    clc::Buffer file = g_settings.fontRoot;
     i = i ? 1 : 0;
     b = b ? 1 : 0;
     file += "/";
