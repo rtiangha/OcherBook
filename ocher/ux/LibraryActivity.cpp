@@ -156,3 +156,17 @@ Rect LibraryActivity::draw(Pos*)
     return drawn;
 }
 
+void LibraryActivity::onAttached()
+{
+    clc::Log::info(LOG_NAME, "attached");
+
+    SystemBar& systemBar = m_controller->ui.m_systemBar;
+    systemBar.m_sep = false;
+    systemBar.m_title.clear();
+    systemBar.show();
+}
+
+void LibraryActivity::onDetached()
+{
+    clc::Log::info(LOG_NAME, "detached");
+}
