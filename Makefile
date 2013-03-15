@@ -148,7 +148,7 @@ LIBEV_LIB=$(LIBEV_DIR)/.libs/libev.a
 $(LIBEV_LIB):
 	$(QUIET)mkdir -p $(BUILD_DIR)
 	tar -zxf $(LIBEV_TGZ) -C $(BUILD_DIR)
-	cd $(LIBEV_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure
+	cd $(LIBEV_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure --host i686-linux --enable-static
 	cd $(LIBEV_DIR) && $(MAKE)
 
 INCS+=-I$(LIBEV_DIR)
@@ -423,7 +423,7 @@ dist-src: clean
 
 ####################
 
-clean: zlib_clean freetype_clean mxml_clean ocher_config_clean ocher_clean unittestpp_clean
+clean: zlib_clean freetype_clean mxml_clean libev_clean ocher_config_clean ocher_clean unittestpp_clean
 	rm -rf $(BUILD_DIR)/dist/
 
 doc:
