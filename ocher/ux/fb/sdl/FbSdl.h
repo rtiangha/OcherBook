@@ -19,6 +19,7 @@ public:
     unsigned int width();
     unsigned int dpi();
 
+    void setEventLoop(EventLoop* loop);
     void setFg(uint8_t r, uint8_t b, uint8_t g);
     void setBg(uint8_t r, uint8_t b, uint8_t g);
     void clear();
@@ -32,6 +33,7 @@ public:
 
 protected:
     SdlLoop m_loop;
+
     int m_sdl;
     SDL_Surface* m_screen;
     bool m_mustLock;

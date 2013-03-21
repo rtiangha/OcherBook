@@ -25,7 +25,8 @@ int ReadActivity::evtKey(struct OcherKeyEvent* evt)
         if (evt->key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
             // TODO  visually turn page down
-            return ACTIVITY_HOME;
+            m_controller->setNextActivity(ACTIVITY_HOME);
+            return -1;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
@@ -115,9 +116,9 @@ Rect ReadActivity::draw(Pos*)
     return drawn;
 }
 
-void ReadActivity::onAttach()
+void ReadActivity::onAttached()
 {
-    clc::Log::info(LOG_NAME, "attach");
+    clc::Log::info(LOG_NAME, "attached");
     meta = m_controller->ctx.selected;
     ASSERT(meta);
     clc::Log::debug(LOG_NAME, "selected %p", meta);
@@ -195,7 +196,7 @@ void ReadActivity::onAttach()
     dirty();
 }
 
-void ReadActivity::onDetach()
+void ReadActivity::onDetached()
 {
     clc::Log::info(LOG_NAME, "Quitting on page %u", m_pageNum);
     meta->record.activePage = m_pageNum;

@@ -44,7 +44,8 @@ int LibraryActivity::evtKey(struct OcherKeyEvent* evt)
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
             clc::Log::info(LOG_NAME, "home");
-            return ACTIVITY_HOME;
+            m_controller->setNextActivity(ACTIVITY_HOME);
+            return -1;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
@@ -74,7 +75,8 @@ int LibraryActivity::evtMouse(struct OcherMouseEvent* evt)
                 break;
             if (m_bookRects[i].contains(&pos)) {
                 m_controller->ctx.selected = meta;
-                return ACTIVITY_READ;
+                m_controller->setNextActivity(ACTIVITY_READ);
+                return -1;
             }
         }
         // TODO buttons
@@ -164,6 +166,8 @@ void LibraryActivity::onAttached()
     systemBar.m_sep = false;
     systemBar.m_title.clear();
     systemBar.show();
+
+    refresh();
 }
 
 void LibraryActivity::onDetached()

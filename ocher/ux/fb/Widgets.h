@@ -51,13 +51,15 @@ public:
     virtual void onAttached() {}
     virtual void onDetached() {}
 
+    void onMouseEvent(struct OcherMouseEvent*);
+    void onKeyEvent(struct OcherKeyEvent*);
+
+protected:
     /**
      * @return -1 handled, -2 pass on, >=0 done
      */
     int _onMouseEvent(struct OcherMouseEvent*);
-    void onMouseEvent(struct OcherMouseEvent*);
 
-protected:
     /**
      * @return Rectangle unioning all dirty rects, or !valid rect if all clean
      */
@@ -68,25 +70,17 @@ protected:
     // TODO focus
 };
 
-class Canvas : public Widget
-{
-public:
-    Canvas();
-    ~Canvas() {}
-
-    void refresh(bool full=false);
-    Rect draw(Pos* pos);
-
-    void loop();
-};
-
 class Panel : public Widget
 {
 public:
     Panel();
     ~Panel() {}
 
+    virtual void onAttached() = 0;
+    virtual void onDetached() = 0;
+
     Rect draw(Pos* pos);
+    void refresh(bool full=false);
 };
 
 #define OWF_CLOSE 1

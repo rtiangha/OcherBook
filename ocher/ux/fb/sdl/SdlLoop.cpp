@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include <SDL/SDL.h>
 
 #include "clc/support/Logger.h"
@@ -6,21 +7,34 @@
 
 #define LOG_NAME "ocher.sdl"
 
+
 SdlLoop::SdlLoop()
 {
     pipe(m_pipe);
-    // TODO nonblocking
+
+    int flags = fcntl(m_pipe[0], F_GETFL, 0);
+    fcntl(m_pipe[0], F_SETFL, flags | O_NONBLOCK);
 }
 
 SdlLoop::~SdlLoop()
 {
     ASSERT(!isAlive());
+    close(m_pipe[0]);
+    close(m_pipe[1]);
 }
 
-void SdlLoop::start(EventLoop* loop, clc::Monitor* monitor)
+void SdlLoop::setEventLoop(EventLoop* loop)
+{
+    m_loop = loop;
+
+    m_evtWatcher.data = this;
+    ev_io_init(&m_evtWatcher, fireEventsCb, m_pipe[0], EV_READ);
+    ev_io_start(m_loop->evLoop, &m_evtWatcher);
+}
+
+void SdlLoop::start(clc::Monitor* monitor)
 {
     ASSERT(!isAlive());
-    m_loop = loop;
     m_startupMonitor = monitor;
     clc::Thread::start();
 }
@@ -51,6 +65,43 @@ SDL_Surface* SdlLoop::init()
     return screen;
 }
 
+void SdlLoop::fireEventsCb(struct ev_loop*, ev_io* watcher, int)
+{
+    ((SdlLoop*)watcher->data)->fireEvents();
+}
+
+void SdlLoop::fireEvents()
+{
+    while (1) {
+        char c;
+        m_evtLock.lock();
+        read(m_pipe[0], &c, 1);
+        OcherEvent* evt = (OcherEvent*)m_evtQ.removeAt(0);
+        m_evtLock.unlock();
+        if (!evt)
+            break;
+        switch (evt->type) {
+            case OEVT_KEY:
+                clc::Log::debug(LOG_NAME, "keyEvent");
+                m_loop->keyEvent(&evt->key);
+                break;
+            case OEVT_MOUSE:
+                clc::Log::debug(LOG_NAME, "mouseEvent");
+                m_loop->mouseEvent(&evt->mouse);
+                break;
+            case OEVT_APP:
+                clc::Log::debug(LOG_NAME, "appEvent");
+                m_loop->appEvent(&evt->app);
+                break;
+            case OEVT_DEVICE:
+                clc::Log::debug(LOG_NAME, "deviceEvent");
+                m_loop->deviceEvent(&evt->device);
+                break;
+        };
+        delete evt;
+    }
+}
+
 void SdlLoop::run()
 {
     m_screen = init();
@@ -68,41 +119,38 @@ void SdlLoop::run()
             continue;
         }
 
-        OcherEvent evt;
-        memset(&evt, 0, sizeof(evt));
+        OcherEvent* evt = new OcherEvent;
         switch (event.type) {
             case SDL_ACTIVEEVENT:
             {
                 if (event.active.state & SDL_APPACTIVE) {
-                    evt.type = OEVT_APP;
+                    evt->type = OEVT_APP;
                     if (event.active.gain) {
-                        evt.app.subtype = OEVT_APP_ACTIVATE;
+                        evt->app.subtype = OEVT_APP_ACTIVATE;
                     } else {
-                        evt.app.subtype = OEVT_APP_DEACTIVATE;
+                        evt->app.subtype = OEVT_APP_DEACTIVATE;
                     }
-                    m_loop->appEvent(&evt.app);
                 }
                 break;
             }
             case SDL_QUIT:
             {
-                evt.type = OEVT_APP;
-                evt.app.subtype = OEVT_APP_CLOSE;
-                m_loop->appEvent(&evt.app);
+                evt->type = OEVT_APP;
+                evt->app.subtype = OEVT_APP_CLOSE;
                 break;
             }
             case SDL_KEYUP:
             {
-                evt.type = OEVT_KEY;
-                evt.key.subtype = OEVT_KEY_UP;
-                evt.key.key = event.key.keysym.sym;
+                evt->type = OEVT_KEY;
+                evt->key.subtype = OEVT_KEY_UP;
+                evt->key.key = event.key.keysym.sym;
                 break;
             }
             case SDL_KEYDOWN:
             {
-                evt.type = OEVT_KEY;
-                evt.key.subtype = OEVT_KEY_DOWN;
-                evt.key.key = event.key.keysym.sym;
+                evt->type = OEVT_KEY;
+                evt->key.subtype = OEVT_KEY_DOWN;
+                evt->key.key = event.key.keysym.sym;
                 break;
             }
             case SDL_MOUSEMOTION:
@@ -113,25 +161,29 @@ void SdlLoop::run()
             }
             case SDL_MOUSEBUTTONUP:
             {
-                evt.type = OEVT_MOUSE;
-                evt.mouse.x = event.button.x;
-                evt.mouse.y = event.button.y;
+                evt->type = OEVT_MOUSE;
+                evt->mouse.x = event.button.x;
+                evt->mouse.y = event.button.y;
                 if (event.button.button == SDL_BUTTON_LEFT) {
-                    evt.mouse.subtype = OEVT_MOUSE1_UP;
+                    evt->mouse.subtype = OEVT_MOUSE1_UP;
                 }
                 break;
             }
             case SDL_MOUSEBUTTONDOWN:
             {
-                evt.type = OEVT_MOUSE;
-                evt.mouse.x = event.button.x;
-                evt.mouse.y = event.button.y;
+                evt->type = OEVT_MOUSE;
+                evt->mouse.x = event.button.x;
+                evt->mouse.y = event.button.y;
                 if (event.button.button == SDL_BUTTON_LEFT) {
-                    evt.mouse.subtype = OEVT_MOUSE1_DOWN;
+                    evt->mouse.subtype = OEVT_MOUSE1_DOWN;
                 }
                 break;
             }
         }
+        m_evtLock.lock();
+        write(m_pipe[1], "", 1);
+        m_evtQ.add(evt);
+        m_evtLock.unlock();
     }
 }
 

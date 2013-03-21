@@ -5,3 +5,11 @@ SettingsActivity::SettingsActivity(Controller* c) :
 {
 }
 
+void SettingsActivity::onAttached()
+{
+}
+
+void SettingsActivity::onDetached()
+{
+}
+

@@ -36,6 +36,8 @@ public:
 
 protected:
     Activity m_activity;
+    Panel* m_activityPanel;
+
     HomeActivity m_homeActivity;
     LibraryActivity m_libraryActivity;
     ReadActivity m_readActivity;

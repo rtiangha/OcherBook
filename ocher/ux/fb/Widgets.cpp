@@ -89,33 +89,10 @@ void Widget::onMouseEvent(struct OcherMouseEvent* evt)
     _onMouseEvent(evt);
 }
 
-
-Canvas::Canvas() :
-    Widget(0, 0, g_fb->width(), g_fb->height())
+void Widget::onKeyEvent(struct OcherKeyEvent* evt)
 {
-}
-
-void Canvas::loop()
-{
-    g_loop->mouseEvent.Connect(this, &Widget::onMouseEvent);
-
-    g_loop->run();
-
-    g_loop->mouseEvent.Disconnect(this, &Widget::onMouseEvent);
-}
-
-
-void Canvas::refresh(bool full)
-{
-    clc::Log::debug(LOG_NAME, "refresh");
-    Rect drawn = draw(0);
-    if (drawn.valid())
-        g_fb->update(&drawn, full);
-}
-
-Rect Canvas::draw(Pos*)
-{
-    return drawChildren(m_rect.pos());
+    // TODO
+    evtKey(evt);
 }
 
 
@@ -137,6 +114,14 @@ Rect Panel::draw(Pos*)
         drawn = drawChildren(m_rect.pos());
     }
     return drawn;
+}
+
+void Panel::refresh(bool full)
+{
+    clc::Log::debug(LOG_NAME, "refresh");
+    Rect drawn = draw(NULL);
+    if (drawn.valid())
+        g_fb->update(&drawn, full);
 }
 
 

@@ -25,7 +25,7 @@ enum Activity {
 /**
  * Optional backdrop, available to all Activities.
  */
-class OcherCanvas : public Canvas
+class OcherCanvas : public Panel
 {
 public:
     OcherCanvas();

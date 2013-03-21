@@ -143,7 +143,7 @@ zlib_clean:
 LIBEV_VER=4.11
 LIBEV_TGZ=$(DL_DIR)/libev-$(LIBEV_VER).tar.gz
 LIBEV_DIR=$(BUILD_DIR)/libev-$(LIBEV_VER)
-LIBEV_LIB=$(LIBEV_DIR)/.libs/libev.a
+LIBEV_LIB=$(LIBEV_DIR)/.libs/ev.o
 
 $(LIBEV_LIB):
 	$(QUIET)mkdir -p $(BUILD_DIR)

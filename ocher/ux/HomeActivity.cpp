@@ -77,11 +77,13 @@ int HomeActivity::evtMouse(struct OcherMouseEvent* evt)
                 g_fb->update(&r);
                 g_fb->sync();
                 m_controller->ctx.selected = meta;
-                return ACTIVITY_READ;
+                m_controller->setNextActivity(ACTIVITY_READ);
+                return -1;
             }
         }
         if (m_browseLabel.contains(&pos)) {
-            return ACTIVITY_LIBRARY;
+            m_controller->setNextActivity(ACTIVITY_LIBRARY);
+            return -1;
         }
         // TODO: look at shortlist
     }
@@ -208,6 +210,8 @@ void HomeActivity::onAttached()
     systemBar.m_sep = false;
     systemBar.m_title.clear();
     systemBar.show();
+
+    refresh();
 }
 
 void HomeActivity::onDetached()

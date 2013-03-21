@@ -4,12 +4,12 @@
 #include "ocher/ux/Activity.h"
 
 
-class SyncActivity
+class SyncActivity : public Panel
 {
 public:
     SyncActivity(Controller* c);
 
-    Activity run();
+    Rect draw(Pos* pos);
 
 protected:
     void onAttached();

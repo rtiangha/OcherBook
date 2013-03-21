@@ -4,7 +4,7 @@
 #include "ocher/ux/Activity.h"
 
 
-class SettingsActivity
+class SettingsActivity : public Panel
 {
 public:
     SettingsActivity(Controller* c);

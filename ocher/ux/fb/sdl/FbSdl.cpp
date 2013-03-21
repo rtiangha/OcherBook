@@ -26,11 +26,15 @@ FbSdl::~FbSdl()
         SDL_Quit();
 }
 
+void FbSdl::setEventLoop(EventLoop* loop)
+{
+    m_loop.setEventLoop(loop);
+}
+
 bool FbSdl::init()
 {
     clc::Monitor startupMonitor;
-    m_loop.start(g_loop, &startupMonitor);
-
+    m_loop.start(&startupMonitor);
     startupMonitor.lock();
     startupMonitor.wait();
     m_screen = m_loop.getScreen();

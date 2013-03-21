@@ -78,6 +78,7 @@ struct OcherAppEvent
 // TODO: timestamp
 struct OcherEvent
 {
+    OcherEvent() : type(OEVT_NONE) {}
     uint8_t type;
     union {
         struct OcherKeyEvent key;

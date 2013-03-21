@@ -4,20 +4,23 @@
 #include "ocher/ux/Activity.h"
 
 
-class SelectCanvas : public Canvas
+class SelectPanel : public Panel
 {
 public:
-    SelectCanvas();
+    SelectPanel();
 
     int evtMouse(struct OcherMouseEvent*);
     Rect draw(Pos* pos);
+
+    void onAttached() {}
+    void onDetached() {}
 
 protected:
     void highlight(int i);
     Rect apps[2];
 };
 
-SelectCanvas::SelectCanvas()
+SelectPanel::SelectPanel()
 {
     float ratio = 1.6;
     int w = g_fb->width();
@@ -34,7 +37,7 @@ SelectCanvas::SelectCanvas()
     apps[1].y = apps[0].y;
 }
 
-void SelectCanvas::highlight(int i)
+void SelectPanel::highlight(int i)
 {
     Rect r = apps[i];
     for (int n = 0; n < 4; ++n) {
@@ -45,7 +48,7 @@ void SelectCanvas::highlight(int i)
     g_fb->sync();
 }
 
-int SelectCanvas::evtMouse(struct OcherMouseEvent* evt)
+int SelectPanel::evtMouse(struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
@@ -60,7 +63,7 @@ int SelectCanvas::evtMouse(struct OcherMouseEvent* evt)
     return -1;
 }
 
-Rect SelectCanvas::draw(Pos*)
+Rect SelectPanel::draw(Pos*)
 {
     Rect r = g_fb->bbox;
 
@@ -100,7 +103,7 @@ void runBootMenu()
     sleep(1);
 #endif
 
-    SelectCanvas c;
+    SelectPanel c;
     // TODO
     g_fb->sync();
 }

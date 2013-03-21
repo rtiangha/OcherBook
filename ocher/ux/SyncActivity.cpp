@@ -15,16 +15,7 @@
 #define LOG_NAME "ocher.ux.Sync"
 
 
-class SyncCanvas : public Canvas
-{
-public:
-    SyncCanvas() {}
-    ~SyncCanvas() {}
-
-    Rect draw(Pos* pos);
-};
-
-Rect SyncCanvas::draw(Pos*)
+Rect SyncActivity::draw(Pos*)
 {
     Rect drawn;
     if (m_flags & WIDGET_DIRTY) {
@@ -80,13 +71,19 @@ SyncActivity::SyncActivity(Controller* c) :
 {
 }
 
-Activity SyncActivity::run()
+void SyncActivity::onAttached()
 {
-    clc::Log::info(LOG_NAME, "run");
-    SyncCanvas c;
-    c.refresh();
+    clc::Log::info(LOG_NAME, "attached");
+
+    refresh();
 
     processFiles(opt.files);
 
-    return ACTIVITY_HOME;
+    m_controller->setNextActivity(ACTIVITY_HOME);
 }
+
+void SyncActivity::onDetached()
+{
+    clc::Log::info(LOG_NAME, "detached");
+}
+

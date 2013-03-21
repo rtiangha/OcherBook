@@ -3,24 +3,21 @@
 
 #include "clc/data/Buffer.h"
 #include "ocher/ux/Activity.h"
-#include "ocher/ux/fb/Widgets.h"
 
 
 class Renderer;
 
-class ReadActivity : public Canvas
+class ReadActivity : public Panel
 {
 public:
     ReadActivity(Controller* c);
-
-    Activity run();
 
 protected:
     int evtKey(struct OcherKeyEvent*);
     int evtMouse(struct OcherMouseEvent*);
 
-    void onAttach();
-    void onDetach();
+    void onAttached();
+    void onDetached();
 
     Rect draw(Pos* pos);
 

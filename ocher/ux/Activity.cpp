@@ -68,11 +68,8 @@ int OcherCanvas::evtMouse(struct OcherEvent*)
     return -2;
 }
 
-int OcherCanvas::evtApp(struct OcherEvent* evt)
+int OcherCanvas::evtApp(struct OcherEvent*)
 {
-    if (evt->app.subtype == OEVT_APP_CLOSE) {
-        return ACTIVITY_QUIT;
-    }
     return -2;
 }
 
