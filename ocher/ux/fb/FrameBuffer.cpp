@@ -156,10 +156,10 @@ void FrameBuffer::rect(Rect* r)
 
 void FrameBuffer::roundRect(Rect* r, unsigned int radius)
 {
-    hline(r->x+radius, r->y, r->x+r->w-1-(radius<<1));
-    hline(r->x+radius, r->y+r->h-1, r->x+r->w-1-(radius<<1));
-    vline(r->x, r->y+radius, r->y+r->h-1-(radius<<1));
-    vline(r->x+r->w-1, r->y+radius, r->y+r->h-1-(radius<<1));
+    hline(r->x+radius, r->y, r->x+r->w-1-radius);
+    hline(r->x+radius, r->y+r->h-1, r->x+r->w-1-radius);
+    vline(r->x, r->y+radius, r->y+r->h-1-radius);
+    vline(r->x+r->w-1, r->y+radius, r->y+r->h-1-radius);
     if (radius > 1) {
         // TODO
     }
