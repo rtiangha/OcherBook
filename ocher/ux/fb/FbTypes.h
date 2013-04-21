@@ -15,7 +15,7 @@ struct Rect {
     int16_t x, y;
     uint16_t w, h;
 
-    Rect() {}
+    Rect() { setInvalid(); }
     Rect(int16_t _x, int16_t _y, uint16_t _w, uint16_t _h) : x(_x), y(_y), w(_w), h(_h) {}
     Pos* pos() { return (Pos*)this; }
     void offsetBy(Pos* p) { x += p->x; y += p->y; }

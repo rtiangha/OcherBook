@@ -3,6 +3,7 @@
 
 #include <linux/mxcfb.h>
 
+#include "ocher/device/kobo/KoboEvents.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 
 class Mx50Fb : public FrameBuffer
@@ -17,6 +18,7 @@ public:
     unsigned int width();
     unsigned int dpi();
 
+    void setEventLoop(EventLoop* loop) { m_events.setEventLoop(loop); }
     void setFg(uint8_t r, uint8_t b, uint8_t g);
     void setBg(uint8_t r, uint8_t b, uint8_t g);
     void clear();
@@ -39,6 +41,8 @@ public:
     void setAutoUpdateMode(bool autoUpdate);
 
 protected:
+    KoboEvents m_events;
+
     int m_fd;
     char* m_fb;
     size_t m_fbSize;

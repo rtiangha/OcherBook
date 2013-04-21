@@ -8,24 +8,14 @@
 #define BWIDTH 25   // width  of battery bounding box
 
 BatteryIcon::BatteryIcon(int x, int y, Battery& battery) :
-    Widget(x, y, 30, 30), //BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
+    Widget(x, y, 30, 29), //BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
     m_battery(battery)
 {
 }
 
-Rect BatteryIcon::draw(Pos* pos)
+void BatteryIcon::draw()
 {
     Rect rect(m_rect);
-    rect.offsetBy(pos);
-
-    if (! (m_flags & WIDGET_DIRTY)) {
-        // not bothering with children...
-        Rect drawn;
-        drawn.setInvalid();
-        return drawn;
-    }
-    m_flags &= ~WIDGET_DIRTY;
-
     g_fb->setFg(0xff, 0xff, 0xff);
     g_fb->fillRect(&rect);
     rect.y += 8;
@@ -40,9 +30,6 @@ Rect BatteryIcon::draw(Pos* pos)
     rect.w /= 100;
 
     g_fb->fillRect(&rect);
-
-    Rect drawn = rect;
-    return drawn;
 }
 
 void BatteryIcon::onUpdate()

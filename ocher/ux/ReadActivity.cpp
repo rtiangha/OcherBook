@@ -33,7 +33,7 @@ int ReadActivity::evtKey(struct OcherKeyEvent* evt)
                 m_pageNum--;
                 ui.m_systemBar.hide();
                 ui.m_navBar.hide();
-                dirty();
+                invalidate();
             }
             return -1;
         } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
@@ -42,7 +42,7 @@ int ReadActivity::evtKey(struct OcherKeyEvent* evt)
                 m_pageNum++;
                 ui.m_systemBar.hide();
                 ui.m_navBar.hide();
-                dirty();
+                invalidate();
             }
             return -1;
         }
@@ -71,19 +71,19 @@ int ReadActivity::evtMouse(struct OcherMouseEvent* evt)
                 clc::Log::info(LOG_NAME, "hide system bar");
                 ui.m_systemBar.hide();
                 ui.m_navBar.hide();
-                dirty();
+                invalidate();
             } else {
                 if (evt->x < g_fb->width()/2) {
                     if (m_pageNum > 0) {
                         clc::Log::info(LOG_NAME, "back from page %d", m_pageNum);
                         m_pageNum--;
-                        dirty();
+                        invalidate();
                     }
                 } else {
                     if (!atEnd) {
                         clc::Log::info(LOG_NAME, "forward from page %d", m_pageNum);
                         m_pageNum++;
-                        dirty();
+                        invalidate();
                     }
                 }
             }
@@ -97,23 +97,14 @@ ReadActivity::ReadActivity(Controller* c) :
     m_controller(c),
     m_pagesSinceRefresh(0)
 {
+    maximize();
 }
 
-Rect ReadActivity::draw(Pos*)
+void ReadActivity::draw()
 {
-    Rect drawn;
-    drawn.setInvalid();
-
-    if (m_flags & WIDGET_DIRTY) {
-        clc::Log::info(LOG_NAME, "draw");
-        m_flags &= ~WIDGET_DIRTY;
-        drawn = m_rect;
-        m_pagesSinceRefresh++;
-        atEnd = renderer->render(&meta->m_pagination, m_pageNum, true);
-    }
-    Rect d2 = drawChildren(m_rect.pos());
-    drawn.unionRect(&d2);
-    return drawn;
+    clc::Log::debug(LOG_NAME, "draw");
+    m_pagesSinceRefresh++;
+    atEnd = renderer->render(&meta->m_pagination, m_pageNum, true);
 }
 
 void ReadActivity::onAttached()
@@ -193,7 +184,7 @@ void ReadActivity::onAttached()
     meta->record.touch();
     m_pageNum = meta->record.activePage;
     clc::Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
-    dirty();
+    invalidate();
 }
 
 void ReadActivity::onDetached()

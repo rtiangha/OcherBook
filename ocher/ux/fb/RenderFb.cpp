@@ -311,7 +311,7 @@ done:
     unsigned int ms = usec/1000;
     if (ms == 0)
         ms = 1;
-    clc::Log::info(LOG_NAME, "page %u %s; %u chars in %u ms, %u cps, avg %u cps", pageNum,
+    clc::Log::debug(LOG_NAME, "page %u %s; %u chars in %u ms, %u cps, avg %u cps", pageNum,
             r == 0 ? "break" : "done",
             chars, ms, (unsigned int)(chars*1000/ms),
             (unsigned int)(totalChars*1000/((totalUSec<1000?1000:totalUSec)/1000)));

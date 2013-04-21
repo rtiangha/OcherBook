@@ -74,7 +74,7 @@ ifneq ($(OCHER_TARGET),haiku)
 endif
 
 # Additional CFLAGS for ocher
-OCHER_CFLAGS=--include $(BUILD_DIR)/ocher_config.h -Wall -W -Wformat=2 -Wno-write-strings -Wshadow
+OCHER_CFLAGS=--include $(BUILD_DIR)/ocher_config.h -Wall -W -Wformat=2 -Wno-write-strings
 ifeq ($(OCHER_DEV),1)
 	OCHER_CFLAGS+=-Werror
 endif
@@ -143,12 +143,12 @@ zlib_clean:
 LIBEV_VER=4.11
 LIBEV_TGZ=$(DL_DIR)/libev-$(LIBEV_VER).tar.gz
 LIBEV_DIR=$(BUILD_DIR)/libev-$(LIBEV_VER)
-LIBEV_LIB=$(LIBEV_DIR)/.libs/ev.o
+LIBEV_LIB=$(LIBEV_DIR)/.libs/libev.a
 
 $(LIBEV_LIB):
 	$(QUIET)mkdir -p $(BUILD_DIR)
 	tar -zxf $(LIBEV_TGZ) -C $(BUILD_DIR)
-	cd $(LIBEV_DIR) && CFLAGS="$(CFLAGS_COMMON)" CC=$(CC) ./configure --host i686-linux --enable-static
+	cd $(LIBEV_DIR) && CFLAGS="$(CFLAGS_COMMON) -static" CC=$(CC) ./configure --host i686-linux --enable-static
 	cd $(LIBEV_DIR) && $(MAKE)
 
 INCS+=-I$(LIBEV_DIR)

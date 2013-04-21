@@ -9,7 +9,7 @@ class ClockIcon : public Widget
 public:
     ClockIcon(int x, int y);
 
-    Rect draw(Pos* pos);
+    void draw();
 
     void onActivate(bool active);
 

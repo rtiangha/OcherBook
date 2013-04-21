@@ -15,30 +15,33 @@
 #define LOG_NAME "ocher.ux.Sync"
 
 
-Rect SyncActivity::draw(Pos*)
+class SyncActivityWork : public EventWork
 {
-    Rect drawn;
-    if (m_flags & WIDGET_DIRTY) {
-        clc::Log::debug(LOG_NAME, "draw");
-        m_flags &= ~WIDGET_DIRTY;
-        g_fb->setFg(0xff, 0xff, 0xff);
-        g_fb->fillRect(&m_rect);
-        drawn = m_rect;
-    } else {
-        drawn.setInvalid();
+public:
+    SyncActivityWork(Controller* controller, const char** files) :
+        EventWork(Screen::m_loop),
+        m_files(files),
+        m_controller(controller)
+    {
     }
-    return drawn;
-}
 
-void SyncActivity::processFiles(const char** files)
+protected:
+    const char** m_files;
+    Controller* m_controller;
+    void work();
+    void processFile(const char* file);
+    void notify();
+};
+
+void SyncActivityWork::work()
 {
-    for (const char* file = *files; file; file = *++files) {
+    clc::Log::info(LOG_NAME "Work", "working");
+    for (const char* file = *m_files; file; file = *++m_files) {
         processFile(file);
     }
-    m_controller->ctx.library.notify();
 }
 
-void SyncActivity::processFile(const char* file)
+void SyncActivityWork::processFile(const char* file)
 {
     struct stat s;
     if (stat(file, &s)) {
@@ -66,24 +69,43 @@ void SyncActivity::processFile(const char* file)
     }
 }
 
+void SyncActivityWork::notify()
+{
+    clc::Log::info(LOG_NAME "Work", "notify");
+    m_controller->ctx.library.notify();
+    m_controller->setNextActivity(ACTIVITY_HOME);
+}
+
+
+void SyncActivity::draw()
+{
+    clc::Log::debug(LOG_NAME, "draw");
+    g_fb->setFg(0xff, 0xff, 0xff);
+    g_fb->fillRect(&m_rect);
+}
+
 SyncActivity::SyncActivity(Controller* c) :
     m_controller(c)
 {
+    maximize();
+
+    int w = m_rect.w / 8;
+    m_spinner.setRect(m_rect.w/2 - w/2, m_rect.h/2 - w-2, w, w);
+    addChild(m_spinner);
 }
 
 void SyncActivity::onAttached()
 {
     clc::Log::info(LOG_NAME, "attached");
-
-    refresh();
-
-    processFiles(opt.files);
-
-    m_controller->setNextActivity(ACTIVITY_HOME);
+    m_work = new SyncActivityWork(m_controller, opt.files);
+    m_spinner.start();
+    invalidate();
 }
 
 void SyncActivity::onDetached()
 {
     clc::Log::info(LOG_NAME, "detached");
+    delete m_work;
+    m_spinner.stop();
 }
 

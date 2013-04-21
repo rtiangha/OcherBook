@@ -1,13 +1,29 @@
+test on kobo
+    boot menu doesn't always show
+fb can get garbled
+    related to killall animator?
+utility menu: reboot, boot to nickel, ...
+sleep:
+    can't wake up sometimes
+    clear event q when waking
+not SINGLE_THREADED
+"Attempted recursive use of the logger"
+SystemBar is always showing while reading
+
+
+remove drawing directly in evt callbacks (HomeActivity::evtMouse, g_fb->update, ...)
+beware adding child multiple times / removeChild for shared
+position - abs, rel, .....???!!!
 finish wiring events into libev, fire via signal/slot
-    Kobo
     inotify for card in Filesystem
     power saver
     periodically refresh battery icon
-Controller
-    Activities: onAttached, onDetached
+widgets shouldn't hit g_fb; use screen
+
+windows should have their own fg/bg colors, not the fb
+fix SDL shutdown (#39)
 ioc:
     g_*
-power button not working
 
 persist user state
     json?
@@ -26,6 +42,8 @@ clean up website
 downloadable builds
 
 
+support USB keyboard
+dvi
 clean up object model:
     LibraryActivity
         nav buttons - impl as Widgets; fade disabled

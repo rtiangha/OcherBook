@@ -1,14 +1,69 @@
 #ifndef OCHER_FB_WIDGETS_H
 #define OCHER_FB_WIDGETS_H
 
+#include <ev.h>
 #include "clc/data/List.h"
 #include "clc/data//Buffer.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/Event.h"
 
-#define WIDGET_HIDDEN 1
+#define WIDGET_HIDDEN 1  ///< draw will not be called
 #define WIDGET_OWNED  2
 #define WIDGET_DIRTY  4
+
+
+class Widget;
+
+class Screen
+{
+public:
+    /**
+     * @param rect  absolute coords
+     */
+    Screen();
+    ~Screen();
+
+    void setFrameBuffer(FrameBuffer* fb);
+    void setEventLoop(EventLoop* loop);
+
+    /**
+     * Adds a child (transfers ownership).
+     */
+    void addChild(Widget* child);
+
+    /**
+     * Adds a child (does not transfer ownership).
+     */
+    void addChild(Widget& child);
+
+    void removeChild(Widget* child);
+
+    void onMouseEvent(struct OcherMouseEvent*);
+    void onKeyEvent(struct OcherKeyEvent*);
+
+    static EventLoop* m_loop;
+
+protected:
+    /**
+     * Updates the screen:  Causes all invalidated widgets to redraw, and blits to the framebuffer.
+     * Done periodically automatically
+     */
+    void update();
+
+    clc::List m_invalidRects;
+
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+    static void readyToIdle(EV_P_ ev_prepare* p, int revents);
+    static void waking(EV_P_ ev_check* c, int revents);
+
+    FrameBuffer* m_fb;
+    ev_timer m_timer;
+    ev_prepare m_evPrepare;
+    ev_check m_evCheck;
+
+    Rect m_rect;
+    clc::List m_children;
+};
 
 
 /**
@@ -17,6 +72,7 @@
 class Widget
 {
 public:
+    Widget();
     Widget(int x, int y, unsigned int w, unsigned int h);
     virtual ~Widget();
 
@@ -29,16 +85,33 @@ public:
      */
     void addChild(Widget& child);
 
-    void dirty();
     void hide() { m_flags |= WIDGET_HIDDEN; }
     void show() { m_flags &= ~WIDGET_HIDDEN; }
 
-    /**
-     * @param pos  Absolute position to draw at
-     * @return Rectangle unioning all dirty rects (this and children), or !valid rect if all clean
-     */
-    virtual Rect draw(Pos* pos) = 0;
+    void setRect(int x, int y, int w, int h) { m_rect.x = x; m_rect.y = y; m_rect.w = w; m_rect.h = h; }
+    void setPos(int x, int y);
+    void setSize(int w, int h);
+    void resize(int dx, int dy);
 
+    /**
+     * Invalidates the widget, so that it will be redrawn.
+     */
+    void invalidate();
+
+    /**
+     * Invalidates a portion of the widget, so that it will be redrawn.
+     * @param rect Widget-relative rectangle to invalidate
+     */
+    virtual void invalidate(Rect* rect);
+
+    /**
+     */
+    virtual void draw() = 0;
+    Rect drawChildren();
+
+    /**
+     * @return -1 handled, -2 pass on, >=0 done
+     */
     virtual int evtKey(struct OcherKeyEvent*) { return -2; }
     virtual int evtMouse(struct OcherMouseEvent*) { return -2; }
     virtual int evtApp(struct OcherAppEvent*) { return -2; }
@@ -51,36 +124,10 @@ public:
     virtual void onAttached() {}
     virtual void onDetached() {}
 
-    void onMouseEvent(struct OcherMouseEvent*);
-    void onKeyEvent(struct OcherKeyEvent*);
-
 protected:
-    /**
-     * @return -1 handled, -2 pass on, >=0 done
-     */
-    int _onMouseEvent(struct OcherMouseEvent*);
-
-    /**
-     * @return Rectangle unioning all dirty rects, or !valid rect if all clean
-     */
-    Rect drawChildren(Pos* pos);
-
     Widget* m_parent;
     clc::List m_children;
     // TODO focus
-};
-
-class Panel : public Widget
-{
-public:
-    Panel();
-    ~Panel() {}
-
-    virtual void onAttached() = 0;
-    virtual void onDetached() = 0;
-
-    Rect draw(Pos* pos);
-    void refresh(bool full=false);
 };
 
 #define OWF_CLOSE 1
@@ -88,16 +135,18 @@ public:
 class Window : public Widget
 {
 public:
+    Window();
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window();
 
-    virtual Rect draw(Pos* pos);
+    void draw();
     virtual void drawBorder(Rect* rect);
     virtual void drawTitle(Rect* rect);
     virtual void drawBg(Rect* rect);
     virtual void drawContent(Rect* rect);
 
     void setTitle(const char* title);
+    void maximize();
 
     uint32_t m_bgColor;
     uint32_t m_borderColor;
@@ -117,7 +166,7 @@ public:
 
     void setLabel(const char* label);
 
-    virtual Rect draw(Pos* pos);
+    void draw();
     virtual void drawBorder(Rect* rect);
     virtual void drawLabel(Rect* rect);
 
@@ -142,13 +191,28 @@ class Menu : public Widget
 };
 #endif
 
-#if 0
+
+/**
+ * @todo listen for powerdown event, stop spinning
+ */
 class Spinner : public Widget
 {
-    state;
-    speed;
+public:
+    Spinner();
+    Spinner(int x, int y, unsigned int w, unsigned int h);
+    ~Spinner();
+    void start();
+    void stop();
+    void draw();
+
+protected:
+    unsigned int m_state;
+    unsigned int m_steps;
+    unsigned int m_delayMs;
+
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+    ev_timer m_timer;
 };
-#endif
 
 #if 0
 class TextEntry : public Window
@@ -187,7 +251,7 @@ public:
     Icon(int x, int y, Bitmap* _bmp) : Widget(x, y, _bmp->w, _bmp->h), bmp(_bmp) {}
     virtual ~Icon() {}
 
-    virtual Rect draw(Pos* pos);
+    void draw();
 
     Bitmap* bmp;
 };

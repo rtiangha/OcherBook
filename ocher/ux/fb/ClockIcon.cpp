@@ -7,14 +7,9 @@ ClockIcon::ClockIcon(int x, int y) :
 {
 }
 
-Rect ClockIcon::draw(Pos* pos)
+void ClockIcon::draw()
 {
-    Rect rect(m_rect);
-    rect.offsetBy(pos);
-
     // TODO
-
-    return m_rect;
 }
 
 void ClockIcon::onActivate(bool active)

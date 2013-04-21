@@ -23,23 +23,6 @@ enum Activity {
 
 
 /**
- * Optional backdrop, available to all Activities.
- */
-class OcherCanvas : public Panel
-{
-public:
-    OcherCanvas();
-    ~OcherCanvas();
-
-    int evtKey(struct OcherEvent* evt);
-    int evtMouse(struct OcherEvent* evt);
-    int evtApp(struct OcherEvent* evt);
-    int evtDevice(struct OcherEvent* evt);
-
-    Rect draw(Pos* pos=0);
-};
-
-/**
  * Optional shared UI components, available to all Activities.
  */
 class UiBits

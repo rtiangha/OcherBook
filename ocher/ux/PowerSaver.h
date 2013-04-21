@@ -1,20 +1,30 @@
 #ifndef OCHER_DEV_POWER_SAVER_H
 #define OCHER_DEV_POWER_SAVER_H
 
+#include "Signals/Signal.h"
+using namespace Gallant;
+
+#include "ocher/ux/fb/Widgets.h"
 #include "ocher/ux/Event.h"
 
 class Device;
 
 
-class PowerSaver
+class PowerSaver : public Window
 {
 public:
     PowerSaver();
 
     void setEventLoop(EventLoop* loop);
     void setDevice(Device* device);
-
     void setTimeout(unsigned int seconds);
+
+    Signal0<> wantToSleep;
+
+    void sleep();
+
+    void onAttached();
+    void onDetached();
 
 protected:
     void resetTimeout();

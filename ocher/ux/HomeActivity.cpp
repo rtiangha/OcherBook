@@ -15,6 +15,8 @@ HomeActivity::HomeActivity(Controller* c) :
     m_controller(c),
     coverRatio(1.6)
 {
+    maximize();
+
     SystemBar& systemBar = m_controller->ui.m_systemBar;
     addChild(systemBar);
 
@@ -90,103 +92,93 @@ int HomeActivity::evtMouse(struct OcherMouseEvent* evt)
     return -1;
 }
 
-Rect HomeActivity::draw(Pos*)
+void HomeActivity::draw()
 {
-    Rect drawn;
-    drawn.setInvalid();
+    clc::Log::debug(LOG_NAME, "draw");
 
-    if (m_flags & WIDGET_DIRTY) {
-        clc::Log::debug(LOG_NAME, "draw");
-        m_flags &= ~WIDGET_DIRTY;
-        drawn = m_rect;
+    g_fb->setFg(0xff, 0xff, 0xff);
+    g_fb->fillRect(&m_rect);
+    g_fb->setFg(0, 0, 0);
 
-        g_fb->setFg(0xff, 0xff, 0xff);
-        g_fb->fillRect(&m_rect);
+    FontEngine fe;
+    fe.setSize(12);
+    fe.apply();
+    Rect r;
+    Pos pos;
+    const clc::List& metas = m_controller->ctx.library.getList();
+    for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
+        r = books[i];
+        r.inset(-1);
+        g_fb->rect(&r);
+        r.inset(-1);
+        g_fb->roundRect(&r, 1);
+        r.inset(2);
+
+        Meta* meta = (Meta*)metas.itemAt(i);
+        uint8_t c = meta ? 0xf0 : 0xd0;
+        g_fb->setFg(c, c, c);
+        g_fb->fillRect(&r);
         g_fb->setFg(0, 0, 0);
-
-        FontEngine fe;
-        fe.setSize(12);
-        fe.apply();
-        Rect r;
-        Pos pos;
-        const clc::List& metas = m_controller->ctx.library.getList();
-        for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
-            r = books[i];
-            r.inset(-1);
-            g_fb->rect(&r);
-            r.inset(-1);
-            g_fb->roundRect(&r, 1);
+        if (meta) {
+            pos.x = 0;
+            pos.y = fe.m_cur.ascender;
             r.inset(2);
-
-            Meta* meta = (Meta*)metas.itemAt(i);
-            uint8_t c = meta ? 0xf0 : 0xd0;
-            g_fb->setFg(c, c, c);
-            g_fb->fillRect(&r);
-            g_fb->setFg(0, 0, 0);
-            if (meta) {
-                pos.x = 0;
-                pos.y = fe.m_cur.ascender;
-                r.inset(2);
-                fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_YCLIP | FE_WRAP);
-            }
+            fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_YCLIP | FE_WRAP);
         }
-
-        fe.setSize(18);
-        fe.apply();
-        pos.x = 0; pos.y = 100;
-        fe.renderString("HOME", 4, &pos, &m_rect, FE_XCENTER);
-
-        // Shortlist
-        fe.setSize(14);
-        fe.apply();
-        pos.x = books[0].x;
-        pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_settings.smallSpace;
-        fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
-
-        // TODO simplify, abstract into labels
-        {
-            fe.setSize(12);
-            fe.setItalic(1);
-            fe.apply();
-            Rect lbox;
-            lbox.x = 0;
-            lbox.y = pos.y;
-            Glyph* glyphs[13];
-            const char* text = "Browse all...";
-            fe.plotString(text, strlen(text), &glyphs[0], &lbox);
-            // TODO  right justify against lbox (remove plotString call); get bbox returned
-            pos.x = m_rect.w - books[0].x - lbox.w;
-            fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
-            m_browseLabel.inset(-g_settings.smallSpace);
-        }
-
-        pos.y += fe.m_cur.underlinePos + g_settings.smallSpace;
-        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
-        pos.y++;
-        g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
-
-        pos.x = books[0].x;
-        pos.y += g_settings.smallSpace;
-
-        {
-            const clc::List& shortList = m_controller->ctx.shortList.getList();
-            int margin = books[0].x;
-
-            int h = m_rect.y + m_rect.h - pos.y - margin;
-            int w = h / coverRatio;
-            Rect sl(pos.x, pos.y, w, h);
-            while (sl.x + sl.w <= m_rect.w - margin) {
-                g_fb->roundRect(&sl, 1);
-                sl.inset(-1);
-                g_fb->roundRect(&sl, 2);
-
-                sl.x += sl.w + g_settings.smallSpace;
-            }
-        }
-
     }
-    Rect d2 = drawChildren(m_rect.pos());
-    drawn.unionRect(&d2);
+
+    fe.setSize(18);
+    fe.apply();
+    pos.x = 0; pos.y = 100;
+    fe.renderString("HOME", 4, &pos, &m_rect, FE_XCENTER);
+
+    // Shortlist
+    fe.setSize(14);
+    fe.apply();
+    pos.x = books[0].x;
+    pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_settings.smallSpace;
+    fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
+
+    // TODO simplify, abstract into labels
+    {
+        fe.setSize(12);
+        fe.setItalic(1);
+        fe.apply();
+        Rect lbox;
+        lbox.x = 0;
+        lbox.y = pos.y;
+        Glyph* glyphs[13];
+        const char* text = "Browse all...";
+        fe.plotString(text, strlen(text), &glyphs[0], &lbox);
+        // TODO  right justify against lbox (remove plotString call); get bbox returned
+        pos.x = m_rect.w - books[0].x - lbox.w;
+        fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
+        m_browseLabel.inset(-g_settings.smallSpace);
+    }
+
+    pos.y += fe.m_cur.underlinePos + g_settings.smallSpace;
+    g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+    pos.y++;
+    g_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+
+    pos.x = books[0].x;
+    pos.y += g_settings.smallSpace;
+
+    {
+        const clc::List& shortList = m_controller->ctx.shortList.getList();
+        int margin = books[0].x;
+
+        int h = m_rect.y + m_rect.h - pos.y - margin;
+        int w = h / coverRatio;
+        Rect sl(pos.x, pos.y, w, h);
+        while (sl.x + sl.w <= m_rect.w - margin) {
+            g_fb->roundRect(&sl, 1);
+            sl.inset(-1);
+            g_fb->roundRect(&sl, 2);
+
+            sl.x += sl.w + g_settings.smallSpace;
+        }
+    }
 
 #if 0
     g_fb->byLine(&g_fb->bbox, dim);
@@ -198,8 +190,6 @@ Rect HomeActivity::draw(Pos*)
     g_fb->setFg(0xff, 0xff, 0xff);
     g_fb->fillRect(&popup);
 #endif
-
-    return drawn;
 }
 
 void HomeActivity::onAttached()
@@ -211,7 +201,7 @@ void HomeActivity::onAttached()
     systemBar.m_title.clear();
     systemBar.show();
 
-    refresh();
+    invalidate();
 }
 
 void HomeActivity::onDetached()

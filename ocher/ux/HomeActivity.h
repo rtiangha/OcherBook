@@ -4,13 +4,13 @@
 #include "ocher/ux/Activity.h"
 
 
-class HomeActivity : public Panel
+class HomeActivity : public Window
 {
 public:
     HomeActivity(Controller* c);
     ~HomeActivity();
 
-    Rect draw(Pos* pos);
+    void draw();
 
     int evtKey(struct OcherKeyEvent*);
     int evtMouse(struct OcherMouseEvent*);

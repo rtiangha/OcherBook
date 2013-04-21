@@ -1,7 +1,10 @@
 #include <ev.h>
 #include "clc/support/Logger.h"
+#include "ocher/device/Device.h"
 #include "ocher/settings/Settings.h"
+#include "ocher/ux/Factory.h"
 #include "ocher/ux/PowerSaver.h"
+#include "ocher/ux/fb/FontEngine.h"
 
 #define LOG_NAME "ocher.ux.power"
 
@@ -16,7 +19,7 @@ void PowerSaver::timeoutCb(EV_P_ ev_timer* timer, int revents)
 
 void PowerSaver::timeout()
 {
-    // TODO
+    wantToSleep();
 }
 
 PowerSaver::PowerSaver() :
@@ -63,7 +66,9 @@ void PowerSaver::onMouseEvent(struct OcherMouseEvent* evt)
 
 void PowerSaver::onKeyEvent(struct OcherKeyEvent* evt)
 {
-    if (evt->key != OEVTK_POWER)
+    if (evt->key == OEVTK_POWER && evt->subtype == OEVT_KEY_UP)
+        timeout();
+    else
         resetTimeout();
 }
 
@@ -72,5 +77,38 @@ void PowerSaver::onAppEvent(struct OcherAppEvent* evt)
 }
 
 void PowerSaver::onDeviceEvent(struct OcherDeviceEvent* evt)
+{
+}
+
+
+void PowerSaver::sleep()
+{
+    m_device->sleep();
+
+}
+
+void PowerSaver::onAttached()
+{
+    maximize();
+
+    g_fb->setFg(0xff, 0xff, 0xff);
+    g_fb->fillRect(&m_rect);
+    g_fb->setFg(0, 0, 0);
+
+    FontEngine fe;
+    fe.setSize(18);
+    fe.setItalic(1);
+    fe.apply();
+
+    Pos p;
+    p.x = 0;
+    p.y = m_rect.h/2;
+    fe.renderString("Sleeping", 8, &p, &m_rect, FE_XCENTER);
+
+    g_fb->update(&m_rect, true);  // Full refresh to clear page remnants
+    g_fb->sync();
+}
+
+void PowerSaver::onDetached()
 {
 }

@@ -158,7 +158,7 @@ void Epub::parseSpine(TreeFile* spineFile)
                 EpubItem item;
                 item.href = href;
                 item.mediaType = mediaType;
-                clc::Log::debug(LOG_NAME, "%s -> %s", id, href);
+                clc::Log::trace(LOG_NAME, "%s -> %s", id, href);
                 clc::Buffer _id(id);
                 m_items.insert(std::pair<clc::Buffer, EpubItem>(_id, item));
             }

@@ -7,6 +7,8 @@
 #include "Signals/Signal.h"
 using namespace Gallant;
 
+#include "clc/os/Thread.h"
+
 
 #define OEVT_KEYPRESS           0
 #define OEVT_KEY_DOWN           1
@@ -105,14 +107,35 @@ public:
     struct ev_loop* evLoop;
 };
 
+
 /**
- * Some other event source (something that does not easily plug into libev).
- * Queues events and signals libev when ready.
+ * Offloads heavy work from the EventLoop to another thread.  When the work is completed, 
+ * notifies the EventLoop.  Must be created on the EventLoop's thread.
  */
-class EventSource
+class EventWork : public clc::Thread
 {
 public:
+    EventWork(EventLoop* loop);
+    virtual ~EventWork();
 
+protected:
+    void run();
+
+    /**
+     * Do your heavy work here.
+     */
+    virtual void work() = 0;
+
+    /**
+     * Runs on the original (event) thread.  Useful place to emit signals to let a state machine
+     * progress.
+     * @todo progress callback
+     */
+    virtual void notify() {}
+
+    static void notifyCb(EV_P_ ev_async* w, int revents);
+    ev_async m_async;
+    EventLoop* m_loop;
 };
 
 #endif

@@ -89,6 +89,7 @@ void KoboEvents::pollButton()
         } else if (r == sizeof(kbe)) {
             bool fire = true;
             OcherKeyEvent evt;
+            clc::Log::debug(LOG_NAME, "button type %x", kbe.button);
             if (kbe.button == 0x66) {
                 evt.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
                 evt.key = OEVTK_HOME;

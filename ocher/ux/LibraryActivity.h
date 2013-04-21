@@ -6,13 +6,13 @@
 
 class Meta;
 
-class LibraryActivity : public Panel
+class LibraryActivity : public Window
 {
 public:
     LibraryActivity(Controller* c);
     ~LibraryActivity();
 
-    Rect draw(Pos* pos);
+    void draw();
 
     int evtKey(struct OcherKeyEvent*);
     int evtMouse(struct OcherMouseEvent*);

@@ -7,7 +7,7 @@
 
 class Renderer;
 
-class ReadActivity : public Panel
+class ReadActivity : public Window
 {
 public:
     ReadActivity(Controller* c);
@@ -19,7 +19,7 @@ protected:
     void onAttached();
     void onDetached();
 
-    Rect draw(Pos* pos);
+    void draw();
 
     Controller* m_controller;
 

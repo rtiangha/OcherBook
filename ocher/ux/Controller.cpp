@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "clc/support/Debug.h"
 #include "clc/support/Logger.h"
 #include "ocher/device/Device.h"
@@ -18,12 +19,17 @@ Controller::Controller() :
     m_syncActivity(this)
 {
     // TODO:  replace with IOC
-    m_powerSaver = new PowerSaver();
-    m_powerSaver->setEventLoop(g_loop);
 
     g_fb->setEventLoop(g_loop);
 
     g_device->fs.dirChanged.Connect(this, &Controller::onDirChanged);
+
+    m_screen.setEventLoop(g_loop);
+    m_screen.setFrameBuffer(g_fb);
+
+    m_powerSaver = new PowerSaver();
+    m_powerSaver->setEventLoop(g_loop);
+    m_powerSaver->wantToSleep.Connect(this, &Controller::onWantToSleep);
 }
 
 Controller::~Controller()
@@ -38,13 +44,35 @@ void Controller::onDirChanged(const char* dir, const char* file)
     // TODO
 }
 
+void Controller::onWantToSleep()
+{
+    clc::Log::info(LOG_NAME, "onWantToSleep");
+
+    if (m_activityPanel) {
+        m_screen.removeChild(m_activityPanel);
+        m_activityPanel->onDetached();
+    }
+
+    m_screen.addChild(m_powerSaver);
+    m_powerSaver->onAttached();
+    ::sleep(1); // TODO seems hackish but sync doesn't wait long enough!
+    m_powerSaver->sleep();
+    //g_loop->flush(now);
+    m_screen.removeChild(m_powerSaver);
+    m_powerSaver->onDetached();
+
+    if (m_activityPanel) {
+        m_screen.addChild(m_activityPanel);
+        m_activityPanel->onAttached();
+    }
+}
+
 void Controller::setNextActivity(Activity a)
 {
     clc::Log::info(LOG_NAME, "next activity: %d", a);
     if (m_activityPanel) {
+        m_screen.removeChild(m_activityPanel);
         m_activityPanel->onDetached();
-        g_loop->mouseEvent.Disconnect(m_activityPanel, &Widget::onMouseEvent);
-        g_loop->keyEvent.Disconnect(m_activityPanel, &Widget::onKeyEvent);
     }
 
     switch (a) {
@@ -66,9 +94,7 @@ void Controller::setNextActivity(Activity a)
         default:
             ASSERT(0);
     }
-    g_loop->mouseEvent.Connect(m_activityPanel, &Widget::onMouseEvent);
-    g_loop->keyEvent.Connect(m_activityPanel, &Widget::onKeyEvent);
-    m_activityPanel->dirty();
+    m_screen.addChild(m_activityPanel);
     m_activityPanel->onAttached();
 }
 

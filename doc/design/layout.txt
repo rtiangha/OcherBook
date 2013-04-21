@@ -47,3 +47,5 @@ Renderer class:
     - only "smartness" is that it understands the actual flow of text (line
       height, images, etc)
 
+
+http://latex-community.org/know-how/latex/55-latex-general/475-e-tex

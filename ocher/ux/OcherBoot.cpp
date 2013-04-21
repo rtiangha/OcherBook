@@ -4,7 +4,7 @@
 #include "ocher/ux/Activity.h"
 
 
-class SelectPanel : public Panel
+class SelectPanel : public Window
 {
 public:
     SelectPanel();

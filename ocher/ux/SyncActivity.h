@@ -2,23 +2,25 @@
 #define OCHER_UX_SYNCACTIVITY_H
 
 #include "ocher/ux/Activity.h"
+#include "ocher/ux/fb/Widgets.h"
 
 
-class SyncActivity : public Panel
+class SyncActivityWork;
+
+class SyncActivity : public Window
 {
 public:
     SyncActivity(Controller* c);
 
-    Rect draw(Pos* pos);
+    void draw();
 
 protected:
     void onAttached();
     void onDetached();
 
     Controller* m_controller;
-
-    void processFiles(const char** files);
-    void processFile(const char* file);
+    SyncActivityWork* m_work;
+    Spinner m_spinner;
 };
 
 #endif

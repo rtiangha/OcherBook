@@ -27,6 +27,7 @@ public:
     ~Controller();
 
     void onDirChanged(const char* dir, const char* file);
+    void onWantToSleep();
 
     void run();
     void setNextActivity(Activity a);
@@ -35,8 +36,9 @@ public:
     UiBits ui;
 
 protected:
+    Screen m_screen;
     Activity m_activity;
-    Panel* m_activityPanel;
+    Window* m_activityPanel;
 
     HomeActivity m_homeActivity;
     LibraryActivity m_libraryActivity;

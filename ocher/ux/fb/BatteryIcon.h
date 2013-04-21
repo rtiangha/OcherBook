@@ -10,7 +10,7 @@ class BatteryIcon : public Widget
 public:
     BatteryIcon(int x, int y, Battery& battery);
 
-    Rect draw(Pos* pos);
+    void draw();
 
     void onUpdate();
 
