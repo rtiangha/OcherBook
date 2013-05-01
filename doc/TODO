@@ -6,7 +6,6 @@ utility menu: reboot, boot to nickel, ...
 sleep:
     can't wake up sometimes
     clear event q when waking
-not SINGLE_THREADED
 "Attempted recursive use of the logger"
 SystemBar is always showing while reading
 
