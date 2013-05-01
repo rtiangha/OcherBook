@@ -244,6 +244,7 @@ CLC_OBJS = \
 	clc/data/StrUtil.o \
 	clc/os/Clock.o \
 	clc/os/Lock.o \
+	clc/os/RWLock.o \
 	clc/os/Monitor.o \
 	clc/os/Thread.o \
 	clc/storage/DirIter.o \
