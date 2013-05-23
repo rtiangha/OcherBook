@@ -12,10 +12,6 @@
  *  at runtime to be optimal for the particular platform.
  */
 
-#if defined(__BEOS__) || defined(__HAIKU__)
-#include <support/SupportDefs.h>
-#else
-
 #include <stdint.h>
 
 inline int32_t atomicGet(int32_t *p)
@@ -23,7 +19,7 @@ inline int32_t atomicGet(int32_t *p)
     return *p;
 }
 
-#if defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) // (HAVE_GCC_SYNC_FETCH_AND_ADD)
+#if defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
 
 /*
  * @note http://gcc.gnu.org/onlinedocs/gcc-4.3.3/gcc/Atomic-Builtins.html#Atomic-Builtins
@@ -35,6 +31,18 @@ inline int32_t atomicAdd(int32_t *p, int32_t v)
 inline bool atomicExchange(int32_t* p, int32_t oldVal, int32_t newVal)
 {
     return __sync_bool_compare_and_swap(p, oldVal, newVal);
+}
+
+#elif defined(__BEOS__) || defined(__HAIKU__)
+
+#include <support/SupportDefs.h>
+inline int32_t atomicAdd(int32_t *p, int32_t v)
+{
+    return atomic_add(p, v);
+}
+inline bool atomicExchange(int32_t* p, int32_t oldVal, int32_t newVal)
+{
+    return atomic_test_and_set(p, newVal, oldVal) == oldVal;
 }
 
 #elif defined(__NetBSD__)
@@ -130,7 +138,6 @@ inline bool atomicExchange(int32_t *p, int32_t oldVal, int32_t newVal)
 
 #error Define atomics for your platform
 
-#endif
 #endif
 
 #define atomicIncrement(p) atomicAdd(p, 1)
