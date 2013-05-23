@@ -59,22 +59,22 @@ void RendererFd::clearScreen()
 
 void RendererFd::enableUl()
 {
-    write(m_fd, "\x1b[4m", 5);
+    write(m_fd, "\x1b[4m", 4);
 }
 
 void RendererFd::disableUl()
 {
-    write(m_fd, "\x1b[24m", 6);
+    write(m_fd, "\x1b[24m", 5);
 }
 
 void RendererFd::enableEm()
 {
-    write(m_fd, "\x1b[1m", 5);
+    write(m_fd, "\x1b[1m", 4);
 }
 
 void RendererFd::disableEm()
 {
-    write(m_fd, "\x1b[22m", 6);
+    write(m_fd, "\x1b[22m", 5);
 }
 
 void RendererFd::pushAttrs()
