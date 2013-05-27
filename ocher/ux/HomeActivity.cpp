@@ -196,7 +196,7 @@ void HomeActivity::onAttached()
     SystemBar& systemBar = m_controller->ui.m_systemBar;
     addChild(systemBar);
     systemBar.m_sep = false;
-    systemBar.m_title.clear();
+    systemBar.m_title = "HOME";
     systemBar.show();
 
     invalidate();
