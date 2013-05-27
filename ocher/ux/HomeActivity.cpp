@@ -17,9 +17,6 @@ HomeActivity::HomeActivity(Controller* c) :
 {
     maximize();
 
-    SystemBar& systemBar = m_controller->ui.m_systemBar;
-    addChild(systemBar);
-
     int dx = g_settings.smallSpace;
     int dy = g_settings.smallSpace;
 
@@ -197,6 +194,7 @@ void HomeActivity::onAttached()
     clc::Log::info(LOG_NAME, "attached");
 
     SystemBar& systemBar = m_controller->ui.m_systemBar;
+    addChild(systemBar);
     systemBar.m_sep = false;
     systemBar.m_title.clear();
     systemBar.show();
@@ -207,4 +205,6 @@ void HomeActivity::onAttached()
 void HomeActivity::onDetached()
 {
     clc::Log::info(LOG_NAME, "detached");
+    SystemBar& systemBar = m_controller->ui.m_systemBar;
+    removeChild(&systemBar);
 }

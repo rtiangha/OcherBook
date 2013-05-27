@@ -41,7 +41,6 @@ void SdlLoop::start(clc::Monitor* monitor)
 
 void SdlLoop::stop()
 {
-    ASSERT(isAlive());
     interrupt();
 }
 

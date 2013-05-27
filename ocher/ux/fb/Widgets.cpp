@@ -38,6 +38,7 @@ Widget::~Widget()
 
 void Widget::addChild(Widget* child)
 {
+    ASSERT(! m_children.hasItem(child));
     child->m_flags |= WIDGET_OWNED;
     m_children.add(child);
     if (! (child->m_flags & WIDGET_HIDDEN)) {
@@ -47,10 +48,17 @@ void Widget::addChild(Widget* child)
 
 void Widget::addChild(Widget& child)
 {
+    ASSERT(! m_children.hasItem(&child));
     m_children.add(&child);
     if (! (child.m_flags & WIDGET_HIDDEN)) {
         child.invalidate();
     }
+}
+
+void Widget::removeChild(Widget* child)
+{
+    child->m_flags &= ~WIDGET_OWNED;
+    m_children.removeItem(child);
 }
 
 void Widget::invalidate()
@@ -74,13 +82,15 @@ Rect Widget::drawChildren()
     const size_t N = m_children.size();
     for (unsigned int i = 0; i < N; ++i) {
         Widget* w = (Widget*)m_children.get(i);
-        if (w->m_flags & WIDGET_DIRTY) {
-            w->draw();
-            w->m_flags &= ~WIDGET_DIRTY;
-            drawn.unionRect(&w->m_rect);
+        if (! (w->m_flags & WIDGET_HIDDEN)) {
+            if (w->m_flags & WIDGET_DIRTY) {
+                w->draw();
+                w->m_flags &= ~WIDGET_DIRTY;
+                drawn.unionRect(&w->m_rect);
+            }
+            Rect r = w->drawChildren();
+            drawn.unionRect(&r);
         }
-        Rect r = w->drawChildren();
-        drawn.unionRect(&r);
     }
     return drawn;
 }
@@ -333,14 +343,9 @@ void Screen::setFrameBuffer(FrameBuffer* fb)
     m_rect.h = m_fb->height();
 }
 
-void Screen::removeChild(Widget* child)
-{
-    child->m_flags &= ~WIDGET_OWNED;
-    m_children.removeItem(child);
-}
-
 void Screen::addChild(Widget* child)
 {
+    ASSERT(! m_children.hasItem(child));
     child->m_flags |= WIDGET_OWNED;
     m_children.add(child);
     if (! (child->m_flags & WIDGET_HIDDEN)) {
@@ -350,10 +355,17 @@ void Screen::addChild(Widget* child)
 
 void Screen::addChild(Widget& child)
 {
+    ASSERT(! m_children.hasItem(&child));
     m_children.add(&child);
     if (! (child.m_flags & WIDGET_HIDDEN)) {
         child.invalidate();
     }
+}
+
+void Screen::removeChild(Widget* child)
+{
+    child->m_flags &= ~WIDGET_OWNED;
+    m_children.removeItem(child);
 }
 
 void Screen::update()

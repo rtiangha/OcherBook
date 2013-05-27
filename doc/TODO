@@ -2,12 +2,12 @@ test on kobo
     boot menu doesn't always show
 fb can get garbled
     related to killall animator?
+"Attempted recursive use of the logger"
+
 utility menu: reboot, boot to nickel, ...
 sleep:
     can't wake up sometimes
     clear event q when waking
-"Attempted recursive use of the logger"
-SystemBar is always showing while reading
 
 
 remove drawing directly in evt callbacks (HomeActivity::evtMouse, g_fb->update, ...)

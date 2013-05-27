@@ -85,6 +85,8 @@ public:
      */
     void addChild(Widget& child);
 
+    void removeChild(Widget* child);
+
     void hide() { m_flags |= WIDGET_HIDDEN; }
     void show() { m_flags &= ~WIDGET_HIDDEN; }
 

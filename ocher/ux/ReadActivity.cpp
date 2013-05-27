@@ -173,13 +173,14 @@ void ReadActivity::onAttached()
     }
 #endif
 
-    m_controller->ui.m_systemBar.m_sep = true;
-    m_controller->ui.m_systemBar.m_title = meta->title;
-    m_controller->ui.m_systemBar.hide();
-    addChild(m_controller->ui.m_systemBar);
+    UiBits& ui = m_controller->ui;
+    addChild(ui.m_systemBar);
+    ui.m_systemBar.m_sep = true;
+    ui.m_systemBar.m_title = meta->title;
+    ui.m_systemBar.hide();
 
-    m_controller->ui.m_navBar.hide();
-    addChild(m_controller->ui.m_navBar);
+    ui.m_navBar.hide();
+    addChild(ui.m_navBar);
 
     meta->record.touch();
     m_pageNum = meta->record.activePage;
@@ -192,5 +193,9 @@ void ReadActivity::onDetached()
     clc::Log::info(LOG_NAME, "Quitting on page %u", m_pageNum);
     meta->record.activePage = m_pageNum;
 
-    // TODO delete layout;
+    UiBits& ui = m_controller->ui;
+    removeChild(&ui.m_systemBar);
+    removeChild(&ui.m_navBar);
+
+    // TODO delete layout
 }
