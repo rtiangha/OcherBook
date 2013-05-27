@@ -142,14 +142,30 @@ void SdlLoop::run()
             {
                 evt->type = OEVT_KEY;
                 evt->key.subtype = OEVT_KEY_UP;
-                evt->key.key = event.key.keysym.sym;
+                // Remap some keys to simulate/test dedicated hardware buttons:
+                switch (event.key.keysym.sym) {
+                    case SDLK_POWER:  // probably caught by OS
+                    case SDLK_F3:
+                        evt->key.key = OEVTK_POWER;
+                        break;
+                    default:
+                        evt->key.key = event.key.keysym.sym;
+                }
                 break;
             }
             case SDL_KEYDOWN:
             {
                 evt->type = OEVT_KEY;
                 evt->key.subtype = OEVT_KEY_DOWN;
-                evt->key.key = event.key.keysym.sym;
+                // Remap some keys to simulate/test dedicated hardware buttons:
+                switch (event.key.keysym.sym) {
+                    case SDLK_POWER:  // probably caught by OS
+                    case SDLK_F3:
+                        evt->key.key = OEVTK_POWER;
+                        break;
+                    default:
+                        evt->key.key = event.key.keysym.sym;
+                }
                 break;
             }
             case SDL_MOUSEMOTION:
