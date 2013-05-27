@@ -15,7 +15,7 @@
 LibraryActivity::LibraryActivity(Controller* c) :
     m_controller(c),
     m_ui(c->ui),
-    m_library(c->ctx.library.getList()),
+    m_library(0),
     m_pageNum(0)
 {
     maximize();
@@ -23,7 +23,6 @@ LibraryActivity::LibraryActivity(Controller* c) :
     // TODO calc this
     m_booksPerPage = BOOKS_PER_PAGE;
     m_bookRects = new Rect[m_booksPerPage];
-    m_pages = (m_library.size() + m_booksPerPage - 1) / m_booksPerPage;
 
     m_ui.m_systemBar.m_sep = false;
     m_ui.m_systemBar.m_title = "LIBRARY";
@@ -72,7 +71,7 @@ int LibraryActivity::evtMouse(struct OcherMouseEvent* evt)
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
         for (unsigned int i = 0; i < m_booksPerPage; i++) {
-            Meta* meta = (Meta*)m_library.get(i + m_pageNum*m_booksPerPage);
+            Meta* meta = (Meta*)m_library->get(i + m_pageNum*m_booksPerPage);
             if (!meta)
                 break;
             if (m_bookRects[i].contains(&pos)) {
@@ -124,7 +123,7 @@ void LibraryActivity::draw()
     clip.x = g_settings.medSpace;
     clip.w -= g_settings.medSpace*2;
     for (unsigned int i = 0; i < m_booksPerPage; ++i) {
-        Meta* meta = (Meta*)m_library.get(i + m_pageNum*m_booksPerPage);
+        Meta* meta = (Meta*)m_library->get(i + m_pageNum*m_booksPerPage);
         if (!meta)
             break;
 
@@ -152,6 +151,10 @@ void LibraryActivity::draw()
 void LibraryActivity::onAttached()
 {
     clc::Log::info(LOG_NAME, "attached");
+
+    m_library = m_controller->ctx.library.getList();
+    m_pages = (m_library->size() + m_booksPerPage - 1) / m_booksPerPage;
+    clc::Log::info(LOG_NAME, "%u books across %u pages", (unsigned)m_library->size(), m_pages);
 
     SystemBar& systemBar = m_controller->ui.m_systemBar;
     systemBar.m_sep = false;

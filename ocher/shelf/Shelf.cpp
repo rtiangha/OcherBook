@@ -54,10 +54,10 @@ void Library::add(Meta* meta)
 void ShortList::update(GroupOfBooks* changed)
 {
     m_meta.clear();
-    const clc::List& books = changed->getList();
-    unsigned int n = books.size();
+    const clc::List* books = changed->getList();
+    unsigned int n = books->size();
     for (unsigned int i = 0; i < n; ++i) {
-        Meta* meta = (Meta*)books.get(i);
+        Meta* meta = (Meta*)books->get(i);
         if (meta->record.shortlist) {
             m_meta.add(meta);
         }

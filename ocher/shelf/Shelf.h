@@ -21,7 +21,7 @@ public:
 
     // TODO: updateMetadata vs updateMembership ?
     virtual void update(GroupOfBooks*) {}
-    virtual const clc::List& getList() const = 0;
+    virtual const clc::List* getList() const = 0;
 
 protected:
     clc::List m_observers;
@@ -72,7 +72,7 @@ public:
      */
     void add(Meta*);
 
-    const clc::List& getList() const { return m_meta; }
+    const clc::List* getList() const { return &m_meta; }
 
 protected:
     clc::List m_meta;
@@ -88,7 +88,7 @@ public:
     ~ShortList() { m_base->detach(this); }
 
     void update(GroupOfBooks* changed);
-    const clc::List& getList() const { return m_meta; }
+    const clc::List* getList() const { return &m_meta; }
 
 protected:
     clc::List m_meta;

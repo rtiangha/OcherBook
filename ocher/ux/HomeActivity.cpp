@@ -59,9 +59,9 @@ int HomeActivity::evtMouse(struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
-        const clc::List& metas = m_controller->ctx.library.getList();
+        const clc::List* metas = m_controller->ctx.library.getList();
         for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
-            Meta* meta = (Meta*)metas.itemAt(i);
+            Meta* meta = (Meta*)metas->itemAt(i);
             if (!meta) {
                 clc::Log::trace(LOG_NAME, "book %d has no meta", i);
                 continue;
@@ -102,7 +102,7 @@ void HomeActivity::draw()
     fe.apply();
     Rect r;
     Pos pos;
-    const clc::List& metas = m_controller->ctx.library.getList();
+    const clc::List* metas = m_controller->ctx.library.getList();
     for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
         r = books[i];
         r.inset(-1);
@@ -111,7 +111,7 @@ void HomeActivity::draw()
         g_fb->roundRect(&r, 1);
         r.inset(2);
 
-        Meta* meta = (Meta*)metas.itemAt(i);
+        Meta* meta = (Meta*)metas->itemAt(i);
         uint8_t c = meta ? 0xf0 : 0xd0;
         g_fb->setFg(c, c, c);
         g_fb->fillRect(&r);
@@ -162,7 +162,7 @@ void HomeActivity::draw()
     pos.y += g_settings.smallSpace;
 
     {
-        const clc::List& shortList = m_controller->ctx.shortList.getList();
+        const clc::List* shortList = m_controller->ctx.shortList.getList();
         int margin = books[0].x;
 
         int h = m_rect.y + m_rect.h - pos.y - margin;
