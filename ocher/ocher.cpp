@@ -63,7 +63,7 @@ void initDebug()
                 break;
             clc::Buffer killswitch(1, "%s/.ocher/kill", lib);
             if (access(killswitch.c_str(), F_OK) == 0) {
-                fprintf(stderr, "OcherBook exiting because of '.ocher/kill' killswitch\n");
+                fprintf(stderr, "OcherBook exiting because of '%s' killswitch\n", killswitch.c_str());
                 exit(1);
             }
         }
@@ -203,16 +203,19 @@ int main(int argc, char** argv)
         usage("Please specify one or more files or directories.");
     }
 
+#ifdef OCHER_TARGET_KOBO
+    // Kobo rc scripts start animate.sh, which shows an animation while nickel is starting.
+    // Kill that here (so it doesn't overlay the boot menu) to simplify installation steps.
+    // TODO: Remove when more closely integrated.
+    system("killall on-animator.sh");
+    sleep(1);
+#endif
+
     uiFactory->populate();
-
-    if (bootMenu) {
-        runBootMenu();
-    }
-
     g_device->fs.initWatches();
 
     Controller c;
-    c.run();
+    c.run(bootMenu ? ACTIVITY_BOOT : ACTIVITY_SYNC);
 
     uiFactory->deinit();
 

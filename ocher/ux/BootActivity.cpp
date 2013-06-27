@@ -1,26 +1,14 @@
 #include <unistd.h>
 
+#include "clc/support/Logger.h"
+#include "ocher/ux/BootActivity.h"
 #include "ocher/ux/Factory.h"
-#include "ocher/ux/Activity.h"
+
+#define LOG_NAME "ocher.ux.Boot"
 
 
-class SelectPanel : public Window
-{
-public:
-    SelectPanel();
-
-    int evtMouse(struct OcherMouseEvent*);
-    Rect draw(Pos* pos);
-
-    void onAttached() {}
-    void onDetached() {}
-
-protected:
-    void highlight(int i);
-    Rect apps[2];
-};
-
-SelectPanel::SelectPanel()
+BootActivity::BootActivity(Controller* c) :
+    m_controller(c)
 {
     float ratio = 1.6;
     int w = g_fb->width();
@@ -37,8 +25,21 @@ SelectPanel::SelectPanel()
     apps[1].y = apps[0].y;
 }
 
-void SelectPanel::highlight(int i)
+BootActivity::~BootActivity()
 {
+}
+
+void BootActivity::onAttached()
+{
+}
+
+void BootActivity::onDetached()
+{
+}
+
+void BootActivity::highlight(int i)
+{
+    clc::Log::debug(LOG_NAME, "highlight %d", i);
     Rect r = apps[i];
     for (int n = 0; n < 4; ++n) {
         r.inset(-1);
@@ -48,7 +49,7 @@ void SelectPanel::highlight(int i)
     g_fb->sync();
 }
 
-int SelectPanel::evtMouse(struct OcherMouseEvent* evt)
+int BootActivity::evtMouse(struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
@@ -63,8 +64,10 @@ int SelectPanel::evtMouse(struct OcherMouseEvent* evt)
     return -1;
 }
 
-Rect SelectPanel::draw(Pos*)
+void BootActivity::draw()
 {
+    clc::Log::debug(LOG_NAME, "draw");
+
     Rect r = g_fb->bbox;
 
     g_fb->setFg(0xff, 0xff, 0xff);
@@ -89,21 +92,5 @@ Rect SelectPanel::draw(Pos*)
         pos.y = r.h/2;
         fe.renderString(label, strlen(label), &pos, &r, FE_XCENTER);
     }
-
-    return g_fb->bbox;
 }
 
-void runBootMenu()
-{
-#ifdef OCHER_TARGET_KOBO
-    // Kobo rc scripts start animate.sh, which shows an animation while nickel is starting.
-    // Kill that here (so it doesn't overlay the boot menu) to simplify installation steps.
-    // TODO: Remove when more closely integrated.
-    system("killall on-animator.sh");
-    sleep(1);
-#endif
-
-    SelectPanel c;
-    // TODO
-    g_fb->sync();
-}

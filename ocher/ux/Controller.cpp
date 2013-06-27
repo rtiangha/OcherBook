@@ -16,7 +16,8 @@ Controller::Controller() :
     m_libraryActivity(this),
     m_readActivity(this),
     m_settingsActivity(this),
-    m_syncActivity(this)
+    m_syncActivity(this),
+    m_bootActivity(this)
 {
     // TODO:  replace with IOC
 
@@ -76,6 +77,9 @@ void Controller::setNextActivity(Activity a)
     }
 
     switch (a) {
+        case ACTIVITY_BOOT:
+            m_activityPanel = &m_bootActivity;
+            break;
         case ACTIVITY_SYNC:
             m_activityPanel = &m_syncActivity;
             break;
@@ -98,9 +102,9 @@ void Controller::setNextActivity(Activity a)
     m_activityPanel->onAttached();
 }
 
-void Controller::run()
+void Controller::run(Activity activity)
 {
-    setNextActivity(m_activity);
+    setNextActivity(activity);
     g_loop->run();
 
     // TODO: sync state out

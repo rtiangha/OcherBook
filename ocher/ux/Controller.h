@@ -6,6 +6,7 @@
 #include "ocher/ux/ReadActivity.h"
 #include "ocher/ux/SettingsActivity.h"
 #include "ocher/ux/SyncActivity.h"
+#include "ocher/ux/BootActivity.h"
 #include "ocher/shelf/Shelf.h"
 
 class PowerSaver;
@@ -29,7 +30,7 @@ public:
     void onDirChanged(const char* dir, const char* file);
     void onWantToSleep();
 
-    void run();
+    void run(Activity a);
     void setNextActivity(Activity a);
 
     Context ctx;
@@ -45,6 +46,7 @@ protected:
     ReadActivity m_readActivity;
     SettingsActivity m_settingsActivity;
     SyncActivity m_syncActivity;
+    BootActivity m_bootActivity;
     PowerSaver* m_powerSaver;
 };
 
