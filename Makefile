@@ -229,7 +229,7 @@ else
 endif
 OCHER_CXXFLAGS:=$(OCHER_CFLAGS)
 ifneq ($(OCHER_TARGET),haiku)
-	LD_FLAGS+=-lrt
+	LD_FLAGS+=-lrt -lpthread
 endif
 LD_FLAGS+=$(OCHER_LIBS)
 
@@ -264,12 +264,12 @@ OCHER_OBJS = \
 	ocher/shelf/Meta.o \
 	ocher/shelf/Shelf.o \
 	ocher/ux/Activity.o \
+	ocher/ux/BootActivity.o \
 	ocher/ux/Controller.o \
 	ocher/ux/Event.o \
 	ocher/ux/Factory.o \
 	ocher/ux/HomeActivity.o \
 	ocher/ux/LibraryActivity.o \
-	ocher/ux/OcherBoot.o \
 	ocher/ux/Pagination.o \
 	ocher/ux/PowerSaver.o \
 	ocher/ux/ReadActivity.o \
