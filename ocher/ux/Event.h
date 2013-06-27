@@ -109,12 +109,15 @@ public:
 
 
 /**
- * Offloads heavy work from the EventLoop to another thread.  When the work is completed, 
+ * Offloads heavy work from the EventLoop to another thread.  When the work is completed,
  * notifies the EventLoop.  Must be created on the EventLoop's thread.
  */
 class EventWork : public clc::Thread
 {
 public:
+    /**
+     * Derived class must call start().
+     */
     EventWork(EventLoop* loop);
     virtual ~EventWork();
 

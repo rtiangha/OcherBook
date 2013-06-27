@@ -32,7 +32,6 @@ EventWork::EventWork(EventLoop* loop) :
     ev_async_init(&m_async, notifyCb);
     m_async.data = this;
     ev_async_start(m_loop->evLoop, &m_async);
-    start();
 }
 
 EventWork::~EventWork()

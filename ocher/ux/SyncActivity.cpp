@@ -23,6 +23,7 @@ public:
         m_files(files),
         m_controller(controller)
     {
+        start();
     }
 
 protected:
