@@ -7,11 +7,11 @@ libclc:
 This is (a subset of) my personal C++ utility/portability library, shared
 among multiple projects.
 MIT license.
-See http://ccoffing.net/proj/libclc
+See http://uscoffings.net/clc/tech/proj/libclc
 
 airbag_fd:
 MIT license.
-See http://ccoffing.net/proj/airbag_fd
+See http://uscoffings.net/clc/tech/proj/airbag_fd
 
 zlib:
 Permissive license.
