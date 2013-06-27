@@ -26,7 +26,8 @@ Mx50Fb::Mx50Fb() :
     m_fd(-1),
     m_fb(0),
     m_fbSize(0),
-    m_marker(0)
+    m_marker(0),
+    m_needFull(true)
 {
 }
 
@@ -218,6 +219,10 @@ int Mx50Fb::update(Rect* r, bool full)
         _r.w = width();
         _r.h = height();
         r = &_r;
+    }
+    if (m_needFull) {
+        m_needFull = false;
+        full = true;
     }
     clc::Log::info(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
     struct mxcfb_update_data region;

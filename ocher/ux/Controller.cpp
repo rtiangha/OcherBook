@@ -100,6 +100,7 @@ void Controller::setNextActivity(Activity a)
     }
     m_screen.addChild(m_activityPanel);
     m_activityPanel->onAttached();
+    g_fb->needFull();
 }
 
 void Controller::run(Activity activity)

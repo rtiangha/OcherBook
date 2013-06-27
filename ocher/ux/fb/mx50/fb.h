@@ -30,6 +30,7 @@ public:
     void byLine(Rect* r, void(*fn)(void* p, size_t n));
     int update(Rect* r, bool full=false);
     void sync();
+    void needFull() { m_needFull = true; }
 
     /**
      * @param marker  Waits on the specified update, or -1 for all
@@ -51,6 +52,7 @@ protected:
     struct fb_fix_screeninfo finfo;
     uint8_t m_fgColor;
     uint8_t m_bgColor;
+    bool m_needFull;
 };
 
 #endif

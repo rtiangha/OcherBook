@@ -72,6 +72,8 @@ public:
      * Ensures that all prior updates have completed.
      */
     virtual void sync() {}
+
+    virtual void needFull() {}
 };
 
 #endif

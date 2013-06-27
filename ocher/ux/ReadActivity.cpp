@@ -16,8 +16,6 @@
 #define LOG_NAME "ocher.ux.Read"
 
 
-// TODO: if (m_pagesSinceRefresh >= settings.fullRefreshPages) {
-
 int ReadActivity::evtKey(struct OcherKeyEvent* evt)
 {
     UiBits& ui = m_controller->ui;
@@ -104,6 +102,10 @@ void ReadActivity::draw()
 {
     clc::Log::debug(LOG_NAME, "draw");
     m_pagesSinceRefresh++;
+    if (m_pagesSinceRefresh >= g_settings.fullRefreshPages) {
+        m_pagesSinceRefresh = 0;
+        g_fb->needFull();
+    }
     atEnd = renderer->render(&meta->m_pagination, m_pageNum, true);
 }
 
