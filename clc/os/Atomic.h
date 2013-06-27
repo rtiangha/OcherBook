@@ -136,7 +136,24 @@ inline bool atomicExchange(int32_t *p, int32_t oldVal, int32_t newVal)
 
 #else
 
-#error Define atomics for your platform
+#ifdef DEBUG
+#warning "Define atomics for your platform ... stubbing out racey ones for now"
+inline int32_t atomicAdd(int32_t *p, int32_t v)
+{
+    int32_t prev = *p;
+    *p += v;
+    return prev;
+}
+inline bool atomicExchange(int32_t *p, int32_t oldVal, int32_t newVal)
+{
+    int32_t prev = *p;
+    if (prev == oldVal)
+        *p = newVal;
+    return prev;
+}
+#else
+#error "Define atomics for your platform"
+#endif
 
 #endif
 
