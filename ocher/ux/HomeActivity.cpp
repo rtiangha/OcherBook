@@ -174,6 +174,9 @@ void HomeActivity::draw()
             g_fb->roundRect(&sl, 2);
 
             sl.x += sl.w + g_settings.smallSpace;
+
+            // TODO
+            (void)shortList;
         }
     }
 

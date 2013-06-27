@@ -30,11 +30,11 @@ int Battery::readCapacity()
 {
     int r = -1;
 #ifdef OCHER_TARGET_KOBO
-    char buf[8];
     int fd = open(BAT_PATH "capacity", O_RDONLY);
     if (fd < 0) {
         clc::Log::error(LOG_NAME, "Failed to read battery capacity: %s", strerror(errno));
     } else {
+        char buf[8];
         r = read(fd, buf, sizeof(buf)-1);
         if (r > 0) {
             buf[r] = 0;
