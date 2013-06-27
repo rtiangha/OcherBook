@@ -14,10 +14,11 @@
 ) | ftp $OCHER_IP
 
 (
+    sleep 1
     echo "root"
     sleep 1
     echo "cd /usr/local/ocher"
     echo "chmod +x ocher"
-    echo "killall nickel ocher"
-    echo "nohup ./ocher -vv &"
 ) | telnet $OCHER_IP
+#    echo "killall nickel ocher"
+#    echo "nohup ./ocher -vv &"
