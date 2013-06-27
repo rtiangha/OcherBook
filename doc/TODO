@@ -1,22 +1,38 @@
-test on kobo
-    boot menu doesn't always show
-fb can get garbled
-    related to killall animator?
-"Attempted recursive use of the logger"
-
-utility menu: reboot, boot to nickel, ...
+crashes:
+    crash when power saver kicks on (realloc -32 from libev)
+    run with DEBUG for crashes...  but crap backtraces!
+first draw of boot menu hangs; puts kernel in bad state
 sleep:
     can't wake up sometimes
     clear event q when waking
+finish wiring events into libev, fire via signal/slot
+    inotify for card in Filesystem
+        Filesystem::fireEvents
+    power saver
+    periodically refresh battery icon
+fb can get garbled
+    related to killall animator?
+    bootloader prevents nickel from starting - garbled screen
+fix text centering
+ocher .o outside of build dir
+proper atomics on ARM
+persist user state
+    json -- jsmn?
+    shelf, meta
+    settings
 
+write install walkthrough
+clean up website
+downloadable builds
 
+utility menu: reboot, boot to nickel, ...
+front page should reflect most recent book
+    "selected" doesn't bubble to top -- need another Shelf (MostRecent)?
+css
+"Attempted recursive use of the logger"
 remove drawing directly in evt callbacks (HomeActivity::evtMouse, g_fb->update, ...)
 beware adding child multiple times / removeChild for shared
 position - abs, rel, .....???!!!
-finish wiring events into libev, fire via signal/slot
-    inotify for card in Filesystem
-    power saver
-    periodically refresh battery icon
 widgets shouldn't hit g_fb; use screen
 
 windows should have their own fg/bg colors, not the fb
@@ -24,25 +40,20 @@ fix SDL shutdown (#39)
 ioc:
     g_*
 
-persist user state
-    json?
+rearrange system bar like gnome/mac:
+    "HOME" icon
+chapter/TOC hot links
 sync adds multiple copies
     database
 control LEDs
-bootloader prevents nickel from starting - garbled screen
 "make dist"
     updated rcS
 networking
     for now, store in config file
     wpa_cli
     link quality
-write install walkthrough
-clean up website
-downloadable builds
-
 
 support USB keyboard
-dvi
 clean up object model:
     LibraryActivity
         nav buttons - impl as Widgets; fade disabled
@@ -54,8 +65,6 @@ font size does not always pop correctly
 Show/hide SystemBar causes page to shift
 improve startup time:  don't parse so much to get metadata
 flag in Meta what hasn't been discovered yet (expensive to create icon, ...)
-persist shelf
-    json vs Flattenable
 widget
     pop up menus
     packing
