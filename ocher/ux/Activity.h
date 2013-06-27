@@ -11,6 +11,7 @@
 class Controller;
 
 enum Activity {
+    ACTIVITY_BOOT,
     ACTIVITY_SYNC,
     ACTIVITY_HOME,
     ACTIVITY_READ,
