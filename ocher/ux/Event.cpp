@@ -24,6 +24,10 @@ int EventLoop::run()
     return 0;
 }
 
+void EventLoop::stop()
+{
+    ev_break(evLoop, EVBREAK_ALL);
+}
 
 EventWork::EventWork(EventLoop* loop) :
     clc::Thread("EventWork %p", loop->evLoop),

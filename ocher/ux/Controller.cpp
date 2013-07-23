@@ -31,12 +31,18 @@ Controller::Controller() :
     m_powerSaver = new PowerSaver();
     m_powerSaver->setEventLoop(g_loop);
     m_powerSaver->wantToSleep.Connect(this, &Controller::onWantToSleep);
+
+    g_loop->appEvent.Connect(this, &Controller::onAppEvent);
 }
 
 Controller::~Controller()
 {
-    delete m_powerSaver;
     g_device->fs.dirChanged.Disconnect(this, &Controller::onDirChanged);
+
+    m_powerSaver->wantToSleep.Disconnect(this, &Controller::onWantToSleep);
+    delete m_powerSaver;
+
+    g_loop->appEvent.Disconnect(this, &Controller::onAppEvent);
 }
 
 void Controller::onDirChanged(const char* dir, const char* file)
@@ -66,6 +72,12 @@ void Controller::onWantToSleep()
         m_screen.addChild(m_activityPanel);
         m_activityPanel->onAttached();
     }
+}
+
+void Controller::onAppEvent(struct OcherAppEvent* evt)
+{
+    if (evt->subtype == OEVT_APP_CLOSE)
+        g_loop->stop();
 }
 
 void Controller::setNextActivity(Activity a)

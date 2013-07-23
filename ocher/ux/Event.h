@@ -97,6 +97,7 @@ public:
     ~EventLoop();
 
     int run();
+    void stop();
     // flush(timestamp)
 
     Signal1<struct OcherKeyEvent*> keyEvent;

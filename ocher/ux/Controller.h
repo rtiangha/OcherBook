@@ -29,6 +29,7 @@ public:
 
     void onDirChanged(const char* dir, const char* file);
     void onWantToSleep();
+    void onAppEvent(struct OcherAppEvent* evt);
 
     void run(Activity a);
     void setNextActivity(Activity a);
