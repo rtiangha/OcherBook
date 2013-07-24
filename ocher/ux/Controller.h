@@ -38,6 +38,9 @@ public:
     UiBits ui;
 
 protected:
+    void detachCurrent();
+    void attachCurrent();
+
     Screen m_screen;
     Activity m_activity;
     Window* m_activityPanel;

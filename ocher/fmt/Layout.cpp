@@ -38,6 +38,10 @@ Layout::~Layout()
 
 clc::Buffer Layout::unlock()
 {
+    flushText();
+    delete m_text;
+    m_text = 0;
+
     m_data.unlockBuffer(m_dataLen);
     return m_data;
 }

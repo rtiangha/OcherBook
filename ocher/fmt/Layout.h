@@ -11,7 +11,7 @@
  *  Contains the rough layout of the book's chapters in a file format independent and output device
  *  independent format.  Once the book is laid out in this format, the original file can be
  *  discarded because this is usually more memory efficient.
- * 
+ *
  *  Derive subclasses per file format; create an "append" function to append the book's chapters
  *  (or spine elements, or whatever) and populate m_data.
  *
@@ -72,6 +72,9 @@ public:
 
     //virtual void append(...) = 0;
 
+    /** Finishes and returns the laid-out internal buffer.
+     * @todo terrible API; buffer holds pointers, freed by the class
+     */
     clc::Buffer unlock();
 
 protected:

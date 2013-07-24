@@ -51,14 +51,27 @@ void Controller::onDirChanged(const char* dir, const char* file)
     // TODO
 }
 
-void Controller::onWantToSleep()
+void Controller::detachCurrent()
 {
-    clc::Log::info(LOG_NAME, "onWantToSleep");
-
     if (m_activityPanel) {
         m_screen.removeChild(m_activityPanel);
         m_activityPanel->onDetached();
     }
+}
+
+void Controller::attachCurrent()
+{
+    if (m_activityPanel) {
+        m_screen.addChild(m_activityPanel);
+        m_activityPanel->onAttached();
+    }
+}
+
+void Controller::onWantToSleep()
+{
+    clc::Log::info(LOG_NAME, "onWantToSleep");
+
+    detachCurrent();
 
     m_screen.addChild(m_powerSaver);
     m_powerSaver->onAttached();
@@ -68,25 +81,21 @@ void Controller::onWantToSleep()
     m_screen.removeChild(m_powerSaver);
     m_powerSaver->onDetached();
 
-    if (m_activityPanel) {
-        m_screen.addChild(m_activityPanel);
-        m_activityPanel->onAttached();
-    }
+    attachCurrent();
 }
 
 void Controller::onAppEvent(struct OcherAppEvent* evt)
 {
-    if (evt->subtype == OEVT_APP_CLOSE)
+    if (evt->subtype == OEVT_APP_CLOSE) {
+        detachCurrent();
         g_loop->stop();
+    }
 }
 
 void Controller::setNextActivity(Activity a)
 {
     clc::Log::info(LOG_NAME, "next activity: %d", a);
-    if (m_activityPanel) {
-        m_screen.removeChild(m_activityPanel);
-        m_activityPanel->onDetached();
-    }
+    detachCurrent();
 
     switch (a) {
         case ACTIVITY_BOOT:
@@ -110,8 +119,8 @@ void Controller::setNextActivity(Activity a)
         default:
             ASSERT(0);
     }
-    m_screen.addChild(m_activityPanel);
-    m_activityPanel->onAttached();
+
+    attachCurrent();
     g_fb->needFull();
 }
 

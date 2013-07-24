@@ -1,11 +1,11 @@
 #ifndef OCHER_UX_READACTIVITY_H
 #define OCHER_UX_READACTIVITY_H
 
-#include "clc/data/Buffer.h"
 #include "ocher/ux/Activity.h"
 
 
 class Renderer;
+class Layout;
 
 class ReadActivity : public Window
 {
@@ -23,7 +23,7 @@ protected:
 
     Controller* m_controller;
 
-    clc::Buffer m_layout;
+    Layout* m_layout;
     Renderer* renderer;
     Meta* meta;
     unsigned int m_pageNum;

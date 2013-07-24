@@ -59,6 +59,11 @@ public:
     /**
      * Clips to the framebuffer and blits.
      * @param p  'w' x 'h' bitmap.  Matches the bpp of the framebuffer.
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @param clip
      */
     virtual void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip=0) = 0;
 

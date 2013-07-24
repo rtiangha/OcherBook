@@ -15,6 +15,9 @@ GlyphCache::GlyphCache()
 
 GlyphCache::~GlyphCache()
 {
+    clc::HashtableIter iter(m_cache);
+    while (iter.hasNext())
+        delete ((Glyph*)iter.next());
 }
 
 void GlyphCache::put(GlyphDescr* f, Glyph* g)

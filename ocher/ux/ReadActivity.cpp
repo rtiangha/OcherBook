@@ -93,6 +93,8 @@ int ReadActivity::evtMouse(struct OcherMouseEvent* evt)
 
 ReadActivity::ReadActivity(Controller* c) :
     m_controller(c),
+    m_layout(0),
+    atEnd(1),
     m_pagesSinceRefresh(0)
 {
     maximize();
@@ -119,35 +121,34 @@ void ReadActivity::onAttached()
     g_fb->clear();
     g_fb->update(NULL);
 
-    // TODO:  rework Layout constructors to have separate init due to scoping
-    Layout* layout = 0;
+    ASSERT(m_layout == 0);
     clc::Buffer memLayout;
     const char* file = meta->relPath.c_str();
     clc::Log::info(LOG_NAME, "Loading %s: %s", Meta::fmtToStr(meta->format), file);
     switch (meta->format) {
         case OCHER_FMT_TEXT: {
             Text text(file);
-            layout = new LayoutText(&text);
-            memLayout = layout->unlock();
+            m_layout = new LayoutText(&text);
+            memLayout = m_layout->unlock();
             break;
         }
 #ifdef OCHER_EPUB
         case OCHER_FMT_EPUB: {
             Epub epub(file);
-            layout = new LayoutEpub(&epub);
+            m_layout = new LayoutEpub(&epub);
             clc::Buffer html;
             for (int i = 0; ; i++) {
                 if (epub.getSpineItemByIndex(i, html) != 0)
                     break;
                 mxml_node_t* tree = epub.parseXml(html);
                 if (tree) {
-                    ((LayoutEpub*)layout)->append(tree);
+                    ((LayoutEpub*)m_layout)->append(tree);
                     mxmlDelete(tree);
                 } else {
                     clc::Log::warn(LOG_NAME, "No tree found for spine item %d", i);
                 }
             }
-            memLayout = layout->unlock();
+            memLayout = m_layout->unlock();
             break;
         }
 #endif
@@ -199,5 +200,8 @@ void ReadActivity::onDetached()
     removeChild(&ui.m_systemBar);
     removeChild(&ui.m_navBar);
 
-    // TODO delete layout
+    if (m_layout) {
+        delete m_layout;
+        m_layout = 0;
+    }
 }

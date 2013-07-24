@@ -3,6 +3,8 @@
 #include "ocher/device/Device.h"
 #include "ocher/settings/Settings.h"
 
+//#include "third-party/jsmn/jsmn.c"
+
 Settings g_settings;
 
 
@@ -48,6 +50,13 @@ void Settings::load()
         // TODO
     }
 }
+
+//jsonNumOut(clc::File& f, const char* key, int val)
+//{
+//    clc::Buffer b;
+//    b.format("%s: %d", key, val);
+//    f.write(b);
+//}
 
 void Settings::save()
 {

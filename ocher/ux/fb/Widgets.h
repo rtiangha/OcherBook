@@ -14,12 +14,12 @@
 
 class Widget;
 
+/**
+ * Represents the drawing area of a FrameBuffer and interacts with an EventLoop.
+ */
 class Screen
 {
 public:
-    /**
-     * @param rect  absolute coords
-     */
     Screen();
     ~Screen();
 

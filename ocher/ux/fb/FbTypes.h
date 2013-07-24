@@ -30,6 +30,8 @@ struct Rect {
 class Glyph
 {
 public:
+    Glyph() : bitmap(0) {}
+    ~Glyph() { delete[] bitmap; }
     uint8_t* bitmap;
     uint8_t w;
     uint8_t h;

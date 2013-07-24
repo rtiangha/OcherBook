@@ -106,6 +106,8 @@ void SyncActivity::onAttached()
 void SyncActivity::onDetached()
 {
     clc::Log::info(LOG_NAME, "detached");
+    // TODO:  Can be detached not due to work finishing, but being
+    // forced out, eg, power saver.  Pause work, don't delete.
     delete m_work;
     m_spinner.stop();
 }
