@@ -108,15 +108,13 @@ void Flattener::vecCBuf(const std::vector<Buffer>& v)
 
 void Unflattener::cBuf(Buffer& b)
 {
-    uint16_t len = u16();
-    Buffer t;  // Below could throw, so lock a local
-    char *c = t.lockBuffer(len);
-    while (len > 0) {  // TODO: rewrite with memcpy
-        *c = u8();
-        ++c;
-        --len;
+    Buffer t;
+    while(1) {
+        char c = u8();
+        if (c == 0)
+            break;
+        t.append(c, 1);  // TODO optimize
     }
-    t.unlockBuffer(len);
     b = t;
 }
 

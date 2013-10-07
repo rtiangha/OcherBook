@@ -1,6 +1,8 @@
 #ifndef OCHER_CSS_H
 #define OCHER_CSS_H
 
+#include "clc/data/Buffer.h"
+
 // http://www.w3schools.com/cssref/css_selectors.asp
 //
 // http://www.charlespetzold.com/blog/2011/12/Parsing-CSS-for-EPUB.html
@@ -31,7 +33,7 @@ protected:
     clc::Buffer parseElement();
 };
 
-CSSPageRule(selectorText=None, style=None, parentRule=None, parentStyleSheet=None, readonly=False)
+//CSSPageRule(selectorText=None, style=None, parentRule=None, parentStyleSheet=None, readonly=False)
 
 class CssStyleSheet
 {

@@ -136,6 +136,7 @@ public:
                 fBufferSize *= 2;
 
             size_t* newBuffer = NULL;
+            ASSERT(fBufferSize < 1024*1024*1024/sizeof(void*)); // Probably negative somewhere...
             newBuffer = (size_t*)realloc(fBuffer, fBufferSize * sizeof(size_t));
             if (newBuffer == NULL)
                 throw std::bad_alloc();
@@ -1603,6 +1604,7 @@ Buffer::_Realloc(size_t len)
     ASSERT(oldReferenceCount == -1 || oldReferenceCount == 1);  // Must be unsharable or unshared
     char* dataPtr = m_data - kPrivateDataOffset;
 
+    ASSERT(len < 1024*1024*1024); // Probably negative somewhere...
     dataPtr = (char*)realloc(dataPtr, len + kPrivateDataOffset + 1);
     if (! dataPtr)
         throw std::bad_alloc();

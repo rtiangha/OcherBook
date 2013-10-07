@@ -1,20 +1,23 @@
+fix text centering
+clean up leaks @ shutdown
+first draw of boot menu hangs; puts kernel in bad state
+
 crashes:
     crash when power saver kicks on (realloc -32 from libev)
     run with DEBUG for crashes...  but crap backtraces!
-first draw of boot menu hangs; puts kernel in bad state
+    only on device, not w/ x86 SDL
 sleep:
     can't wake up sometimes
     clear event q when waking
 finish wiring events into libev, fire via signal/slot
     inotify for card in Filesystem
         Filesystem::fireEvents
-    power saver
     periodically refresh battery icon
 fb can get garbled
     related to killall animator?
     bootloader prevents nickel from starting - garbled screen
-fix text centering
-ocher .o outside of build dir
+cmake
+    ocher .o outside of build dir
 proper atomics on ARM
 persist user state
     json -- jsmn?
@@ -28,6 +31,7 @@ downloadable builds
 utility menu: reboot, boot to nickel, ...
 front page should reflect most recent book
     "selected" doesn't bubble to top -- need another Shelf (MostRecent)?
+does epub spec allow UTF-16?
 css
 "Attempted recursive use of the logger"
 remove drawing directly in evt callbacks (HomeActivity::evtMouse, g_fb->update, ...)

@@ -272,6 +272,7 @@ void Logger::log(Log::Level level, const char* fmt, va_list ap)
     static int recursive = 0;
     if (recursive) {
         printf("Attempted recursive use of the logger\n");
+        ASSERT(0);
         return;
     }
     recursive = 1;
@@ -279,6 +280,7 @@ void Logger::log(Log::Level level, const char* fmt, va_list ap)
     static ThreadLocal recursive;
     if (recursive.get()) {
         printf("Attempted recursive use of the logger\n");
+        ASSERT(0);
         return;
     }
     recursive.set((void*)1);

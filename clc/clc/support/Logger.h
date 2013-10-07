@@ -7,6 +7,9 @@
 #include "clc/os/RWLock.h"
 #endif
 #include "clc/data/Set.h"
+#ifndef CLC_LOG_LEVEL
+#define CLC_LOG_LEVEL 5
+#endif
 
 
 namespace clc

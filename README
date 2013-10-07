@@ -1,7 +1,9 @@
 OcherBook is an open-source ebook reader, supporting multiple file formats and
-output devices.  It focuses on creating a good (and portable) ebook reading
-experience, but not necessarily the complete software stack.  For example, for
-expediency it may reuse the existing kernel on ereaders.
+output devices.  The major goals are:
+
+    - Return control and privacy of the reading experience to the reader.
+    - Modular design
+    - Small with few external dependencies
 
 To get the code:
 

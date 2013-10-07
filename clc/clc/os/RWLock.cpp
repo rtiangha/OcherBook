@@ -5,7 +5,6 @@
 #include "clc/os/RWLock.h"
 
 
-
 namespace clc
 {
 

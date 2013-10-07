@@ -35,10 +35,28 @@ public:
     int err;
 };
 
+class BufferUnderflowException : public Exception
+{
+public:
+    BufferUnderflowException(char const* _what="") throw() : Exception(_what) {}
+};
+
 class BufferOverflowException : public Exception
 {
 public:
     BufferOverflowException(char const* _what="") throw() : Exception(_what) {}
+};
+
+class IllegalArgumentException : public Exception
+{
+public:
+    IllegalArgumentException(char const* _what="") throw() : Exception(_what) {}
+};
+
+class IllegalFormatException : public Exception
+{
+public:
+    IllegalFormatException(char const* _what="") throw() : Exception(_what) {}
 };
 
 }

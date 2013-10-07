@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "clc/data/List.h"
+#include "clc/support/Debug.h"
 
 
 namespace clc
@@ -348,6 +349,7 @@ bool List::_resizeArray(size_t count)
 
     // resize if necessary
     if (newSize != m_allocated) {
+        ASSERT(newSize < 1024*1024*1024/sizeof(void*)); // Probably negative somewhere...
         void** newObjectList = (void**)realloc(m_list, newSize * sizeof(void*));
         if (newObjectList) {
             m_list = newObjectList;
