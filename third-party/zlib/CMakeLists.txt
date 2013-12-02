@@ -9,10 +9,9 @@ else()
 		URL http://zlib.net/zlib-1.2.8.tar.gz
 		URL_MD5 44d667c142d7cda120332623eab69f40
 		BUILD_IN_SOURCE 1
-		UPDATE_COMMAND ""
 		#CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC)
 		CONFIGURE_COMMAND <SOURCE_DIR>/configure --static --prefix=<INSTALL_DIR>
-		BUILD_COMMAND make
+		BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
 		)
 	list(APPEND ZLIB_INCLUDE_DIR
 		${CMAKE_CURRENT_BINARY_DIR}/zlib-external-prefix/src/zlib-external/contrib/minizip/

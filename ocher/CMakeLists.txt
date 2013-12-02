@@ -1,5 +1,4 @@
 # TODO get_propery INCLUDE_DIRECTORIES of various third_party dirs
-set(USE_SDL 1) #TODO
 
 include_directories(
 	${ROOT_DIR}
@@ -10,6 +9,13 @@ include_directories(
 	${FREETYPE_INCLUDE_DIR}
 	${THIRD_PARTY_DIR}
 	)
+if(OCHER_KOBO)
+	include_directories(${CMAKE_SOURCE_DIR}/linux)
+endif()
+if(OCHER_SDL)
+	include_directories(/usr/local/include)
+	link_directories(/usr/local/lib)
+endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
 	add_definitions(-DCLC_LOG_LEVEL=5)
@@ -53,14 +59,9 @@ list(APPEND SOURCES
 	ux/fb/FontEngine.cpp
 	ux/fb/SystemBar.cpp
 	ux/fb/FrameBuffer.cpp
-	ux/fb/mx50/fb.cpp
-	ux/fb/mx50/FactoryFbMx50.cpp
 	ux/ReadActivity.cpp
 	ux/HomeActivity.cpp
 	ux/SyncActivity.cpp
-	#ux/ncurses/Browse.cpp
-	#ux/ncurses/FactoryNC.cpp
-	#ux/ncurses/RenderCurses.cpp
 	ux/Event.cpp
 	ux/Factory.cpp
 	ux/Controller.cpp
@@ -70,15 +71,28 @@ list(APPEND SOURCES
 	resources/Bitmaps.cpp
 	ocher.cpp
 	device/Device.cpp
-	device/kobo/KoboEvents.cpp
 	device/Battery.cpp
 	device/Filesystem.cpp
 	)
-if(USE_SDL)
+if(OCHER_UI_NCURSES)
 	list(APPEND SOURCES
+		ux/ncurses/Browse.cpp
+		ux/ncurses/FactoryNC.cpp
+		ux/ncurses/RenderCurses.cpp
+		)
+endif()
+if(OCHER_KOBO)
+	list(APPEND SOURCES
+		ux/fb/mx50/fb.cpp
+		ux/fb/mx50/FactoryFbMx50.cpp
+		device/kobo/KoboEvents.cpp
+		)
+endif()
+if(OCHER_SDL)
+	list(APPEND SOURCES
+		ux/fb/sdl/FactoryFbSdl.cpp
 		ux/fb/sdl/FbSdl.cpp
 		ux/fb/sdl/SdlLoop.cpp
-		ux/fb/sdl/FactoryFbSdl.cpp
 		)
 endif()
 
@@ -88,13 +102,13 @@ add_executable(ocher
 target_link_libraries(ocher
 	freetype
 	libev
-	#Signals
 	zlib
 	mxml
 	clc
 	pthread
+	bz2  # TODO freetype (may!) want this
 	)
-if(USE_SDL)
+if(OCHER_SDL)
 	target_link_libraries(ocher
 		SDL
 		)

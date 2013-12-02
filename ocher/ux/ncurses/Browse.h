@@ -1,7 +1,7 @@
 #ifndef OCHER_BROWSE_CURSES_H
 #define OCHER_BROWSE_CURSES_H
 
-#include <cdk/cdk.h>
+#include <cdk.h>
 
 #include "clc/data/Buffer.h"
 

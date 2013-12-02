@@ -6,12 +6,12 @@ if (MXML_USE_SYSTEM)
 	find_library(mxml REQUIRED)
 else()
 	ExternalProject_add(mxml-external
-		URL http://www.msweet.org/files/project3/mxml-2.7.tar.gz
+		# Note - non-https sometimes only yields a 0-byte file...
+		URL https://www.msweet.org/files/project3/mxml-2.7.tar.gz
 		URL_MD5 76f2ae49bf0f5745d5cb5d9507774dc9
 		BUILD_IN_SOURCE 1
-		UPDATE_COMMAND ""
 		CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
-		BUILD_COMMAND make libmxml.a
+		BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} libmxml.a
 		)
 	set(MXML_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/mxml-external-prefix/include PARENT_SCOPE)
 	add_library(mxml STATIC IMPORTED GLOBAL)
