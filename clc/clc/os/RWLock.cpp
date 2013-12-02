@@ -30,7 +30,7 @@ RWLock::~RWLock()
     ASSERT(canwlock(&m_rwlock));
 #else
     int r = pthread_rwlock_destroy(&m_rwlock);
-    ASSERT(r == 0);
+    ASSERT(r == 0); UNUSED(r);
 #endif
 }
 
@@ -45,7 +45,7 @@ RWLock::readLock()
     m_writer = false;
 #else
     int r = pthread_rwlock_rdlock(&m_rwlock);
-    ASSERT(r == 0);
+    ASSERT(r == 0); UNUSED(r);
 #endif
 }
 
@@ -60,7 +60,7 @@ RWLock::writeLock()
     m_writer = true;
 #else
     int r = pthread_rwlock_rdlock(&m_rwlock);
-    ASSERT(r == 0);
+    ASSERT(r == 0); UNUSED(r);
 #endif
 }
 
@@ -77,7 +77,7 @@ RWLock::unlock()
         runlock(&m_rwlock);
 #else
     int r = pthread_rwlock_unlock(&m_rwlock);
-    ASSERT(r == 0);
+    ASSERT(r == 0); UNUSED(r);
 #endif
 }
 
