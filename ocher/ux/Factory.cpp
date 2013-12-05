@@ -1,11 +1,16 @@
 #include "ocher/ux/Event.h"
 #include "ocher/ux/Factory.h"
 
-clc::List drivers;
-
 EventLoop* g_loop;
 FrameBuffer* g_fb;
 FreeType* g_ft;
+
+
+clc::List& getDrivers()
+{
+    static clc::List drivers;
+    return drivers;
+}
 
 
 UiFactory::UiFactory()

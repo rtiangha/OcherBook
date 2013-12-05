@@ -162,8 +162,8 @@ int main(int argc, char** argv)
     initSettings();
     initDebug();
 
-    for (unsigned int i = 0; i < drivers.size(); ++i) {
-        UiFactory* factory = (UiFactory*)drivers.get(i);
+    for (unsigned int i = 0; i < getDrivers().size(); ++i) {
+        UiFactory* factory = (UiFactory*)getDrivers().get(i);
 
         if (listDrivers) {
             printf("\t%s\n", factory->getName());

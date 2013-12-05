@@ -12,7 +12,7 @@
 #define UX_DRIVER_REGISTER(driver) \
     class Register##driver { \
     public: \
-        Register##driver() { drivers.add(new UiFactory##driver); } \
+        Register##driver() { getDrivers().add(new UiFactory##driver); } \
     } reg##driver
 
 class EventLoop;
@@ -21,7 +21,7 @@ class EventLoop;
  * The list of all user experience drivers.  All compiled-in drivers automatically register
  * themselves here.
  */
-extern clc::List drivers;
+clc::List& getDrivers();
 
 extern EventLoop* g_loop;
 extern FrameBuffer* g_fb;
