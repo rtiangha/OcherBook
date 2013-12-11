@@ -28,12 +28,6 @@ list(APPEND TESTS
 	)
 
 list(APPEND SOURCES
-	fmt/text/Text.cpp
-	fmt/text/LayoutText.cpp
-	#fmt/epub/Css.cpp
-	fmt/epub/LayoutEpub.cpp
-	fmt/epub/UnzipCache.cpp
-	fmt/epub/Epub.cpp
 	fmt/Layout.cpp
 	fmt/Format.cpp
 	fmt/minizip/ioapi.c
@@ -95,6 +89,22 @@ if(OCHER_SDL)
 		ux/fb/sdl/SdlLoop.cpp
 		)
 endif()
+if(OCHER_EPUB)
+	list(APPEND SOURCES
+		#fmt/epub/Css.cpp
+		fmt/epub/LayoutEpub.cpp
+		fmt/epub/UnzipCache.cpp
+		fmt/epub/Epub.cpp
+		)
+	add_definitions(-DOCHER_EPUB)
+endif()
+if(OCHER_TEXT)
+	list(APPEND SOURCES
+		fmt/text/Text.cpp
+		fmt/text/LayoutText.cpp
+		)
+	add_definitions(-DOCHER_TEXT)
+endif()
 
 add_executable(ocher
 	${SOURCES}
@@ -113,9 +123,23 @@ if(OCHER_SDL)
 		SDL
 		)
 endif()
-#	cppcheck --check-config $(INCS) ocher/ 2> $(BUILD_DIR)/cppcheck.log
-#	cppcheck --std=posix --max-configs=100 --enable=all --suppress=cstyleCast $(INCS) ocher/ 2>> $(BUILD_DIR)/cppcheck.log
 
 
-#which dot || (echo "Please install the graphviz package, or unset HAVE_DOT in doc/Doxyfile"; exit 1)
-#cd ocher && doxygen ../doc/Doxyfile
+include(ProcessorCount)
+ProcessorCount(NUM_CPUS)
+if(NOT NUM_CPUS EQUAL 0)
+	set(CPPCHECK_FLAGS -j${NUM_CPUS})
+endif()
+get_target_property(OCHER_INCS ocher INCLUDE_DIRECTORIES)
+foreach(INC ${OCHER_INCS})
+	list(APPEND CPPCHECK_INCS "-I${INC}")
+endforeach()
+add_custom_target(cppcheck
+	#COMMAND cppcheck --check-config $(INCS) ocher/ 2> $(BUILD_DIR)/cppcheck.log
+	COMMAND cppcheck --max-configs=100 ${CPPCHECK_FLAGS} --enable=all ${CPPCHECK_INCS} ${CMAKE_CURRENT_SOURCE_DIR} 2> ${CMAKE_CURRENT_BINARY_DIR}/cppcheck.log
+	)
+
+
+add_custom_target(doxygen
+	COMMAND doxygen ${PROJECT_SOURCE_DIR}/doc/Doxyfile
+	)
