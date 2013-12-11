@@ -25,7 +25,7 @@ void PowerSaver::timeout()
 PowerSaver::PowerSaver() :
     m_loop(0),
     m_seconds(15*60), // TODO settings
-    m_device(0)
+    m_device(g_device)
 {
 }
 
@@ -84,7 +84,6 @@ void PowerSaver::onDeviceEvent(struct OcherDeviceEvent* evt)
 void PowerSaver::sleep()
 {
     m_device->sleep();
-
 }
 
 void PowerSaver::onAttached()
