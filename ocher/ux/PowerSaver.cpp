@@ -1,20 +1,26 @@
-#include <ev.h>
-#include "clc/support/Logger.h"
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #include "ocher/device/Device.h"
 #include "ocher/settings/Settings.h"
-#include "ocher/ux/Factory.h"
 #include "ocher/ux/PowerSaver.h"
 #include "ocher/ux/fb/FontEngine.h"
+#include "ocher/util/Logger.h"
+
+#include <ev.h>
 
 #define LOG_NAME "ocher.ux.power"
 
 
 ev_timer timeout_watcher;
 
-void PowerSaver::timeoutCb(EV_P_ ev_timer* timer, int revents)
+void PowerSaver::timeoutCb(EV_P_ ev_timer *timer, int revents)
 {
-    clc::Log::debug(LOG_NAME, "timeout");
-    ((PowerSaver*)timer->data)->timeout();
+    Log::debug(LOG_NAME, "timeout");
+
+    ((PowerSaver *)timer->data)->timeout();
 }
 
 void PowerSaver::timeout()
@@ -24,12 +30,13 @@ void PowerSaver::timeout()
 
 PowerSaver::PowerSaver() :
     m_loop(0),
-    m_seconds(15*60), // TODO settings
-    m_device(g_device)
+    m_seconds(15 * 60),
+    // TODO settings
+    m_device(0)
 {
 }
 
-void PowerSaver::setEventLoop(EventLoop* loop)
+void PowerSaver::inject(EventLoop *loop)
 {
     m_loop = loop;
 
@@ -41,7 +48,7 @@ void PowerSaver::setEventLoop(EventLoop* loop)
     resetTimeout();
 }
 
-void PowerSaver::setDevice(Device* device)
+void PowerSaver::inject(Device *device)
 {
     m_device = device;
 }
@@ -59,12 +66,12 @@ void PowerSaver::resetTimeout()
     m_timer.data = this;
 }
 
-void PowerSaver::onMouseEvent(struct OcherMouseEvent* evt)
+void PowerSaver::onMouseEvent(struct OcherMouseEvent *evt)
 {
     resetTimeout();
 }
 
-void PowerSaver::onKeyEvent(struct OcherKeyEvent* evt)
+void PowerSaver::onKeyEvent(struct OcherKeyEvent *evt)
 {
     if (evt->key == OEVTK_POWER && evt->subtype == OEVT_KEY_UP)
         timeout();
@@ -72,11 +79,11 @@ void PowerSaver::onKeyEvent(struct OcherKeyEvent* evt)
         resetTimeout();
 }
 
-void PowerSaver::onAppEvent(struct OcherAppEvent* evt)
+void PowerSaver::onAppEvent(struct OcherAppEvent *evt)
 {
 }
 
-void PowerSaver::onDeviceEvent(struct OcherDeviceEvent* evt)
+void PowerSaver::onDeviceEvent(struct OcherDeviceEvent *evt)
 {
 }
 
@@ -84,30 +91,4 @@ void PowerSaver::onDeviceEvent(struct OcherDeviceEvent* evt)
 void PowerSaver::sleep()
 {
     m_device->sleep();
-}
-
-void PowerSaver::onAttached()
-{
-    maximize();
-
-    g_fb->setFg(0xff, 0xff, 0xff);
-    g_fb->fillRect(&m_rect);
-    g_fb->setFg(0, 0, 0);
-
-    FontEngine fe;
-    fe.setSize(18);
-    fe.setItalic(1);
-    fe.apply();
-
-    Pos p;
-    p.x = 0;
-    p.y = m_rect.h/2;
-    fe.renderString("Sleeping", 8, &p, &m_rect, FE_XCENTER);
-
-    g_fb->update(&m_rect, true);  // Full refresh to clear page remnants
-    g_fb->sync();
-}
-
-void PowerSaver::onDetached()
-{
 }

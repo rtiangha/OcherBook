@@ -1,20 +1,26 @@
-#include "ocher/ux/Factory.h"
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
+#include "ocher/Container.h"
 #include "ocher/ux/fb/NavBar.h"
 
 
-NavBar::NavBar() :
-    Window(0, g_fb->height()-50, g_fb->width(), 50)
+NavBar::NavBar(FrameBuffer *fb) :
+    Window(0, fb->height() - 50, fb->width(), 50),
+    m_fb(fb)
 {
 }
 
-void NavBar::drawContent(Rect* pos)
+void NavBar::drawContent(Rect *pos)
 {
     m_rect.y++;
     m_rect.h--;
-    g_fb->setFg(0xff, 0xff, 0xff);
-    g_fb->fillRect(&m_rect);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(&m_rect);
     m_rect.y--;
     m_rect.h++;
-    g_fb->setFg(0, 0, 0);
-    g_fb->hline(m_rect.x, m_rect.y, m_rect.x+m_rect.w-1);
+    m_fb->setFg(0, 0, 0);
+    m_fb->hline(m_rect.x, m_rect.y, m_rect.x + m_rect.w - 1);
 }

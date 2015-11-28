@@ -1,39 +1,40 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_DEVICE_H
 #define OCHER_DEVICE_H
 
-#include "clc/data/Buffer.h"
+#include <string>
 
-#include "ocher/device/Filesystem.h"
-
-
-/**
- * Represents the physical e-reader device.
+/** Represents the physical e-reader device.
  */
-class Device
-{
+class Device {
 public:
-    clc::Buffer getVersion();
-    clc::Buffer getBuildDate();
+    virtual ~Device()
+    {
+    }
 
-    clc::Buffer getMac();
-    clc::Buffer getIp();
+    std::string getVersion();
+    std::string getBuildDate();
 
-    void reboot() {}
+    std::string getMac();
+    std::string getIp();
+
+    virtual void reboot()
+    {
+    }
+
+    virtual void shutdown()
+    {
+    }
 
     /**
      * Puts the device in a low power state until ??? TODO.
      * Returns when awake.
      */
-    void sleep();
-
-    Filesystem fs;
+    virtual void sleep();
 };
-
-/**
- * The device singleton
- */
-extern Device* g_device;
-
-void initDevice();
 
 #endif

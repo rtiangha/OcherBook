@@ -1,9 +1,0 @@
-Scaled
-http://www.gnu.org/software/freefont/
-http://dejavu-fonts.org/
-
-Fixed-width
-http://sourceforge.net/projects/sourcecodepro.adobe/
-
-Bitmap
-

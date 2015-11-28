@@ -1,10 +1,15 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_META_H
 #define OCHER_META_H
 
-#include "clc/data/Buffer.h"
-
 #include "ocher/ux/Pagination.h"
 
+#include <string>
+#include <sys/time.h>
 
 enum Encoding {
     OCHER_ENC_UNKNOWN,
@@ -22,13 +27,16 @@ enum Fmt {
     OCHER_FMT_HTML,
 };
 
-/**
- * User-specific and book-specific metadata.
+/** User-specific and book-specific metadata.
  */
-class BookRecord
-{
+class BookRecord {
 public:
-    BookRecord() : activePage(0), touched(0), shortlist(0) {}
+    BookRecord() :
+        activePage(0),
+        touched(0),
+        shortlist(0)
+    {
+    }
 
     unsigned int activePage;  // TODO:  can't use page number; varies by device/settings
 
@@ -45,30 +53,29 @@ public:
     // TODO: notes
 };
 
-/**
- * Metadata associated with each book.  This is the root object for each e-book such as
- * the format, the layout, metadata, user's reading record, etc.  Note the separation between
- * book-specific and user-specific data.
+/** Metadata associated with each book.
+ *
+ * This is the root object for each e-book such as the format, the layout, metadata, user's reading
+ * record, etc.  Note the separation between book-specific and user-specific data.
  *
  * TODO: refcounted by views (Shelf)?
  */
-class Meta
-{
+class Meta {
 public:
     Meta();
 
-    static const char* fmtToStr(Fmt fmt);
+    static const char *fmtToStr(Fmt fmt);
 
     Fmt format;
     Encoding encoding;
 
-    clc::Buffer relPath;  // TODO: for now, full path
+    std::string relPath;  // TODO: for now, full path
 
-    clc::Buffer author;
-    clc::Buffer title;
-    clc::Buffer language;
+    std::string author;
+    std::string title;
+    std::string language;
 
-    clc::Buffer icon;
+    std::string icon;
 
     Pagination m_pagination;
     unsigned int pages; // is this even meaningful?
@@ -78,6 +85,6 @@ public:
     unsigned int percentRead();
 };
 
-void loadMeta(Meta* meta);
+void loadMeta(Meta *meta);
 
 #endif

@@ -1,48 +1,23 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_CSS_H
 #define OCHER_CSS_H
 
-#include "clc/data/Buffer.h"
+#include <libcss/libcss.h>
 
-// http://www.w3schools.com/cssref/css_selectors.asp
-//
-// http://www.charlespetzold.com/blog/2011/12/Parsing-CSS-for-EPUB.html
-//
-// http://idpf.org/epub/20/spec/OPS_2.0.1_draft.htm#Section3.3
+#include <string>
 
-// sample APIs
-// http://packages.python.org/cssutils/
-
-// @page
-// @font-face
-// @media
-
-
-class CssRule
-{
+class CssParser {
 public:
+    CssParser();
+    ~CssParser();
+
+    void parseString(std::string &b);
+
+    css_stylesheet *sheet;
 };
-
-class CssParser
-{
-public:
-    CssRule* parseString(clc::Buffer &b);
-    //CssRule* parseFile(clc::Buffer &filename);
-    //parseUrl
-    //parseStyle
-protected:
-    clc::Buffer parseElement();
-};
-
-//CSSPageRule(selectorText=None, style=None, parentRule=None, parentStyleSheet=None, readonly=False)
-
-class CssStyleSheet
-{
-public:
-    // encoding
-    // rules
-    //
-};
-
 
 #endif
-

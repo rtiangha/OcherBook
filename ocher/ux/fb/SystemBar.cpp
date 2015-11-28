@@ -1,13 +1,19 @@
-#include "ocher/ux/Factory.h"
-#include "ocher/ux/fb/SystemBar.h"
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
+#include "ocher/Container.h"
 #include "ocher/settings/Settings.h"
+#include "ocher/ux/fb/SystemBar.h"
 
 
-SystemBar::SystemBar(Battery& battery) :
-    Window(0, 0, g_fb->width(), 30 /* TODO */),
+SystemBar::SystemBar(FrameBuffer *fb, Battery *battery) :
+    Window(0, 0, fb->width(), 30 /* TODO */),
     m_sep(false),
-    m_batteryIcon(g_settings.smallSpace, 0, battery),
-    m_clockIcon(g_fb->width()-50, 0)
+    m_fb(fb),
+    m_batteryIcon(g_container.settings->smallSpace, 0, battery),
+    m_clockIcon(m_fb->width() - 50, 0)
 {
     m_borderWidth = 0;
     addChild(m_batteryIcon);
@@ -17,22 +23,24 @@ SystemBar::SystemBar(Battery& battery) :
 }
 
 
-void SystemBar::drawContent(Rect* r)
+void SystemBar::drawContent(Rect *r)
 {
-    g_fb->setFg(0xff, 0xff, 0xff);
-    g_fb->fillRect(&m_rect);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(&m_rect);
     if (m_sep) {
-        g_fb->setFg(0, 0, 0);
-        g_fb->hline(r->x, r->y+r->h-1, r->x+r->w-1);
+        m_fb->setFg(0, 0, 0);
+        m_fb->hline(r->x, r->y + r->h - 1, r->x + r->w - 1);
     }
     if (m_title.length()) {
-        FontEngine fe;
-        fe.setSize(10);
-        fe.setItalic(0);
-        fe.setBold(0);
-        fe.apply();
-        Pos pos;
-        pos.x = 0; pos.y = fe.m_cur.ascender + 2;
-        fe.renderString(m_title.c_str(), m_title.length(), &pos, &g_fb->bbox, FE_XCENTER);
+        /* TODO  need factories...
+           FontEngine fe;
+           fe.setSize(10);
+           fe.setItalic(0);
+           fe.setBold(0);
+           fe.apply();
+           Pos pos;
+           pos.x = 0; pos.y = fe.m_cur.ascender + 2;
+           fe.renderString(m_title.c_str(), m_title.length(), &pos, &m_fb->bbox, FE_XCENTER);
+         */
     }
 }

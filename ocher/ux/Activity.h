@@ -1,17 +1,15 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_UX_ACTIVITY_H
 #define OCHER_UX_ACTIVITY_H
 
-#include "ocher/device/Battery.h"
-#include "ocher/ux/fb/BatteryIcon.h"
-#include "ocher/ux/fb/NavBar.h"
-#include "ocher/ux/fb/SystemBar.h"
-#include "ocher/ux/fb/Widgets.h"
 
-
-class Controller;
-
-enum Activity {
+enum ActivityType {
     ACTIVITY_BOOT,
+    ACTIVITY_SLEEP,
     ACTIVITY_SYNC,
     ACTIVITY_HOME,
     ACTIVITY_READ,
@@ -23,17 +21,12 @@ enum Activity {
 };
 
 
-/**
- * Optional shared UI components, available to all Activities.
+/** A logical portion of user interaction.
  */
-class UiBits
-{
+class Activity {
 public:
-    UiBits() : m_systemBar(m_battery) {}
-
-    Battery m_battery;
-    SystemBar m_systemBar;
-    NavBar m_navBar;
+    virtual void onAttached() = 0;
+    virtual void onDetached() = 0;
 };
 
 #endif

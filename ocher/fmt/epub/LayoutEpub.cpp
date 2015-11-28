@@ -1,35 +1,40 @@
-#include "mxml.h"
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
 
-#include "clc/support/Logger.h"
+#include "ocher/Container.h"
 #include "ocher/fmt/epub/Epub.h"
 #include "ocher/fmt/epub/LayoutEpub.h"
 #include "ocher/fmt/epub/TreeMem.h"
 #include "ocher/settings/Settings.h"
+#include "ocher/util/Logger.h"
+
+// #include "hubbub/hubbub.h"
+// #include "libcss/libcss.h"
+#include "mxml.h"
 
 #define LOG_NAME "ocher.epub"
 
 
-// TODO:  meta should be attached to the bytecode
-// TODO:  css
-// TODO:  canonicalize:  HTML escapes, ...
-
-
-void LayoutEpub::processNode(mxml_node_t* node)
+void LayoutEpub::processNode(mxml_node_t *node)
 {
+    Settings *settings = g_container.settings;
+
     if (node->type == MXML_ELEMENT) {
-        const char* name = node->value.element.name;
-        clc::Log::trace(LOG_NAME, "found element '%s'", name);
+        const char *name = node->value.element.name;
+        Log::trace(LOG_NAME, "found element '%s'", name);
         if (strcasecmp(name, "div") == 0) {
             processSiblings(node->child);
         } else if (strcasecmp(name, "title") == 0) {
 
         } else if (strcasecmp(name, "link") == 0) {
             // load CSS
-            const char* type = mxmlElementGetAttr(node, "type");
+            const char *type = mxmlElementGetAttr(node, "type");
             if (type && strcmp(type, "text/css") == 0) {
-                const char* href = mxmlElementGetAttr(node, "href");
+                const char *href = mxmlElementGetAttr(node, "href");
                 if (href) {
-                    clc::Buffer css;
+                    std::string css;
                     css = m_epub->getFile(href);
                     // TODO: parse CSS
                 }
@@ -45,10 +50,10 @@ void LayoutEpub::processNode(mxml_node_t* node)
             outputNl();
             pushTextAttr(AttrBold, 0);
             // TODO CSS: text size, ...
-            int inc = 3 - (name[1]-'0');
+            int inc = 3 - (name[1] - '0');
             if (inc < 0)
                 inc = 0;
-            pushTextAttr(AttrSizeAbs, g_settings.fontPoints+inc*2);
+            pushTextAttr(AttrSizeAbs, settings->fontPoints + inc * 2);
             processSiblings(node->child);
             popTextAttr(2);
             outputNl();
@@ -64,34 +69,57 @@ void LayoutEpub::processNode(mxml_node_t* node)
             pushTextAttr(AttrItalics, 0);
             processSiblings(node->child);
             popTextAttr();
+        } else if (strcasecmp(name, "img") == 0) {
+            const char *src = mxmlElementGetAttr(node, "src");
+            if (src) {
+                std::string img;
+                img = m_epub->getFile(src);
+                // TODO width, height, scale, ...
+                // pushImage(img, 0, index);
+            }
         } else {
             processSiblings(node->child);
         }
     } else if (node->type == MXML_OPAQUE) {
-        clc::Log::trace(LOG_NAME, "found opaque");
-        for (char* p = node->value.opaque; *p; ++p) {
+        Log::trace(LOG_NAME, "found opaque");
+        for (char *p = node->value.opaque; *p; ++p) {
             outputChar(*p);
         }
         flushText();
     }
 }
 
-void LayoutEpub::processSiblings(mxml_node_t* node)
+void LayoutEpub::processSiblings(mxml_node_t *node)
 {
-    for ( ; node; node = mxmlGetNextSibling(node)) {
+    for (; node; node = mxmlGetNextSibling(node)) {
         processNode(node);
     }
 }
 
-void LayoutEpub::append(mxml_node_t* tree)
+#if 1
+void LayoutEpub::append(mxml_node_t *tree)
 {
     // TODO:  "html/body" matches nothing if the root node is "html" (no ?xml) so using "*/body"
-    mxml_node_t* body = mxmlFindPath(tree, "*/body");
+    mxml_node_t *body = mxmlFindPath(tree, "*/body");
+
     if (body) {
         // mxmlFindPath returns the first child node.  Ok, so processSiblings.
         processSiblings(body);
         outputPageBreak();
     } else {
-        clc::Log::warn(LOG_NAME, "no body");
+        Log::warn(LOG_NAME, "no body");
     }
 }
+#else
+void LayoutEpub::append(std::string &html)
+{
+    mxml_node_t *tree = epub.parseXml(html);
+
+    if (tree) {
+        ((LayoutEpub *)m_layout)->append(tree);
+        mxmlDelete(tree);
+    } else {
+        Log::warn(LOG_NAME, "No tree found for spine item %d", i);
+    }
+}
+#endif

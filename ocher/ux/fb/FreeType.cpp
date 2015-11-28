@@ -1,14 +1,20 @@
-#include <ctype.h>
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
 
-#include "clc/support/Logger.h"
+#include "ocher/Container.h"
 #include "ocher/settings/Settings.h"
 #include "ocher/ux/fb/FreeType.h"
+#include "ocher/util/Logger.h"
+
+#include <ctype.h>
 
 #define LOG_NAME "ocher.freetype"
 
 
 
-static const char* ttfFiles[] = {
+static const char *ttfFiles[] = {
     // TODO
 #ifdef OCHER_TARGET_KOBO
     "Delima.ttf",
@@ -16,10 +22,17 @@ static const char* ttfFiles[] = {
     "Delima-Bold.ttf",
     "Delima-BoldItalic.ttf",
 #else
+#if 0
     "liberation/LiberationSerif-Regular.ttf",
     "liberation/LiberationSerif-Italic.ttf",
     "liberation/LiberationSerif-Bold.ttf",
     "liberation/LiberationSerif-BoldItalic.ttf",
+#else
+    "dejavu/DejaVuSerif.ttf",
+    "dejavu/DejaVuSerif-Italic.ttf",
+    "dejavu/DejaVuSerif-Bold.ttf",
+    "dejavu/DejaVuSerif-BoldItalic.ttf",
+#endif
 #endif
 };
 
@@ -37,9 +50,10 @@ FreeType::~FreeType()
 bool FreeType::init()
 {
     int r;
+
     r = FT_Init_FreeType(&m_lib);
     if (r) {
-        clc::Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
+        Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
         return false;
     }
     return setFace(0, 0);
@@ -47,15 +61,16 @@ bool FreeType::init()
 
 bool FreeType::setFace(int i, int b)
 {
-    clc::Buffer file = g_settings.fontRoot;
+    std::string file = g_container.settings->fontRoot;
+
     i = i ? 1 : 0;
     b = b ? 1 : 0;
     file += "/";
-    file += ttfFiles[i+b*2];
+    file += ttfFiles[i + b * 2];
 
     int r = FT_New_Face(m_lib, file.c_str(), 0, &m_face);
     if (r || !m_face) {
-        clc::Log::error(LOG_NAME, "FT_New_Face(\"%s\") failed: %d", file.c_str(), r);
+        Log::error(LOG_NAME, "FT_New_Face(\"%s\") failed: %d", file.c_str(), r);
         return false;
     }
     return true;
@@ -63,21 +78,22 @@ bool FreeType::setFace(int i, int b)
 
 void FreeType::setSize(unsigned int points)
 {
-    FT_Set_Char_Size(m_face, 0, points*64, m_dpi, m_dpi);
+    FT_Set_Char_Size(m_face, 0, points * 64, m_dpi, m_dpi);
 }
 
-int FreeType::plotGlyph(GlyphDescr* f, Glyph* g)
+int FreeType::plotGlyph(GlyphDescr *f, Glyph *g)
 {
     unsigned int glyphIndex = FT_Get_Char_Index(m_face, f->c);
     int r = FT_Load_Glyph(m_face, glyphIndex, FT_LOAD_DEFAULT);
+
     if (r) {
-        clc::Log::error(LOG_NAME, "FT_Load_Glyph failed: %d", r);
+        Log::error(LOG_NAME, "FT_Load_Glyph failed: %d", r);
         return -1;
     }
     if (m_face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
         r = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
         if (r) {
-            clc::Log::error(LOG_NAME, "FT_Render_Glyph failed: %d", r);
+            Log::error(LOG_NAME, "FT_Render_Glyph failed: %d", r);
             return -1;
         }
     }

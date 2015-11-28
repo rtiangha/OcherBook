@@ -1,5 +1,4 @@
-How to paginate?
-================
+# How to paginate?
 
 Users probably still expect page numbers.
 
@@ -14,8 +13,7 @@ between physical and logical pages, and book may end early or late.
 users, but faster and possibly more useful.
 
 
-Survey
-------
+## Survey
 
 Kobo seems to estimate the number of pages based on some statistical guess at
 how many characters fit on a page (probably assuming some common font size,
@@ -25,7 +23,6 @@ say it has the same number of pages, regardless of your font size.  The actual
 end of the book has no relation to the claimed page numbers.
 
 
-Scrolling
-=========
+## Scrolling
 
 

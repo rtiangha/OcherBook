@@ -1,22 +1,28 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_UX_FB_SYSTEMBAR_H
 #define OCHER_UX_FB_SYSTEMBAR_H
 
-#include "clc/data/Buffer.h"
-#include "ocher/ux/fb/Widgets.h"
 #include "ocher/ux/fb/BatteryIcon.h"
 #include "ocher/ux/fb/ClockIcon.h"
+#include "ocher/ux/fb/Widgets.h"
 
+#include <string>
 
-class SystemBar : public Window
-{
+class SystemBar : public Window {
 public:
-    SystemBar(Battery& battery);
+    SystemBar(FrameBuffer *fb, Battery *battery);
 
     bool m_sep;
-    clc::Buffer m_title;
+    std::string m_title;
 
 protected:
-    void drawContent(Rect*);
+    void drawContent(Rect *);
+
+    FrameBuffer *m_fb;
 
     BatteryIcon m_batteryIcon;
     ClockIcon m_clockIcon;

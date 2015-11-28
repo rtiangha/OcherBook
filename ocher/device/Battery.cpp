@@ -1,11 +1,16 @@
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
 
-#include "clc/support/Logger.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "ocher/device/Battery.h"
+#include "ocher/util/Logger.h"
 
 #define LOG_NAME "ocher.dev.battery"
 #define BAT_PATH "/sys/devices/platform/pmic_battery.1/power_supply/mc13892_bat/"
@@ -21,6 +26,7 @@ Battery::Battery() :
 int Battery::readAll()
 {
     int r = 0;
+
     r |= readCapacity();
     r |= readStatus();
     return r;
@@ -29,17 +35,18 @@ int Battery::readAll()
 int Battery::readCapacity()
 {
     int r = -1;
+
 #ifdef OCHER_TARGET_KOBO
     int fd = open(BAT_PATH "capacity", O_RDONLY);
     if (fd < 0) {
-        clc::Log::error(LOG_NAME, "Failed to read battery capacity: %s", strerror(errno));
+        Log::error(LOG_NAME, "Failed to read battery capacity: %s", strerror(errno));
     } else {
         char buf[8];
-        r = read(fd, buf, sizeof(buf)-1);
+        r = read(fd, buf, sizeof(buf) - 1);
         if (r > 0) {
             buf[r] = 0;
             m_percent = atoi(buf);
-            clc::Log::info(LOG_NAME, "Battery is %u%%", m_percent);
+            Log::info(LOG_NAME, "Battery is %u%%", m_percent);
             r = 0;
         }
         close(fd);
@@ -75,4 +82,3 @@ unknown:
     m_status = Unknown;
     return -1;
 }
-

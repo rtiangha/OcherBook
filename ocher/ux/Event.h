@@ -1,13 +1,20 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_EVENT_H
 #define OCHER_EVENT_H
 
-#include <stdint.h>
-#include <ev.h>
+#include "ocher/util/Thread.h"
 
 #include "Signals/Signal.h"
+#include <ev.h>
+
+#include <stdint.h>
+
 using namespace Gallant;
 
-#include "clc/os/Thread.h"
 
 
 #define OEVT_KEYPRESS           0
@@ -23,8 +30,7 @@ using namespace Gallant;
 #define OEVTK_PAGEDOWN          281
 #define OEVTK_POWER             320
 
-struct OcherKeyEvent
-{
+struct OcherKeyEvent {
     unsigned int subtype;
     uint32_t key;
 };
@@ -43,8 +49,7 @@ struct OcherKeyEvent
 #define OEVT_MOUSE3_UP         11
 #define OEVT_MOUSE_MOTION      12
 
-struct OcherMouseEvent
-{
+struct OcherMouseEvent {
     unsigned int subtype;  // up, down, ...
     int buttons;
     uint16_t x;
@@ -56,8 +61,7 @@ struct OcherMouseEvent
 #define OEVT_DEVICE_RESUME      1
 #define OEVT_DEVICE_POWER       2
 
-struct OcherDeviceEvent
-{
+struct OcherDeviceEvent {
     unsigned int subtype;
 };
 
@@ -65,8 +69,7 @@ struct OcherDeviceEvent
 #define OEVT_APP_DEACTIVATE     1
 #define OEVT_APP_CLOSE          2
 
-struct OcherAppEvent
-{
+struct OcherAppEvent {
     unsigned int subtype;
 };
 
@@ -78,9 +81,11 @@ struct OcherAppEvent
 
 // TODO: model after sdl more
 // TODO: timestamp
-struct OcherEvent
-{
-    OcherEvent() : type(OEVT_NONE) {}
+struct OcherEvent {
+    OcherEvent() :
+        type(OEVT_NONE)
+    {
+    }
     uint8_t type;
     union {
         struct OcherKeyEvent key;
@@ -90,36 +95,36 @@ struct OcherEvent
     };
 };
 
-class EventLoop
-{
+class EventLoop {
 public:
     EventLoop();
     ~EventLoop();
 
     int run();
     void stop();
-    // flush(timestamp)
+    /** Defines a new epoch; events timestamped prior to this are silently dropped. */
+    void setEpoch();
 
-    Signal1<struct OcherKeyEvent*> keyEvent;
-    Signal1<struct OcherMouseEvent*> mouseEvent;
-    Signal1<struct OcherAppEvent*> appEvent;
-    Signal1<struct OcherDeviceEvent*> deviceEvent;
+    Signal1<struct OcherKeyEvent *> keyEvent;
+    Signal1<struct OcherMouseEvent *> mouseEvent;
+    Signal1<struct OcherAppEvent *> appEvent;
+    Signal1<struct OcherDeviceEvent *> deviceEvent;
 
-    struct ev_loop* evLoop;
+    struct ev_loop *evLoop;
+
+    uint32_t m_epoch;
 };
 
 
-/**
- * Offloads heavy work from the EventLoop to another thread.  When the work is completed,
- * notifies the EventLoop.  Must be created on the EventLoop's thread.
+/** Offloads heavy work from the EventLoop to another thread.  When the work is completed, notifies
+ * the EventLoop.  Must be created on the EventLoop's thread.
  */
-class EventWork : public clc::Thread
-{
+class EventWork : public Thread {
 public:
     /**
      * Derived class must call start().
      */
-    EventWork(EventLoop* loop);
+    EventWork(EventLoop *loop);
     virtual ~EventWork();
 
 protected:
@@ -135,12 +140,13 @@ protected:
      * progress.
      * @todo progress callback
      */
-    virtual void notify() {}
+    virtual void notify()
+    {
+    }
 
-    static void notifyCb(EV_P_ ev_async* w, int revents);
+    static void notifyCb(EV_P_ ev_async *w, int revents);
     ev_async m_async;
-    EventLoop* m_loop;
+    EventLoop *m_loop;
 };
 
 #endif
-

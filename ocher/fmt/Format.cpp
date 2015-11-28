@@ -1,16 +1,22 @@
-#include "clc/storage/File.h"
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #include "ocher/fmt/Format.h"
+#include "ocher/util/File.h"
 
 
-Fmt detectFormat(const char* file, Encoding* encoding)
+Fmt detectFormat(const char *file, Encoding *encoding)
 {
     Fmt format = OCHER_FMT_UNKNOWN;
+
     *encoding = OCHER_ENC_UNKNOWN;
 
-    clc::File f;
+    File f;
     if (f.setTo(file) == 0) {
         unsigned char buf[4];
-        ssize_t r = f.read((char*)buf, 4);
+        ssize_t r = f.read((char *)buf, 4);
         if (r >= 4 && buf[0] == 'P' && buf[1] == 'K' && buf[2] == 0x03 && buf[3] == 0x04) {
             format = OCHER_FMT_EPUB;
         } else {
@@ -45,13 +51,15 @@ Fmt detectFormat(const char* file, Encoding* encoding)
                 int i = 0;
 
                 // HTML ought to start out something like: \s*<\s*html
-                while (i < r && isspace(buf2[i]))
+                while (i < r && isspace(buf2[i])) {
                     ++i;
+                }
                 if (i < r && buf2[i] == '<') {
                     ++i;
-                    while (i < r && isspace(buf2[i]))
+                    while (i < r && isspace(buf2[i])) {
                         ++i;
-                    if (strncasecmp(buf2+i, "html", r-i) == 0)
+                    }
+                    if (strncasecmp(buf2 + i, "html", r - i) == 0)
                         format = OCHER_FMT_HTML;
                 }
 

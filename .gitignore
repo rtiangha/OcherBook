@@ -1,9 +1,5 @@
-*.o
-*.d
-*.a
-arm-2010q1
 doc/OcherBook/
-build/
-test/books/
+build*/
+books/
 .svn
-
+.hg

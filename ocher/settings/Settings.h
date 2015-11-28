@@ -1,36 +1,47 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_SETTINGS_H
 #define OCHER_SETTINGS_H
 
-#include "clc/data/Buffer.h"
+#include <string>
 
 // TODO:  conditionalize some settings based on platform?  so can maintain/
 // share a single settings files
 
+class Filesystem;
 
-struct Settings {
+/** Persisted user settings
+ */
+class Settings {
+public:
     Settings();
 
     void load();
     void save();
 
-    int trackReading;  ///< Track major reading events? (start/end book, ...)
-    int encryptReading;  ///< Encrypt reading events?
+    void inject(Filesystem *fs);
+
+    int trackReading;   ///< Track major reading events? (start/end book, ...)
+    int encryptReading; ///< Encrypt reading events?
 
     unsigned int minutesUntilSleep;
-    int sleepShowBook;  ///< When sleeping, show latest book cover?
+    int sleepShowBook;                 ///< When sleeping, show latest book cover?
 
-    unsigned int minutesUntilPowerOff;  ///< idle min until poweroff (lower bound by minutesUntilSleep)
+    unsigned int minutesUntilPowerOff; ///< idle min until poweroff (lower bound by minutesUntilSleep)
 
-    clc::Buffer sleepHtml;
-    clc::Buffer powerOffHtml;
+    std::string sleepHtml;
+    std::string powerOffHtml;
 
-    //time zone
+    // time zone
 
-    //language
+    // language
 
-    clc::Buffer wirelessSsid;
+    std::string wirelessSsid;
     int wirelessAirplaneMode;  ///< Ask before turning on wireless
-    
+
     unsigned int fullRefreshPages;
 
     int showPageNumbers;
@@ -40,7 +51,8 @@ struct Settings {
     // force font size
     // line spacing
     int marginTop;
-    int marginBottom;;
+    int marginBottom;
+    ;
     int marginLeft;
     int marginRight;
     // justification
@@ -48,7 +60,7 @@ struct Settings {
     // icons
 
     // filesystem point(s)
-    clc::Buffer fontRoot;
+    std::string fontRoot;
 
     // UI scaling
     int smallSpace;
@@ -56,8 +68,9 @@ struct Settings {
     int largeSpace;
 
     // home page arrangement
-};
 
-extern Settings g_settings;
+protected:
+    Filesystem *m_fs;
+};
 
 #endif

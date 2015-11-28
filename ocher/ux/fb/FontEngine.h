@@ -1,14 +1,21 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_UX_FONT_ENGINE_H
 #define OCHER_UX_FONT_ENGINE_H
 
-#include "clc/data/Hashtable.h"
 #include "ocher/ux/fb/FbTypes.h"
+#include "ocher/ux/fb/FreeType.h"
 
+#include <map>
+
+class FrameBuffer;
 
 /**
  */
-struct GlyphFace
-{
+struct GlyphFace {
     uint8_t faceId;
     uint8_t points;
     uint8_t underline;
@@ -22,36 +29,24 @@ struct GlyphFace
     int16_t underlinePos;
 } __attribute__((packed));
 
-struct GlyphDescr
-{
-    uint32_t c;
-    // TODO: bitfield
-    uint8_t faceId;
-    uint8_t points;
-    uint8_t underline;
-    uint8_t bold;
-    uint8_t italic;
-} __attribute__((packed));
-
-class GlyphCache
-{
+class GlyphCache {
 public:
     GlyphCache();
     ~GlyphCache();
 
-    void put(GlyphDescr* f, Glyph* g);
-    Glyph* get(GlyphDescr* f);
+    void put(GlyphDescr &f, Glyph *g);
+    Glyph *get(GlyphDescr &f);
 
-    clc::Hashtable m_cache;  ///< Maps GlyphDescr -> Glyph
+    std::map<GlyphDescr, Glyph *> m_cache;
 };
 
-/**
- * Converts glyphs to bitmaps.
+/** Converts glyphs to bitmaps.
+ *
+ * @todo  GlyphCache/FreeType should be shared; face is per local context
  */
-class FontEngine
-{
+class FontEngine {
 public:
-    FontEngine();
+    FontEngine(FrameBuffer *fb);
     ~FontEngine();
 
     static void scanForFonts();  // TODO move to FreeType?
@@ -67,12 +62,12 @@ public:
     GlyphFace m_next;
 
     /**
-     * 
+     *
      */
-    void plotString(const char* str, unsigned int len, Glyph** glyphs, Rect* boundingBox);
+    void plotString(const char *str, unsigned int len, Glyph **glyphs, Rect *boundingBox);
 
-    /**
-     * Renders a string, in the current font.
+    /** Renders a string, in the current font.
+     *
      * @param str  Data to render
      * @param len
      * @param pen  Position of starting baseline, relative to r.  Updated.
@@ -92,11 +87,12 @@ public:
 #define FE_XCLIP    4
 #define FE_YCLIP    8
 #define FE_XCENTER 16
-    unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags,
-            Rect* bbox=0);
+    unsigned int renderString(const char *str, unsigned int len, Pos *pen, const Rect *r, unsigned int flags,
+            Rect *bbox = 0);
 
     GlyphCache m_cache;
+
+    FreeType m_ft;
 };
 
 #endif
-

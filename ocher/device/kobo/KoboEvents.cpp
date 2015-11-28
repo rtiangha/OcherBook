@@ -1,30 +1,35 @@
-#include <unistd.h>
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
+#include "ocher/device/kobo/KoboEvents.h"
+#include "ocher/util/Debug.h"
+#include "ocher/util/Logger.h"
+
 #include <errno.h>
 #include <fcntl.h>
-#include <string.h>
 #include <linux/input.h>
-
-#include "clc/support/Debug.h"
-#include "clc/support/Logger.h"
-#include "ocher/device/kobo/KoboEvents.h"
+#include <string.h>
+#include <unistd.h>
 
 #define LOG_NAME "ocher.dev.kobo"
 
 
 /*
-Processor       : ARMv7 Processor rev 5 (v7l)
-BogoMIPS        : 159.90
-Features        : swp half thumb fastmult vfp edsp neon vfpv3 
-CPU implementer : 0x41
-CPU architecture: 7
-CPU variant     : 0x2
-CPU part        : 0xc08
-CPU revision    : 5
+   Processor       : ARMv7 Processor rev 5 (v7l)
+   BogoMIPS        : 159.90
+   Features        : swp half thumb fastmult vfp edsp neon vfpv3
+   CPU implementer : 0x41
+   CPU architecture: 7
+   CPU variant     : 0x2
+   CPU part        : 0xc08
+   CPU revision    : 5
 
-Hardware        : Freescale MX50 ARM2 Board
-Revision        : 50011
-Serial          : 0000000000000000
-*/
+   Hardware        : Freescale MX50 ARM2 Board
+   Revision        : 50011
+   Serial          : 0000000000000000
+ */
 
 
 struct KoboButtonEvent {
@@ -55,7 +60,7 @@ KoboEvents::~KoboEvents()
     }
 }
 
-void KoboEvents::setEventLoop(EventLoop* loop)
+void KoboEvents::setEventLoop(EventLoop *loop)
 {
     m_loop = loop;
 
@@ -71,9 +76,9 @@ void KoboEvents::setEventLoop(EventLoop* loop)
     }
 }
 
-void KoboEvents::buttonCb(struct ev_loop*, ev_io* watcher, int)
+void KoboEvents::buttonCb(struct ev_loop *, ev_io *watcher, int)
 {
-    ((KoboEvents*)watcher->data)->pollButton();
+    ((KoboEvents *)watcher->data)->pollButton();
 }
 
 void KoboEvents::pollButton()
@@ -89,7 +94,7 @@ void KoboEvents::pollButton()
         } else if (r == sizeof(kbe)) {
             bool fire = true;
             OcherKeyEvent evt;
-            clc::Log::debug(LOG_NAME, "button type %x", kbe.button);
+            Log::debug(LOG_NAME, "button type %x", kbe.button);
             if (kbe.button == 0x66) {
                 evt.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
                 evt.key = OEVTK_HOME;
@@ -108,9 +113,9 @@ void KoboEvents::pollButton()
     }
 }
 
-void KoboEvents::touchCb(struct ev_loop*, ev_io* watcher, int)
+void KoboEvents::touchCb(struct ev_loop *, ev_io *watcher, int)
 {
-    ((KoboEvents*)watcher->data)->pollTouch();
+    ((KoboEvents *)watcher->data)->pollTouch();
 }
 
 void KoboEvents::pollTouch()
@@ -119,17 +124,18 @@ void KoboEvents::pollTouch()
     struct input_event kevt[64];
 
     int r;
+
     do {
         r = read(m_touchFd, kevt, sizeof(kevt));
     } while (r == -1 && errno == EINTR);
 
     unsigned int n = r / sizeof(struct input_event);
-    clc::Log::debug(LOG_NAME, "read %u events", n);
+    Log::debug(LOG_NAME, "read %u events", n);
 
     // http://www.kernel.org/doc/Documentation/input/event-codes.txt
     int syn = 0;
     for (unsigned int i = 0; i < n; ++i) {
-        clc::Log::debug(LOG_NAME, "type %d code %d value %d", kevt[i].type, kevt[i].code,
+        Log::debug(LOG_NAME, "type %d code %d value %d", kevt[i].type, kevt[i].code,
                 kevt[i].value);
         if (kevt[i].type == EV_SYN) {
             syn = 1;
@@ -151,13 +157,13 @@ void KoboEvents::pollTouch()
         }
 
         if (syn) {
-#if 1  // TODO: Why do down vs up coordinate systems differ??
+#if 1       // TODO: Why do down vs up coordinate systems differ??
             if (m_evt.subtype == OEVT_MOUSE1_DOWN) {
                 m_evt.x = 600 - m_evt.y;
                 m_evt.y = m_evt.x;
             }
 #endif
-            clc::Log::info(LOG_NAME, "mouse %u, %u %s", m_evt.x, m_evt.y,
+            Log::info(LOG_NAME, "mouse %u, %u %s", m_evt.x, m_evt.y,
                     m_evt.subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
             m_loop->mouseEvent(&m_evt);
         }

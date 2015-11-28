@@ -1,16 +1,16 @@
 /*
  *	Delegate.h
- *  CoreGame
  *	Efficient delegates in C++ that generate only two lines of asm code
  *
  *	Created by Don Clugston.
  *	Contributions by Jody Hagins.
- *	http://www.codeproject.com/KB/cpp/FastDelegate.aspx
- *
  *	Tweaked by Patrick Hogan on 5/18/09.
+ *	http://www.codeproject.com/KB/cpp/FastDelegate.aspx
+ *  http://www.codeproject.com/Articles/7150/Member-Function-Pointers-and-the-Fastest-Possible
  *
- *	License: The Code Project Open License (CPOL)
- *	http://www.codeproject.com/info/cpol10.aspx
+ *	License:
+ *	As stated explicitly in the article linked above, this code is released into the public domain
+ *	and may be used for any purpose.
  *
  */
 
@@ -65,7 +65,7 @@
 //
 // 19-May-09 1.5a Patrick Hogan:
 //				  * Bundled with Signals.h for signals and slots library
-//				  * Changed namespace to "gallant"
+//				  * Changed namespace to "Gallant"
 
 #ifndef _Delegate_H_
 #define _Delegate_H_
@@ -312,8 +312,8 @@ const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
 template <int N>
 struct SimplifyMemFunc {
 	template <class X, class XFuncType, class GenericMemFuncType>
-	inline static GenericClass *Convert(X * /*pthis*/, XFuncType /*function_to_bind*/,
-		GenericMemFuncType &/*bound_func*/) {
+	inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind,
+		GenericMemFuncType &bound_func) {
 		// Unsupported member function type -- force a compile failure.
 		// (it's illegal to have a array with negative size).
 		typedef char ERROR_Unsupported_member_function_pointer_on_this_compiler[N-100];
@@ -780,7 +780,7 @@ public:
 // support static_cast between void * and function pointers.
 
 	template< class DerivedClass >
-	inline void CopyFrom (DerivedClass * /*pParent*/, const DelegateMemento &right) {
+	inline void CopyFrom (DerivedClass *pParent, const DelegateMemento &right) {
 		SetMementoFrom(right);
 	}
 	// For static functions, the 'static_function_invoker' class in the parent

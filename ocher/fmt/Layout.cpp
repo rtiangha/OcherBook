@@ -1,8 +1,13 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #include <ctype.h>
 
-#include "clc/support/Debug.h"
-#include "clc/support/Logger.h"
 #include "ocher/fmt/Layout.h"
+#include "ocher/util/Debug.h"
+#include "ocher/util/Logger.h"
 
 
 Layout::Layout() :
@@ -10,7 +15,7 @@ Layout::Layout() :
     nl(0),
     ws(0),
     pre(0),
-    m_text(new clc::Buffer),
+    m_text(new Buffer),
     m_textLen(0)
 {
     m_text->lockBuffer(chunk);
@@ -21,22 +26,23 @@ Layout::~Layout()
 {
     // Walk the bytecode and delete embedded strings
     const unsigned int N = m_data.size();
-    const char* raw = m_data.data();
+    const char *raw = m_data.data();
+
     for (unsigned int i = 0; i < N; ) {
-        uint16_t code = *(uint16_t*)(raw+i);
+        uint16_t code = *(uint16_t *)(raw + i);
         i += 2;
-        unsigned int opType = (code>>12)&0xf;
-        unsigned int op = (code>>8)&0xf;
+        unsigned int opType = (code >> 12) & 0xf;
+        unsigned int op = (code >> 8) & 0xf;
         if (opType == OpCmd && op == CmdOutputStr) {
-            delete *(clc::Buffer**)(raw+i);
-            i += sizeof(clc::Buffer*);
+            delete *(Buffer **)(raw + i);
+            i += sizeof(Buffer *);
         }
     }
 
     delete m_text;
 }
 
-clc::Buffer Layout::unlock()
+Buffer Layout::unlock()
 {
     flushText();
     delete m_text;
@@ -46,29 +52,31 @@ clc::Buffer Layout::unlock()
     return m_data;
 }
 
-char* Layout::checkAlloc(unsigned int n)
+char *Layout::checkAlloc(unsigned int n)
 {
     if (m_dataLen + n > m_data.size()) {
         m_data.unlockBuffer(m_data.size());
         m_data.lockBuffer(m_dataLen + n + chunk);
     }
-    char* p = m_data.c_str() + m_dataLen;
+    char *p = m_data.c_str() + m_dataLen;
     m_dataLen += n;
     return p;
 }
 
 void Layout::push(unsigned int opType, unsigned int op, unsigned int arg)
 {
-    char* p = checkAlloc(2);
-    uint16_t i = (opType<<12) | (op<<8) | arg;
-    *(uint16_t*)p = i;
+    char *p = checkAlloc(2);
+    uint16_t i = (opType << 12) | (op << 8) | arg;
+
+    *(uint16_t *)p = i;
 }
 
-void Layout::pushPtr(void* ptr)
+void Layout::pushPtr(void *ptr)
 {
     int n = sizeof(ptr);
-    char* p = checkAlloc(n);
-    *((char**)p) = (char*)ptr;
+    char *p = checkAlloc(n);
+
+    *((char **)p) = (char *)ptr;
 }
 
 void Layout::pushTextAttr(TextAttr attr, uint8_t arg)
@@ -91,6 +99,11 @@ void Layout::popLineAttr(unsigned int n)
     push(OpCmd, CmdPopAttr, n);
 }
 
+// void Layout::pushImage()
+// {
+//	push(OpImage, );
+// }
+
 inline void Layout::_outputChar(char c)
 {
     if (m_textLen == chunk) {
@@ -102,7 +115,7 @@ inline void Layout::_outputChar(char c)
 void Layout::outputChar(char c)
 {
     if (isspace(c)) {
-        if (! ws) {
+        if (!ws) {
             ws = 1;
             _outputChar(' ');
         }
@@ -115,7 +128,7 @@ void Layout::outputChar(char c)
 
 void Layout::outputNl()
 {
-    if (! nl) {
+    if (!nl) {
         _outputChar('\n');
         nl = 1;
     }
@@ -134,7 +147,7 @@ void Layout::flushText()
         m_text->unlockBuffer(m_textLen);
         pushPtr(m_text);
         // m_text pointer is now owned by the layout bytecode.
-        m_text = new clc::Buffer;
+        m_text = new Buffer;
         m_text->lockBuffer(chunk);
         m_textLen = 0;
     }

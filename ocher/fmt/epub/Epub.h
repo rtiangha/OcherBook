@@ -1,62 +1,70 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_EPUB_PARSER_H
 #define OCHER_EPUB_PARSER_H
 
-#include <map>
-#include <vector>
-
-#include "mxml.h"
-
-#include "clc/data/Buffer.h"
 #include "ocher/fmt/Format.h"
 #include "ocher/fmt/epub/UnzipCache.h"
 
+#include "mxml.h"
 
-struct EpubItem
-{
-    clc::Buffer href;
-    clc::Buffer mediaType;
+#include <map>
+#include <string>
+#include <vector>
+
+
+struct EpubItem {
+    std::string href;
+    std::string mediaType;
 };
 
-class Epub : public Format
-{
+class Epub : public Format {
 public:
     /**
      */
-    Epub(FileCache* fileCache);
+    Epub(FileCache *fileCache);
+
     /**
      */
-    Epub(const char* epubFilename, const char* password=0);
+    Epub(const std::string &epubFilename, const char *password = 0);
+
     ~Epub();
 
-    clc::Buffer m_epubVersion;
-    clc::Buffer m_uid;
+    std::string m_epubVersion;
+    std::string m_uid;
 
-    clc::Buffer getFile(const char* filename) {
-        TreeFile* f = m_zip->getFile(filename, m_contentPath.c_str());
-        clc::Buffer b;
+    std::string getFile(const char *filename)
+    {
+        TreeFile *f = m_zip->getFile(filename, m_contentPath.c_str());
+        std::string b;
+
         if (f) {
             b = f->data;
         }
         return b;
     }
 
-    int getSpineItemByIndex(unsigned int i, clc::Buffer &item);
-    int getManifestItemById(unsigned int i, clc::Buffer &item);
-    int getContentByHref(const char* href, clc::Buffer &item);
+    int getSpineItemByIndex(unsigned int i, std::string &item);
+    int getManifestItemById(unsigned int i, std::string &item);
+    int getContentByHref(const char *href, std::string &item);
 
-    /**
-     * Parses XML. Caller must call mxml_delete.
+    /** Parses XML.
+     *
+     * Caller must call mxml_delete.
      */
-    mxml_node_t* parseXml(clc::Buffer &xml);
+    mxml_node_t *parseXml(std::string &xml);
 
 protected:
-    TreeFile* findSpine();
-    void parseSpine(TreeFile* spine);
+    TreeFile *findSpine();
+    void parseSpine(TreeFile *spine);
 
-    FileCache* m_zip;
-    std::map<clc::Buffer, EpubItem> m_items;
-    std::vector<clc::Buffer> m_spine;
-    clc::Buffer m_contentPath;  ///< directory of full-path attr
+    FileCache *m_zip;
+    std::map<std::string, EpubItem> m_items;
+    std::vector<std::string> m_spine;
+    std::string m_contentPath;  ///< directory of full-path attr
 };
 
 

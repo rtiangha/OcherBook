@@ -1,10 +1,16 @@
-#include <stddef.h>
-#include <ctype.h>
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
 
-#include "clc/support/Logger.h"
+#include "ocher/Container.h"
 #include "ocher/settings/Settings.h"
-#include "ocher/ux/Factory.h"
 #include "ocher/ux/fb/FontEngine.h"
+#include "ocher/ux/fb/FrameBuffer.h"
+#include "ocher/util/Logger.h"
+
+#include <ctype.h>
+#include <stddef.h>
 
 #define LOG_NAME "ocher.ux.FontEngine"
 
@@ -15,25 +21,36 @@ GlyphCache::GlyphCache()
 
 GlyphCache::~GlyphCache()
 {
-    clc::HashtableIter iter(m_cache);
-    while (iter.hasNext())
-        delete ((Glyph*)iter.next());
+    for (auto it = m_cache.begin(); it != m_cache.end(); ++it) {
+        delete it->second;
+        m_cache.erase(it++);
+    }
 }
 
-void GlyphCache::put(GlyphDescr* f, Glyph* g)
+void GlyphCache::put(GlyphDescr &f, Glyph *g)
 {
-    m_cache.put(f, sizeof(*f), g);
+    auto search = m_cache.find(f);
+    if (search != m_cache.end()) {
+        delete search->second;
+    }
+    m_cache[f] = g;
 }
 
-Glyph* GlyphCache::get(GlyphDescr* f)
+Glyph *GlyphCache::get(GlyphDescr &f)
 {
-    return (Glyph*)m_cache.get(f, sizeof(*f));
+    auto search = m_cache.find(f);
+    if (search != m_cache.end()) {
+        return search->second;
+    } else {
+        return NULL;
+    }
 }
 
-FontEngine::FontEngine()
+FontEngine::FontEngine(FrameBuffer *fb) :
+    m_ft(fb->dpi())
 {
     m_next.faceId = 0;
-    m_next.points = g_settings.fontPoints;
+    m_next.points = g_container.settings->fontPoints;
     m_next.underline = 0;
     m_next.bold = 0;
     m_next.italic = 0;
@@ -47,25 +64,27 @@ FontEngine::~FontEngine()
 
 void FontEngine::scanForFonts()
 {
-    const char* search;
-    if (g_settings.fontRoot.length() == 0)
+    const char *search;
+
+    if (g_container.settings->fontRoot.length() == 0)
         search = ".";
     else
-        search = g_settings.fontRoot.c_str();
+        search = g_container.settings->fontRoot.c_str();
 
-    const char* p = search;
-    const char* colon;
+    const char *p = search;
+    const char *colon;
     colon = strchr(p, ':');
     if (colon) {
         // TODO
     }
 }
 
-static int utf8ToUtf32(const char* _p, uint32_t* u32)
+static int utf8ToUtf32(const char *_p, uint32_t *u32)
 {
-    const unsigned char* p = (const unsigned char*)_p;
+    const unsigned char *p = (const unsigned char *)_p;
     int len = 1;
     uint32_t c = *p;
+
     if (c >= 0x7f) {
         if ((c & 0xe0) == 0xc0) {
             c = ((c & 0x1f) << 6) | (p[1] & 0x3f);
@@ -127,27 +146,28 @@ void FontEngine::apply()
             /*TODO*/;
         }
         if (m_cur.italic != m_next.italic || m_cur.bold != m_next.bold) {
-            g_ft->setFace(m_next.italic, m_next.bold);
-            g_ft->setSize(m_next.points);
+            m_ft.setFace(m_next.italic, m_next.bold);
+            m_ft.setSize(m_next.points);
         } else if (m_cur.points != m_next.points) {
-            g_ft->setSize(m_next.points);
+            m_ft.setSize(m_next.points);
         }
         if (m_cur.underline != m_next.underline) {
             /*TODO*/;
         }
         m_cur = m_next;
-        m_cur.ascender = g_ft->getAscender();
-        m_cur.descender = g_ft->getDescender();
+        m_cur.ascender = m_ft.getAscender();
+        m_cur.descender = m_ft.getDescender();
         m_cur.bearingY = m_cur.ascender;  /* TODO */
-        m_cur.lineHeight = g_ft->getLineHeight();
-        m_cur.underlinePos = g_ft->getUnderlinePos();
+        m_cur.lineHeight = m_ft.getLineHeight();
+        m_cur.underlinePos = m_ft.getUnderlinePos();
         dirty = 0;
     }
 }
 
-void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rect* bbox)
+void FontEngine::plotString(const char *p, unsigned int len, Glyph **glyphs, Rect *bbox)
 {
     GlyphDescr d;
+
     d.faceId = m_cur.faceId;
     d.points = m_cur.points;
     d.underline = m_cur.underline;
@@ -156,21 +176,21 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
 
     bbox->w = 0;
     unsigned int i = 0;
-    for (const char* end = p+len; p < end; ) {
+    for (const char *end = p + len; p < end; ) {
         p += utf8ToUtf32(p, &d.c);
 
-        Glyph* g = m_cache.get(&d);
+        Glyph *g = m_cache.get(d);
         if (!g) {
-            //clc::Log::trace(LOG_NAME, "%d pt %c is not cached", d.face.points, d.c);
+            // Log::trace(LOG_NAME, "%d pt %c is not cached", d.face.points, d.c);
             g = new Glyph;
-            if (g_ft->plotGlyph(&d, g) < 0) {
-                clc::Log::warn(LOG_NAME, "plotGlyph failed for %x; skipping", d.c);
+            if (m_ft.plotGlyph(&d, g) < 0) {
+                Log::warn(LOG_NAME, "plotGlyph failed for %x; skipping", d.c);
                 delete g;
                 continue;
             }
 
             invert(g->bitmap, g->w * g->h);
-            m_cache.put(&d, g);
+            m_cache.put(d, g);
         }
 
         glyphs[i++] = g;
@@ -182,14 +202,15 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
 
 // TODO:  return array of arrays of glyphs, and starting pos for each array
 // or callback:  str, offset, len, bbox
-unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags, Rect* bbox)
+unsigned int FontEngine::renderString(const char *str, unsigned int len, Pos *pen, const Rect *r, unsigned int flags, Rect *bbox)
 {
-    const char* p = str;
+    const char *p = str;
     bool wordWrapped = false;
+
     if (bbox)
         bbox->setInvalid();
 
-    if (! (flags & FE_YCLIP) && pen->y >= r->h - m_cur.descender) {
+    if (!(flags & FE_YCLIP) && pen->y >= r->h - m_cur.descender) {
         return 0;
     }
 
@@ -205,20 +226,20 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
         if (*p != '\n') {
             // Where is the next word break?
             unsigned int w = 0;
-            while (w < len && !isspace(*(p+w))) {
+            while (w < len && !isspace(*(p + w))) {
                 ++w;
             }
             if (w < len)
                 ++w;
 
-            Glyph* glyphs[w+1];
+            Glyph *glyphs[w + 1];
             Rect wordBox;
             wordBox.x = pen->x;
             wordBox.y = pen->y;
             plotString(p, w, glyphs, &wordBox);
-            if (flags & FE_WRAP &&  // want wrap
-                    pen->x + wordBox.w > r->w &&  // but wouldn't fit on this line
-                    wordBox.w <= r->w) {  // but would fit on next
+            if (flags & FE_WRAP &&           // want wrap
+                pen->x + wordBox.w > r->w && // but wouldn't fit on this line
+                wordBox.w <= r->w) {         // but would fit on next
                 wordBox.x = pen->x = 0;
                 pen->y += m_cur.lineHeight;
                 wordBox.y = pen->y;
@@ -239,13 +260,14 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
                 Pos dst;
                 int xOffset = 0;
                 if (flags & FE_XCENTER) {
-                    for (unsigned int i = 0; glyphs[i]; ++i)
+                    for (unsigned int i = 0; glyphs[i]; ++i) {
                         xOffset += glyphs[i]->advanceX;
-                    xOffset = r->w/2 - (xOffset>>1);
+                    }
+                    xOffset = r->w / 2 - (xOffset >> 1);
                 }
                 dst.x = pen->x + r->x + xOffset;
                 dst.y = pen->y + r->y;
-                g_fb->blitGlyphs(glyphs, &dst, r);
+                g_container.frameBuffer->blitGlyphs(glyphs, &dst, r);
                 pen->x = dst.x - r->x - xOffset;
                 pen->y = dst.y - r->y;
             }
@@ -277,4 +299,3 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
     } while (len > 0);
     return -1;  // TODO
 }
-

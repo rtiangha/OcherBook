@@ -1,11 +1,18 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_FB_WIDGETS_H
 #define OCHER_FB_WIDGETS_H
 
-#include <ev.h>
-#include "clc/data/List.h"
-#include "clc/data//Buffer.h"
-#include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/Event.h"
+#include "ocher/ux/fb/FrameBuffer.h"
+
+#include <ev.h>
+
+#include <string>
+#include <vector>
 
 #define WIDGET_HIDDEN 1  ///< draw will not be called
 #define WIDGET_OWNED  2
@@ -13,35 +20,35 @@
 
 
 class Widget;
+class Window;
 
 /**
  * Represents the drawing area of a FrameBuffer and interacts with an EventLoop.
  */
-class Screen
-{
+class FbScreen {
 public:
-    Screen();
-    ~Screen();
+    FbScreen();
+    ~FbScreen();
 
-    void setFrameBuffer(FrameBuffer* fb);
-    void setEventLoop(EventLoop* loop);
+    void setFrameBuffer(FrameBuffer *fb);
+    void setEventLoop(EventLoop *loop);
 
     /**
      * Adds a child (transfers ownership).
      */
-    void addChild(Widget* child);
+    void addChild(Window *child);
 
     /**
      * Adds a child (does not transfer ownership).
      */
-    void addChild(Widget& child);
+//	void addChild(Widget& child);
 
-    void removeChild(Widget* child);
+    void removeChild(Window *child);
 
-    void onMouseEvent(struct OcherMouseEvent*);
-    void onKeyEvent(struct OcherKeyEvent*);
+    void onMouseEvent(struct OcherMouseEvent *);
+    void onKeyEvent(struct OcherKeyEvent *);
 
-    static EventLoop* m_loop;
+    EventLoop *m_loop;
 
 protected:
     /**
@@ -50,27 +57,26 @@ protected:
      */
     void update();
 
-    clc::List m_invalidRects;
+    // std::vector<> m_invalidRects;
 
-    static void timeoutCb(EV_P_ ev_timer* w, int revents);
-    static void readyToIdle(EV_P_ ev_prepare* p, int revents);
-    static void waking(EV_P_ ev_check* c, int revents);
+    static void timeoutCb(EV_P_ ev_timer *w, int revents);
+    static void readyToIdle(EV_P_ ev_prepare *p, int revents);
+    static void waking(EV_P_ ev_check *c, int revents);
 
-    FrameBuffer* m_fb;
+    FrameBuffer *m_fb;
     ev_timer m_timer;
     ev_prepare m_evPrepare;
     ev_check m_evCheck;
 
     Rect m_rect;
-    clc::List m_children;
+    std::vector<Widget *> m_children;
 };
 
 
 /**
  * Base class for all UI widgets
  */
-class Widget
-{
+class Widget {
 public:
     Widget();
     Widget(int x, int y, unsigned int w, unsigned int h);
@@ -79,18 +85,30 @@ public:
     /**
      * Adds a child (transfers ownership).
      */
-    void addChild(Widget* child);
+    void addChild(Widget *child);
     /**
      * Adds a child (does not transfer ownership).
      */
-    void addChild(Widget& child);
+    void addChild(Widget &child);
 
-    void removeChild(Widget* child);
+    void removeChild(Widget *child);
 
-    void hide() { m_flags |= WIDGET_HIDDEN; }
-    void show() { m_flags &= ~WIDGET_HIDDEN; }
+    void hide()
+    {
+        m_flags |= WIDGET_HIDDEN;
+    }
+    void show()
+    {
+        m_flags &= ~WIDGET_HIDDEN;
+    }
 
-    void setRect(int x, int y, int w, int h) { m_rect.x = x; m_rect.y = y; m_rect.w = w; m_rect.h = h; }
+    void setRect(int x, int y, int w, int h)
+    {
+        m_rect.x = x;
+        m_rect.y = y;
+        m_rect.w = w;
+        m_rect.h = h;
+    }
     void setPos(int x, int y);
     void setSize(int w, int h);
     void resize(int dx, int dy);
@@ -104,7 +122,7 @@ public:
      * Invalidates a portion of the widget, so that it will be redrawn.
      * @param rect Widget-relative rectangle to invalidate
      */
-    virtual void invalidate(Rect* rect);
+    virtual void invalidate(Rect *rect);
 
     /**
      */
@@ -114,76 +132,92 @@ public:
     /**
      * @return -1 handled, -2 pass on, >=0 done
      */
-    virtual int evtKey(struct OcherKeyEvent*) { return -2; }
-    virtual int evtMouse(struct OcherMouseEvent*) { return -2; }
-    virtual int evtApp(struct OcherAppEvent*) { return -2; }
-    virtual int evtDevice(struct OcherDeviceEvent*) { return -2; }
+    virtual int evtKey(struct OcherKeyEvent *)
+    {
+        return -2;
+    }
+    virtual int evtMouse(struct OcherMouseEvent *)
+    {
+        return -2;
+    }
+    virtual int evtApp(struct OcherAppEvent *)
+    {
+        return -2;
+    }
+    virtual int evtDevice(struct OcherDeviceEvent *)
+    {
+        return -2;
+    }
 
     // TODO: abs or rel?
     Rect m_rect;
     unsigned int m_flags;
 
-    virtual void onAttached() {}
-    virtual void onDetached() {}
+    virtual void onAttached()
+    {
+    }
+    virtual void onDetached()
+    {
+    }
 
 protected:
-    Widget* m_parent;
-    clc::List m_children;
+    FrameBuffer *m_fb;
+    Widget *m_parent;
+    std::vector<Widget *> m_children;
     // TODO focus
 };
 
 #define OWF_CLOSE 1
 
-class Window : public Widget
-{
+class Window : public Widget {
 public:
     Window();
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window();
 
     void draw();
-    virtual void drawBorder(Rect* rect);
-    virtual void drawTitle(Rect* rect);
-    virtual void drawBg(Rect* rect);
-    virtual void drawContent(Rect* rect);
+    virtual void drawBorder(Rect *rect);
+    virtual void drawTitle(Rect *rect);
+    virtual void drawBg(Rect *rect);
+    virtual void drawContent(Rect *rect);
 
-    void setTitle(const char* title);
+    void setTitle(const char *title);
     void maximize();
 
     uint32_t m_bgColor;
     uint32_t m_borderColor;
     uint8_t m_borderWidth;
     uint32_t m_winflags;
+
 protected:
-    char* m_title;
+    char *m_title;
     // border style:  none, simple, raised
-    //bubble arrow:  none, top, right, bottom, left
-    //close
+    // bubble arrow:  none, top, right, bottom, left
+    // close
 };
 
 class Button : public Widget {
 public:
-    Button(int x, int y, unsigned int w=0, unsigned int h=0);
+    Button(int x, int y, unsigned int w = 0, unsigned int h = 0);
     ~Button();
 
-    void setLabel(const char* label);
+    void setLabel(const char *label);
 
     void draw();
-    virtual void drawBorder(Rect* rect);
-    virtual void drawLabel(Rect* rect);
+    virtual void drawBorder(Rect *rect);
+    virtual void drawLabel(Rect *rect);
 
 protected:
-    int evtKey(struct OcherKeyEvent*);
-    int evtMouse(struct OcherMouseEvent*);
+    int evtKey(struct OcherKeyEvent *);
+    int evtMouse(struct OcherMouseEvent *);
 
     int border;
-    clc::Buffer m_label;
-    //icon;
+    std::string m_label;
+    // icon;
 };
 
 #if 0
-class Menu : public Widget
-{
+class Menu : public Widget {
     int border;
     int separator;
     items;
@@ -197,10 +231,9 @@ class Menu : public Widget
 /**
  * @todo listen for powerdown event, stop spinning
  */
-class Spinner : public Widget
-{
+class Spinner : public Widget {
 public:
-    Spinner();
+    Spinner(EventLoop *loop);
     Spinner(int x, int y, unsigned int w, unsigned int h);
     ~Spinner();
     void start();
@@ -212,25 +245,23 @@ protected:
     unsigned int m_steps;
     unsigned int m_delayMs;
 
-    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+    static void timeoutCb(EV_P_ ev_timer *w, int revents);
+    EventLoop *m_loop;
     ev_timer m_timer;
 };
 
 #if 0
-class TextEntry : public Window
-{
+class TextEntry : public Window {
 };
 #endif
 
 #if 0
-class OSKeyboard : public Widget
-{
+class OSKeyboard : public Widget {
 };
 #endif
 
 #if 0
-class Label : public Widget
-{
+class Label : public Widget {
     label;
     font;
     size;
@@ -238,37 +269,44 @@ class Label : public Widget
 };
 #endif
 
-class Bitmap
-{
+class Bitmap {
 public:
-    Bitmap(int _w, int _h, const unsigned char* _bmp) : w(_w), h(_h), bmp(_bmp) {}
+    Bitmap(int _w, int _h, const unsigned char *_bmp) :
+        w(_w),
+        h(_h),
+        bmp(_bmp)
+    {
+    }
     int w;
     int h;
-    const unsigned char* bmp;
+    const unsigned char *bmp;
 };
 
-class Icon : public Widget
-{
+class Icon : public Widget {
 public:
-    Icon(int x, int y, Bitmap* _bmp) : Widget(x, y, _bmp->w, _bmp->h), bmp(_bmp) {}
-    virtual ~Icon() {}
+    Icon(int x, int y, Bitmap *_bmp) :
+        Widget(x, y, _bmp->w, _bmp->h),
+        bmp(_bmp)
+    {
+    }
+    virtual ~Icon()
+    {
+    }
 
     void draw();
 
-    Bitmap* bmp;
+    Bitmap *bmp;
 };
 
 #if 0
-class Srubber : public Widget
-{
-    plus/minus vs arrows
-        ff arrows
+class Srubber : public Widget {
+    plus / minus vs arrows
+    ff arrows
 };
 #endif
 
 #if 0
-class DropDown : public Window
-{
+class DropDown : public Window {
 };
 #endif
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #include "ocher/ux/fb/RleBitmap.h"
 
 
@@ -6,12 +11,13 @@ RleBitmap::RleBitmap() :
 {
 }
 
-void RleBitmap::pack(uint8_t* u, unsigned int len, uint8_t* p)
+void RleBitmap::pack(uint8_t *u, unsigned int len, uint8_t *p)
 {
     unsigned int count = 0;
     uint8_t runOf;
+
     for (unsigned int i = 0; i < len; ++i) {
-        if (! count) {
+        if (!count) {
             runOf = u[i];
             ++count;
         } else if (runOf != u[i] || count == 257) {
@@ -35,12 +41,13 @@ void RleBitmap::pack(uint8_t* u, unsigned int len, uint8_t* p)
     }
 }
 
-int RleBitmap::unpack(uint8_t* u, unsigned int len)
+int RleBitmap::unpack(uint8_t *u, unsigned int len)
 {
     unsigned int count = 0;
     uint8_t runOf;
+
     for (unsigned int i = 0; i < len && m_off < m_len; ) {
-        if (! count) {
+        if (!count) {
             runOf = m_p[m_off++];
             ++count;
         } else if (count == 1) {

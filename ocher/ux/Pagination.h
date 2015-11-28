@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_PAGINATION_H
 #define OCHER_PAGINATION_H
 
-#include "clc/data/List.h"
-
+#include <vector>
 
 /**
  * Stores a mapping from a page number to offsets within the Layout.
@@ -10,8 +14,7 @@
  * @todo  persist pagination for faster random access (per everything that might affect layout:
  * ocher version, book modification time, layout prefs, ...)
  */
-class Pagination
-{
+class Pagination {
 public:
     Pagination();
     ~Pagination();
@@ -27,22 +30,24 @@ public:
      */
     void set(unsigned int page, unsigned int layoutOffset, unsigned int strOffset /* TODO attrs */);
 
-    bool get(unsigned int page, unsigned int* layoutOffset, unsigned int* strOffset /* TODO attrs */);
+    bool get(unsigned int page, unsigned int *layoutOffset, unsigned int *strOffset /* TODO attrs */);
 
-    unsigned int numPages() const { return m_numPages; }
+    unsigned int numPages() const
+    {
+        return m_numPages;
+    }
 
 protected:
-    struct PageMapping
-    {
+    struct PageMapping {
         /** @todo to handle large epubs on small machines, may need to break up
          * the layout per spine index */
-        //unsigned int spineIndex;
+        // unsigned int spineIndex;
         unsigned int layoutOffset;    /* TODO xxx  this is uninitialized */
         unsigned int strOffset;
         /* TODO attrs */
     };
     static const unsigned int pagesPerChunk = 100;
-    clc::List m_pages;
+    std::vector<PageMapping *> m_pages;
     unsigned int m_numPages;
 };
 

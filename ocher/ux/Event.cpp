@@ -1,14 +1,20 @@
-#include <ev.h>
-#include "clc/support/Logger.h"
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
 
 #include "ocher/ux/Event.h"
+#include "ocher/util/Logger.h"
+
+#include <ev.h>
 
 #define LOG_NAME "ocher.evt"
 
 
-EventLoop::EventLoop()
+EventLoop::EventLoop() :
+    evLoop(EV_DEFAULT),
+    m_epoch(0)
 {
-    evLoop = EV_DEFAULT;
 }
 
 EventLoop::~EventLoop()
@@ -17,9 +23,10 @@ EventLoop::~EventLoop()
 
 int EventLoop::run()
 {
-    clc::Log::debug(LOG_NAME, "ev_run");
+    Log::debug(LOG_NAME, "ev_run");
+
     ev_run(evLoop, 0);
-    clc::Log::debug(LOG_NAME, "ev_run done");
+    Log::debug(LOG_NAME, "ev_run done");
 
     return 0;
 }
@@ -29,8 +36,13 @@ void EventLoop::stop()
     ev_break(evLoop, EVBREAK_ALL);
 }
 
-EventWork::EventWork(EventLoop* loop) :
-    clc::Thread("EventWork %p", loop->evLoop),
+void EventLoop::setEpoch()
+{
+    /* TODO m_epoch = SDL_GetTick() */
+}
+
+EventWork::EventWork(EventLoop *loop) :
+    Thread("EventWork %p", loop->evLoop),
     m_loop(loop)
 {
     ev_async_init(&m_async, notifyCb);
@@ -48,9 +60,9 @@ void EventWork::run()
     ev_async_send(m_loop->evLoop, &m_async);
 }
 
-void EventWork::notifyCb(EV_P_ ev_async* w, int revents)
+void EventWork::notifyCb(EV_P_ ev_async *w, int revents)
 {
-    EventWork* self = ((EventWork*)w->data);
+    EventWork *self = ((EventWork *)w->data);
+
     self->notify();
 }
-

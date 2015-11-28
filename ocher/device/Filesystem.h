@@ -1,32 +1,36 @@
+/*
+ * Copyright (c) 2015, Chuck Coffing
+ * OcherBook is released under the GPLv3.  See COPYING.
+ */
+
 #ifndef OCHER_FILESYSTEM_H
 #define OCHER_FILESYSTEM_H
 
-#include "clc/os/Thread.h"
+#include "ocher/util/Thread.h"
 
 #include "Signals/Signal.h"
 using namespace Gallant;
 
+class Options;
 
-/**
- * Represents the interesting points of the filesystem (namely, where the books exist, and where
+/** Represents the interesting points of the filesystem (namely, where the books exist, and where
  * user settings might be stored.)
  *
  * On some platforms, notifies when the books change.
  */
-class Filesystem
-{
+class Filesystem {
 public:
     Filesystem();
     ~Filesystem();
 
-    const char** m_libraries;
-    char* m_home;
-    char* m_settings;
+    const char **m_libraries;
+    char *m_home;
+    char *m_settings;
 
-    void initWatches();
+    void initWatches(Options *options);
     void deinitWatches();
     void fireEvents();
-    Signal2<const char*, const char*> dirChanged;
+    Signal2<const char *, const char *> dirChanged;
 
 protected:
     int m_infd;

@@ -1,20 +1,21 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #define INDENT "    "
 
-void die(FILE* f, const char* msg)
+void die(FILE *f, const char *msg)
 {
     printf("%s at offset %ld\n", msg, ftell(f));
     exit(1);
 }
 
-void eatSpace(FILE* f)
+void eatSpace(FILE *f)
 {
     int comment = 0;
     int c;
+
     while (!feof(f)) {
         c = fgetc(f);
         if (comment) {
@@ -31,28 +32,28 @@ void eatSpace(FILE* f)
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     char varBuf[64];
-    char incBuf[64+32];
+    char incBuf[64 + 32];
 
     if (argc != 2) {
         fprintf(stderr, "Usage: %s <bitmap.pgm>\n", argv[0]);
         return 1;
     }
 
-    const char* filename = argv[1];
-    FILE* f = fopen(filename, "r");
+    const char *filename = argv[1];
+    FILE *f = fopen(filename, "r");
     if (!f) {
         perror("fopen");
         return 1;
     }
 
-    const char* name = strrchr(argv[1], '/');
-    name = name ? name+1 : argv[1];
-    strncpy(varBuf, name, sizeof(varBuf)-1);
-    varBuf[sizeof(varBuf)-1] = 0;
-    for (char* p = varBuf; *p; ++p) {
+    const char *name = strrchr(argv[1], '/');
+    name = name ? name + 1 : argv[1];
+    strncpy(varBuf, name, sizeof(varBuf) - 1);
+    varBuf[sizeof(varBuf) - 1] = 0;
+    for (char *p = varBuf; *p; ++p) {
         if (*p == '.') {
             *p = 0;
             break;
@@ -62,7 +63,7 @@ int main(int argc, char** argv)
     strcpy(incBuf, "OCHER_ICON_");
     strcat(incBuf, varBuf);
     strcat(incBuf, "_H");
-    for (char* p = incBuf; *p; ++p) {
+    for (char *p = incBuf; *p; ++p) {
         *p = toupper(*p);
     }
 
@@ -101,7 +102,7 @@ int main(int argc, char** argv)
             printf("\n" INDENT);
         }
         printf("0x%02x, ", c);
-    };
+    }
     printf("\n};\n");
 
     printf("Bitmap bmp%s(%u, %u, _%s);\n", varBuf, x, y, varBuf);
@@ -111,4 +112,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
