@@ -1,6 +1,8 @@
+add_executable(BufferTest BufferTest.cpp)
+target_link_libraries(BufferTest ocherbook)
+add_test(BufferTest BufferTest)
+
 add_executable(OcherTest OcherTest.cpp)
 target_link_libraries(OcherTest ocherbook)
-
-# TODO  add_test per test
 add_test(OcherTest OcherTest)
 

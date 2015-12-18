@@ -115,24 +115,24 @@ TEST_CASE("Buffer compare") {
 
     CHECK(s1 == s2);
     CHECK(s1 != s3);
-    CHECK(s1.Compare(s2) == 0);
-    CHECK(s1.Compare(s2.c_str()) == 0);
-    CHECK(s1.Compare(s3) != 0);
-    CHECK(s1.ICompare(s2) == 0);
-    CHECK(s1.ICompare(s3) == 0);
+    CHECK(s1.compare(s2) == 0);
+    CHECK(s1.compare(s2.c_str()) == 0);
+    CHECK(s1.compare(s3) != 0);
+    CHECK(s1.compareI(s2) == 0);
+    CHECK(s1.compareI(s3) == 0);
     CHECK(s1 > s5);
-    CHECK(s1.Compare(s5) > 0);
-    CHECK(s1.Compare(s5.c_str()) > 0);
+    CHECK(s1.compare(s5) > 0);
+    CHECK(s1.compare(s5.c_str()) > 0);
     CHECK(s5 < s1);
-    CHECK(s5.Compare(s1) < 0);
-    CHECK(s5.Compare(s1.c_str()) < 0);
-    CHECK(s1.Compare(s4, 4) == 0);
-    CHECK(s3.ICompare(s4, 4) == 0);
-    CHECK(s1.Compare(s4, 5) != 0);
-    CHECK(s3.ICompare(s4, 5) != 0);
+    CHECK(s5.compare(s1) < 0);
+    CHECK(s5.compare(s1.c_str()) < 0);
+    CHECK(s1.compare(s4, 4) == 0);
+    CHECK(s3.compareI(s4, 4) == 0);
+    CHECK(s1.compare(s4, 5) != 0);
+    CHECK(s3.compareI(s4, 5) != 0);
 }
 
-TEST_CASE("Buffer binaryCompare") {
+TEST_CASE("Buffer binarycompare") {
     Buffer s1("te\0ting", 7);
     Buffer s2("te\0ting", 7);
     Buffer s3("Te\0ting", 7);
@@ -141,21 +141,21 @@ TEST_CASE("Buffer binaryCompare") {
 
     CHECK(s1 == s2);
     CHECK(s1 != s3);
-    CHECK(s1.Compare(s2) == 0);
-    CHECK(s1.Compare(s2.c_str()) > 0);
-    CHECK(s1.Compare(s3) != 0);
-    CHECK(s1.ICompare(s2) == 0);
-    CHECK(s1.ICompare(s3) == 0);
+    CHECK(s1.compare(s2) == 0);
+    CHECK(s1.compare(s2.c_str()) > 0);
+    CHECK(s1.compare(s3) != 0);
+    CHECK(s1.compareI(s2) == 0);
+    CHECK(s1.compareI(s3) == 0);
     CHECK(s1 > s5);
-    CHECK(s1.Compare(s5) > 0);
-    CHECK(s1.Compare(s5.c_str()) > 0);
+    CHECK(s1.compare(s5) > 0);
+    CHECK(s1.compare(s5.c_str()) > 0);
     CHECK(s5 < s1);
-    CHECK(s5.Compare(s1) < 0);
-    CHECK(s5.Compare(s1.c_str()) > 0);
-    CHECK(s1.Compare(s4, 4) == 0);
-    CHECK(s3.ICompare(s4, 4) == 0);
-    CHECK(s1.Compare(s4, 5) != 0);
-    CHECK(s3.ICompare(s4, 5) == 0);  // Case implies all treated as C string
+    CHECK(s5.compare(s1) < 0);
+    CHECK(s5.compare(s1.c_str()) > 0);
+    CHECK(s1.compare(s4, 4) == 0);
+    CHECK(s3.compareI(s4, 4) == 0);
+    CHECK(s1.compare(s4, 5) != 0);
+    CHECK(s3.compareI(s4, 5) == 0);  // Case implies all treated as C string
 }
 
 TEST_CASE("Buffer setToTrunc") {

@@ -12,10 +12,10 @@
 #include "ocher/fmt/Format.h"
 #include "ocher/fmt/epub/TreeMem.h"
 #include "ocher/settings/Options.h"
-#include "ocher/ux/PowerSaver.h"
 #include "ocher/util/Buffer.h"
 #include "ocher/util/LogAppenders.h"
 #include "ocher/util/Path.h"
+#include "ocher/ux/PowerSaver.h"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
