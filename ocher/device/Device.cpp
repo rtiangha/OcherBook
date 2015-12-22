@@ -3,16 +3,17 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-
 #include "ocher/device/Device.h"
 #include "ocher/ocher.h"
 #include "ocher/util/Logger.h"
 #include "ocher/util/StrUtil.h"
+
+#include <errno.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define LOG_NAME "ocher.dev"
 

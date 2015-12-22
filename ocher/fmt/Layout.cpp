@@ -3,12 +3,11 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include <ctype.h>
-
 #include "ocher/fmt/Layout.h"
 #include "ocher/util/Debug.h"
 #include "ocher/util/Logger.h"
 
+#include <ctype.h>
 
 Layout::Layout() :
     m_dataLen(0),

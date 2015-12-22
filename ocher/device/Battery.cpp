@@ -3,14 +3,14 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/device/Battery.h"
+#include "ocher/util/Logger.h"
+
 #include <errno.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#include "ocher/device/Battery.h"
-#include "ocher/util/Logger.h"
 
 #define LOG_NAME "ocher.dev.battery"
 #define BAT_PATH "/sys/devices/platform/pmic_battery.1/power_supply/mc13892_bat/"

@@ -1,12 +1,12 @@
 #ifndef LIBCLC_FILE_H
 #define LIBCLC_FILE_H
 
+#include "Buffer.h"
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string>
 #include <time.h>
-
-#include "Buffer.h"
 
 
 /** Portable blocking file IO.  Similar to the POSIX model but with some conveniences

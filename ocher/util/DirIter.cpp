@@ -1,13 +1,14 @@
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <fnmatch.h>
-
 #include "util/DirIter.h"
 #include "util/Path.h"
+
+#include <dirent.h>
+#include <errno.h>
+#include <fnmatch.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 
 DirIter::DirIter() :

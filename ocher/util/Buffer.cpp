@@ -1,3 +1,5 @@
+#include "Buffer.h"
+
 #define __STDC_FORMAT_MACROS
 #include <assert.h>
 #include <ctype.h>
@@ -5,8 +7,6 @@
 #include <new>
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "Buffer.h"
 
 // define proper names for case-option of _doReplace()
 #define KEEP_CASE false

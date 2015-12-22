@@ -1,7 +1,7 @@
-#include <new>
-
 #include "util/LogAppenderFile.h"
 #include "util/Path.h"
+
+#include <new>
 
 
 LogAppenderFile::LogAppenderFile(const char *filename) :

@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <sys/types.h>
 
 /**
  *  An efficient copy-on-write buffer, which can hold C strings or binary data.
