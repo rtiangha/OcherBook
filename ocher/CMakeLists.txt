@@ -221,9 +221,10 @@ endforeach()
 add_custom_target(cppcheck
 	COMMAND cppcheck
 		--max-configs=100 ${CPPCHECK_CPUS}
-		-ithird-party ${CPPCHECK_INCS}
+		-i${THIRD_PARTY_DIR} --config-exclude=${THIRD_PARTY_DIR}
 		--std=c++11 --std=posix --language=c++
 		--enable=warning
+		${CPPCHECK_INCS}
 		${CMAKE_CURRENT_SOURCE_DIR} 2> ${CMAKE_CURRENT_BINARY_DIR}/cppcheck.log
 	WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 	)

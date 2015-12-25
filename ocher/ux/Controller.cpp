@@ -97,6 +97,8 @@ Controller::Controller(Options *options) :
 
     initDebug();
 
+    g_container.settings->load();
+
     // Sort UxController list based on desirability
     // (assume native >> toolkits >> framebuffer >> tui >> text)
 #ifdef UX_FB

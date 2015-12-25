@@ -44,6 +44,10 @@ public:
     int outFd;
 
     std::map<std::string, std::string> keys;
+
+    /** User's password, to unlock a secure level.  Typically cleared on power-off or sleep.
+     */
+    std::string password;
 };
 
 #endif
