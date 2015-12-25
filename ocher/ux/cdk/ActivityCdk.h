@@ -10,7 +10,7 @@
 
 class UxControllerCdk;
 
-/**
+/** Specialization of Activity for ncurses
  */
 class ActivityCdk : public Activity {
 public:

@@ -9,20 +9,20 @@
 
 /**
  *  Hashes a chunk of data.
- *  @param key
+ *  @param data
  *  @param len
  *  @return A 32 bit hash value.
  *  @note This hash is not necessarily consistent across different endiannesses.
  */
-uint32_t hash(const uint8_t *key, unsigned int len);
+uint32_t hash(const uint8_t *data, unsigned int len);
 
-inline uint32_t hash(const char *key, unsigned int len)
+inline uint32_t hash(const char *data, unsigned int len)
 {
-    return hash((const uint8_t *)key, len);
+    return hash((const uint8_t *)data, len);
 }
-inline uint32_t hash(const void *key, unsigned int len)
+inline uint32_t hash(const void *data, unsigned int len)
 {
-    return hash((const uint8_t *)key, len);
+    return hash((const uint8_t *)data, len);
 }
 
 #endif

@@ -1,8 +1,8 @@
 #include "util/MurmurHash2.h"
 
-/**
+/*
  *  MurmurHash2, public domain by Austin Appleby
- *  @url http://murmurhash.googlepages.com
+ *  @sa http://murmurhash.googlepages.com
  *
  *  Requirements when selecting a hash:
  *   - Fast

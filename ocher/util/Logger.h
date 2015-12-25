@@ -16,31 +16,26 @@
 class Logger;
 class LogAppender;
 
-/**
- *  Owns all Logger instances.
+/** Owns all Logger instances.
  */
 class Loggers {
 public:
     Loggers();
     ~Loggers();
 
-    /**
-     *  Clears all Logger instances, and all references to all LogAppenders.
+    /** Clears all Logger instances, and all references to all LogAppenders.
      */
     void clear();
 
-    /**
-     *  Clears all references to the LogAppender.
+    /** Clears all references to the LogAppender.
      */
     void clearAppender(LogAppender *);
 
-    /**
-     *  Creates a default root Logger.
+    /** Creates a default root Logger.
      */
     void setRoot();
 
-    /**
-     *  Returns the named Logger.  If it does not yet exist, it is created.  Ownership remains
+    /** Returns the named Logger.  If it does not yet exist, it is created.  Ownership remains
      *  with the Loggers.
      *  @param[in] name  The name of the logger, in dotted form.
      */
@@ -96,34 +91,45 @@ public:
      *  Convenience methods to log to a specific logger.  If the logger's level includes the
      *  specified level, the message is forwarded on to all Appenders up the heirarchy.
      * @param name  Identifies the receiving Logger.
+     * @param level  Level to log at
+     * @param fmt  Format string
+     * @param args  Arguments for the format string
      */
     static void log(const char *name, Log::Level, const char *fmt, va_list args);
     /**
      * @param name  Identifies the receiving Logger.
+     * @param level  Level to log at
+     * @param fmt  Format string
      */
     static void log(const char *name, Log::Level, const char *fmt, ...) __attribute__((format(printf, 3, 4)));
     /**
      * @param name  Identifies the receiving Logger.
+     * @param fmt  Format string
      */
     static void trace(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
+     * @param fmt  Format string
      */
     static void debug(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
+     * @param fmt  Format string
      */
     static void info(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
+     * @param fmt  Format string
      */
     static void warn(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
+     * @param fmt  Format string
      */
     static void error(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
+     * @param fmt  Format string
      */
     static void fatal(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
@@ -204,6 +210,7 @@ public:
 
     /**
      *  Sets the minimum level that this logger will log.
+     * @param level  Minimum log level
      */
     void setLevel(Log::Level level);
 
@@ -221,35 +228,46 @@ public:
 
     /**
      *  Log the message at the specified level.
+     *  @param level  Level to log at
+     *  @param fmt  Format string
      */
     void log(Log::Level level, const char *fmt, ...);
 
     /**
      *  Log the message at the specified level.
+     * @param level  Level to log at
+     * @param fmt  Format string
+     * @param args  Arguments for the format string
      */
     void log(Log::Level level, const char *fmt, va_list args);
 
     /**
+     * @param fmt  Format string
      */
     void trace(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
+     * @param fmt  Format string
      */
     void debug(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
+     * @param fmt  Format string
      */
     void info(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
+     * @param fmt  Format string
      */
     void warn(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
+     * @param fmt  Format string
      */
     void error(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
+     * @param fmt  Format string
      */
     void fatal(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
 

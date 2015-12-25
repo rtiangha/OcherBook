@@ -48,7 +48,7 @@ public:
 
     enum SortKeys {
         ByAuthor,
-        By
+        ByTitle,
     };
 
     /**
@@ -67,7 +67,7 @@ public:
 
 /** The Library contains references to all of the user's books.
  *
- * Unlike the Shelf, it owns the actual books.
+ * Unlike a Shelf, it owns the actual books.
  */
 class Library : public GroupOfBooks {
 public:
@@ -92,7 +92,7 @@ protected:
 };
 
 
-/**
+/** A ShortList is a Shelf of books the user intends to read.
  */
 class ShortList : public Shelf {
 public:
@@ -101,12 +101,14 @@ public:
     {
         m_base->attach(this);
     }
+
     ~ShortList()
     {
         m_base->detach(this);
     }
 
     void update(GroupOfBooks *changed);
+
     const std::vector<Meta *> *getList() const
     {
         return &m_meta;

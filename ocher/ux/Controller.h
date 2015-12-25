@@ -18,15 +18,16 @@ class Options;
 class PowerSaver;
 class Renderer;
 
-/**
+/** Holds the current reading state.
  */
-class Context {
+class ReadingContext {
 public:
-    Context() :
+    ReadingContext() :
         shortList(&library),
         selected(0)
     {
     }
+
     Library library;
     ShortList shortList;
 
@@ -54,6 +55,7 @@ public:
     {
         return (FrameBuffer *)0;
     }
+
     virtual FontEngine *getFontEngine()
     {
         return (FontEngine *)0;
@@ -68,7 +70,7 @@ public:
     void onDirChanged(const char *dir, const char *file);
     void onAppEvent(struct OcherAppEvent *evt);
 
-    Context ctx;
+    ReadingContext ctx;
 
 protected:
     enum ActivityType m_nextActivity;

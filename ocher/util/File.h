@@ -33,6 +33,7 @@ public:
     File();
 
     /** Constructor.
+     *  @param filename
      *  @param mode  Similar to the mode string expected by fopen ("r", "r+", "w", etc).  For
      *      compatibility, binary may be specified with "b", but is always assumed anyway.
      *      Optional (non-C-like) suffixes include "x" (fail if file already exists), "u"
@@ -71,7 +72,7 @@ public:
     uint64_t position() const;
 
     /** @param offset
-     *  @param  how  What offset is relative to
+     *  @param  whence  What offset is relative to
      *  @throw  IOException if seek failed
      *  @return  The new absolute offset
      */
@@ -86,7 +87,6 @@ public:
     uint32_t read(char *buffer, uint32_t numBytes);
 
     /** Reads a line, up to any and including any line terminator.
-     *  @param buf the string to read into
      *  @param keepEol Whether to keep or strip the end of line character, if any.
      *  @param maxLen Maximum reasonable length (or 0 for unlimited); greater causes an exception
      *  @throw IOException on error (EOF is not an error)

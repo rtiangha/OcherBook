@@ -10,7 +10,7 @@
 
 class UxControllerFd;
 
-/**
+/** Specialization of Activity for file descriptors
  */
 class ActivityFd : public Activity {
 public:

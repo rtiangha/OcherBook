@@ -21,6 +21,8 @@ struct EpubItem {
     std::string mediaType;
 };
 
+/** EPub file format reader
+ */
 class Epub : public Format {
 public:
     /**

@@ -2,7 +2,8 @@
 #define UTIL_EXCEPTION_H
 
 /**
- *  @file Common exceptions.
+ *  @file
+ *  Common exceptions.
  *
  *  @todo  better state than a string.  e.g., include file
  */

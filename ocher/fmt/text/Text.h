@@ -9,6 +9,8 @@
 #include "ocher/fmt/Format.h"
 
 
+/** Plain-text file format reader
+ */
 class Text : public Format {
 public:
     Text(const std::string &filename);

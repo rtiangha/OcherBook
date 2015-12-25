@@ -11,7 +11,7 @@
 
 class UxControllerFb;
 
-/**
+/** Specialization of Activity for framebuffers
  */
 class ActivityFb : public Activity, public Window {
 public:
