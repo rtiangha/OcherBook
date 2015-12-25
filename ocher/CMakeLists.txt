@@ -47,7 +47,6 @@ list(APPEND LIB_SOURCES
 	util/Debug.h
 	util/DirIter.cpp
 	util/DirIter.h
-	util/Exception.h
 	util/File.cpp
 	util/File.h
 	util/Intrinsics.h

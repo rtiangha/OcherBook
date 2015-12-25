@@ -1,5 +1,4 @@
 #include "util/Buffer.h"
-#include "util/Exception.h"
 #include "util/File.h"
 #include "util/Random.h"
 
@@ -10,6 +9,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/uio.h>
+#include <system_error>
 #include <unistd.h>
 
 #undef O_BINARY
@@ -31,7 +31,7 @@ File::File(const std::string &pathname, const char *mode) :
     int r = init(mode);
 
     if (r)
-        throw IOException("init", r);
+        throw std::system_error(r, std::system_category(), "init");
 }
 
 File::File(const char *pathname, const char *mode) :
@@ -42,7 +42,7 @@ File::File(const char *pathname, const char *mode) :
     int r = init(mode);
 
     if (r)
-        throw IOException("init", r);
+        throw std::system_error(r, std::system_category(), "init");
 }
 
 int File::setTo(const char *pathname, const char *mode)
@@ -182,7 +182,7 @@ File::~File()
 uint64_t File::position() const
 {
     if (!m_fd) {
-        throw IOException("position", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "position");
     }
     return ftell(m_fd);
 }
@@ -190,11 +190,11 @@ uint64_t File::position() const
 uint64_t File::seek(int64_t offset, int whence)
 {
     if (!m_fd) {
-        throw IOException("seek", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "seek");
     }
     int r = fseek(m_fd, offset, whence);
     if (r == -1)
-        throw IOException("seek", errno);
+        throw std::system_error(errno, std::system_category(), "seek");
     return ftell(m_fd);
 }
 
@@ -203,7 +203,7 @@ uint64_t File::size()
     struct stat statbuf;
 
     if (!m_fd) {
-        throw IOException("size", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "size");
     }
     int fd = fileno(m_fd);
     int r = fstat(fd, &statbuf);
@@ -217,7 +217,7 @@ void File::getTimes(time_t &accessTime, time_t &modifyTime, time_t &changeTime)
     struct stat statbuf;
 
     if (!m_fd) {
-        throw IOException("getTimes", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "getTimes");
     }
     int fd = fileno(m_fd);
     int r = fstat(fd, &statbuf);
@@ -231,13 +231,13 @@ void File::getTimes(time_t &accessTime, time_t &modifyTime, time_t &changeTime)
 uint32_t File::read(char *buf, uint32_t numBytes)
 {
     if (!m_fd) {
-        throw IOException("read", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "read");
     }
     size_t r;
     r = fread(buf, 1, numBytes, m_fd);
     if (r != numBytes) {
         if (ferror(m_fd)) {
-            throw IOException("fread", EIO);
+            throw std::system_error(EIO, std::system_category(), "fread");
         }
     }
     return r;
@@ -246,7 +246,7 @@ uint32_t File::read(char *buf, uint32_t numBytes)
 std::string File::readLine(bool keepEol, size_t maxLen)
 {
     if (!m_fd) {
-        throw IOException("readLine", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "readLine");
     }
     uint32_t bytesRead = 0;
     Buffer buf;
@@ -260,7 +260,7 @@ std::string File::readLine(bool keepEol, size_t maxLen)
                 break;
             } else {
                 buf.unlockBuffer(bytesRead);
-                throw IOException("fgets", errno);
+                throw std::system_error(errno, std::system_category(), "fgets");
             }
         }
         size_t len = strlen(r);
@@ -268,7 +268,7 @@ std::string File::readLine(bool keepEol, size_t maxLen)
         if (tmpBuf[len - 1] != '\n') {
             buf.unlockBuffer(bytesRead);
             if (maxLen && len > maxLen)
-                throw BufferOverflowException();
+                throw std::overflow_error("readLine");
         } else {
             if (!keepEol) {
                 tmpBuf[len - 1] = '\0';
@@ -321,12 +321,12 @@ void File::readRest(std::string &s)
 void File::write(const char *buf, uint32_t numBytes)
 {
     if (!m_fd) {
-        throw IOException("write", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "write");
     }
     size_t r;
     r = fwrite(buf, 1, numBytes, m_fd);
     if (r != numBytes) {
-        throw IOException("write", EIO);
+        throw std::system_error(EIO, std::system_category(), "write");
     }
     assert((uint32_t)r == numBytes);  // sucessful blocking IO does not do short writes
 }
@@ -334,7 +334,7 @@ void File::write(const char *buf, uint32_t numBytes)
 void File::flush()
 {
     if (!m_fd) {
-        throw IOException("flush", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "flush");
     }
     fflush(m_fd);
 }
@@ -350,7 +350,7 @@ void File::close()
 bool File::isEof() const
 {
     if (!m_fd) {
-        throw IOException("isEof", EINVAL);
+        throw std::system_error(EINVAL, std::system_category(), "isEof");
     }
     // Note: does not set errno
     return feof(m_fd) > 0;

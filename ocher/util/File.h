@@ -40,7 +40,7 @@ public:
      *      (create unique filename based off specified filename), and "t" for a temporary
      *      file (automatically unlink in destructor).  In summary, mode must
      *      match [rwa]b?+?b?[xut]?
-     *  @throw  IOException if open failed
+     *  @throw  std::system_error if open failed
      */
     File(const std::string &filename, const char *mode = "r");
     File(const char *filename, const char *mode = "r");
@@ -73,7 +73,7 @@ public:
 
     /** @param offset
      *  @param  whence  What offset is relative to
-     *  @throw  IOException if seek failed
+     *  @throw  std::system_error if seek failed
      *  @return  The new absolute offset
      */
     uint64_t seek(int64_t offset, int whence);
@@ -82,30 +82,30 @@ public:
      *  @param buffer
      *  @param numBytes
      *  @return  The number of bytes read.  Less than requested indicates EOF.
-     *  @throw  IOException on error (EOF is not an error)
+     *  @throw  std::system_error on error (EOF is not an error)
      */
     uint32_t read(char *buffer, uint32_t numBytes);
 
     /** Reads a line, up to any and including any line terminator.
      *  @param keepEol Whether to keep or strip the end of line character, if any.
      *  @param maxLen Maximum reasonable length (or 0 for unlimited); greater causes an exception
-     *  @throw IOException on error (EOF is not an error)
+     *  @throw std::system_error on error (EOF is not an error)
      *  @throw BufferOverflowException if maxLen exceeded
      */
     std::string readLine(bool keepEol = false, size_t maxLen = 0);
 
     /** Reads numBytes into buffer at offset.
-     *  @throw  IOException on error (EOF is not an error)
+     *  @throw  std::system_error on error (EOF is not an error)
      */
     uint32_t read(Buffer &buffer, uint32_t numBytes, uint32_t offset = 0);
 
     /** Reads and returns the remainder of the file, appending it to the string.
      *  @param[out] b  Rest of file is appended to this buffer.
-     *  @throw  IOException on error (EOF is not an error)
+     *  @throw  std::system_error on error (EOF is not an error)
      */
     void readRest(std::string &b);
 
-    /** @throw  IOException
+    /** @throw  std::system_error
      */
     void write(const char *buf, uint32_t numBytes);
     void write(const std::string &buf)
