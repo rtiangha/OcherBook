@@ -18,7 +18,8 @@
 
 
 File::File() :
-    m_fd(0)
+    m_fd(0),
+    m_temp(false)
 {
 }
 

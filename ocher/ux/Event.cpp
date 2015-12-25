@@ -62,7 +62,7 @@ void EventWork::run()
 
 void EventWork::notifyCb(EV_P_ ev_async *w, int revents)
 {
-    EventWork *self = ((EventWork *)w->data);
+    EventWork *self = static_cast<EventWork *>(w->data);
 
     self->notify();
 }

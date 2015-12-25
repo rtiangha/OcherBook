@@ -24,6 +24,7 @@ Container::Container() :
     battery(0),
     filesystem(0),
     settings(0),
+    options(0),
     powerSaver(0),
     uxController(0),
     frameBuffer(0),

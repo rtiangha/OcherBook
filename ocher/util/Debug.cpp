@@ -47,7 +47,7 @@ void Debugger::printf(char const *fmt, ...)
 
 int Debugger::asserted(char const *file, int line, char const *expr)
 {
-    Debugger::printf("%s:%u: failed assertion `%s'\n", file, line, expr);
+    Debugger::printf("%s:%d: failed assertion `%s'\n", file, line, expr);
     int r = Debugger::enter();
 
     if (r == 0)

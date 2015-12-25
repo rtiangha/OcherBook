@@ -53,7 +53,6 @@ public:
     void setNextActivity(enum ActivityType a);
 
 protected:
-    enum ActivityType m_nextActivity;
     ActivityFb *m_activity;
 
     BootActivityFb *m_bootActivity;
@@ -67,7 +66,7 @@ protected:
     Renderer *m_renderer;
     FontEngine *m_fontEngine;
     FrameBuffer *m_frameBuffer;
-    FbScreen *m_screen;
+    FbScreen m_screen;
 
     std::string m_name;
 };

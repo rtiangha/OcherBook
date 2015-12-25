@@ -18,8 +18,7 @@ Lock::Lock()
 #elif defined(__BEOS__) || defined(__HAIKU__)
     // nothing
 #else
-    int r;
-    if ((r = pthread_mutex_init(&m_lock, NULL)))
+    if (pthread_mutex_init(&m_lock, NULL))
         throw std::bad_alloc();
 #endif
 }

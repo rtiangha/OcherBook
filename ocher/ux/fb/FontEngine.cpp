@@ -21,9 +21,9 @@ GlyphCache::GlyphCache()
 
 GlyphCache::~GlyphCache()
 {
-    for (auto it = m_cache.begin(); it != m_cache.end(); ++it) {
+    for (auto it = m_cache.begin(); it != m_cache.end(); ) {
         delete it->second;
-        m_cache.erase(it++);
+        it = m_cache.erase(it);
     }
 }
 

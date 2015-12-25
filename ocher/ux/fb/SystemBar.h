@@ -17,7 +17,6 @@ public:
     SystemBar(FrameBuffer *fb, Battery *battery);
 
     bool m_sep;
-    std::string m_title;
 
 protected:
     void drawContent(Rect *);

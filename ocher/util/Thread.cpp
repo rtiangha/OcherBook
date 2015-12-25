@@ -183,7 +183,7 @@ void Thread::start()
 
 thread_status_t Thread::bootstrap(void *_self)
 {
-    Thread *self = (Thread *)_self;
+    Thread *self = static_cast<Thread *>(_self);
     Log::debug("util.thread", "Thread \"%s\" bootstrap", self->m_name.c_str());
 
     self->m_stateChange.lock();

@@ -42,7 +42,7 @@ Widget::~Widget()
 
 void Widget::addChild(Widget *child)
 {
-    ASSERT(!m_children.hasItem(child));
+    //ASSERT(!m_children.hasItem(child));
     child->m_flags |= WIDGET_OWNED;
     m_children.push_back(child);
     if (!(child->m_flags & WIDGET_HIDDEN)) {
@@ -52,7 +52,7 @@ void Widget::addChild(Widget *child)
 
 void Widget::addChild(Widget &child)
 {
-    ASSERT(!m_children.hasItem(&child));
+    //ASSERT(!m_children.hasItem(&child));
     m_children.push_back(&child);
     if (!(child.m_flags & WIDGET_HIDDEN)) {
         child.invalidate();
@@ -111,8 +111,7 @@ Window::Window() :
     m_bgColor(0xffffffff),
     m_borderColor(0),
     m_borderWidth(borderWidth),
-    m_winflags(0),
-    m_title(0)
+    m_winflags(0)
 {
 }
 
@@ -121,15 +120,12 @@ Window::Window(int x, int y, unsigned int w, unsigned int h) :
     m_bgColor(0xffffffff),
     m_borderColor(0),
     m_borderWidth(borderWidth),
-    m_winflags(0),
-    m_title(0)
+    m_winflags(0)
 {
 }
 
 Window::~Window()
 {
-    if (m_title)
-        free(m_title);
 }
 
 void Window::maximize()
@@ -141,9 +137,7 @@ void Window::maximize()
 
 void Window::setTitle(const char *title)
 {
-    if (m_title)
-        free(m_title);
-    m_title = strdup(title);
+    m_title = title;
 }
 
 void Window::draw()
@@ -272,7 +266,7 @@ void Spinner::start()
 void Spinner::timeoutCb(EV_P_ ev_timer *timer, int)
 {
     Log::trace(LOG_NAME ".spinner", "timeout");
-    Spinner *self = ((Spinner *)timer->data);
+    Spinner *self = static_cast<Spinner *>(timer->data);
 
     self->m_state++;
     if (self->m_state >= self->m_steps)
@@ -367,7 +361,7 @@ void FbScreen::addChild(Window *child)
 {
     Widget *widget = dynamic_cast<Widget *>(child);
 
-    ASSERT(!m_children.hasItem(widget));
+    //ASSERT(!m_children.hasItem(widget));
     widget->m_flags |= WIDGET_OWNED;
     m_children.push_back(widget);
     if (!(widget->m_flags & WIDGET_HIDDEN)) {
@@ -378,7 +372,7 @@ void FbScreen::addChild(Window *child)
 #if 0
 void FbScreen::addChild(Widget &child)
 {
-    ASSERT(!m_children.hasItem(&child));
+    //ASSERT(!m_children.hasItem(&child));
     m_children.push_back(&child);
     if (!(child.m_flags & WIDGET_HIDDEN)) {
         child.invalidate();
@@ -440,13 +434,13 @@ void FbScreen::timeoutCb(EV_P_ ev_timer *timer, int)
 {
     Log::trace(LOG_NAME ".screen", "timeout");
 
-    ((FbScreen *)timer->data)->update();
+    static_cast<FbScreen *>(timer->data)->update();
 }
 
 void FbScreen::readyToIdle(EV_P_ ev_prepare *p, int)
 {
     Log::trace(LOG_NAME ".screen", "readyToIdle");
-    FbScreen *self = (FbScreen *)p->data;
+    FbScreen *self = static_cast<FbScreen *>(p->data);
 
     self->update();
     ev_timer_stop(loop, &self->m_timer);
@@ -455,7 +449,7 @@ void FbScreen::readyToIdle(EV_P_ ev_prepare *p, int)
 void FbScreen::waking(EV_P_ ev_check *c, int)
 {
     Log::trace(LOG_NAME ".screen", "waking");
-    FbScreen *self = (FbScreen *)c->data;
+    FbScreen *self = static_cast<FbScreen *>(c->data);
 
     ev_timer_start(loop, &self->m_timer);
 }

@@ -32,6 +32,7 @@
 
 
 UxController::UxController() :
+    m_nextActivity(ACTIVITY_QUIT),
     m_powerSaver(0),
     m_loop(0)
 {

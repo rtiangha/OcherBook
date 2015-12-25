@@ -7,8 +7,11 @@
 
 
 RleBitmap::RleBitmap() :
-    m_p(0)
+    m_p(0),
+    m_len(0),
+    m_off(0)
 {
+    // TODO
 }
 
 void RleBitmap::pack(uint8_t *u, unsigned int len, uint8_t *p)
@@ -24,7 +27,7 @@ void RleBitmap::pack(uint8_t *u, unsigned int len, uint8_t *p)
             *p++ = runOf;
             if (--count) {
                 *p++ = runOf;
-                *p++ = --count;
+                *p++ = count - 1;
                 count = 0;
             }
             runOf = u[i];

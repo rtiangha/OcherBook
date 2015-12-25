@@ -23,6 +23,7 @@ public:
     FrameBuffer()
     {
     }
+
     virtual ~FrameBuffer()
     {
     }

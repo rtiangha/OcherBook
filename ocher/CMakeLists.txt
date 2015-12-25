@@ -204,7 +204,6 @@ endif()
 
 add_executable(ocher
 	ocher.cpp
-	${BIN_SOURCES}
 	)
 target_link_libraries(ocher
 	ocherbook
@@ -214,15 +213,20 @@ target_link_libraries(ocher
 include(ProcessorCount)
 ProcessorCount(NUM_CPUS)
 if(NOT NUM_CPUS EQUAL 0)
-	set(CPPCHECK_FLAGS -j${NUM_CPUS})
+	set(CPPCHECK_CPUS -j${NUM_CPUS})
 endif()
 get_target_property(OCHER_INCS ocherbook INCLUDE_DIRECTORIES)
 foreach(INC ${OCHER_INCS})
 	list(APPEND CPPCHECK_INCS "-I${INC}")
 endforeach()
 add_custom_target(cppcheck
-	#COMMAND cppcheck --check-config $(INCS) ocher/ 2> $(BUILD_DIR)/cppcheck.log
-	COMMAND cppcheck --max-configs=100 ${CPPCHECK_FLAGS} --enable=all ${CPPCHECK_INCS} ${CMAKE_CURRENT_SOURCE_DIR} 2> ${CMAKE_CURRENT_BINARY_DIR}/cppcheck.log
+	COMMAND cppcheck
+		--max-configs=100 ${CPPCHECK_CPUS}
+		-ithird-party ${CPPCHECK_INCS}
+		--std=c++11 --std=posix --language=c++
+		--enable=warning
+		${CMAKE_CURRENT_SOURCE_DIR} 2> ${CMAKE_CURRENT_BINARY_DIR}/cppcheck.log
+	WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
 	)
 
 

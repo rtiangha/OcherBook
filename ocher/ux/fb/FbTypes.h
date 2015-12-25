@@ -15,6 +15,7 @@ struct Pos {
     Pos()
     {
     }
+
     Pos(int16_t _x, int16_t _y) :
         x(_x),
         y(_y)
@@ -37,9 +38,9 @@ struct Rect {
         h(_h)
     {
     }
-    Pos *pos()
+    const Pos *pos()
     {
-        return (Pos *)this;
+        return reinterpret_cast<const Pos *>(this);
     }
     void offsetBy(Pos *p)
     {

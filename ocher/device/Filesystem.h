@@ -23,6 +23,9 @@ public:
     Filesystem();
     ~Filesystem();
 
+    Filesystem(const Filesystem &) = delete;
+    Filesystem &operator=(const Filesystem &) = delete;
+
     const char **m_libraries;
     char *m_home;
     char *m_settings;

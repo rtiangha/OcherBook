@@ -21,6 +21,7 @@ public:
         ul(0),
         b(0),
         em(0),
+        pad(0),
         pts(12)
     {
     }

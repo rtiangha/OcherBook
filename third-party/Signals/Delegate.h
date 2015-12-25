@@ -199,8 +199,13 @@ inline OutputClass horrible_cast(const InputClass input){
 	// Cause a compile-time error if in, out and u are not the same size.
 	// If the compile fails here, it means the compiler has peculiar
 	// unions which would prevent the cast from working.
+#if 0
 	typedef int ERROR_CantUseHorrible_cast[sizeof(InputClass)==sizeof(u)
 		&& sizeof(InputClass)==sizeof(OutputClass) ? 1 : -1];
+#else
+	static_assert(sizeof(InputClass)==sizeof(u)
+		&& sizeof(InputClass)==sizeof(OutputClass), "can't use horrible_cast");
+#endif
 	u.in = input;
 	return u.out;
 }
@@ -316,7 +321,11 @@ struct SimplifyMemFunc {
 		GenericMemFuncType &bound_func) {
 		// Unsupported member function type -- force a compile failure.
 		// (it's illegal to have a array with negative size).
+#if 0
 		typedef char ERROR_Unsupported_member_function_pointer_on_this_compiler[N-100];
+#else
+		static_assert(N >= 100, "unsupported member function pointer");
+#endif
 		return 0;
 	}
 };
@@ -802,7 +811,11 @@ public:
 		// Ensure that there's a compilation failure if function pointers
 		// and data pointers have different sizes.
 		// If you get this error, you need to #undef FASTDELEGATE_USESTATICFUNCTIONHACK.
+#if 0
 		typedef int ERROR_CantUseEvilMethod[sizeof(GenericClass *)==sizeof(function_to_bind) ? 1 : -1];
+#else
+		static_assert(sizeof(GenericClass *)==sizeof(function_to_bind), "can't use evil method");
+#endif
 		m_pthis = horrible_cast<GenericClass *>(function_to_bind);
 		// MSVC, SunC++ and DMC accept the following (non-standard) code:
 //		m_pthis = static_cast<GenericClass *>(static_cast<void *>(function_to_bind));
@@ -817,7 +830,11 @@ public:
 		// Ensure that there's a compilation failure if function pointers
 		// and data pointers have different sizes.
 		// If you get this error, you need to #undef FASTDELEGATE_USESTATICFUNCTIONHACK.
+#if 0
 		typedef int ERROR_CantUseEvilMethod[sizeof(UnvoidStaticFuncPtr)==sizeof(this) ? 1 : -1];
+#else
+		static_assert(sizeof(UnvoidStaticFuncPtr)==sizeof(this), "can't use evil method");
+#endif
 		return horrible_cast<UnvoidStaticFuncPtr>(this);
 	}
 #endif // !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)

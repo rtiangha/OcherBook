@@ -50,7 +50,8 @@ static std::string settingsDir()
 #endif
 
 Filesystem::Filesystem() :
-    m_libraries(0)
+    m_libraries(0),
+    m_infd(-1)
 {
 #ifdef OCHER_TARGET_KOBO
     m_libraries = new const char *[3];
@@ -91,8 +92,10 @@ void Filesystem::initWatches(Options *options)
         return;
     }
 
+    if (!options->files)
+        return;
     for (int i = 0;; ++i) {
-        const char *lib = options->files[i]; // m_libraries[i];
+        const char *lib = options->files[i]; // TODO  m_libraries[i];
         if (!lib)
             break;
         int wd = inotify_add_watch(m_infd, lib, IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);

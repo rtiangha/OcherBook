@@ -15,6 +15,7 @@
 
 UxControllerFb::UxControllerFb() :
     m_systemBar(0),
+    m_navBar(0),
     m_activity(0),
     m_bootActivity(0),
     m_homeActivity(0),
@@ -86,6 +87,9 @@ bool UxControllerFb::init()
     m_sleepActivity = new SleepActivityFb(this);
     m_syncActivity = new SyncActivityFb(this);
 
+    m_screen.setFrameBuffer(frameBuffer);
+    m_screen.setEventLoop(g_container.loop);
+
     return true;
 }
 
@@ -102,7 +106,7 @@ void UxControllerFb::run(enum ActivityType a)
         Log::info(LOG_NAME, "next activity: %d", m_nextActivity);
 
         if (m_activity) {
-            m_screen->removeChild(m_activity);
+            m_screen.removeChild(m_activity);
             m_activity->onDetached();
         }
 
@@ -132,7 +136,7 @@ void UxControllerFb::run(enum ActivityType a)
             ASSERT(0);
         }
 
-        m_screen->addChild(m_activity);
+        m_screen.addChild(m_activity);
         m_activity->onAttached();
 
         m_frameBuffer->needFull();

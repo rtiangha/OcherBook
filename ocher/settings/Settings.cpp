@@ -28,7 +28,8 @@ Settings::Settings() :
     marginRight(10),
     smallSpace(10),
     medSpace(15),
-    largeSpace(30)
+    largeSpace(30),
+    m_fs(NULL)
 {
 #ifdef OCHER_TARGET_KOBO
     fontRoot = "/usr/local/Trolltech/QtEmbedded-4.6.2-arm/lib/fonts";

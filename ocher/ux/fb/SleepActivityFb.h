@@ -17,7 +17,6 @@ public:
     void onDetached();
 
 protected:
-    UxControllerFb *m_uxController;
     FrameBuffer *m_fb;
     Device *m_device;
     EventLoop *m_loop;

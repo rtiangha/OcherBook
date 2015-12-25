@@ -14,7 +14,6 @@
 
 SleepActivityFb::SleepActivityFb(UxControllerFb *c) :
     ActivityFb(c),
-    m_uxController(c),
     m_fb(c->getFrameBuffer()),
     m_device(g_container.device),
     m_loop(g_container.loop)

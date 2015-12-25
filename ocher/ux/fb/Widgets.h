@@ -189,8 +189,9 @@ public:
     uint8_t m_borderWidth;
     uint32_t m_winflags;
 
+    std::string m_title;
+
 protected:
-    char *m_title;
     // border style:  none, simple, raised
     // bubble arrow:  none, top, right, bottom, left
     // close

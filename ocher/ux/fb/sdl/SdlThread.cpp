@@ -15,7 +15,10 @@
 
 
 SdlThread::SdlThread() :
-    Thread("SdlThread")
+    Thread("SdlThread"),
+    m_loop(0),
+    m_startupMonitor(0),
+    m_screen(0)
 {
     pipe(m_pipe);
 
@@ -74,16 +77,21 @@ SDL_Surface *SdlThread::init()
 
 void SdlThread::fireEventsCb(struct ev_loop *, ev_io *watcher, int)
 {
-    ((SdlThread *)watcher->data)->fireEvents();
+    static_cast<SdlThread *>(watcher->data)->fireEvents();
 }
 
 void SdlThread::fireEvents()
 {
     while (1) {
         char c;
+        OcherEvent *evt = NULL;
+
         m_evtLock.lock();
         read(m_pipe[0], &c, 1);
-        OcherEvent *evt = m_evtQ.pop_front();
+        if (!m_evtQ.empty()) {
+            evt = m_evtQ.front();
+            m_evtQ.pop_front();
+        }
         m_evtLock.unlock();
         if (!evt)
             break;

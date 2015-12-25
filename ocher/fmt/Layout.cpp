@@ -14,10 +14,10 @@ Layout::Layout() :
     nl(0),
     ws(0),
     pre(0),
-    m_text(new Buffer),
-    m_textLen(0)
+    m_buffer(new Buffer),
+    m_bufferLen(0)
 {
-    m_text->lockBuffer(chunk);
+    m_buffer->lockBuffer(chunk);
     m_data.lockBuffer(chunk);
 }
 
@@ -38,14 +38,14 @@ Layout::~Layout()
         }
     }
 
-    delete m_text;
+    delete m_buffer;
 }
 
 Buffer Layout::unlock()
 {
     flushText();
-    delete m_text;
-    m_text = 0;
+    delete m_buffer;
+    m_buffer = 0;
 
     m_data.unlockBuffer(m_dataLen);
     return m_data;
@@ -105,10 +105,10 @@ void Layout::popLineAttr(unsigned int n)
 
 inline void Layout::_outputChar(char c)
 {
-    if (m_textLen == chunk) {
+    if (m_bufferLen == chunk) {
         flushText();
     }
-    (*m_text)[m_textLen++] = c;
+    (*m_buffer)[m_bufferLen++] = c;
 }
 
 void Layout::outputChar(char c)
@@ -141,14 +141,14 @@ void Layout::outputBr()
 
 void Layout::flushText()
 {
-    if (m_textLen) {
+    if (m_bufferLen) {
         push(OpCmd, CmdOutputStr, 0);
-        m_text->unlockBuffer(m_textLen);
-        pushPtr(m_text);
-        // m_text pointer is now owned by the layout bytecode.
-        m_text = new Buffer;
-        m_text->lockBuffer(chunk);
-        m_textLen = 0;
+        m_buffer->unlockBuffer(m_bufferLen);
+        pushPtr(m_buffer);
+        // m_buffer pointer is now owned by the layout bytecode.
+        m_buffer = new Buffer;
+        m_buffer->lockBuffer(chunk);
+        m_bufferLen = 0;
     }
 }
 

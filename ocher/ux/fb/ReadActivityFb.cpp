@@ -154,7 +154,7 @@ void ReadActivityFb::onAttached()
 #if 1
             mxml_node_t *tree = epub.parseXml(html);
             if (tree) {
-                ((LayoutEpub *)m_layout)->append(tree);
+                static_cast<LayoutEpub *>(m_layout)->append(tree);
                 mxmlDelete(tree);
             } else {
                 Log::warn(LOG_NAME, "No tree found for spine item %d", i);

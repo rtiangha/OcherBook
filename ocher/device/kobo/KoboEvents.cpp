@@ -78,7 +78,7 @@ void KoboEvents::setEventLoop(EventLoop *loop)
 
 void KoboEvents::buttonCb(struct ev_loop *, ev_io *watcher, int)
 {
-    ((KoboEvents *)watcher->data)->pollButton();
+    static_cast<KoboEvents *>(watcher->data)->pollButton();
 }
 
 void KoboEvents::pollButton()
@@ -115,7 +115,7 @@ void KoboEvents::pollButton()
 
 void KoboEvents::touchCb(struct ev_loop *, ev_io *watcher, int)
 {
-    ((KoboEvents *)watcher->data)->pollTouch();
+    static_cast<KoboEvents *>(watcher->data)->pollTouch();
 }
 
 void KoboEvents::pollTouch()

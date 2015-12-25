@@ -54,14 +54,14 @@ int LibraryActivityFb::evtKey(struct OcherKeyEvent *evt)
             m_uxController->setNextActivity(ACTIVITY_HOME);
             return -1;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
-            Log::info(LOG_NAME, "back from page %d", m_pageNum);
+            Log::info(LOG_NAME, "back from page %u", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
                 invalidate();
             }
             return -1;
         } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
-            Log::info(LOG_NAME, "forward from page %d", m_pageNum);
+            Log::info(LOG_NAME, "forward from page %u", m_pageNum);
             if (m_pageNum + 1 < m_pages) {
                 m_pageNum++;
                 invalidate();

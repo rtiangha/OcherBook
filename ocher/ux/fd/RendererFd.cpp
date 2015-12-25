@@ -28,7 +28,10 @@
 // TODO:  if isatty: SIGWINCH
 
 RendererFd::RendererFd() :
+    m_isTty(false),
     m_fd(-1),
+    m_width(80),
+    m_height(0),
     m_x(0),
     m_y(0),
     ai(1)
@@ -38,8 +41,6 @@ RendererFd::RendererFd() :
 bool RendererFd::init()
 {
     m_fd = g_container.options->inFd;
-    m_width = 80;
-    m_height = 0;
     if (isatty(m_fd) == -1) {
         if (errno == EBADF) {
             Log::error(LOG_NAME, "bad file descriptor");

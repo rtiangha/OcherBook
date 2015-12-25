@@ -20,7 +20,7 @@ void PowerSaver::timeoutCb(EV_P_ ev_timer *timer, int revents)
 {
     Log::debug(LOG_NAME, "timeout");
 
-    ((PowerSaver *)timer->data)->timeout();
+    static_cast<PowerSaver *>(timer->data)->timeout();
 }
 
 void PowerSaver::timeout()

@@ -63,8 +63,6 @@ void Loggers::setRoot()
             lock_guard<mutex> lock(m_lock);
             m_loggers[root->getName()] = root;
         }
-
-        assert(get(""));
     }
 }
 
@@ -216,7 +214,8 @@ static const char levelChar[] = {
     'D',
     'I',
     'W',
-    'E'
+    'E',
+    'F'
 };
 
 void Logger::log(Log::Level level, const char *fmt, va_list ap)

@@ -58,9 +58,9 @@ void LibraryActivityFd::draw()
         Meta *m = (*m_library)[i];
         // TODO:  title/author
         // TODO:  pad to width
-        printf("%3d: %s\n", i + 1, m->title.c_str());
+        printf("%3u: %s\n", i + 1, m->title.c_str());
         printf("     %s\n", m->author.c_str());
-        printf("     %4s  %u of %d\n", Meta::fmtToStr(m->format), 0, 100);
+        printf("     %4s  %d of %d\n", Meta::fmtToStr(m->format), 0, 100);
     }
 
     //char key = getKey();

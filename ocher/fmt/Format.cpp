@@ -33,7 +33,7 @@ Fmt detectFormat(const char *file, Encoding *encoding)
             } else if (r >= 4 && buf[0] == 0xff && buf[1] == 0xfe && !buf[2] && !buf[3]) {
                 skip = 4;
                 *encoding = OCHER_ENC_UTF32LE;
-            } else if (4 >= 4 && !buf[0] && !buf[1] && buf[2] == 0xfe && buf[3] == 0xff) {
+            } else if (r >= 4 && !buf[0] && !buf[1] && buf[2] == 0xfe && buf[3] == 0xff) {
                 skip = 4;
                 *encoding = OCHER_ENC_UTF32BE;
             } else {

@@ -6,14 +6,16 @@
 
 
 RWLock::RWLock()
+#if defined(USE_LIBTASK)
+    : m_writer(false)
+#endif
 {
 #if defined(__BEOS__) || defined(__HAIKU__)
     // TODO
 #elif defined(USE_LIBTASK)
     memset(&m_rwlock, 0, sizeof(m_rwlock));
 #else
-    int r;
-    if ((r = pthread_rwlock_init(&m_rwlock, NULL)))
+    if (pthread_rwlock_init(&m_rwlock, NULL))
         throw std::bad_alloc();
 #endif
 }

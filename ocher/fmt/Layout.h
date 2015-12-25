@@ -79,6 +79,9 @@ public:
     Layout();
     ~Layout();
 
+    Layout(const Layout &) = delete;
+    Layout &operator=(const Layout &) = delete;
+
     // virtual void append(...) = 0;
 
     /** Finishes and returns the laid-out internal buffer.
@@ -111,8 +114,8 @@ protected:
     int nl;
     int ws;
     int pre;
-    Buffer *m_text;
-    unsigned int m_textLen;
+    Buffer *m_buffer;
+    unsigned int m_bufferLen;
 
     // Image* m_images[];
 
