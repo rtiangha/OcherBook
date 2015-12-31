@@ -179,6 +179,7 @@ void Logger::setAppender(LogAppender *a)
     auto iter = m_appenders.find(a);
     if (iter != m_appenders.end())
         m_appenders.erase(iter);
+    m_appenders.insert(a);
     a->setLoggers(m_loggers);
 }
 
