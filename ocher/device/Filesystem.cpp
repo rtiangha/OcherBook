@@ -41,8 +41,8 @@ static std::string settingsDir()
     }
     dir = e;
 #if defined(__APPLE__)
-    Path::join(dir, "Library");
-    Path::join(dir, "Application Support");
+    dir = Path::join(dir, "Library");
+    dir = Path::join(dir, "Application Support");
 #endif
 #endif
     return dir;
@@ -63,13 +63,13 @@ Filesystem::Filesystem() :
 #else
     std::string s = settingsDir();
 #if defined(__HAIKU__) || defined(__APPLE__)
-    Path::join(s, "OcherBook");
+    s = Path::join(s, "OcherBook");
 #else
-    Path::join(s, ".OcherBook");
+    s = Path::join(s, ".OcherBook");
 #endif
     m_home = strdup(s.c_str());
     ::mkdir(s.c_str(), 0775);
-    Path::join(s, "settings");
+    s = Path::join(s, "settings");
     m_settings = strdup(s.c_str());
 #endif
 }
