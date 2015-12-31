@@ -25,6 +25,7 @@ TEST_CASE("nlohmann::json not found") {
 
     // clearly, can get an int:
     i = j["foo"];
+    (void)i;
 
     // trying to get an int (but is null) throws
     REQUIRE_THROWS_AS(i = j["bar"], std::domain_error);

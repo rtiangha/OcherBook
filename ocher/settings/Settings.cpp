@@ -11,6 +11,8 @@
 
 #include "json.hpp"
 
+#include <assert.h>
+
 using nlohmann::json;
 
 Settings defaultSettings;
@@ -22,6 +24,7 @@ const char *Settings::SecureLevelToString(SecureLevel s)
     case SecureLevelPersonal: return "personal";
     case SecureLevelPrivate: return "private";
     }
+    assert(0);
 }
 
 const char *Settings::SleepShowToString(SleepShow s)
@@ -32,6 +35,7 @@ const char *Settings::SleepShowToString(SleepShow s)
     case SleepShowCover: return "cover";
     case SleepShowBlank: return "blank";
     }
+    assert(0);
 }
 
 Settings::Settings() :
