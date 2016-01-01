@@ -53,12 +53,12 @@ HomeActivityFb::~HomeActivityFb()
 {
 }
 
-int HomeActivityFb::evtKey(struct OcherKeyEvent *)
+int HomeActivityFb::evtKey(const struct OcherKeyEvent *)
 {
     return -1;
 }
 
-int HomeActivityFb::evtMouse(struct OcherMouseEvent *evt)
+int HomeActivityFb::evtMouse(const struct OcherMouseEvent *evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);

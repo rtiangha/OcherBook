@@ -22,7 +22,7 @@
 #define LOG_NAME "ocher.ux.Read"
 
 
-int ReadActivityFb::evtKey(struct OcherKeyEvent *evt)
+int ReadActivityFb::evtKey(const struct OcherKeyEvent *evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
@@ -53,7 +53,7 @@ int ReadActivityFb::evtKey(struct OcherKeyEvent *evt)
     return -2;
 }
 
-int ReadActivityFb::evtMouse(struct OcherMouseEvent *evt)
+int ReadActivityFb::evtMouse(const struct OcherMouseEvent *evt)
 {
     SystemBar *systemBar = m_uxController->m_systemBar;
     NavBar *navBar = m_uxController->m_navBar;

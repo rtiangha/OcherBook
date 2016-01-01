@@ -32,7 +32,12 @@ UxControllerCdk::init() {
 
 }
 
-void UxControllerCdk::run(enum ActivityType a)
+void UxControllerCdk::setNextActivity(enum ActivityType a)
 {
-    // TODO
+    Log::info(LOG_NAME, "next activity: %d", a);
+    if (a == ACTIVITY_QUIT) {
+        m_loop->stop();
+    } else {
+        // TODO
+    }
 }

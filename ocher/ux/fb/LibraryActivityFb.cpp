@@ -46,7 +46,7 @@ LibraryActivityFb::~LibraryActivityFb()
     delete[] m_bookRects;
 }
 
-int LibraryActivityFb::evtKey(struct OcherKeyEvent *evt)
+int LibraryActivityFb::evtKey(const struct OcherKeyEvent *evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
@@ -72,7 +72,7 @@ int LibraryActivityFb::evtKey(struct OcherKeyEvent *evt)
     return -2;
 }
 
-int LibraryActivityFb::evtMouse(struct OcherMouseEvent *evt)
+int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);

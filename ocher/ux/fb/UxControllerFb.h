@@ -45,8 +45,6 @@ public:
         return m_renderer;
     }
 
-    void run(enum ActivityType a);
-
     SystemBar *m_systemBar;
     NavBar *m_navBar;
 

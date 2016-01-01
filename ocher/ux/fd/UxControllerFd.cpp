@@ -3,6 +3,7 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/ux/Event.h"
 #include "ocher/ux/Renderer.h"
 #include "ocher/ux/fd/RendererFd.h"
 #include "ocher/ux/fd/UxControllerFd.h"
@@ -28,10 +29,12 @@ bool UxControllerFd::init()
     return true;
 }
 
-void UxControllerFd::run(enum ActivityType a)
+void UxControllerFd::setNextActivity(enum ActivityType a)
 {
-    while (m_nextActivity != ACTIVITY_QUIT) {
-        Log::info(LOG_NAME, "next activity: %d", m_nextActivity);
+    Log::info(LOG_NAME, "next activity: %d", a);
+    if (a == ACTIVITY_QUIT) {
+        m_loop->stop();
+    } else {
         // TODO
     }
 }

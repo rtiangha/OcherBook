@@ -36,10 +36,7 @@ protected:
     static void timeoutCb(EV_P_ ev_timer *w, int revents);
     void timeout();
 
-    void onMouseEvent(struct OcherMouseEvent *evt);
-    void onKeyEvent(struct OcherKeyEvent *evt);
-    void onAppEvent(struct OcherAppEvent *evt);
-    void onDeviceEvent(struct OcherDeviceEvent *evt);
+    void dispatchEvent(const struct OcherEvent *evt);
 
     EventLoop *m_loop;
     ev_timer m_timer;

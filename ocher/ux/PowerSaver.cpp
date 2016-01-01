@@ -40,10 +40,7 @@ void PowerSaver::inject(EventLoop *loop)
 {
     m_loop = loop;
 
-    m_loop->mouseEvent.Connect(this, &PowerSaver::onMouseEvent);
-    m_loop->keyEvent.Connect(this, &PowerSaver::onKeyEvent);
-    m_loop->appEvent.Connect(this, &PowerSaver::onAppEvent);
-    m_loop->deviceEvent.Connect(this, &PowerSaver::onDeviceEvent);
+    m_loop->emitEvent.Connect(this, &PowerSaver::dispatchEvent);
 
     resetTimeout();
 }
@@ -66,27 +63,17 @@ void PowerSaver::resetTimeout()
     m_timer.data = this;
 }
 
-void PowerSaver::onMouseEvent(struct OcherMouseEvent *evt)
+void PowerSaver::dispatchEvent(const struct OcherEvent *evt)
 {
-    resetTimeout();
-}
-
-void PowerSaver::onKeyEvent(struct OcherKeyEvent *evt)
-{
-    if (evt->key == OEVTK_POWER && evt->subtype == OEVT_KEY_UP)
-        timeout();
-    else
+    if (evt->type == OEVT_MOUSE) {
         resetTimeout();
+    } else if (evt->type == OEVT_KEY) {
+        if (evt->key.key == OEVTK_POWER && evt->key.subtype == OEVT_KEY_UP)
+            timeout();
+        else
+            resetTimeout();
+    }
 }
-
-void PowerSaver::onAppEvent(struct OcherAppEvent *evt)
-{
-}
-
-void PowerSaver::onDeviceEvent(struct OcherDeviceEvent *evt)
-{
-}
-
 
 void PowerSaver::sleep()
 {

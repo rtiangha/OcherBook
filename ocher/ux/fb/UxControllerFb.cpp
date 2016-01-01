@@ -95,22 +95,16 @@ bool UxControllerFb::init()
 
 void UxControllerFb::setNextActivity(enum ActivityType a)
 {
-    m_nextActivity = a;
-}
-
-void UxControllerFb::run(enum ActivityType a)
-{
-    setNextActivity(a);
-
-    while (m_nextActivity != ACTIVITY_QUIT) {
-        Log::info(LOG_NAME, "next activity: %d", m_nextActivity);
-
+    Log::info(LOG_NAME, "next activity: %d", a);
+    if (a == ACTIVITY_QUIT) {
+        m_loop->stop();
+    } else {
         if (m_activity) {
             m_screen.removeChild(m_activity);
             m_activity->onDetached();
         }
 
-        switch (m_nextActivity) {
+        switch (a) {
         case ACTIVITY_BOOT:
             m_activity = m_bootActivity;
             break;

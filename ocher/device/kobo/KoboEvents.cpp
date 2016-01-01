@@ -105,7 +105,7 @@ void KoboEvents::pollButton()
                 fire = false;
             }
             if (fire) {
-                m_loop->keyEvent(&evt);
+                m_loop->emitEvent(&evt);
             }
         } else {
             break;
@@ -165,7 +165,7 @@ void KoboEvents::pollTouch()
 #endif
             Log::info(LOG_NAME, "mouse %u, %u %s", m_evt.x, m_evt.y,
                     m_evt.subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
-            m_loop->mouseEvent(&m_evt);
+            m_loop->emitEvent(&m_evt);
         }
     }
 }

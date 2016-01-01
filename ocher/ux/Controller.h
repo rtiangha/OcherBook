@@ -64,17 +64,15 @@ public:
 
     // TODO: in general, need more control (when running a new activity, is the prior
     // one destroyed?  or suspended?
-    virtual void run(enum ActivityType a) = 0;
+    virtual void setNextActivity(enum ActivityType a) = 0;
 
     void onWantToSleep();
     void onDirChanged(const char *dir, const char *file);
-    void onAppEvent(struct OcherAppEvent *evt);
+    void handleEvent(const struct OcherEvent *evt);
 
     ReadingContext ctx;
 
 protected:
-    enum ActivityType m_nextActivity;
-
     Filesystem *m_filesystem;
     PowerSaver *m_powerSaver;
     EventLoop *m_loop;

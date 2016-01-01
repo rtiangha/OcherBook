@@ -29,7 +29,7 @@ public:
         return m_renderer;
     }
 
-    void run(enum ActivityType a);
+    void setNextActivity(enum ActivityType a);
 
 protected:
     std::string m_name;

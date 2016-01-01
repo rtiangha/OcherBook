@@ -58,7 +58,7 @@ void BootActivityFb::highlight(int i)
     m_fb->sync();
 }
 
-int BootActivityFb::evtMouse(struct OcherMouseEvent *evt)
+int BootActivityFb::evtMouse(const struct OcherMouseEvent *evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);

@@ -13,13 +13,11 @@
 
 #include "SDL/SDL.h"
 
-#include <list>
-
 
 /**
  * Thread to initialize SDL graphics and gather SDL events.  Note that SDL must do these two things
  * on the same thread, but the main thread of OcherBook knows nothing of SDL.  Therefore SDL runs on
- * its own thread, and feeds events back to the main thread via libev to be fired there.
+ * its own thread, and injects events back into the EventLoop.
  */
 class SdlThread : public Thread {
 public:
@@ -39,13 +37,6 @@ public:
 protected:
     SDL_Surface *init();
     void run();
-
-    Lock m_evtLock;
-    std::list<OcherEvent *> m_evtQ;
-    int m_pipe[2];
-    struct ev_io m_evtWatcher;
-    static void fireEventsCb(struct ev_loop *, ev_io *watcher, int);
-    void fireEvents();
 
     EventLoop *m_loop;
     Monitor *m_startupMonitor;

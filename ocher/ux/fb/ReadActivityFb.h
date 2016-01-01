@@ -17,8 +17,8 @@ public:
     ReadActivityFb(UxControllerFb *c);
 
 protected:
-    int evtKey(struct OcherKeyEvent *);
-    int evtMouse(struct OcherMouseEvent *);
+    int evtKey(const struct OcherKeyEvent *);
+    int evtMouse(const struct OcherMouseEvent *);
 
     void onAttached();
     void onDetached();

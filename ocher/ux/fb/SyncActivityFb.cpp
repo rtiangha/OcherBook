@@ -29,20 +29,26 @@ public:
         start();
     }
 
+    ~SyncActivityWork()
+    {
+        join();
+    }
+
 protected:
     const char **m_files;
     UxControllerFb *m_uxController;
     void work();
     void processFile(const char *file);
-    void notify();
 };
 
 void SyncActivityWork::work()
 {
     Log::info(LOG_NAME "Work", "working");
 
-    for (const char *file = *m_files; file; file = *++m_files) {
-        processFile(file);
+    if (m_files) {
+        for (const char *file = *m_files; file; file = *++m_files) {
+            processFile(file);
+        }
     }
 }
 
@@ -74,15 +80,6 @@ void SyncActivityWork::processFile(const char *file)
         }
     }
 }
-
-void SyncActivityWork::notify()
-{
-    Log::info(LOG_NAME "Work", "notify");
-
-    m_uxController->ctx.library.notify();
-    m_uxController->setNextActivity(ACTIVITY_HOME);
-}
-
 
 void SyncActivityFb::draw()
 {
@@ -123,4 +120,7 @@ void SyncActivityFb::onDetached()
     // forced out, eg, power saver.  Pause work, don't delete.
     delete m_work;
     m_spinner.stop();
+
+    m_uxController->ctx.library.notify();
+    m_uxController->setNextActivity(ACTIVITY_HOME);
 }

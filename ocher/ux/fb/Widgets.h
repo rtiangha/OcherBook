@@ -45,8 +45,7 @@ public:
 
     void removeChild(Window *child);
 
-    void onMouseEvent(struct OcherMouseEvent *);
-    void onKeyEvent(struct OcherKeyEvent *);
+    void dispatchEvent(const struct OcherEvent *);
 
     EventLoop *m_loop;
 
@@ -132,19 +131,19 @@ public:
     /**
      * @return -1 handled, -2 pass on, >=0 done
      */
-    virtual int evtKey(struct OcherKeyEvent *)
+    virtual int evtKey(const struct OcherKeyEvent *)
     {
         return -2;
     }
-    virtual int evtMouse(struct OcherMouseEvent *)
+    virtual int evtMouse(const struct OcherMouseEvent *)
     {
         return -2;
     }
-    virtual int evtApp(struct OcherAppEvent *)
+    virtual int evtApp(const struct OcherAppEvent *)
     {
         return -2;
     }
-    virtual int evtDevice(struct OcherDeviceEvent *)
+    virtual int evtDevice(const struct OcherDeviceEvent *)
     {
         return -2;
     }
@@ -209,8 +208,8 @@ public:
     virtual void drawLabel(Rect *rect);
 
 protected:
-    int evtKey(struct OcherKeyEvent *);
-    int evtMouse(struct OcherMouseEvent *);
+    int evtKey(const struct OcherKeyEvent *);
+    int evtMouse(const struct OcherMouseEvent *);
 
     int border;
     std::string m_label;

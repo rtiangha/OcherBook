@@ -222,12 +222,12 @@ void Button::drawLabel(Rect *rect)
     }
 }
 
-int Button::evtKey(struct OcherKeyEvent *)
+int Button::evtKey(const struct OcherKeyEvent *)
 {
     return -2;
 }
 
-int Button::evtMouse(struct OcherMouseEvent *)
+int Button::evtMouse(const struct OcherMouseEvent *)
 {
     return -2;
 }
@@ -331,8 +331,7 @@ void FbScreen::setEventLoop(EventLoop *loop)
 
     m_loop = loop;
 
-    m_loop->mouseEvent.Connect(this, &FbScreen::onMouseEvent);
-    m_loop->keyEvent.Connect(this, &FbScreen::onKeyEvent);
+    m_loop->emitEvent.Connect(this, &FbScreen::dispatchEvent);
 
     ev_timer_init(&m_timer, timeoutCb, 0.25, 0.25);
     m_timer.data = this;
@@ -454,22 +453,21 @@ void FbScreen::waking(EV_P_ ev_check *c, int)
     ev_timer_start(loop, &self->m_timer);
 }
 
-void FbScreen::onMouseEvent(struct OcherMouseEvent *evt)
+void FbScreen::dispatchEvent(const struct OcherEvent *evt)
 {
-    /* TODO find the right child */
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        int r = m_children[i]->evtMouse(evt);
-        if (r != -2)
-            break;
-    }
-}
-
-void FbScreen::onKeyEvent(struct OcherKeyEvent *evt)
-{
-    /* TODO find the right child */
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        int r = m_children[i]->evtKey(evt);
-        if (r != -2)
-            break;
+    if (evt->type == OEVT_MOUSE) {
+        /* TODO find the right child */
+        for (unsigned int i = 0; i < m_children.size(); ++i) {
+            int r = m_children[i]->evtMouse(&evt->mouse);
+            if (r != -2)
+                break;
+        }
+    } else if (evt->type == OEVT_KEY) {
+        /* TODO find the right child */
+        for (unsigned int i = 0; i < m_children.size(); ++i) {
+            int r = m_children[i]->evtKey(&evt->key);
+            if (r != -2)
+                break;
+        }
     }
 }

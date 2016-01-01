@@ -11,7 +11,9 @@
 #include "Signals/Signal.h"
 #include <ev.h>
 
+#include <mutex>
 #include <stdint.h>
+#include <vector>
 
 using namespace Gallant;
 
@@ -105,14 +107,26 @@ public:
     /** Defines a new epoch; events timestamped prior to this are silently dropped. */
     void setEpoch();
 
-    Signal1<struct OcherKeyEvent *> keyEvent;
-    Signal1<struct OcherMouseEvent *> mouseEvent;
-    Signal1<struct OcherAppEvent *> appEvent;
-    Signal1<struct OcherDeviceEvent *> deviceEvent;
+    /** Injects events to be dispatched as if they had ocurred within the EventLoop.  This allows
+     * external event loops to be integrated.  The event will be dispatched as soon as possible.
+     */
+    void injectEvent(const struct OcherEvent &event);
+
+    /** Connect to be notified of events.  Your event handlers must be fast; ideally non-blocking.
+     */
+    Signal1<const struct OcherEvent *> emitEvent;
 
     struct ev_loop *evLoop;
 
     uint32_t m_epoch;
+
+protected:
+    ev_async m_async;
+    static void emitInjectedCb(EV_P_ ev_async *w, int revents);
+    void emitInjected();
+
+    std::mutex m_lock;
+    std::vector<struct OcherEvent> m_events;
 };
 
 
@@ -121,8 +135,7 @@ public:
  */
 class EventWork : public Thread {
 public:
-    /**
-     * Derived class must call start().
+    /** Derived class must call start().
      */
     EventWork(EventLoop *loop);
     virtual ~EventWork();
@@ -130,21 +143,19 @@ public:
 protected:
     void run();
 
-    /**
-     * Do your heavy work here.
+    /** Do your heavy work here.
      */
     virtual void work() = 0;
 
-    /**
-     * Runs on the original (event) thread.  Useful place to emit signals to let a state machine
-     * progress.
+    /** Runs on the EventLoop thread.  Useful place to emit signals to let a state machine progress.
+     *
      * @todo progress callback
      */
-    virtual void notify()
+    virtual void notifyComplete()
     {
     }
 
-    static void notifyCb(EV_P_ ev_async *w, int revents);
+    static void completeCb(EV_P_ ev_async *w, int revents);
     ev_async m_async;
     EventLoop *m_loop;
 };

@@ -32,7 +32,6 @@
 
 
 UxController::UxController() :
-    m_nextActivity(ACTIVITY_QUIT),
     m_powerSaver(0),
     m_loop(0)
 {
@@ -43,14 +42,14 @@ UxController::UxController() :
     m_filesystem->dirChanged.Connect(this, &UxController::onDirChanged);
     m_filesystem->initWatches(g_container.options);
 
-    m_loop->appEvent.Connect(this, &UxController::onAppEvent);
+    m_loop->emitEvent.Connect(this, &UxController::handleEvent);
     m_powerSaver->wantToSleep.Connect(this, &UxController::onWantToSleep);
 }
 
 UxController::~UxController()
 {
     m_filesystem->dirChanged.Disconnect(this, &UxController::onDirChanged);
-    m_loop->appEvent.Disconnect(this, &UxController::onAppEvent);
+    m_loop->emitEvent.Disconnect(this, &UxController::handleEvent);
     m_powerSaver->wantToSleep.Disconnect(this, &UxController::onWantToSleep);
 }
 
@@ -67,11 +66,10 @@ void UxController::onWantToSleep()
     // TODO
 }
 
-void UxController::onAppEvent(struct OcherAppEvent *evt)
+void UxController::handleEvent(const struct OcherEvent *evt)
 {
-    if (evt->subtype == OEVT_APP_CLOSE) {
-        m_nextActivity = ACTIVITY_QUIT;
-        m_loop->stop();
+    if (evt->type == OEVT_APP && evt->app.subtype == OEVT_APP_CLOSE) {
+        setNextActivity(ACTIVITY_QUIT);
     }
 }
 
@@ -224,7 +222,8 @@ void Controller::run()
 
     Options *opt = g_container.options;
     ActivityType a = opt->bootMenu ? ACTIVITY_BOOT : ACTIVITY_SYNC;
-    m_uxController->run(a);
+    m_uxController->setNextActivity(a);
+    g_container.loop->run();
 
     // TODO: sync state out
 }
