@@ -3,7 +3,12 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/util/Logger.h"
+#include "ocher/ux/Event.h"
+#include "ocher/ux/cdk/RendererCdk.h"
 #include "ocher/ux/cdk/UxControllerCdk.h"
+
+#define LOG_NAME "ocher.ux.cdk"
 
 UxControllerCdk::UxControllerCdk() :
     m_scr(0),
@@ -22,14 +27,16 @@ UxControllerCdk::~UxControllerCdk()
     delwin(m_scr);
 }
 
-UxControllerCdk::init() {
-    m_renderer = new RendererCdk();
-
+bool UxControllerCdk::init()
+{
     m_scr = initscr();
     m_screen = initCDKScreen(m_scr);
     initCDKColor();
-    m_renderer->init(m_scr, m_screen);
 
+    // TODO:  This should be a thread, like SDL
+    m_renderer = new RendererCdk(m_scr, m_screen);
+
+    return true;
 }
 
 void UxControllerCdk::setNextActivity(enum ActivityType a)
@@ -38,6 +45,33 @@ void UxControllerCdk::setNextActivity(enum ActivityType a)
     if (a == ACTIVITY_QUIT) {
         m_loop->stop();
     } else {
-        // TODO
+
+        // TODO:  this just sends an event to the CDK thread
+        switch (a) {
+        case ACTIVITY_BOOT:
+            // TODO
+            setNextActivity(ACTIVITY_HOME);
+            break;
+        case ACTIVITY_SLEEP:
+            // TODO
+            setNextActivity(ACTIVITY_HOME);
+            break;
+        case ACTIVITY_SYNC:
+            // TODO
+            setNextActivity(ACTIVITY_HOME);
+            break;
+        case ACTIVITY_HOME:
+            break;
+        case ACTIVITY_READ:
+            break;
+        case ACTIVITY_LIBRARY:
+            break;
+        case ACTIVITY_SETTINGS:
+            // TODO
+            setNextActivity(ACTIVITY_HOME);
+            break;
+        default:
+            ASSERT(0);
+        }
     }
 }

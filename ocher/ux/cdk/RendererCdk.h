@@ -8,15 +8,15 @@
 
 #include "ocher/ux/Renderer.h"
 
-#include <cdk/cdkscreen.h>
+// TODO: smaller include fails later:  #include <cdk/cdkscreen.h>
+#include <cdk.h>
 
 class Pagination;
 
 class RendererCdk : public Renderer {
 public:
-    RendererCdk();
+    RendererCdk(WINDOW *scr, CDKSCREEN *m_screen);
 
-    bool init(WINDOW *scr, CDKSCREEN *m_screen);
     int render(Pagination *pagination, unsigned int pageNum, bool doBlit);
 
     int outputWrapped(std::string *b, unsigned int strOffset, bool doBlit);

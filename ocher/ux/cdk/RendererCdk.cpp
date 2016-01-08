@@ -21,19 +21,14 @@
 // TODO:  page size
 // TODO:  margins (not the same as margins for fb?)
 
-RendererCdk::RendererCdk() :
+RendererCdk::RendererCdk(WINDOW *scr, CDKSCREEN *screen) :
+    m_scr(scr),
+    m_screen(screen),
     m_x(0),
     m_y(0),
     ai(1)
 {
-}
-
-bool RendererCdk::init(WINDOW *scr, CDKSCREEN *screen)
-{
-    m_scr = scr;
-    m_screen = screen;
     getmaxyx(m_scr, m_height, m_width);
-    return true;
 }
 
 void RendererCdk::enableUl()

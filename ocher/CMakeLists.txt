@@ -108,8 +108,9 @@ list(APPEND LIB_SOURCES
 	)
 if(OCHER_UI_CDK)
 	list(APPEND LIB_SOURCES
-		ux/cdk/BrowseActivityCdk.cpp
-		ux/cdk/BrowseActivityCdk.h
+		ux/cdk/ActivityCdk.h
+		ux/cdk/LibraryActivityCdk.cpp
+		ux/cdk/LibraryActivityCdk.h
 		ux/cdk/RendererCdk.cpp
 		ux/cdk/RendererCdk.h
 		ux/cdk/UxControllerCdk.cpp
@@ -198,6 +199,7 @@ endif()
 if(OCHER_UI_CDK)
 	target_link_libraries(ocherbook
 		cdk
+		ncurses
 		)
 endif()
 

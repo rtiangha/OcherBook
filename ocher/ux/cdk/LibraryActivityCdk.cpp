@@ -4,40 +4,45 @@
  */
 
 #include "ocher/shelf/Meta.h"
-#include "ocher/ux/cdk/BrowseActivityCdk.h"
 #include "ocher/util/Logger.h"
+#include "ocher/ux/cdk/LibraryActivityCdk.h"
+#include "ocher/ux/cdk/RendererCdk.h"
+#include "ocher/ux/cdk/UxControllerCdk.h"
+
+#include <cdk.h>
 
 #define LOG_NAME "ocher.ux.Library"
 
 
-BrowseActivityCdk::BrowseActivityCdk(UxControllerCdk *uxController) :
+LibraryActivityCdk::LibraryActivityCdk(UxControllerCdk *uxController) :
     ActivityCdk(uxController)
 {
 }
 
-void BrowseActivityCdk::onAttached()
+void LibraryActivityCdk::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
 }
 
-void BrowseActivityCdk::onDetached()
+void LibraryActivityCdk::onDetached()
 {
     Log::info(LOG_NAME, "detached");
 }
 
-Meta *BrowseActivityCdk::browse(std::vector<Meta *> &meta)
+Meta *LibraryActivityCdk::browse(std::vector<Meta *> &meta)
 {
     const unsigned int nItems = meta.size();
-    char *items[nItems];
+    const char *items[nItems];
 
     for (unsigned int i = 0; i < nItems; ++i) {
         Meta *m = meta[i];
         items[i] = m->relPath.c_str();
     }
 
-    CDKSCROLL *scroll = newCDKScroll(m_screen, LEFT, TOP, RIGHT, 0, 0, "Select a book...",
-            items, nItems, 0, 0, 1, 1);
+    // TODO:  Is this really char **?
+    CDKSCROLL *scroll = newCDKScroll(m_uxController->m_screen, LEFT, TOP, RIGHT, 0, 0,
+            "Select a book...", (char **)items, nItems, 0, 0, 1, 1);
     int r = activateCDKScroll(scroll, NULL);
     destroyCDKScroll(scroll);
     if (r == -1) {
@@ -47,9 +52,9 @@ Meta *BrowseActivityCdk::browse(std::vector<Meta *> &meta)
     }
 }
 
-void BrowseActivityCdk::read(Meta *meta)
+void LibraryActivityCdk::read(Meta *meta)
 {
-    Renderer *renderer = uiFactory->getRenderer();
+    Renderer *renderer = m_uxController->getRenderer();
 
     for (int pageNum = 0;; ) {
         int atEnd = renderer->render(&meta->m_pagination, pageNum, true);

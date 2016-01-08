@@ -10,7 +10,9 @@
 
 #include <cdk.h>
 
-/**
+class RendererCdk;
+
+/** Controller for the CDK user experience.  Manages interactions with CDK on a dedicated thread.
  */
 class UxControllerCdk : public UxController {
 public:
@@ -31,10 +33,11 @@ public:
 
     void setNextActivity(enum ActivityType a);
 
-protected:
-    std::string m_name;
     WINDOW *m_scr;
     CDKSCREEN *m_screen;
+
+protected:
+    std::string m_name;
 
     Renderer *m_renderer;
 };
