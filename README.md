@@ -32,9 +32,6 @@ will be rebased.
 To get the code:
 
     $ git clone git@github.com:ccoffing/OcherBook.git
-    $ cd OcherBook
-    $ git submodule init
-    $ git submodule update
 
 ## Building
 
