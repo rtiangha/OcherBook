@@ -60,5 +60,5 @@ See doc/LICENSES for all relevant licenses.
 ## Links
 
 - [OcherBook](http://uscoffings.net/tech/ocherbook)
-- [Hacking the Kobo Touch](http://uscoffings.net/tech/embedded/kobo)
+- [Hacking the Kobo Touch](http://uscoffings.net/tech/embedded/kobo-touch)
 
