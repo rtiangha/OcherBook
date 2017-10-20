@@ -6,8 +6,8 @@ if (ZLIB_USE_SYSTEM)
 	find_library(zlib REQUIRED)
 else()
 	ExternalProject_add(zlib-external
-		URL http://zlib.net/zlib-1.2.8.tar.gz
-		URL_MD5 44d667c142d7cda120332623eab69f40
+		URL http://zlib.net/zlib-1.2.11.tar.gz
+		URL_HASH SHA256=c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
 		BUILD_IN_SOURCE 1
 		#CFLAGS="$(CFLAGS_COMMON) -O3" CC=$(CC)
 		CONFIGURE_COMMAND <SOURCE_DIR>/configure --static --prefix=<INSTALL_DIR>
