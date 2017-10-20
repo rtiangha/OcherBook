@@ -1,5 +1,7 @@
 # OcherBook
 
+![Ocher handprint](doc/hand.png)
+
 ## About
 
 OcherBook is an open-source ebook reader, supporting multiple file formats and
