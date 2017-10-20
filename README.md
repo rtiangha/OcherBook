@@ -10,11 +10,22 @@ output devices.  The major goals are:
     - Modular design
     - Small with few external dependencies.
 
+## Target Devices
+
 Perhaps the largest distinguishing implementation detail of OcherBook is that
 its in-memory format is not DOM, and the rendering backends are not web
 browsers.  Think DVI.  Therefore it is not going to render complex books nearly
 as accurately, but it is far more portable and efficient.  This may eventually
 turn out to be a mistake, but for now it's an advantage that I'm running with.
+
+It also handles its own event loop and its own rendering, so it could
+potentially run on _very_ limited devices.  This is, perhaps, the singular charm
+of this project.  (OTOH, see branch `feature/qt-instead` -- but beware, this
+branch will be rebased).
+
+For embedded work, autotools can be better than the pretentiousness of CMake.  I
+was re-imagining things in branch `feature/ocher2` -- but beware, this branch
+will be rebased.
 
 ## Code
 
