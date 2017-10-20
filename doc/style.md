@@ -14,7 +14,7 @@ unexpected.  Expect and handle the rest locally.
 
 # Formatting
 
-See `uncrustify.cpp.cfg`.
+clang-format -style=WebKit
 
 
 # Documentation

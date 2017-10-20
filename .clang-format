@@ -1,0 +1,10 @@
+---
+BasedOnStyle: WebKit
+AlignAfterOpenBracket: DontAlign
+AllowShortBlocksOnASingleLine: 'false'
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: 'false'
+AllowShortLoopsOnASingleLine: 'false'
+ColumnLimit: '100'
+...
+
