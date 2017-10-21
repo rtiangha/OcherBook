@@ -1,70 +1,26 @@
-# TODO
-# features requires/conflicts
-# 3rd party external builds
-# help
-# cross compile
-# consume config file
-
-
 cmake_minimum_required(VERSION 3.1)
 
-project(ocherbook)
-set(ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-list(APPEND CMAKE_MODULE_PATH "${ROOT_DIR}/cmake")
-
-#
-# Global compiler flags
-#
+if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+	message(FATAL_ERROR "In-source builds are strongly discouraged.")
+endif()
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug)
 endif()
-message("build type ${CMAKE_BUILD_TYPE}")
-set(_CFLAGS_WARN "-Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wformat")
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_C_FLAGS_RELEASE "-Os -DNDEBUG")
-set(CMAKE_C_FLAGS_DEBUG   "-g -O0 -DDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "-Os -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG   "-g -O0 -DDEBUG")
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${_CFLAGS_WARN}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_CFLAGS_WARN}")
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${_CFLAGS_DBG}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_CFLAGS_DBG}")
-endif()
 
-#
-# Global paths
-#
-set(THIRD_PARTY_DIR "${ROOT_DIR}/third-party")
+project(ocher VERSION 0.1.0 LANGUAGES CXX C)
 
-#
-# Global variables
-#
-
-#
-# Features
-#
-# Features turned on by the user are TRUE.
-# Features turned off by the user are FALSE.
-# Features implicitly turned on are 1.
-# Features implicitly turned off are 0.
-#
-
-include(${ROOT_DIR}/cmake/config.cmake)
-#include(${ROOT_DIR}/cmake/features/xxx)
+include(cmake/config.cmake)
+include(cmake/build-flags.cmake)
 
 if(NOT CMAKE_CROSSCOMPILING)
-enable_testing()
+	enable_testing()
 endif()
 
+add_subdirectory(third-party/Signals)
+add_subdirectory(third-party/catch)
+add_subdirectory(third-party/freetype)
+add_subdirectory(third-party/json)
+add_subdirectory(third-party/libev)
 add_subdirectory(third-party/mxml)
 add_subdirectory(third-party/zlib)
-add_subdirectory(third-party/Signals)
-add_subdirectory(third-party/libev)
-add_subdirectory(third-party/freetype)
-#add_subdirectory(third-party/libwapcaplet)
-#add_subdirectory(third-party/libparserutils)
-#add_subdirectory(third-party/libcss)
-#add_subdirectory(third-party/libhubbub)
-
 add_subdirectory(ocher)

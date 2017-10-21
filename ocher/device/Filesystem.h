@@ -8,7 +8,7 @@
 
 #include "ocher/util/Thread.h"
 
-#include "Signals/Signal.h"
+#include "Signal.h"
 using namespace Gallant;
 
 class Options;

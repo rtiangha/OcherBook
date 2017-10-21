@@ -8,7 +8,7 @@
 
 #include "ocher/ux/Event.h"
 
-#include "Signals/Signal.h"
+#include "Signal.h"
 using namespace Gallant;
 
 class Device;

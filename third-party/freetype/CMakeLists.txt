@@ -1,8 +1,11 @@
-option(FREETYPE_USE_SYSTEM "Use the system's libmfreetype.so?  Recommend OFF for embedded.")
-
 include(ExternalProject)
 
-if (FREETYPE_USE_SYSTEM)
+option(WITH_FREETYPE "Use Freetype for font rendering" ON)
+option(WITH_SYSTEM_FREETYPE "Use installed FreeType?  (Else build from source)" OFF)
+
+if (WITH_FREETYPE)
+
+if (WITH_SYSTEM_FREETYPE)
 	find_library(freetype REQUIRED)
 else()
 	ExternalProject_add(freetype-external
@@ -11,11 +14,15 @@ else()
 		BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
 		INSTALL_COMMAND ${CMAKE_MAKE_PROGRAM} install
 		)
-	set(FREETYPE_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/freetype-external-prefix/include/freetype2
-		${CMAKE_CURRENT_BINARY_DIR}/freetype-external-prefix/include PARENT_SCOPE)
-	add_library(freetype STATIC IMPORTED GLOBAL)
-	set_property(TARGET freetype PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/freetype-external-prefix/lib/libfreetype.a)
+	add_library(freetype INTERFACE)
+	target_link_libraries(freetype INTERFACE
+		${CMAKE_CURRENT_BINARY_DIR}/freetype-external-prefix/lib/libfreetype.a
+		)
+	target_include_directories(freetype INTERFACE
+		${CMAKE_CURRENT_BINARY_DIR}/freetype-external-prefix/include/freetype2
+		${CMAKE_CURRENT_BINARY_DIR}/freetype-external-prefix/include
+		)
 	add_dependencies(freetype freetype-external)
 endif()
 
-
+endif()

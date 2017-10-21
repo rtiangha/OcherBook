@@ -8,7 +8,7 @@
 
 #include "ocher/util/Thread.h"
 
-#include "Signals/Signal.h"
+#include "Signal.h"
 #include <ev.h>
 
 #include <mutex>

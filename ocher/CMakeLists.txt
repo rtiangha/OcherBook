@@ -1,29 +1,9 @@
-# TODO get_propery INCLUDE_DIRECTORIES of various third_party dirs
+set(CMAKE_CXX_STANDARD 11)
 
 include_directories(
-	${ROOT_DIR}
-	${ZLIB_INCLUDE_DIR}
-	${LIBEV_INCLUDE_DIR}
-	${FREETYPE_INCLUDE_DIR}
-	${THIRD_PARTY_DIR}
-	.
+	${CMAKE_CURRENT_SOURCE_DIR}/..
+	${CMAKE_CURRENT_SOURCE_DIR}
 	)
-if(OCHER_KOBO)
-	include_directories(${CMAKE_SOURCE_DIR}/linux)
-endif()
-if(OCHER_SDL OR OCHER_UI_CDK)
-	include_directories(/usr/local/include)
-	link_directories(/usr/local/lib)
-endif()
-if(OCHER_FMT_EPUB)
-	include_directories(
-		${HUBBUB_INC_DIR}
-		${LIBCSS_INC_DIR}
-		${WAPCAPLET_INC_DIR}
-		${PARSERUTILS_INC_DIR}
-		${MXML_INCLUDE_DIR}
-		)
-endif()
 
 list(APPEND LIB_SOURCES
 	Container.cpp
@@ -176,6 +156,8 @@ target_compile_definitions(ocherbook
 	)
 
 target_link_libraries(ocherbook
+	Signals
+	json
 	freetype
 	libev
 	zlib
@@ -211,30 +193,8 @@ target_link_libraries(ocher
 	)
 
 
-include(ProcessorCount)
-ProcessorCount(NUM_CPUS)
-if(NOT NUM_CPUS EQUAL 0)
-	set(CPPCHECK_CPUS -j${NUM_CPUS})
-endif()
-get_target_property(OCHER_INCS ocherbook INCLUDE_DIRECTORIES)
-foreach(INC ${OCHER_INCS})
-	list(APPEND CPPCHECK_INCS "-I${INC}")
-endforeach()
-add_custom_target(cppcheck
-	COMMAND cppcheck
-		--max-configs=100 ${CPPCHECK_CPUS}
-		-i${THIRD_PARTY_DIR} --config-exclude=${THIRD_PARTY_DIR}
-		--std=c++11 --std=posix --language=c++
-		--enable=warning
-		${CPPCHECK_INCS}
-		${CMAKE_CURRENT_SOURCE_DIR} 2> ${CMAKE_CURRENT_BINARY_DIR}/cppcheck.log
-	WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-	)
-
-
 configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile
 	${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-
 add_custom_target(doxygen
 	COMMAND doxygen ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
