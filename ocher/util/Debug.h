@@ -31,7 +31,7 @@ public:
     static int asserted(char const *file, int line, char const *expr);
 
     /**
-     * Names the thread, so that they name is visible in the debugger.
+     * Names the thread, so that the name is visible in the debugger.
      * @note only in debug builds
      */
     static void nameThread(const char *name);

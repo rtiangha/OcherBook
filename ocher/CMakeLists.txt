@@ -46,8 +46,6 @@ list(APPEND LIB_SOURCES
 	util/Path.h
 	util/RWLock.cpp
 	util/RWLock.h
-	util/Random.cpp
-	util/Random.h
 	util/Stopwatch.h
 	util/StrUtil.cpp
 	util/StrUtil.h

@@ -1,10 +1,10 @@
 #include "util/Buffer.h"
 #include "util/File.h"
-#include "util/Random.h"
 
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <random>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -126,13 +126,15 @@ int File::init(const char *mode)
     }
     int fd;
     if (uniq) {
-        Random rnd;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 10 + 26 + 26);
         m_filename.append(".XXXXXX");
         const unsigned int len = m_filename.length();
         while (1) {
             do {
                 for (unsigned int i = 0; i < 6; ++i) {
-                    char l = rnd.nextInt(10 + 26 + 26);
+                    char l = dis(gen);
                     if (l >= 10 + 26)
                         l += ('a' - 10 - 26);
                     else if (l >= 10)
