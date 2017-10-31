@@ -103,7 +103,7 @@ if(OCHER_KOBO)
 		)
 	list(APPEND OCHER_DEFS UX_FB UX_FB_MX50)
 endif()
-if(OCHER_SDL)
+if(OCHER_TARGET_SDL)
 	list(APPEND LIB_SOURCES
 		ux/fb/sdl/FrameBufferSdl.cpp
 		ux/fb/sdl/SdlThread.cpp
@@ -171,7 +171,7 @@ if(FALSE AND OCHER_FMT_EPUB)
 		wapcaplet
 		)
 endif()
-if(OCHER_SDL)
+if(OCHER_TARGET_SDL)
 	target_link_libraries(ocherbook
 		SDL
 		)
