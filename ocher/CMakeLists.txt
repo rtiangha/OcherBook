@@ -30,28 +30,19 @@ list(APPEND LIB_SOURCES
 	util/File.cpp
 	util/File.h
 	util/Intrinsics.h
-	util/Lock.cpp
-	util/Lock.h
 	util/LogAppenderFile.cpp
 	util/LogAppenderFile.h
 	util/LogAppenders.cpp
 	util/LogAppenders.h
 	util/Logger.cpp
 	util/Logger.h
-	util/Monitor.cpp
-	util/Monitor.h
 	util/MurmurHash2.cpp
 	util/MurmurHash2.h
 	util/Path.cpp
 	util/Path.h
-	util/RWLock.cpp
-	util/RWLock.h
 	util/Stopwatch.h
 	util/StrUtil.cpp
 	util/StrUtil.h
-	util/Thread.cpp
-	util/Thread.h
-	util/ThreadLocal.h
 	ux/Activity.cpp
 	ux/Controller.cpp
 	ux/Event.cpp

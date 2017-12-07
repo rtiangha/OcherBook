@@ -81,7 +81,6 @@ void EventLoop::emitInjected()
 }
 
 EventWork::EventWork(EventLoop *loop) :
-    Thread("EventWork %p", loop->evLoop),
     m_loop(loop)
 {
     ev_async_init(&m_async, completeCb);
@@ -93,8 +92,20 @@ EventWork::~EventWork()
 {
 }
 
+void EventWork::start()
+{
+    std::thread t(&EventWork::run, this);
+    m_thread = std::move(t);
+}
+
+void EventWork::join()
+{
+    m_thread.join();
+}
+
 void EventWork::run()
 {
+    //nameThread("EventWork %p", loop->evLoop);
     work();
     ev_async_send(m_loop->evLoop, &m_async);
 }

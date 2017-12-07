@@ -6,13 +6,12 @@
 #ifndef OCHER_EVENT_H
 #define OCHER_EVENT_H
 
-#include "ocher/util/Thread.h"
-
 #include "Signal.h"
 #include <ev.h>
 
 #include <mutex>
 #include <stdint.h>
+#include <thread>
 #include <vector>
 
 using namespace Gallant;
@@ -133,12 +132,15 @@ protected:
 /** Offloads heavy work from the EventLoop to another thread.  When the work is completed, notifies
  * the EventLoop.  Must be created on the EventLoop's thread.
  */
-class EventWork : public Thread {
+class EventWork {
 public:
-    /** Derived class must call start().
+    /** Derived class must call start() / join().
      */
     EventWork(EventLoop *loop);
     virtual ~EventWork();
+
+    void start();
+    void join();
 
 protected:
     void run();
@@ -158,6 +160,7 @@ protected:
     static void completeCb(EV_P_ ev_async *w, int revents);
     ev_async m_async;
     EventLoop *m_loop;
+    std::thread m_thread;
 };
 
 #endif

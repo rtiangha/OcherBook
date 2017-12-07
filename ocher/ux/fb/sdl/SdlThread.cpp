@@ -12,16 +12,15 @@
 
 
 SdlThread::SdlThread() :
-    Thread("SdlThread"),
-    m_loop(0),
-    m_startupMonitor(0),
-    m_screen(0)
+    m_stop(false),
+    m_loop(0)
 {
 }
 
 SdlThread::~SdlThread()
 {
-    ASSERT(!isAlive());
+    if (m_thread.joinable())
+        m_thread.join();
 }
 
 void SdlThread::setEventLoop(EventLoop *loop)
@@ -29,16 +28,18 @@ void SdlThread::setEventLoop(EventLoop *loop)
     m_loop = loop;
 }
 
-void SdlThread::start(Monitor *monitor)
+void SdlThread::start(std::promise<SDL_Surface*>& screenPromise)
 {
-    ASSERT(!isAlive());
-    m_startupMonitor = monitor;
-    Thread::start();
+    m_screenPromise = std::move(screenPromise);
+    std::thread t(&SdlThread::run, this);
+    m_thread = std::move(t);
 }
 
 void SdlThread::stop()
 {
-    interrupt();
+    m_stop = true;
+    if (m_thread.joinable())
+        m_thread.join();
 }
 
 SDL_Surface *SdlThread::init()
@@ -64,16 +65,14 @@ SDL_Surface *SdlThread::init()
 
 void SdlThread::run()
 {
-    m_screen = init();
-    m_startupMonitor->lock();
-    m_startupMonitor->notify();
-    m_startupMonitor->unlock();
-    if (!m_screen)
+    SDL_Surface* screen = init();
+    m_screenPromise.set_value(screen);
+    if (!screen)
         return;
 
     SDL_Event event;
 
-    while (!isInterrupted()) {
+    while (!m_stop) {
         if (SDL_WaitEvent(&event) == 0) {
             Log::error(LOG_NAME, "SDL_WaitEvent: %s", SDL_GetError());
             continue;

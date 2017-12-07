@@ -17,6 +17,7 @@
 #include "ocher/ux/Renderer.h"
 #include "ocher/ux/fb/ReadActivityFb.h"
 #include "ocher/ux/fb/UxControllerFb.h"
+#include "ocher/util/Debug.h"
 #include "ocher/util/Logger.h"
 
 #define LOG_NAME "ocher.ux.Read"

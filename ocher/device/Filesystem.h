@@ -6,8 +6,6 @@
 #ifndef OCHER_FILESYSTEM_H
 #define OCHER_FILESYSTEM_H
 
-#include "ocher/util/Thread.h"
-
 #include "Signal.h"
 using namespace Gallant;
 

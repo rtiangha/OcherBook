@@ -37,13 +37,12 @@ void FrameBufferSdl::inject(EventLoop *loop)
 
 bool FrameBufferSdl::init()
 {
-    Monitor startupMonitor;
+    std::promise<SDL_Surface*> screenPromise;
+    std::future<SDL_Surface*> screenFuture = screenPromise.get_future();
 
-    m_sdlThread.start(&startupMonitor);
-    startupMonitor.lock();
-    startupMonitor.wait();
-    m_screen = m_sdlThread.getScreen();
-    startupMonitor.unlock();
+    m_sdlThread.start(screenPromise);
+
+    m_screen = screenFuture.get();
     if (!m_screen) {
         return false;
     }

@@ -9,6 +9,7 @@
 #ifdef UX_FB_SDL
 #include "ocher/ux/fb/sdl/FrameBufferSdl.h"
 #endif
+#include "ocher/util/Debug.h"
 #include "ocher/util/Logger.h"
 
 #define LOG_NAME "ocher.ux.ctrl"
