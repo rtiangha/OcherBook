@@ -1,4 +1,4 @@
-set(_CFLAGS_WARN "-Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wformat")
+set(_CFLAGS_WARN "-Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wformat -Wno-c++1z-compat")
 set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} ${_CFLAGS_WARN}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_CFLAGS_WARN}")
 
