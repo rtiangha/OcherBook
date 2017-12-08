@@ -1,8 +1,18 @@
 set(CMAKE_CXX_STANDARD 11)
 
+string(REPLACE "." ";" OCHER_VERSIONS ${PROJECT_VERSION})
+list(GET OCHER_VERSIONS 0 OCHER_MAJOR)
+list(GET OCHER_VERSIONS 1 OCHER_MINOR)
+list(GET OCHER_VERSIONS 2 OCHER_PATCH)
+configure_file(
+	${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+	${CMAKE_CURRENT_BINARY_DIR}/version.h
+	)
+
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/..
 	${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_BINARY_DIR}
 	)
 
 list(APPEND LIB_SOURCES
@@ -179,14 +189,6 @@ add_executable(ocher
 	)
 target_link_libraries(ocher
 	ocherbook
-	)
-
-
-configure_file(${PROJECT_SOURCE_DIR}/doc/Doxyfile
-	${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-add_custom_target(doxygen
-	COMMAND doxygen ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 	)
 
 add_subdirectory(test)
