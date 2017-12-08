@@ -37,7 +37,10 @@ public:
 protected:
     const char **m_files;
     UxControllerFb *m_uxController;
-    void work();
+
+    void work() override;
+    void notifyComplete() override;
+
     void processFile(const char *file);
 };
 
@@ -50,6 +53,13 @@ void SyncActivityWork::work()
             processFile(file);
         }
     }
+
+    Log::info(LOG_NAME "Work", "done working");
+}
+
+void SyncActivityWork::notifyComplete()
+{
+    m_uxController->setNextActivity(ACTIVITY_HOME);
 }
 
 void SyncActivityWork::processFile(const char *file)
@@ -122,5 +132,4 @@ void SyncActivityFb::onDetached()
     m_spinner.stop();
 
     m_uxController->ctx.library.notify();
-    m_uxController->setNextActivity(ACTIVITY_HOME);
 }
