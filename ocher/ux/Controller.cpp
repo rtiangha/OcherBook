@@ -151,6 +151,8 @@ Controller::Controller(Options *options) :
 
     m_uxController = g_container.uxController;
 
+    Log::info("ocher", "Done wiring the '%s' driver", uxController->getName());
+
     initCrash();
 }
 

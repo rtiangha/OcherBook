@@ -4,6 +4,8 @@
  */
 
 #include "ocher/ux/Event.h"
+
+#include "ocher/util/Debug.h"
 #include "ocher/util/Logger.h"
 
 #include <ev.h>
@@ -105,7 +107,7 @@ void EventWork::join()
 
 void EventWork::run()
 {
-    //nameThread("EventWork %p", loop->evLoop);
+    Debugger::nameThread("EventWork %p", m_loop->evLoop);
     work();
     ev_async_send(m_loop->evLoop, &m_async);
 }

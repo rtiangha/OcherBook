@@ -34,7 +34,7 @@ public:
      * Names the thread, so that the name is visible in the debugger.
      * @note only in debug builds
      */
-    static void nameThread(const char *name);
+    static void nameThread(const char *name, ...);
 };
 
 #if DEBUG

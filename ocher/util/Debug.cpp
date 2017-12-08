@@ -1,6 +1,9 @@
-#include "util/Buffer.h"
 #include "util/Debug.h"
 
+#include "util/Buffer.h"
+#include "util/StrUtil.h"
+
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -16,7 +19,7 @@ int Debugger::enter()
 #ifdef HAVE_BUILTIN_TRAP
     __builtin_trap();
 #else
-    *((volatile int *)0) = 1;
+    abort();
 #endif
     return r;
 }
@@ -55,15 +58,16 @@ int Debugger::asserted(char const *file, int line, char const *expr)
     return r;
 }
 
-void Debugger::nameThread(const char *name)
+void Debugger::nameThread(const char *fmt, ...)
 {
+    va_list ap;
+    va_start(ap, fmt);
+    std::string name = formatList(fmt, ap);
+    va_end(ap);
+
 #if DEBUG
 #if defined(__linux__)
-    prctl(PR_SET_NAME, (unsigned long)name);
-#else
-    (void)name;
+    prctl(PR_SET_NAME, (unsigned long)name.c_str());
 #endif
-#else
-    (void)name;
 #endif
 }
