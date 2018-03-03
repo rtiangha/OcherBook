@@ -6,6 +6,9 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE Debug)
 endif()
+if(NOT OCHER_TOOLCHAIN_ROOT)
+	set(OCHER_TOOLCHAIN_ROOT /toolchains)
+endif()
 
 project(ocher VERSION 0.1.0 LANGUAGES CXX C)
 

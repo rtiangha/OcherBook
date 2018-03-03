@@ -1,6 +1,6 @@
 include(ExternalProject)
 
-option(WITH_SYSTEM_LIBEV "Use installed libev?  (Else build from source)" ${WITH_SYSTEM_FREETYPE_DEFAULT})
+option(WITH_SYSTEM_LIBEV "Use installed libev?  (Else build from source)" ${WITH_SYSTEM_LIBEV_DEFAULT})
 
 if (WITH_SYSTEM_LIBEV)
 	find_library(ev REQUIRED)
@@ -8,7 +8,7 @@ else()
 	ExternalProject_add(libev-external
 		URL http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz
 		URL_HASH SHA256=973593d3479abdf657674a55afe5f78624b0e440614e2b8cb3a07f16d4d7f821
-		CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
+		CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER} <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
 		BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}
 		)
 	add_library(libev INTERFACE)
