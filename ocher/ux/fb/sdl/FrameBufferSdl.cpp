@@ -7,7 +7,7 @@
 #include "ocher/util/Bitops.h"
 #include "ocher/util/Logger.h"
 
-#include "SDL/SDL.h"
+#include <SDL.h>
 
 #include <exception>
 

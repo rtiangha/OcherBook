@@ -8,7 +8,7 @@
 
 #include "ocher/ux/Event.h"
 
-#include "SDL/SDL.h"
+#include <SDL.h>
 
 #include <future>
 #include <thread>

@@ -9,7 +9,7 @@
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/ux/fb/sdl/SdlThread.h"
 
-#include "SDL/SDL.h"
+#include <SDL.h>
 
 
 class FrameBufferSdl : public FrameBuffer {

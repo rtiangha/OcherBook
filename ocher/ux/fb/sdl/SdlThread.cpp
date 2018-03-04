@@ -6,7 +6,7 @@
 #include "ocher/ux/fb/sdl/SdlThread.h"
 #include "ocher/util/Logger.h"
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #define LOG_NAME "ocher.sdl"
 

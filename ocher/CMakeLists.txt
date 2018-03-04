@@ -1,5 +1,10 @@
 set(CMAKE_CXX_STANDARD 11)
 
+if(OCHER_TARGET_SDL)
+	find_package(SDL REQUIRED)
+	include_directories(${SDL_INCLUDE_DIR})
+endif()
+
 string(REPLACE "." ";" OCHER_VERSIONS ${PROJECT_VERSION})
 list(GET OCHER_VERSIONS 0 OCHER_MAJOR)
 list(GET OCHER_VERSIONS 1 OCHER_MINOR)
@@ -174,7 +179,7 @@ if(FALSE AND OCHER_FMT_EPUB)
 endif()
 if(OCHER_TARGET_SDL)
 	target_link_libraries(ocherbook
-		SDL
+		${SDL_LIBRARY}
 		)
 endif()
 if(OCHER_UI_CDK)
