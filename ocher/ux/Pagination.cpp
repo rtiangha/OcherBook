@@ -3,9 +3,10 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/Pagination.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "ux/Pagination.h"
+
+#include "util/Debug.h"
+#include "util/Logger.h"
 
 #define LOG_NAME "ocher.pagination"
 
@@ -38,7 +39,7 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
             m_pages.push_back(new PageMapping[pagesPerChunk]);
         }
     }
-    struct PageMapping *mapping = (struct PageMapping *)m_pages[chunk];
+    auto mapping = m_pages[chunk];
     mapping += pageNum % pagesPerChunk;
     if (mapping->layoutOffset != layoutOffset || mapping->strOffset != strOffset) {
         mapping->layoutOffset = layoutOffset;
@@ -49,7 +50,7 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
     }
 }
 
-bool Pagination::get(unsigned int pageNum, unsigned int *layoutOffset, unsigned int *strOffset /* TODO attrs */)
+bool Pagination::get(unsigned int pageNum, unsigned int* layoutOffset, unsigned int* strOffset /* TODO attrs */)
 {
     Log::debug(LOG_NAME, "get page %u", pageNum);
 
@@ -59,7 +60,7 @@ bool Pagination::get(unsigned int pageNum, unsigned int *layoutOffset, unsigned 
     if (chunk > m_pages.size()) {
         return false;
     }
-    struct PageMapping *mapping = (struct PageMapping *)m_pages[chunk];
+    auto mapping = m_pages[chunk];
     mapping += pageNum % pagesPerChunk;
     *layoutOffset = mapping->layoutOffset;
     *strOffset = mapping->strOffset;

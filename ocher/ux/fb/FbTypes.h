@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_FB_TYPES_H
 #define OCHER_UX_FB_TYPES_H
 
-#include <stdint.h>
+#include <cstdint>
 
 
 struct Pos {
@@ -66,8 +66,8 @@ struct Rect {
     {
         x += i;
         y += i;
-        w -= (i << 1);
-        h -= (i << 1);
+        w -= (i + i);
+        h -= (i + i);
     }
 };
 
@@ -93,7 +93,7 @@ public:
 
 struct GlyphDescr {
     GlyphDescr() : v(0) {}
-    bool operator<(const GlyphDescr &r) const
+    bool operator<(const GlyphDescr& r) const
     {
         return v < r.v;
     }

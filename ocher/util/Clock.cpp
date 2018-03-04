@@ -1,5 +1,6 @@
 #include "util/Clock.h"
-#include "util/Intrinsics.h"
+
+#include "util/intrinsics.h"
 
 #if defined(__BEOS__) || defined(__HAIKU__)
 #include <kernel/OS.h>
@@ -8,7 +9,7 @@
 #include <mach/mach_time.h>
 #else
 // #define __USE_POSIX199309
-#include <time.h>
+#include <ctime>
 #endif
 #include <sys/time.h>
 #endif
@@ -58,7 +59,7 @@ uint64_t Clock::nowUSec()
     return real_time_clock_usecs();
 #else
     struct timeval tv;
-    gettimeofday(&tv, 0);
+    gettimeofday(&tv, nullptr);
     uint64_t sec = tv.tv_sec;
     uint64_t usec = tv.tv_usec;
     return usec + (sec * 1000000);
@@ -78,7 +79,7 @@ uint64_t Clock::monotonicUSec()
     if (s_usingMon) {
         struct timespec ts;
         int r = clock_gettime(CLOCK_MONOTONIC, &ts);
-        if (LIKELY(r == 0)) {
+        if (likely(r == 0)) {
             uint64_t sec = ts.tv_sec;
             uint64_t nsec = ts.tv_nsec;
             return nsec / 1000 + sec * 1000000;
@@ -97,7 +98,7 @@ uint64_t Clock::monotonicUSec()
 #ifndef SINGLE_THREADED
         clockLock.lock();
 #endif
-        if (UNLIKELY(now < previousTime))
+        if (unlikely(now < previousTime))
             diff += previousTime - now;
         previousTime = now;
         now += diff;
@@ -110,7 +111,7 @@ uint64_t Clock::monotonicUSec()
 }
 
 #if !defined(__BEOS__) && !defined(__HAIKU__)
-void Clock::futureUsec(unsigned int usec, struct timespec *ts)
+void Clock::futureUsec(unsigned int usec, struct timespec* ts)
 {
     while (usec > 1000000U) {
         usec -= 1000000U;
@@ -123,7 +124,7 @@ void Clock::futureUsec(unsigned int usec, struct timespec *ts)
     }
 }
 
-struct timespec Clock::futureUsec(unsigned int usec, const struct timeval *tv)
+struct timespec Clock::futureUsec(unsigned int usec, const struct timeval* tv)
 {
     struct timespec ts;
 
@@ -137,7 +138,7 @@ struct timespec Clock::futureUsec(unsigned int usec)
 {
     struct timeval tv;
 
-    gettimeofday(&tv, NULL);
+    gettimeofday(&tv, nullptr);
     return futureUsec(usec, &tv);
 }
 #endif

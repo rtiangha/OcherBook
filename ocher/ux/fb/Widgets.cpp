@@ -3,13 +3,14 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/ux/fb/Widgets.h"
-#include "ocher/util/Logger.h"
+#include "ux/fb/Widgets.h"
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include "Container.h"
+#include "util/Logger.h"
+
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
 
 #define LOG_NAME "ocher.widgets"
 
@@ -19,7 +20,7 @@ static const unsigned int roundRadius = 1;
 Widget::Widget() :
     m_flags(WIDGET_DIRTY),
     m_fb(g_container.frameBuffer),
-    m_parent(0)
+    m_parent(nullptr)
 {
 }
 
@@ -27,22 +28,20 @@ Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     m_rect(x, y, w, h),
     m_flags(WIDGET_DIRTY),
     m_fb(g_container.frameBuffer),
-    m_parent(0)
+    m_parent(nullptr)
 {
 }
 
 Widget::~Widget()
 {
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        Widget *w = m_children[i];
-        if (w->m_flags & WIDGET_OWNED)
-            delete w;
+    for (auto widget : m_children) {
+        if (widget->m_flags & WIDGET_OWNED)
+            delete widget;
     }
 }
 
-void Widget::addChild(Widget *child)
+void Widget::addChild(Widget* child)
 {
-    //ASSERT(!m_children.hasItem(child));
     child->m_flags |= WIDGET_OWNED;
     m_children.push_back(child);
     if (!(child->m_flags & WIDGET_HIDDEN)) {
@@ -50,16 +49,15 @@ void Widget::addChild(Widget *child)
     }
 }
 
-void Widget::addChild(Widget &child)
+void Widget::addChild(Widget& child)
 {
-    //ASSERT(!m_children.hasItem(&child));
     m_children.push_back(&child);
     if (!(child.m_flags & WIDGET_HIDDEN)) {
         child.invalidate();
     }
 }
 
-void Widget::removeChild(Widget *child)
+void Widget::removeChild(Widget* child)
 {
     child->m_flags &= ~WIDGET_OWNED;
     for (auto it = m_children.begin(); it < m_children.end(); ++it) {
@@ -73,13 +71,12 @@ void Widget::removeChild(Widget *child)
 void Widget::invalidate()
 {
     m_flags |= WIDGET_DIRTY;
-    for (unsigned int i = 0; i < m_children.size(); ++i) {
-        Widget *w = m_children[i];
+    for (auto w : m_children) {
         w->invalidate();
     }
 }
 
-void Widget::invalidate(Rect *rect)
+void Widget::invalidate(Rect* rect)
 {
     // TODO
     invalidate();
@@ -91,7 +88,7 @@ Rect Widget::drawChildren()
     const size_t N = m_children.size();
 
     for (unsigned int i = 0; i < N; ++i) {
-        Widget *w = m_children[i];
+        Widget* w = m_children[i];
         if (!(w->m_flags & WIDGET_HIDDEN)) {
             if (w->m_flags & WIDGET_DIRTY) {
                 w->draw();
@@ -124,10 +121,6 @@ Window::Window(int x, int y, unsigned int w, unsigned int h) :
 {
 }
 
-Window::~Window()
-{
-}
-
 void Window::maximize()
 {
     m_rect.x = m_rect.y = 0;
@@ -135,7 +128,7 @@ void Window::maximize()
     m_rect.h = m_fb->height();
 }
 
-void Window::setTitle(const char *title)
+void Window::setTitle(const char* title)
 {
     m_title = title;
 }
@@ -151,7 +144,7 @@ void Window::draw()
     drawChildren();
 }
 
-void Window::drawBorder(Rect *rect)
+void Window::drawBorder(Rect* rect)
 {
     if (m_borderWidth) {
         m_fb->setFg(0, 0, 0);
@@ -163,7 +156,7 @@ void Window::drawBorder(Rect *rect)
     }
 }
 
-void Window::drawTitle(Rect *rect)
+void Window::drawTitle(Rect* rect)
 {
     if (m_winflags & OWF_CLOSE) {
         m_fb->setFg(0, 0, 0);
@@ -174,23 +167,19 @@ void Window::drawTitle(Rect *rect)
     }
 }
 
-void Window::drawBg(Rect *rect)
+void Window::drawBg(Rect* rect)
 {
     m_fb->setFg(0xff, 0xff, 0xff);
     m_fb->fillRect(rect);
 }
 
-void Window::drawContent(Rect *)
+void Window::drawContent(Rect*)
 {
 }
 
 
 Button::Button(int x, int y, unsigned int w, unsigned int h) :
     Widget(x, y, w, h)
-{
-}
-
-Button::~Button()
 {
 }
 
@@ -203,12 +192,12 @@ void Button::draw()
     drawChildren();
 }
 
-void Button::drawBorder(Rect *rect)
+void Button::drawBorder(Rect* rect)
 {
     m_fb->roundRect(rect, roundRadius);
 }
 
-void Button::drawLabel(Rect *rect)
+void Button::drawLabel(Rect* rect)
 {
     if (m_label.length()) {
         /* TODO --
@@ -222,18 +211,18 @@ void Button::drawLabel(Rect *rect)
     }
 }
 
-int Button::evtKey(const struct OcherKeyEvent *)
+int Button::evtKey(const struct OcherKeyEvent*)
 {
     return -2;
 }
 
-int Button::evtMouse(const struct OcherMouseEvent *)
+int Button::evtMouse(const struct OcherMouseEvent*)
 {
     return -2;
 }
 
 
-Spinner::Spinner(EventLoop *loop) :
+Spinner::Spinner(EventLoop* loop) :
     m_state(0),
     m_steps(12),
     m_delayMs(200),
@@ -263,10 +252,10 @@ void Spinner::start()
     ev_timer_start(m_loop->evLoop, &m_timer);
 }
 
-void Spinner::timeoutCb(EV_P_ ev_timer *timer, int)
+void Spinner::timeoutCb(EV_P_ ev_timer* timer, int)
 {
     Log::trace(LOG_NAME ".spinner", "timeout");
-    Spinner *self = static_cast<Spinner *>(timer->data);
+    auto self = static_cast<Spinner*>(timer->data);
 
     self->m_state++;
     if (self->m_state >= self->m_steps)
@@ -316,16 +305,12 @@ void Icon::draw()
 #endif
 }
 
-
 FbScreen::FbScreen()
+    : m_loop(nullptr)
 {
 }
 
-FbScreen::~FbScreen()
-{
-}
-
-void FbScreen::setEventLoop(EventLoop *loop)
+void FbScreen::setEventLoop(EventLoop* loop)
 {
     Log::info(LOG_NAME ".screen", "setEventLoop");
 
@@ -346,7 +331,7 @@ void FbScreen::setEventLoop(EventLoop *loop)
     ev_check_start(m_loop->evLoop, &m_evCheck);
 }
 
-void FbScreen::setFrameBuffer(FrameBuffer *fb)
+void FbScreen::setFrameBuffer(FrameBuffer* fb)
 {
     m_fb = fb;
 
@@ -356,11 +341,10 @@ void FbScreen::setFrameBuffer(FrameBuffer *fb)
     m_rect.h = m_fb->height();
 }
 
-void FbScreen::addChild(Window *child)
+void FbScreen::addChild(Window* child)
 {
-    Widget *widget = dynamic_cast<Widget *>(child);
+    auto widget = dynamic_cast<Widget*>(child);
 
-    //ASSERT(!m_children.hasItem(widget));
     widget->m_flags |= WIDGET_OWNED;
     m_children.push_back(widget);
     if (!(widget->m_flags & WIDGET_HIDDEN)) {
@@ -369,9 +353,8 @@ void FbScreen::addChild(Window *child)
 }
 
 #if 0
-void FbScreen::addChild(Widget &child)
+void FbScreen::addChild(Widget& child)
 {
-    //ASSERT(!m_children.hasItem(&child));
     m_children.push_back(&child);
     if (!(child.m_flags & WIDGET_HIDDEN)) {
         child.invalidate();
@@ -379,9 +362,9 @@ void FbScreen::addChild(Widget &child)
 }
 #endif
 
-void FbScreen::removeChild(Window *child)
+void FbScreen::removeChild(Window* child)
 {
-    Widget *widget = dynamic_cast<Widget *>(child);
+    auto widget = dynamic_cast<Widget*>(child);
 
     widget->m_flags &= ~WIDGET_OWNED;
     for (auto it = m_children.begin(); it < m_children.end(); ++it) {
@@ -404,7 +387,7 @@ void FbScreen::update()
     const size_t N = m_children.size();
 
     for (unsigned int i = 0; i < N; ++i) {
-        Widget *w = m_children[i];
+        Widget* w = m_children[i];
         if (!(w->m_flags & WIDGET_HIDDEN)) {
             if (w->m_flags & WIDGET_DIRTY) {
                 w->draw();
@@ -429,43 +412,43 @@ void FbScreen::update()
  * - When even loop goes idle, do one last (perhaps the only) update, and cancel the timer.
  */
 
-void FbScreen::timeoutCb(EV_P_ ev_timer *timer, int)
+void FbScreen::timeoutCb(EV_P_ ev_timer* timer, int)
 {
     Log::trace(LOG_NAME ".screen", "timeout");
 
-    static_cast<FbScreen *>(timer->data)->update();
+    static_cast<FbScreen*>(timer->data)->update();
 }
 
-void FbScreen::readyToIdle(EV_P_ ev_prepare *p, int)
+void FbScreen::readyToIdle(EV_P_ ev_prepare* p, int)
 {
     Log::trace(LOG_NAME ".screen", "readyToIdle");
-    FbScreen *self = static_cast<FbScreen *>(p->data);
+    auto self = static_cast<FbScreen*>(p->data);
 
     self->update();
     ev_timer_stop(loop, &self->m_timer);
 }
 
-void FbScreen::waking(EV_P_ ev_check *c, int)
+void FbScreen::waking(EV_P_ ev_check* c, int)
 {
     Log::trace(LOG_NAME ".screen", "waking");
-    FbScreen *self = static_cast<FbScreen *>(c->data);
+    auto self = static_cast<FbScreen*>(c->data);
 
     ev_timer_start(loop, &self->m_timer);
 }
 
-void FbScreen::dispatchEvent(const struct OcherEvent *evt)
+void FbScreen::dispatchEvent(const struct OcherEvent* evt)
 {
     if (evt->type == OEVT_MOUSE) {
         /* TODO find the right child */
-        for (unsigned int i = 0; i < m_children.size(); ++i) {
-            int r = m_children[i]->evtMouse(&evt->mouse);
+        for (auto w : m_children) {
+            int r = w->evtMouse(&evt->mouse);
             if (r != -2)
                 break;
         }
     } else if (evt->type == OEVT_KEY) {
         /* TODO find the right child */
-        for (unsigned int i = 0; i < m_children.size(); ++i) {
-            int r = m_children[i]->evtKey(&evt->key);
+        for (auto w : m_children) {
+            int r = w->evtKey(&evt->key);
             if (r != -2)
                 break;
         }

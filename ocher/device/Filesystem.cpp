@@ -3,14 +3,14 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "device/Filesystem.h"
 
-#include "ocher/device/Filesystem.h"
-#include "ocher/settings/Options.h"
-#include "ocher/util/File.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/Path.h"
+#include "settings/Options.h"
+#include "util/File.h"
+#include "util/Logger.h"
+#include "util/Path.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/stat.h>
 #if !defined(__HAIKU__)
 #include <pwd.h>
@@ -30,9 +30,9 @@ static std::string settingsDir()
 #if defined(__HAIKU__)
     dir = "/boot/home/config/settings";
 #else
-    const char *e = getenv("HOME");
+    const char* e = getenv("HOME");
     if (!e) {
-        struct passwd *p = getpwuid(getuid());
+        struct passwd* p = getpwuid(getuid());
         if (p) {
             e = p->pw_dir;
         } else {
@@ -50,11 +50,11 @@ static std::string settingsDir()
 #endif
 
 Filesystem::Filesystem() :
-    m_libraries(0),
+    m_libraries(nullptr),
     m_infd(-1)
 {
 #ifdef OCHER_TARGET_KOBO
-    m_libraries = new const char *[3];
+    m_libraries = new const char*[3];
     m_libraries[0] = "/mnt/sd";
     m_libraries[1] = "/mnt/onboard";
     m_libraries[2] = 0;
@@ -83,7 +83,7 @@ Filesystem::~Filesystem()
     delete m_libraries;
 }
 
-void Filesystem::initWatches(Options *options)
+void Filesystem::initWatches(Options* options)
 {
 #ifdef __linux__
     m_infd = inotify_init();
@@ -95,7 +95,7 @@ void Filesystem::initWatches(Options *options)
     if (!options->files)
         return;
     for (int i = 0;; ++i) {
-        const char *lib = options->files[i]; // TODO  m_libraries[i];
+        const char* lib = options->files[i]; // TODO  m_libraries[i];
         if (!lib)
             break;
         int wd = inotify_add_watch(m_infd, lib, IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);
@@ -120,7 +120,7 @@ void Filesystem::fireEvents()
     ssize_t len = read(m_infd, buff, sizeof(buff));
     ssize_t i = 0;
     while (i < len) {
-        struct inotify_event *pevent = (struct inotify_event *)&buff[i];
+        struct inotify_event* pevent = reinterpret_cast<struct inotify_event*>(&buff[i]);
 
         // if (pevent->len)
         //  pevent->name);

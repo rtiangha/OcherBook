@@ -6,12 +6,12 @@
 #ifndef OCHER_UX_CDK_HOMEACTIVITY_H
 #define OCHER_UX_CDK_HOMEACTIVITY_H
 
-#include "ocher/ux/cdk/ActivityCdk.h"
+#include "ux/cdk/ActivityCdk.h"
 
 
 class HomeActivityCdk : public ActivityCdk {
 public:
-    HomeActivityCdk(UxControllerCdk *c);
+    HomeActivityCdk(UxControllerCdk* c);
     ~HomeActivityCdk();
 };
 

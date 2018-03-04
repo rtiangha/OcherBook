@@ -5,6 +5,8 @@ if(OCHER_TARGET_SDL)
 	include_directories(${SDL_INCLUDE_DIR})
 endif()
 
+list(APPEND OCHER_DEFS __USE_GNU)
+
 string(REPLACE "." ";" OCHER_VERSIONS ${PROJECT_VERSION})
 list(GET OCHER_VERSIONS 0 OCHER_MAJOR)
 list(GET OCHER_VERSIONS 1 OCHER_MINOR)
@@ -44,15 +46,13 @@ list(APPEND LIB_SOURCES
 	util/DirIter.h
 	util/File.cpp
 	util/File.h
-	util/Intrinsics.h
+	util/intrinsics.h
 	util/LogAppenderFile.cpp
 	util/LogAppenderFile.h
 	util/LogAppenders.cpp
 	util/LogAppenders.h
 	util/Logger.cpp
 	util/Logger.h
-	util/MurmurHash2.cpp
-	util/MurmurHash2.h
 	util/Path.cpp
 	util/Path.h
 	util/Stopwatch.h
@@ -122,8 +122,6 @@ endif()
 
 if(OCHER_FMT_EPUB)
 	list(APPEND LIB_SOURCES
-		#fmt/epub/Css.cpp
-		#fmt/epub/ParseHtml.c
 		fmt/epub/LayoutEpub.cpp
 		fmt/epub/UnzipCache.cpp
 		fmt/epub/Epub.cpp

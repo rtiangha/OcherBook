@@ -1,10 +1,11 @@
-#include "util/LogAppenders.h"
 #include "util/Logger.h"
+
+#include "util/LogAppenders.h"
 #include "util/StrUtil.h"
 
+#include <cstring>
 #include <memory>
 #include <string>
-#include <string.h>
 
 using namespace std;
 
@@ -23,9 +24,9 @@ Loggers::~Loggers()
     m_init = false;
 }
 
-void Loggers::clearAppenderUnchecked(LogAppender *logAppender)
+void Loggers::clearAppenderUnchecked(LogAppender* logAppender)
 {
-    for (auto &logger : m_loggers) {
+    for (auto& logger : m_loggers) {
         logger.second->clearAppender(logAppender);
     }
 }
@@ -36,12 +37,12 @@ void Loggers::clear()
         lock_guard<mutex> lock(m_lock);
 
         // Break ties to all LogAppenders, so that destruction order of statics does not matter.
-        clearAppenderUnchecked(0);
+        clearAppenderUnchecked(nullptr);
         m_loggers.clear();
     }
 }
 
-void Loggers::clearAppender(LogAppender *logAppender)
+void Loggers::clearAppender(LogAppender* logAppender)
 {
     if (m_init) {
         lock_guard<mutex> lock(m_lock);
@@ -56,7 +57,7 @@ void Loggers::setRoot()
     // because I can't honor the contract.  Just don't do it.
     assert(m_init);
     if (m_init) {
-        Logger *root = new Logger(this, 0, "", 0);
+        auto root = new Logger(this, nullptr, "", 0);
         root->setLevel(Log::Warn);
 
         {
@@ -66,24 +67,24 @@ void Loggers::setRoot()
     }
 }
 
-Logger *Loggers::get(const char *name)
+Logger* Loggers::get(const char* name)
 {
     if (!m_init)
-        return (Logger *)0;
+        return nullptr;
 
     m_lock.lock();
-    Logger *logger = m_loggers[name];
+    Logger* logger = m_loggers[name];
     m_lock.unlock();
 
     if (!logger) {
         unsigned int nameLen = strlen(name);
-        const char *end;
+        const char* end;
         unsigned int searchOffset = 0;
         // Root logger should have been created in setRoot.
         assert(nameLen > 0);
 
         lock_guard<mutex> lock(m_lock);
-        Logger *parent = m_loggers[""];
+        Logger* parent = m_loggers[""];
         assert(parent);
         do {
             unsigned int subnameLen;
@@ -118,17 +119,17 @@ void Log::reset()
     loggers.setRoot();
 }
 
-Logger *Log::get(const char *name)
+Logger* Log::get(const char* name)
 {
     return loggers.get(name);
 }
 
-void Log::log(const char *name, Log::Level level, const char *fmt, va_list args)
+void Log::log(const char* name, Log::Level level, const char* fmt, va_list args)
 {
     get(name)->log(level, fmt, args);
 }
 
-void Log::log(const char *name, Log::Level level, const char *fmt, ...)
+void Log::log(const char* name, Log::Level level, const char* fmt, ...)
 {
     va_list ap;
 
@@ -137,7 +138,7 @@ void Log::log(const char *name, Log::Level level, const char *fmt, ...)
     va_end(ap);
 }
 
-Logger::Logger(Loggers *loggers, Logger *parent, std::string &name) :
+Logger::Logger(Loggers* loggers, Logger* parent, std::string& name) :
     m_loggers(loggers),
     m_parent(parent),
     m_name(name),
@@ -145,7 +146,7 @@ Logger::Logger(Loggers *loggers, Logger *parent, std::string &name) :
 {
 }
 
-Logger::Logger(Loggers *loggers, Logger *parent, const char *name, int32_t nameLen) :
+Logger::Logger(Loggers* loggers, Logger* parent, const char* name, int32_t nameLen) :
     m_loggers(loggers),
     m_parent(parent),
     m_name(name, nameLen),
@@ -166,12 +167,12 @@ Log::Level Logger::getLevel() const
     return m_parent->getLevel();
 }
 
-Logger *Logger::getParent()
+Logger* Logger::getParent()
 {
     return m_parent;
 }
 
-void Logger::setAppender(LogAppender *a)
+void Logger::setAppender(LogAppender* a)
 {
     assert(a);
 
@@ -183,7 +184,7 @@ void Logger::setAppender(LogAppender *a)
     a->setLoggers(m_loggers);
 }
 
-void Logger::clearAppender(LogAppender *logAppender)
+void Logger::clearAppender(LogAppender* logAppender)
 {
     if (logAppender) {
         auto iter = m_appenders.find(logAppender);
@@ -191,13 +192,13 @@ void Logger::clearAppender(LogAppender *logAppender)
             m_appenders.erase(iter);
     } else {
         for (auto a : m_appenders) {
-            a->setLoggers(0);
+            a->setLoggers(nullptr);
         }
         m_appenders.clear();
     }
 }
 
-void Logger::append(Log::Level level, std::string const &s)
+void Logger::append(Log::Level level, const std::string& s)
 {
     {
         lock_guard<mutex> lock(m_loggers->m_lock);
@@ -219,10 +220,10 @@ static const char levelChar[] = {
     'F'
 };
 
-void Logger::log(Log::Level level, const char *fmt, va_list ap)
+void Logger::log(Log::Level level, const char* fmt, va_list ap)
 {
     try {
-        if (this && getLevel() <= level) {
+        if (getLevel() <= level) {
 #if 0
             std::string s;
             uint64_t usec64 = Clock::monotonicUSec();
@@ -247,7 +248,7 @@ void Logger::log(Log::Level level, const char *fmt, va_list ap)
     }
 }
 
-void Logger::log(Log::Level level, const char *fmt, ...)
+void Logger::log(Log::Level level, const char* fmt, ...)
 {
     va_list ap;
 

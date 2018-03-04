@@ -3,26 +3,27 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/device/Battery.h"
-#include "ocher/device/Device.h"
-#include "ocher/device/Filesystem.h"
-#include "ocher/settings/Options.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/Controller.h"
-#include "ocher/ux/PowerSaver.h"
+#include "ux/Controller.h"
+
+#include "Container.h"
+#include "device/Battery.h"
+#include "device/Device.h"
+#include "device/Filesystem.h"
+#include "settings/Options.h"
+#include "settings/Settings.h"
+#include "ux/PowerSaver.h"
 #ifdef UX_FB
-#include "ocher/ux/fb/UxControllerFb.h"
+#include "ux/fb/UxControllerFb.h"
 #endif
 #ifdef UX_CDK
-#include "ocher/ux/cdk/UxControllerCdk.h"
+#include "ux/cdk/UxControllerCdk.h"
 #endif
 #ifdef UX_FD
-#include "ocher/ux/fd/UxControllerFd.h"
+#include "ux/fd/UxControllerFd.h"
 #endif
-#include "ocher/util/Debug.h"
-#include "ocher/util/LogAppenders.h"
-#include "ocher/util/Logger.h"
+#include "util/Debug.h"
+#include "util/LogAppenders.h"
+#include "util/Logger.h"
 
 #include "airbag_fd/airbag_fd.h"
 
@@ -32,8 +33,8 @@
 
 
 UxController::UxController() :
-    m_powerSaver(0),
-    m_loop(0)
+    m_powerSaver(nullptr),
+    m_loop(nullptr)
 {
     m_filesystem = g_container.filesystem;
     m_loop = g_container.loop;
@@ -53,7 +54,7 @@ UxController::~UxController()
     m_powerSaver->wantToSleep.Disconnect(this, &UxController::onWantToSleep);
 }
 
-void UxController::onDirChanged(const char *dir, const char *file)
+void UxController::onDirChanged(const char* dir, const char* file)
 {
     Log::info(LOG_NAME, "onDirChanged %s %s", dir, file);
     // TODO
@@ -66,15 +67,15 @@ void UxController::onWantToSleep()
     // TODO
 }
 
-void UxController::handleEvent(const struct OcherEvent *evt)
+void UxController::handleEvent(const struct OcherEvent* evt)
 {
     if (evt->type == OEVT_APP && evt->app.subtype == OEVT_APP_CLOSE) {
         setNextActivity(ACTIVITY_QUIT);
     }
 }
 
-Controller::Controller(Options *options) :
-    m_uxController(0)
+Controller::Controller(Options* options)
+    : m_uxController(nullptr)
 {
     g_container.options = options;
     initLog();
@@ -111,16 +112,15 @@ Controller::Controller(Options *options) :
 
     // TODO....  move to run() or init()
 
-    UxController *uxController = NULL;
-    for (unsigned int i = 0; i < g_container.uxControllers.size(); ++i) {
-        UxController *c = g_container.uxControllers[i];
+    UxController* uxController = nullptr;
+    for (UxController* c : g_container.uxControllers) {
         Log::info("ocher", "considering driver %s", c->getName());
 
-        if (options->driverName) {
-            if (strcmp(c->getName(), options->driverName) == 0) {
-                Log::debug("ocher", "Attempting to init the '%s' driver", options->driverName);
+        if (g_container.options->driverName) {
+            if (strcmp(c->getName(), g_container.options->driverName) == 0) {
+                Log::debug("ocher", "Attempting to init the '%s' driver", g_container.options->driverName);
                 if (!c->init()) {
-                    Log::warn("ocher", "Failed to init the '%s' driver", options->driverName);
+                    Log::warn("ocher", "Failed to init the '%s' driver", g_container.options->driverName);
                     throw std::runtime_error("failed to init driver"); // TODO
                 }
                 uxController = c;
@@ -136,7 +136,7 @@ Controller::Controller(Options *options) :
         }
     }
 
-    if (uxController == NULL) {
+    if (uxController == nullptr) {
         throw std::runtime_error("failed to find suitable output driver"); // TODO
     }
     Log::info("ocher", "Using the '%s' driver", uxController->getName());
@@ -144,7 +144,8 @@ Controller::Controller(Options *options) :
     g_container.uxController = uxController;
 #ifdef UX_FB
     g_container.frameBuffer = uxController->getFrameBuffer();
-    g_container.frameBuffer->inject(g_container.loop);
+    if (g_container.frameBuffer)
+        g_container.frameBuffer->inject(g_container.loop);
 #endif
     g_container.fontEngine = uxController->getFontEngine();
     g_container.renderer = uxController->getRenderer();
@@ -154,10 +155,6 @@ Controller::Controller(Options *options) :
     Log::info("ocher", "Done wiring the '%s' driver", uxController->getName());
 
     initCrash();
-}
-
-Controller::~Controller()
-{
 }
 
 void Controller::initCrash()
@@ -171,11 +168,11 @@ void Controller::initCrash()
 void Controller::initLog()
 {
     static LogAppenderCFile appender(stderr);
-    Logger *l = Log::get("");
+    Logger* l = Log::get("");
 
     l->setAppender(&appender);
 
-    Options *opt = g_container.options;
+    Options* opt = g_container.options;
     if (opt->verbose < 0)
         l->setLevel(Log::Fatal);
     else if (opt->verbose == 0)
@@ -199,7 +196,7 @@ void Controller::initDebug()
     // framebuffer in incompatible ways).
     if (g_container.device->fs.m_libraries) {
         for (int i = 0;; ++i) {
-            const char *lib = g_container.device->fs.m_libraries[i];
+            const char* lib = g_container.device->fs.m_libraries[i];
             if (!lib)
                 break;
             std::string killswitch(1, "%s/.ocher/kill", lib);
@@ -222,8 +219,7 @@ void Controller::run()
     sleep(1);
 #endif
 
-    Options *opt = g_container.options;
-    ActivityType a = opt->bootMenu ? ACTIVITY_BOOT : ACTIVITY_SYNC;
+    ActivityType a = g_container.options->bootMenu ? ACTIVITY_BOOT : ACTIVITY_SYNC;
     m_uxController->setNextActivity(a);
     g_container.loop->run();
 

@@ -3,11 +3,12 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/device/Device.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/PowerSaver.h"
-#include "ocher/ux/fb/FontEngine.h"
-#include "ocher/util/Logger.h"
+#include "ux/PowerSaver.h"
+
+#include "device/Device.h"
+#include "settings/Settings.h"
+#include "ux/fb/FontEngine.h"
+#include "util/Logger.h"
 
 #include <ev.h>
 
@@ -16,11 +17,11 @@
 
 ev_timer timeout_watcher;
 
-void PowerSaver::timeoutCb(EV_P_ ev_timer *timer, int revents)
+void PowerSaver::timeoutCb(EV_P_ ev_timer* timer, int revents)
 {
     Log::debug(LOG_NAME, "timeout");
 
-    static_cast<PowerSaver *>(timer->data)->timeout();
+    static_cast<PowerSaver*>(timer->data)->timeout();
 }
 
 void PowerSaver::timeout()
@@ -29,14 +30,14 @@ void PowerSaver::timeout()
 }
 
 PowerSaver::PowerSaver() :
-    m_loop(0),
+    m_loop(nullptr),
     m_seconds(15 * 60),
     // TODO settings
-    m_device(0)
+    m_device(nullptr)
 {
 }
 
-void PowerSaver::inject(EventLoop *loop)
+void PowerSaver::inject(EventLoop* loop)
 {
     m_loop = loop;
 
@@ -45,7 +46,7 @@ void PowerSaver::inject(EventLoop *loop)
     resetTimeout();
 }
 
-void PowerSaver::inject(Device *device)
+void PowerSaver::inject(Device* device)
 {
     m_device = device;
 }
@@ -63,7 +64,7 @@ void PowerSaver::resetTimeout()
     m_timer.data = this;
 }
 
-void PowerSaver::dispatchEvent(const struct OcherEvent *evt)
+void PowerSaver::dispatchEvent(const struct OcherEvent* evt)
 {
     if (evt->type == OEVT_MOUSE) {
         resetTimeout();

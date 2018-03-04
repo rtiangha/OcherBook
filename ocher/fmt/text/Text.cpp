@@ -3,14 +3,15 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/fmt/text/Text.h"
-#include "ocher/util/File.h"
-#include "ocher/util/Logger.h"
+#include "fmt/text/Text.h"
+
+#include "util/File.h"
+#include "util/Logger.h"
 
 #define LOG_NAME "ocher.text"
 
 
-Text::Text(const std::string &filename)
+Text::Text(const std::string& filename)
 {
     File f(filename);
 

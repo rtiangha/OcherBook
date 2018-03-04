@@ -22,19 +22,19 @@ public:
     {
     }
 
-    void attach(GroupOfBooks *observer);
-    void detach(GroupOfBooks *observer);
+    void attach(GroupOfBooks* observer);
+    void detach(GroupOfBooks* observer);
     void notify();
 
     // TODO: updateMetadata vs updateMembership ?
-    virtual void update(GroupOfBooks *)
+    virtual void update(GroupOfBooks*)
     {
     }
 
-    virtual const std::vector<Meta *> *getList() const = 0;
+    virtual const std::vector<Meta*>& getList() const = 0;
 
 protected:
-    std::vector<GroupOfBooks *> m_observers;
+    std::vector<GroupOfBooks*> m_observers;
 };
 
 
@@ -42,9 +42,8 @@ protected:
  */
 class Shelf : public GroupOfBooks {
 public:
-    Shelf();
-
-    ~Shelf();
+    Shelf() = default;
+    ~Shelf() = default;
 
     enum SortKeys {
         ByAuthor,
@@ -54,7 +53,7 @@ public:
     /**
      * Shelves watch other GroupOfBooks and must implement update().
      */
-    virtual void update(GroupOfBooks *changed) = 0;
+    virtual void update(GroupOfBooks* changed) = 0;
 
 #if 0
     addFilterTag();
@@ -80,15 +79,15 @@ public:
     /** Adds the metadata to the Library.  Ownership is transferred.
      * Caller should call notify() when done adding.
      */
-    void add(Meta *);
+    void add(Meta*);
 
-    const std::vector<Meta *> *getList() const
+    const std::vector<Meta*>& getList() const
     {
-        return &m_meta;
+        return m_meta;
     }
 
 protected:
-    std::vector<Meta *> m_meta;
+    std::vector<Meta*> m_meta;
 };
 
 
@@ -96,7 +95,7 @@ protected:
  */
 class ShortList : public Shelf {
 public:
-    ShortList(GroupOfBooks *base) :
+    ShortList(GroupOfBooks* base) :
         m_base(base)
     {
         m_base->attach(this);
@@ -107,16 +106,16 @@ public:
         m_base->detach(this);
     }
 
-    void update(GroupOfBooks *changed);
+    void update(GroupOfBooks* changed);
 
-    const std::vector<Meta *> *getList() const
+    const std::vector<Meta*>& getList() const
     {
-        return &m_meta;
+        return m_meta;
     }
 
 protected:
-    std::vector<Meta *> m_meta;
-    GroupOfBooks *m_base;
+    std::vector<Meta*> m_meta;
+    GroupOfBooks* m_base;
 };
 
 #endif

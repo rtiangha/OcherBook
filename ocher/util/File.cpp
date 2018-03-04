@@ -1,30 +1,40 @@
-#include "util/Buffer.h"
 #include "util/File.h"
 
-#include <assert.h>
-#include <errno.h>
+#include "util/Buffer.h"
+
+#include <cassert>
+#include <cerrno>
+#include <cstdio>
 #include <fcntl.h>
 #include <random>
-#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <system_error>
 #include <unistd.h>
 
-#undef O_BINARY
-#define O_BINARY 0
 #define DEF_CREAT_MODE 0666
 
 
 File::File() :
-    m_fd(0),
+    m_file(nullptr),
     m_temp(false)
 {
 }
 
-File::File(const std::string &pathname, const char *mode) :
-    m_fd(0),
+File::File(std::string pathname, const char* mode) :
+    m_file(nullptr),
+    m_filename(std::move(pathname)),
+    m_temp(false)
+{
+    int r = init(mode);
+
+    if (r)
+        throw std::system_error(r, std::system_category(), "init");
+}
+
+File::File(const char* pathname, const char* mode) :
+    m_file(nullptr),
     m_filename(pathname),
     m_temp(false)
 {
@@ -34,32 +44,21 @@ File::File(const std::string &pathname, const char *mode) :
         throw std::system_error(r, std::system_category(), "init");
 }
 
-File::File(const char *pathname, const char *mode) :
-    m_fd(0),
-    m_filename(pathname),
-    m_temp(false)
-{
-    int r = init(mode);
-
-    if (r)
-        throw std::system_error(r, std::system_category(), "init");
-}
-
-int File::setTo(const char *pathname, const char *mode)
+int File::setTo(const char* pathname, const char* mode)
 {
     unset();
     m_filename = pathname;
     return init(mode);
 }
 
-int File::setTo(const std::string &pathname, const char *mode)
+int File::setTo(const std::string& pathname, const char* mode)
 {
     unset();
     m_filename = pathname;
     return init(mode);
 }
 
-int File::init(const char *mode)
+int File::init(const char* mode)
 {
     /*
      * Cannot use fopen because the strings are not completely portable (in particular, "x" to
@@ -70,7 +69,7 @@ int File::init(const char *mode)
      */
     char fmode[4] = { 0 }; // Collected flags for fdopen
     int fmi = 0;
-    int oflag = O_BINARY;  // Collected flags for open
+    int oflag = 0;  // Collected flags for open
     int omode = DEF_CREAT_MODE;
 
     int state = 0;  // Trivial FSM: 0=r,w,a 1=+ 2=x,u,t
@@ -121,7 +120,7 @@ int File::init(const char *mode)
             break;
         }
         default:
-            assert(0);
+            assert(false);
         }
     }
     int fd;
@@ -131,7 +130,7 @@ int File::init(const char *mode)
         std::uniform_int_distribution<> dis(0, 10 + 26 + 26);
         m_filename.append(".XXXXXX");
         const unsigned int len = m_filename.length();
-        while (1) {
+        while (true) {
             do {
                 for (unsigned int i = 0; i < 6; ++i) {
                     char l = dis(gen);
@@ -155,8 +154,8 @@ int File::init(const char *mode)
     if (fd == -1) {
         return errno;
     }
-    m_fd = fdopen(fd, &fmode[0]);
-    if (m_fd == NULL) {
+    m_file = fdopen(fd, &fmode[0]);
+    if (m_file == nullptr) {
         int e = errno;
         ::close(fd);
         return e;
@@ -166,11 +165,11 @@ int File::init(const char *mode)
 
 void File::unset()
 {
-    if (m_fd) {
+    if (m_file) {
         close();
         if (m_temp)
             unlink(m_filename.c_str());
-        m_fd = 0;
+        m_file = nullptr;
     }
     m_filename.clear();
     m_temp = false;
@@ -183,45 +182,45 @@ File::~File()
 
 uint64_t File::position() const
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "position");
     }
-    return ftell(m_fd);
+    return ftell(m_file);
 }
 
 uint64_t File::seek(int64_t offset, int whence)
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "seek");
     }
-    int r = fseek(m_fd, offset, whence);
+    int r = fseek(m_file, offset, whence);
     if (r == -1)
         throw std::system_error(errno, std::system_category(), "seek");
-    return ftell(m_fd);
+    return ftell(m_file);
 }
 
 uint64_t File::size()
 {
     struct stat statbuf;
 
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "size");
     }
-    int fd = fileno(m_fd);
+    int fd = fileno(m_file);
     int r = fstat(fd, &statbuf);
     assert(r == 0);
     (void)r;
     return statbuf.st_size;
 }
 
-void File::getTimes(time_t &accessTime, time_t &modifyTime, time_t &changeTime)
+void File::getTimes(time_t& accessTime, time_t& modifyTime, time_t& changeTime)
 {
     struct stat statbuf;
 
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "getTimes");
     }
-    int fd = fileno(m_fd);
+    int fd = fileno(m_file);
     int r = fstat(fd, &statbuf);
     assert(r == 0);
     (void)r;
@@ -230,15 +229,15 @@ void File::getTimes(time_t &accessTime, time_t &modifyTime, time_t &changeTime)
     changeTime = statbuf.st_ctime;
 }
 
-uint32_t File::read(char *buf, uint32_t numBytes)
+uint32_t File::read(char* buf, uint32_t numBytes)
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "read");
     }
     size_t r;
-    r = fread(buf, 1, numBytes, m_fd);
+    r = fread(buf, 1, numBytes, m_file);
     if (r != numBytes) {
-        if (ferror(m_fd)) {
+        if (ferror(m_file)) {
             throw std::system_error(EIO, std::system_category(), "fread");
         }
     }
@@ -247,17 +246,17 @@ uint32_t File::read(char *buf, uint32_t numBytes)
 
 std::string File::readLine(bool keepEol, size_t maxLen)
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "readLine");
     }
     uint32_t bytesRead = 0;
     Buffer buf;
-    for (;; ) {
+    while (true) {
         const size_t lineChunk = 2048;
-        char *tmpBuf = buf.lockBuffer(bytesRead + lineChunk);
+        char* tmpBuf = buf.lockBuffer(bytesRead + lineChunk);
         tmpBuf += bytesRead;
-        char *r = fgets(tmpBuf, lineChunk, m_fd);
-        if (r == NULL) {
+        char* r = fgets(tmpBuf, lineChunk, m_file);
+        if (r == nullptr) {
             if (isEof()) {
                 break;
             } else {
@@ -283,10 +282,10 @@ std::string File::readLine(bool keepEol, size_t maxLen)
     return std::string(buf.c_str(), buf.length());
 }
 
-uint32_t File::read(Buffer &s, uint32_t numBytes, uint32_t offset)
+uint32_t File::read(Buffer& s, uint32_t numBytes, uint32_t offset)
 {
     uint32_t received = 0;
-    char *buffer = s.lockBuffer(offset + numBytes);
+    char* buffer = s.lockBuffer(offset + numBytes);
 
     try {
         received = read(buffer + offset, numBytes);
@@ -298,7 +297,7 @@ uint32_t File::read(Buffer &s, uint32_t numBytes, uint32_t offset)
     return received;
 }
 
-void File::readRest(std::string &s)
+void File::readRest(std::string& s)
 {
     // Tempting to query size and prealloc that much, but some files in /proc claim 0 size.
     const uint32_t maxChunk = 16384;
@@ -307,7 +306,7 @@ void File::readRest(std::string &s)
     Buffer buf;
 
     do {
-        char *buffer = buf.lockBuffer(offset + maxChunk);
+        char* buffer = buf.lockBuffer(offset + maxChunk);
         try {
             received = read(buffer + offset, maxChunk);
         } catch (...) {
@@ -320,13 +319,13 @@ void File::readRest(std::string &s)
     s.assign(buf.c_str(), buf.length());
 }
 
-void File::write(const char *buf, uint32_t numBytes)
+void File::write(const char* buf, uint32_t numBytes)
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "write");
     }
     size_t r;
-    r = fwrite(buf, 1, numBytes, m_fd);
+    r = fwrite(buf, 1, numBytes, m_file);
     if (r != numBytes) {
         throw std::system_error(EIO, std::system_category(), "write");
     }
@@ -335,25 +334,25 @@ void File::write(const char *buf, uint32_t numBytes)
 
 void File::flush()
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "flush");
     }
-    fflush(m_fd);
+    fflush(m_file);
 }
 
 void File::close()
 {
-    if (m_fd) {
-        fclose(m_fd);
-        m_fd = NULL;
+    if (m_file) {
+        fclose(m_file);
+        m_file = nullptr;
     }
 }
 
 bool File::isEof() const
 {
-    if (!m_fd) {
+    if (!m_file) {
         throw std::system_error(EINVAL, std::system_category(), "isEof");
     }
     // Note: does not set errno
-    return feof(m_fd) > 0;
+    return feof(m_file) > 0;
 }

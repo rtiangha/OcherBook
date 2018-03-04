@@ -6,9 +6,11 @@
 #ifndef OCHER_UX_CDK_UXCONTROLLER_H
 #define OCHER_UX_CDK_UXCONTROLLER_H
 
-#include "ocher/ux/Controller.h"
+#include "ux/Controller.h"
 
 #include <cdk.h>
+
+#include <string>
 
 class RendererCdk;
 
@@ -19,27 +21,27 @@ public:
     UxControllerCdk();
     ~UxControllerCdk();
 
-    const char *getName() const
+    const char* getName() const
     {
         return "cdk";
     }
 
     bool init();
 
-    Renderer *getRenderer()
+    Renderer* getRenderer()
     {
         return m_renderer;
     }
 
     void setNextActivity(enum ActivityType a);
 
-    WINDOW *m_scr;
-    CDKSCREEN *m_screen;
+    WINDOW* m_scr;
+    CDKSCREEN* m_screen;
 
 protected:
     std::string m_name;
 
-    Renderer *m_renderer;
+    Renderer* m_renderer;
 };
 
 #endif

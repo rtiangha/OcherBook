@@ -3,15 +3,16 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/device/Filesystem.h"
-#include "ocher/settings/Options.h"
-#include "ocher/shelf/Meta.h"
-#include "ocher/ux/fd/LibraryActivityFd.h"
-#include "ocher/ux/fd/UxControllerFd.h"
-#include "ocher/util/Logger.h"
+#include "ux/fd/LibraryActivityFd.h"
 
-#include <stdio.h>
+#include "Container.h"
+#include "device/Filesystem.h"
+#include "settings/Options.h"
+#include "shelf/Meta.h"
+#include "ux/fd/UxControllerFd.h"
+#include "util/Logger.h"
+
+#include <cstdio>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -39,15 +40,11 @@ static char getKey()
     return (char)key;
 }
 
-LibraryActivityFd::LibraryActivityFd(UxControllerFd *c) :
+LibraryActivityFd::LibraryActivityFd(UxControllerFd* c) :
     ActivityFd(c),
     m_settings(g_container.settings),
-    m_library(0),
+    m_library(nullptr),
     m_pageNum(0)
-{
-}
-
-LibraryActivityFd::~LibraryActivityFd()
 {
 }
 
@@ -55,7 +52,7 @@ void LibraryActivityFd::draw()
 {
     printf("\n");
     for (unsigned int i = 0; i < m_library->size(); ++i) {
-        Meta *m = (*m_library)[i];
+        Meta* m = (*m_library)[i];
         // TODO:  title/author
         // TODO:  pad to width
         printf("%3u: %s\n", i + 1, m->title.c_str());
@@ -64,14 +61,14 @@ void LibraryActivityFd::draw()
     }
 
     //char key = getKey();
-    //return (Meta *)m_library->get(key - '1');
+    //return (Meta*)m_library->get(key - '1');
 }
 
 void LibraryActivityFd::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
-    m_library = m_uxController->ctx.library.getList();
+    m_library = &m_uxController->ctx.library.getList();
     m_pages = (m_library->size() + m_booksPerPage - 1) / m_booksPerPage;
     Log::info(LOG_NAME, "%u books across %u pages", (unsigned)m_library->size(), m_pages);
 
@@ -83,9 +80,9 @@ void LibraryActivityFd::onDetached()
 }
 
 #if 0
-void BrowseFd::read(Meta *meta)
+void BrowseFd::read(Meta* meta)
 {
-    Renderer *renderer = uiFactory->getRenderer();
+    Renderer* renderer = uiFactory->getRenderer();
 
     for (int pageNum = 0;; ) {
         int atEnd = renderer->render(&meta->m_pagination, pageNum, true);

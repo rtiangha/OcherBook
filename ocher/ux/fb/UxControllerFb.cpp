@@ -3,31 +3,32 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/ux/fb/RendererFb.h"
-#include "ocher/ux/fb/UxControllerFb.h"
+#include "ux/fb/UxControllerFb.h"
+
+#include "Container.h"
+#include "ux/fb/RendererFb.h"
 #ifdef UX_FB_SDL
-#include "ocher/ux/fb/sdl/FrameBufferSdl.h"
+#include "ux/fb/sdl/FrameBufferSdl.h"
 #endif
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
 
 #define LOG_NAME "ocher.ux.ctrl"
 
 UxControllerFb::UxControllerFb() :
-    m_systemBar(0),
-    m_navBar(0),
-    m_activity(0),
-    m_bootActivity(0),
-    m_homeActivity(0),
-    m_libraryActivity(0),
-    m_readActivity(0),
-    m_settingsActivity(0),
-    m_sleepActivity(0),
-    m_syncActivity(0),
-    m_renderer(0),
-    m_fontEngine(0),
-    m_frameBuffer(0),
+    m_systemBar(nullptr),
+    m_navBar(nullptr),
+    m_activity(nullptr),
+    m_bootActivity(nullptr),
+    m_homeActivity(nullptr),
+    m_libraryActivity(nullptr),
+    m_readActivity(nullptr),
+    m_settingsActivity(nullptr),
+    m_sleepActivity(nullptr),
+    m_syncActivity(nullptr),
+    m_renderer(nullptr),
+    m_fontEngine(nullptr),
+    m_frameBuffer(nullptr),
     m_name("fb")
 {
 }
@@ -53,11 +54,15 @@ UxControllerFb::~UxControllerFb()
 
 bool UxControllerFb::init()
 {
-    FrameBuffer *frameBuffer;
+    FrameBuffer* frameBuffer;
 
     do {
 #ifdef UX_FB_SDL
         frameBuffer = new FrameBufferSdl();
+        // XXX  This is getting called from Controller.cpp:130
+        // which starts the SDL thread
+        // which tries to inject an SDL event into the event loop,
+        // but that's set from Controller.cpp:146
         if (frameBuffer->init()) {
             m_name += ".sdl";
             break;
@@ -71,7 +76,7 @@ bool UxControllerFb::init()
         }
 #endif
         return false;
-    } while (0);
+    } while (false);
 
     g_container.frameBuffer = m_frameBuffer = frameBuffer;
     m_renderer = new RendererFb(m_frameBuffer);

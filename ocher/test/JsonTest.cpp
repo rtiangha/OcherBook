@@ -54,7 +54,7 @@ TEST_CASE("nlohmann::json user mistypes int as string") {
     try {
         i = j["foo"];
         CHECK(false);  // did throw
-    } catch (std::domain_error &e) {
+    } catch (std::domain_error&) {
         std::string s = j["foo"];
         i = atoi(s.c_str());
         CHECK(i == 42);

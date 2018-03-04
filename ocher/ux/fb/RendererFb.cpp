@@ -3,17 +3,18 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/fmt/Layout.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/Pagination.h"
-#include "ocher/ux/fb/FrameBuffer.h"
-#include "ocher/ux/fb/RendererFb.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/Stopwatch.h"
+#include "ux/fb/RendererFb.h"
 
-#include <ctype.h>
+#include "Container.h"
+#include "fmt/Layout.h"
+#include "settings/Settings.h"
+#include "ux/Pagination.h"
+#include "ux/fb/FrameBuffer.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
+#include "util/Stopwatch.h"
+
+#include <cctype>
 
 #define LOG_NAME "ocher.render.fb"
 #ifdef DEBUG
@@ -21,7 +22,7 @@
 #endif
 
 
-RendererFb::RendererFb(FrameBuffer *fb) :
+RendererFb::RendererFb(FrameBuffer* fb) :
     m_fb(fb),
     m_fe(fb),
     m_settings(g_container.settings),
@@ -49,11 +50,11 @@ void RendererFb::popAttrs()
     ai--;
 }
 
-int RendererFb::outputWrapped(Buffer *b, unsigned int strOffset, bool doBlit)
+int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
 {
     unsigned int len = b->size();
-    const char *start = b->data();
-    const char *p = start;
+    const char* start = b->data();
+    const char* p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;
@@ -92,7 +93,7 @@ int RendererFb::outputWrapped(Buffer *b, unsigned int strOffset, bool doBlit)
                 ++w;
 
             Rect bbox;
-            Glyph *glyphs[w + 1];
+            Glyph* glyphs[w + 1];
             bbox.x = m_penX;
             bbox.y = m_penY;
             m_fe.plotString(p, w, glyphs, &bbox);
@@ -116,7 +117,7 @@ int RendererFb::outputWrapped(Buffer *b, unsigned int strOffset, bool doBlit)
                 m_penY = pos.y;
             } else {
                 for (unsigned int i = 0; glyphs[i]; ++i) {
-                    Glyph *g = glyphs[i];
+                    Glyph* g = glyphs[i];
                     m_penX += g->advanceX;
                     m_penY += g->advanceY;
                 }
@@ -157,7 +158,7 @@ void RendererFb::applyAttrs()
     m_fe.apply();
 }
 
-int RendererFb::render(Pagination *pagination, unsigned int pageNum, bool doBlit)
+int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
     Log::info(LOG_NAME, "%s page %u of %u", doBlit ? "render" : "layout", pageNum, pagination->numPages());
 
@@ -181,7 +182,7 @@ int RendererFb::render(Pagination *pagination, unsigned int pageNum, bool doBlit
 
     int r = 1;
     const unsigned int N = m_layout.size();
-    const char *raw = m_layout.data();
+    const char* raw = m_layout.data();
     ASSERT(layoutOffset <= N);
 
     applyAttrs();
@@ -192,7 +193,7 @@ int RendererFb::render(Pagination *pagination, unsigned int pageNum, bool doBlit
     unsigned int i = layoutOffset;
     while (i < N) {
         ASSERT(i + 2 <= N);
-        uint16_t code = *(uint16_t *)(raw + i);
+        uint16_t code = *(uint16_t*)(raw + i);
         i += 2;
 
         unsigned int opType = (code >> 12) & 0xf;
@@ -270,8 +271,8 @@ int RendererFb::render(Pagination *pagination, unsigned int pageNum, bool doBlit
             case Layout::CmdOutputStr: {
                 m_fe.apply();
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
-                ASSERT(i + sizeof(Buffer *) <= N);
-                Buffer *str = *(Buffer **)(raw + i);
+                ASSERT(i + sizeof(Buffer*) <= N);
+                Buffer* str = *(Buffer**)(raw + i);
                 ASSERT(strOffset <= str->size());
 #ifdef CPS_STATS
                 chars += str->length();          // miscounts UTF8...
@@ -285,7 +286,7 @@ int RendererFb::render(Pagination *pagination, unsigned int pageNum, bool doBlit
                     r = 0;
                     goto done;
                 }
-                i += sizeof(Buffer *);
+                i += sizeof(Buffer*);
                 break;
             }
             case Layout::CmdForcePage:

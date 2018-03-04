@@ -3,26 +3,26 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#ifndef OCHER_FILETREE_H
-#define OCHER_FILETREE_H
+#ifndef OCHER_EPUB_TREEMEM_H
+#define OCHER_EPUB_TREEMEM_H
 
 /** @file
  * Represents a simple filesystem in memory.
  */
 
-#include "ocher/util/Buffer.h"
+#include "util/Buffer.h"
 
 #include <list>
 #include <string>
 
 class TreeFile {
 public:
-    TreeFile(const std::string &_name) :
+    TreeFile(const std::string& _name) :
         name(_name)
     {
     }
 
-    TreeFile(const std::string &_name, Buffer &_data) :
+    TreeFile(const std::string& _name, Buffer& _data) :
         name(_name),
         data(_data)
     {
@@ -35,32 +35,32 @@ public:
 
 class TreeDirectory {
 public:
-    TreeDirectory(const char *_name) :
+    TreeDirectory(const char* _name) :
         name(_name)
     {
     }
 
-    TreeDirectory(const std::string &_name) :
+    TreeDirectory(const std::string& _name) :
         name(_name)
     {
     }
 
     ~TreeDirectory()
     {
-        for (std::list<TreeFile *>::const_iterator i = files.begin(); i != files.end(); ++i) {
+        for (std::list<TreeFile*>::const_iterator i = files.begin(); i != files.end(); ++i) {
             delete *i;
         }
-        for (std::list<TreeDirectory *>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
+        for (std::list<TreeDirectory*>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
             delete *i;
         }
     }
 
     std::string name;
 
-    std::list<TreeDirectory *> subdirs;
-    std::list<TreeFile *> files;
+    std::list<TreeDirectory*> subdirs;
+    std::list<TreeFile*> files;
 
-    TreeFile *createFilepp(const char *_name, const char *_data)
+    TreeFile* createFilepp(const char* _name, const char* _data)
     {
         std::string nameBuf(_name);
         Buffer dataBuf(_data);
@@ -68,16 +68,24 @@ public:
         return createFile(nameBuf, dataBuf);
     }
 
-    TreeFile *createFilep(const char *_name, Buffer &_data)
+    TreeFile* createFilep(const char* _name, const std::string& _data)
+    {
+        std::string nameBuf(_name);
+        Buffer dataBuf(_data.c_str(), _data.length());
+
+        return createFile(nameBuf, dataBuf);
+    }
+
+    TreeFile* createFilep(const char* _name, Buffer& _data)
     {
         std::string nameBuf(_name);
 
         return createFile(nameBuf, _data);
     }
 
-    TreeFile *createFile(const std::string &_name, Buffer &_data)
+    TreeFile* createFile(const std::string& _name, Buffer& _data)
     {
-        TreeFile *file = getFile(_name);
+        TreeFile* file = getFile(_name);
 
         if (!file) {
             file = new TreeFile(_name, _data);
@@ -86,14 +94,14 @@ public:
         return file;
     }
 
-    TreeDirectory *createDirectory(const char *_name)
+    TreeDirectory* createDirectory(const char* _name)
     {
         return createDirectory(std::string(_name));
     }
 
-    TreeDirectory *createDirectory(const std::string &_name)
+    TreeDirectory* createDirectory(const std::string& _name)
     {
-        TreeDirectory *dir = getDirectory(_name);
+        TreeDirectory* dir = getDirectory(_name);
 
         if (!dir) {
             dir = new TreeDirectory(_name);
@@ -102,48 +110,48 @@ public:
         return dir;
     }
 
-    TreeFile *getFile(const std::string &_name) const
+    TreeFile* getFile(const std::string& _name) const
     {
-        for (std::list<TreeFile *>::const_iterator i = files.begin(); i != files.end(); ++i) {
-            if ((*i)->name == _name)
-                return *i;
+        for (TreeFile* file : files) {
+            if (file->name == _name)
+                return file;
         }
         return 0;
     }
 
-    TreeFile *getFile(const char *_name) const
+    TreeFile* getFile(const char* _name) const
     {
-        for (std::list<TreeFile *>::const_iterator i = files.begin(); i != files.end(); ++i) {
-            if ((*i)->name == _name)
-                return *i;
+        for (TreeFile* file : files) {
+            if (file->name == _name)
+                return file;
         }
         return 0;
     }
 
-    TreeDirectory *getDirectory(const std::string &_name) const
+    TreeDirectory* getDirectory(const std::string& _name) const
     {
-        for (std::list<TreeDirectory *>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
-            if ((*i)->name == _name)
-                return *i;
+        for (TreeDirectory* subdir : subdirs) {
+            if (subdir->name == _name)
+                return subdir;
         }
         return 0;
     }
 
-    TreeFile *findFile(const char *_name) const
+    TreeFile* findFile(const char* _name) const
     {
-        const char *slash = strchr(_name, '/');
+        const char* slash = strchr(_name, '/');
 
         if (slash) {
             size_t len = slash - _name;
-            for (std::list<TreeDirectory *>::const_iterator i = subdirs.begin(); i != subdirs.end(); ++i) {
-                if ((*i)->name.length() == len && strncmp((*i)->name.c_str(), _name, len) == 0) {
-                    return (*i)->findFile(slash + 1);
+            for (TreeDirectory* subdir : subdirs) {
+                if (subdir->name.length() == len && strncmp(subdir->name.c_str(), _name, len) == 0) {
+                    return subdir->findFile(slash + 1);
                 }
             }
         } else {
-            for (std::list<TreeFile *>::const_iterator i = files.begin(); i != files.end(); ++i) {
-                if ((*i)->name == _name) {
-                    return *i;
+            for (TreeFile* file : files) {
+                if (file->name == _name) {
+                    return file;
                 }
             }
         }

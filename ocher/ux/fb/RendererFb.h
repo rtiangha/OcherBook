@@ -6,8 +6,8 @@
 #ifndef OCHER_FB_RENDER_H
 #define OCHER_FB_RENDER_H
 
-#include "ocher/ux/Renderer.h"
-#include "ocher/ux/fb/FontEngine.h"
+#include "ux/Renderer.h"
+#include "ux/fb/FontEngine.h"
 
 class FrameBuffer;
 class Pagination;
@@ -16,20 +16,20 @@ class Settings;
 
 class RendererFb : public Renderer {
 public:
-    RendererFb(FrameBuffer *fb);
+    RendererFb(FrameBuffer* fb);
 
     bool init();
     void deinit();
 
-    int render(Pagination *pagination, unsigned int pageNum, bool doBlit);
+    int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
 protected:
-    int outputWrapped(Buffer *b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit);
     void applyAttrs();
 
-    FrameBuffer *m_fb;
+    FrameBuffer* m_fb;
     FontEngine m_fe;
-    Settings *m_settings;
+    Settings* m_settings;
     int m_penX;
     int m_penY;
 

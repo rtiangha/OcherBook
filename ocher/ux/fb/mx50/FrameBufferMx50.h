@@ -6,8 +6,8 @@
 #ifndef MX50_FB_H
 #define MX50_FB_H
 
-#include "ocher/device/kobo/KoboEvents.h"
-#include "ocher/ux/fb/FrameBuffer.h"
+#include "device/kobo/KoboEvents.h"
+#include "ux/fb/FrameBuffer.h"
 
 #include <linux/mxcfb.h>
 
@@ -23,7 +23,7 @@ public:
     unsigned int width();
     unsigned int dpi();
 
-    void inject(EventLoop *loop)
+    void inject(EventLoop* loop)
     {
         m_events.setEventLoop(loop);
     }
@@ -37,10 +37,10 @@ public:
     {
         line(x, y1, x, y2);
     }
-    void blit(const unsigned char *p, int x, int y, int w, int h, const Rect *clip);
-    void fillRect(Rect *r);
-    void byLine(Rect *r, void (*fn)(void *p, size_t n));
-    int update(Rect *r, bool full = false);
+    void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip);
+    void fillRect(Rect* r);
+    void byLine(Rect* r, void (*fn)(void* p, size_t n));
+    int update(Rect* r, bool full = false);
     void sync();
     void needFull()
     {
@@ -60,7 +60,7 @@ protected:
     KoboEvents m_events;  // TODO abstract
 
     int m_fd;
-    char *m_fb;
+    char* m_fb;
     size_t m_fbSize;
     unsigned int m_marker;
     struct fb_var_screeninfo vinfo;

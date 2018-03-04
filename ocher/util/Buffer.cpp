@@ -1,12 +1,12 @@
 #include "Buffer.h"
 
 #define __STDC_FORMAT_MACROS
-#include <assert.h>
-#include <ctype.h>
-#include <inttypes.h>
+#include <cassert>
+#include <cctype>
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
 #include <new>
-#include <stdio.h>
-#include <stdlib.h>
 
 // define proper names for case-option of _doReplace()
 #define KEEP_CASE false
@@ -88,13 +88,6 @@ inline bool Buffer::_isShareable() const
 
 class Buffer::PosVect {
 public:
-    PosVect() :
-        fSize(0),
-        fBufferSize(20),
-        fBuffer(NULL)
-    {
-    }
-
     ~PosVect()
     {
         free(fBuffer);
@@ -102,13 +95,13 @@ public:
 
     void Add(size_t pos)
     {
-        if (fBuffer == NULL || fSize == fBufferSize) {
-            if (fBuffer != NULL)
+        if (fBuffer == nullptr || fSize == fBufferSize) {
+            if (fBuffer != nullptr)
                 fBufferSize *= 2;
 
-            size_t *newBuffer = NULL;
+            size_t *newBuffer = nullptr;
             newBuffer = (size_t *)realloc(fBuffer, fBufferSize * sizeof(size_t));
-            if (newBuffer == NULL)
+            if (newBuffer == nullptr)
                 throw std::bad_alloc();
 
             fBuffer = newBuffer;
@@ -128,9 +121,9 @@ public:
     }
 
 private:
-    size_t fSize;
-    size_t fBufferSize;
-    size_t *fBuffer;
+    size_t fSize = 0;
+    size_t fBufferSize = 20;
+    size_t *fBuffer = nullptr;
 };
 
 
@@ -162,7 +155,7 @@ Buffer::Buffer(const char *string, size_t len)
 
 Buffer::Buffer(size_t prealloc)
 {
-    _init(NULL, prealloc);
+    _init(nullptr, prealloc);
 }
 
 Buffer::~Buffer()
@@ -188,69 +181,6 @@ Buffer &Buffer::operator=(const char *string)
 Buffer &Buffer::operator=(char c)
 {
     return setTo(c, 1);
-}
-
-Buffer &Buffer::formatList(const char *fmt, va_list argList)
-{
-#ifdef __NetBSD__   // TODO:  HAVE_VASPRINTF
-    char *buf;
-    vasprintf(&buf, fmt, argList);
-    size_t len = strlen(buf);
-    _detachWith(buf, len, len);
-    free(buf);
-#else
-    va_list argList2;
-    va_copy(argList2, argList);
-    int len = vsnprintf(NULL, 0, fmt, argList2) + 1;  // measure,
-    va_end(argList2);
-    char *buf = (char *)alloca(len);
-    int printed = vsnprintf(buf, len, fmt, argList); // format,
-    assert(printed + 1 == len);
-    (void)printed;
-    _detachWith(buf, len - 1, len - 1);              // copy
-#endif
-    return *this;
-}
-
-Buffer &Buffer::format(const char *fmt, ...)
-{
-    va_list argList;
-
-    va_start(argList, fmt);
-    formatList(fmt, argList);
-    va_end(argList);
-    return *this;
-}
-
-Buffer &Buffer::appendFormatList(const char *fmt, va_list argList)
-{
-#ifdef __NetBSD__   // TODO:  HAVE_VASPRINTF
-    char *buf;
-    vasprintf(&buf, fmt, argList);
-    _doAppend(buf, strlen(buf) - 1);
-    free(buf);
-#else
-    va_list argList2;
-    va_copy(argList2, argList);
-    int len = vsnprintf(NULL, 0, fmt, argList2) + 1;  // measure,
-    va_end(argList2);
-    char *buf = (char *)alloca(len);
-    int printed = vsnprintf(buf, len, fmt, argList); // format,
-    assert(printed + 1 == len);
-    (void)printed;
-    _doAppend(buf, len - 1);                         // copy
-#endif
-    return *this;
-}
-
-Buffer &Buffer::appendFormat(const char *fmt, ...)
-{
-    va_list argList;
-
-    va_start(argList, fmt);
-    appendFormatList(fmt, argList);
-    va_end(argList);
-    return *this;
 }
 
 Buffer &Buffer::setTo(const char *string, size_t len)
@@ -844,7 +774,7 @@ Buffer &Buffer::replaceAll(char replaceThis, char withThis, size_t fromOffset)
     if (pos != NotFound) {
         fork();
         m_data[pos] = withThis;
-        while (1) {
+        while (true) {
             pos = findFirst(replaceThis, pos);
             if (pos == NotFound)
                 break;
@@ -971,7 +901,7 @@ Buffer &Buffer::replaceAllI(char replaceThis, char withThis, size_t fromOffset)
     if (pos != NotFound) {
         fork();
         m_data[pos] = withThis;
-        while (1) {
+        while (true) {
             pos = _findAfterI(tmp, pos, 1);
             if (pos == NotFound)
                 break;
@@ -1367,7 +1297,7 @@ void Buffer::_detachWith(const char *data, size_t dataLen, size_t totalLen)
 void Buffer::_freePrivateData()
 {
     free(m_data - kPrivateDataOffset);
-    m_data = 0;
+    m_data = nullptr;
 }
 
 void Buffer::_doAppend(const char *string, size_t len)
@@ -1404,7 +1334,7 @@ size_t Buffer::_shortFindAfter(const char *string, size_t /*len*/) const
     // TODO  honor len
     const char *ptr = strstr(c_str(), string);
 
-    if (ptr != NULL)
+    if (ptr != nullptr)
         return ptr - c_str();
 
     return NotFound;
@@ -1415,7 +1345,7 @@ size_t Buffer::_findAfter(const char *string, size_t offset, size_t /*strlen*/) 
     // TODO  honor len
     const char *ptr = strstr(c_str() + offset, string);
 
-    if (ptr != NULL)
+    if (ptr != nullptr)
         return ptr - c_str();
 
     return NotFound;
@@ -1426,7 +1356,7 @@ size_t Buffer::_findAfterI(const char *string, size_t offset, size_t /*strlen*/)
     // TODO  honor len
     const char *ptr = strcasestr(c_str() + offset, string);
 
-    if (ptr != NULL)
+    if (ptr != nullptr)
         return ptr - c_str();
 
     return NotFound;
@@ -1523,7 +1453,7 @@ Buffer &Buffer::_doCharacterDeescape(const char *string, char escapeChar)
 Buffer &Buffer::_doReplace(const char *findThis, const char *replaceWith,
         unsigned int maxReplaceCount, size_t fromOffset, bool ignoreCase)
 {
-    if (findThis == NULL || maxReplaceCount == 0 || fromOffset >= length())
+    if (findThis == nullptr || maxReplaceCount == 0 || fromOffset >= length())
         return *this;
 
     typedef size_t (Buffer::*TFindMethod)(const char *, size_t, size_t) const;

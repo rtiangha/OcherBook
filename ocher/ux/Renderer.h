@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_RENDERER_H
 #define OCHER_UX_RENDERER_H
 
-#include "ocher/util/Buffer.h"
+#include "util/Buffer.h"
 
 class Pagination;
 

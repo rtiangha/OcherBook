@@ -6,8 +6,8 @@
 #ifndef OCHER_UX_FONT_ENGINE_H
 #define OCHER_UX_FONT_ENGINE_H
 
-#include "ocher/ux/fb/FbTypes.h"
-#include "ocher/ux/fb/FreeType.h"
+#include "ux/fb/FbTypes.h"
+#include "ux/fb/FreeType.h"
 
 #include <map>
 
@@ -31,13 +31,12 @@ struct GlyphFace {
 
 class GlyphCache {
 public:
-    GlyphCache();
     ~GlyphCache();
 
-    void put(GlyphDescr &f, Glyph *g);
-    Glyph *get(GlyphDescr &f);
+    void put(GlyphDescr& f, Glyph* g);
+    Glyph* get(GlyphDescr& f);
 
-    std::map<GlyphDescr, Glyph *> m_cache;
+    std::map<GlyphDescr, Glyph*> m_cache;
 };
 
 /** Converts glyphs to bitmaps.
@@ -46,8 +45,7 @@ public:
  */
 class FontEngine {
 public:
-    FontEngine(FrameBuffer *fb);
-    ~FontEngine();
+    FontEngine(FrameBuffer* fb);
 
     static void scanForFonts();  // TODO move to FreeType?
 
@@ -64,7 +62,7 @@ public:
     /**
      *
      */
-    void plotString(const char *str, unsigned int len, Glyph **glyphs, Rect *boundingBox);
+    void plotString(const char* str, unsigned int len, Glyph** glyphs, Rect* boundingBox);
 
     /** Renders a string, in the current font.
      *
@@ -87,8 +85,8 @@ public:
 #define FE_XCLIP    4
 #define FE_YCLIP    8
 #define FE_XCENTER 16
-    unsigned int renderString(const char *str, unsigned int len, Pos *pen, const Rect *r, unsigned int flags,
-            Rect *bbox = 0);
+    unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags,
+            Rect* bbox = 0);
 
     GlyphCache m_cache;
 

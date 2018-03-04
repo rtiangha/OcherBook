@@ -1,8 +1,8 @@
-#ifndef LIBCLC_DIRITER_H
-#define LIBCLC_DIRITER_H
+#ifndef OCHER_UTIL_DIRITER_H
+#define OCHER_UTIL_DIRITER_H
 
+#include <cstdint>
 #include <dirent.h>
-#include <stdint.h>
 #include <string>
 #include <sys/stat.h>
 
@@ -19,11 +19,11 @@ public:
 
     DirIter();
 
-    DirIter(const char *dir, unsigned int flags = 0);
+    DirIter(const char* dir, unsigned int flags = 0);
 
     ~DirIter();
 
-    void setTo(const char *dir, unsigned int flags = 0);
+    void setTo(const char* dir, unsigned int flags = 0);
 
     /**
      * @param[out] entryName  The name of the next entry, or empty string if no more entries.
@@ -32,9 +32,9 @@ public:
      *     Zero, entryName empty: end of iteration.
      *     Nonzero, entryName empty: iteration failed.
      */
-    int getNext(std::string &entryName);
+    int getNext(std::string& entryName);
 
-    const std::string &getName() const
+    const std::string& getName() const
     {
         return m_name;
     }
@@ -44,7 +44,7 @@ protected:
 
     std::string m_name;
     unsigned int m_flags;
-    DIR *m_dp;
+    DIR* m_dp;
 };
 
 #endif

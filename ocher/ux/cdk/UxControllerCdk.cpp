@@ -3,24 +3,26 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/util/Logger.h"
-#include "ocher/ux/Event.h"
-#include "ocher/ux/cdk/RendererCdk.h"
-#include "ocher/ux/cdk/UxControllerCdk.h"
+#include "ux/cdk/UxControllerCdk.h"
+
+#include "util/Debug.h"
+#include "util/Logger.h"
+#include "ux/Event.h"
+#include "ux/cdk/RendererCdk.h"
 
 #define LOG_NAME "ocher.ux.cdk"
 
 UxControllerCdk::UxControllerCdk() :
-    m_scr(0),
-    m_screen(0),
-    m_renderer(0)
+    m_scr(nullptr),
+    m_screen(nullptr),
+    m_renderer(nullptr)
 {
 }
 
 UxControllerCdk::~UxControllerCdk()
 {
     delete m_renderer;
-    m_renderer = 0;
+    m_renderer = nullptr;
 
     destroyCDKScreen(m_screen);
     endCDK();
@@ -71,7 +73,7 @@ void UxControllerCdk::setNextActivity(enum ActivityType a)
             setNextActivity(ACTIVITY_HOME);
             break;
         default:
-            ASSERT(0);
+            ASSERT(false);
         }
     }
 }

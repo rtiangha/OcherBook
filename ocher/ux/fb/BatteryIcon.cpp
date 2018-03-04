@@ -3,9 +3,10 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/ux/fb/BatteryIcon.h"
+
 #include "ocher/Container.h"
 #include "ocher/device/Battery.h"
-#include "ocher/ux/fb/BatteryIcon.h"
 #include "ocher/ux/fb/Widgets.h"
 
 

@@ -4,6 +4,7 @@
  */
 
 #include "ocher/ux/fb/sdl/FrameBufferSdl.h"
+
 #include "ocher/util/Bitops.h"
 #include "ocher/util/Logger.h"
 
@@ -13,13 +14,10 @@
 
 #define LOG_NAME "ocher.sdl"
 
-// Ocher's Rect is chosen to match SDL's.
-#define TO_SDL_RECT(r) ((SDL_Rect *)(r))
-
 
 FrameBufferSdl::FrameBufferSdl() :
     m_sdl(0),
-    m_screen(0)
+    m_screen(nullptr)
 {
 }
 
@@ -30,7 +28,7 @@ FrameBufferSdl::~FrameBufferSdl()
         SDL_Quit();
 }
 
-void FrameBufferSdl::inject(EventLoop *loop)
+void FrameBufferSdl::inject(EventLoop* loop)
 {
     m_sdlThread.setEventLoop(loop);
 }
@@ -102,29 +100,30 @@ void FrameBufferSdl::clear()
 {
     Log::debug(LOG_NAME, "clear");
 
-    SDL_FillRect(m_screen, NULL, m_bgColor);
+    SDL_FillRect(m_screen, nullptr, m_bgColor);
     SDL_UpdateRect(m_screen, 0, 0, 0, 0);
 }
 
-void FrameBufferSdl::fillRect(Rect *_r)
+void FrameBufferSdl::fillRect(Rect* _r)
 {
-    SDL_Rect *r = TO_SDL_RECT(_r);
+    // Ocher's Rect is chosen to match SDL's.
+    auto r = reinterpret_cast<SDL_Rect*>(_r);
 
     SDL_FillRect(m_screen, r, m_fgColor);
 }
 
-void FrameBufferSdl::byLine(Rect *r, void (*fn)(void *p, size_t n))
+void FrameBufferSdl::byLine(Rect* r, void (*fn)(void* p, size_t n))
 {
     int y2 = r->y + r->h;
 
     for (int y = r->y; y < y2; ++y) {
-        fn(((unsigned char *)m_screen->pixels) + y * m_screen->pitch + r->x, r->w);
+        fn(((unsigned char*)m_screen->pixels) + y * m_screen->pitch + r->x, r->w);
     }
 }
 
 inline void FrameBufferSdl::pset(int x, int y)
 {
-    *(((unsigned char *)m_screen->pixels) + y * m_screen->pitch + x) = m_fgColor;
+    *(((unsigned char*)m_screen->pixels) + y * m_screen->pitch + x) = m_fgColor;
 }
 
 void FrameBufferSdl::hline(int x1, int y, int x2)
@@ -139,7 +138,7 @@ void FrameBufferSdl::vline(int x, int y1, int y2)
     line(x, y1, x, y2);
 }
 
-void FrameBufferSdl::blit(const unsigned char *p, int x, int y, int w, int h, const Rect *userClip)
+void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
     Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
     int rectWidth = w;
@@ -180,7 +179,7 @@ void FrameBufferSdl::blit(const unsigned char *p, int x, int y, int w, int h, co
         }
     }
     Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
-    unsigned char *dst = ((unsigned char *)m_screen->pixels) + y * m_screen->pitch + x;
+    unsigned char* dst = ((unsigned char*)m_screen->pixels) + y * m_screen->pitch + x;
     for (int i = 0; i < h; ++i) {
         memAnd(dst, p, w);
         dst += m_screen->pitch;
@@ -191,7 +190,7 @@ void FrameBufferSdl::blit(const unsigned char *p, int x, int y, int w, int h, co
     }
 }
 
-int FrameBufferSdl::update(Rect *r, bool /*full*/)
+int FrameBufferSdl::update(Rect* r, bool /*full*/)
 {
     Rect _r;
 
@@ -202,6 +201,6 @@ int FrameBufferSdl::update(Rect *r, bool /*full*/)
         r = &_r;
     }
     Log::debug(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
-    SDL_UpdateRects(m_screen, 1, (SDL_Rect *)r);
+    SDL_UpdateRects(m_screen, 1, reinterpret_cast<SDL_Rect*>(r));
     return 0;
 }

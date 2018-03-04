@@ -3,25 +3,24 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#define __USE_GNU  // for memrchr
+#include "ux/cdk/RendererCdk.h"
 
-#include "ocher/fmt/Layout.h"
-#include "ocher/settings/Options.h"
-#include "ocher/ux/Pagination.h"
-#include "ocher/ux/cdk/RendererCdk.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "fmt/Layout.h"
+#include "settings/Options.h"
+#include "ux/Pagination.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
 
-#include <ctype.h>
-#include <stdint.h>
-#include <string.h>
+#include <cctype>
+#include <cstdint>
+#include <cstring>
 #include <unistd.h>
 
 
 // TODO:  page size
 // TODO:  margins (not the same as margins for fb?)
 
-RendererCdk::RendererCdk(WINDOW *scr, CDKSCREEN *screen) :
+RendererCdk::RendererCdk(WINDOW* scr, CDKSCREEN* screen) :
     m_scr(scr),
     m_screen(screen),
     m_x(0),
@@ -78,11 +77,11 @@ void RendererCdk::popAttrs()
     applyAttrs(-1);
 }
 
-int RendererCdk::outputWrapped(std::string *b, unsigned int strOffset, bool doBlit)
+int RendererCdk::outputWrapped(std::string* b, unsigned int strOffset, bool doBlit)
 {
     unsigned int len = b->size();
-    const unsigned char *start = (const unsigned char *)b->data();
-    const unsigned char *p = start;
+    auto start = (const unsigned char*)b->data();
+    auto p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;
@@ -100,17 +99,17 @@ int RendererCdk::outputWrapped(std::string *b, unsigned int strOffset, bool doBl
         }
 
         // How many chars should go out on this line?
-        const unsigned char *nl = 0;
+        const unsigned char* nl = nullptr;
         unsigned int n = w;
         if (w >= len) {
             n = len;
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
         } else {
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
             if (!nl) {
                 // don't break words
                 if (!isspace(*(p + n - 1)) && !isspace(*(p + n))) {
-                    unsigned char *space = (unsigned char *)memrchr(p, ' ', n);
+                    auto space = (unsigned char*)memrchr(p, ' ', n);
                     if (space) {
                         nl = space;
                     }
@@ -121,7 +120,7 @@ int RendererCdk::outputWrapped(std::string *b, unsigned int strOffset, bool doBl
             n = nl - p;
 
         if (doBlit) {
-            mvwaddnstr(m_scr, m_y, m_x, (const char *)p, n);
+            mvwaddnstr(m_scr, m_y, m_x, (const char*)p, n);
         }
         p += n;
         len -= n;
@@ -142,7 +141,7 @@ int RendererCdk::outputWrapped(std::string *b, unsigned int strOffset, bool doBl
 }
 
 
-int RendererCdk::render(Pagination *pagination, unsigned int pageNum, bool doBlit)
+int RendererCdk::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
     Log::info("ocher.render.cdk", "render page %u %u", pageNum, doBlit);
 
@@ -165,11 +164,11 @@ int RendererCdk::render(Pagination *pagination, unsigned int pageNum, bool doBli
     }
 
     const unsigned int N = m_layout.size();
-    const char *raw = m_layout.data();
+    const char* raw = m_layout.data();
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i + 2 <= N);
-        uint16_t code = *(uint16_t *)(raw + i);
+        uint16_t code = *(uint16_t*)(raw + i);
         i += 2;
 
         unsigned int opType = (code >> 12) & 0xf;
@@ -238,8 +237,8 @@ int RendererCdk::render(Pagination *pagination, unsigned int pageNum, bool doBli
                 break;
             case Layout::CmdOutputStr: {
                 Log::trace("ocher.render.cdk", "OpCmd CmdOutputStr");
-                ASSERT(i + sizeof(std::string *) <= N);
-                std::string *str = *(std::string **)(raw + i);
+                ASSERT(i + sizeof(std::string*) <= N);
+                std::string* str = *(std::string**)(raw + i);
                 ASSERT(strOffset <= str->size());
                 int breakOffset = outputWrapped(str, strOffset, doBlit);
                 strOffset = 0;
@@ -251,7 +250,7 @@ int RendererCdk::render(Pagination *pagination, unsigned int pageNum, bool doBli
                     Log::debug("ocher.renderer.cdk", "page %u break", pageNum);
                     return 0;
                 }
-                i += sizeof(std::string *);
+                i += sizeof(std::string*);
                 break;
             }
             case Layout::CmdForcePage:

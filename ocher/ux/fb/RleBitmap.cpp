@@ -7,14 +7,14 @@
 
 
 RleBitmap::RleBitmap() :
-    m_p(0),
+    m_p(nullptr),
     m_len(0),
     m_off(0)
 {
     // TODO
 }
 
-void RleBitmap::pack(uint8_t *u, unsigned int len, uint8_t *p)
+void RleBitmap::pack(uint8_t* u, unsigned int len, uint8_t* p)
 {
     unsigned int count = 0;
     uint8_t runOf;
@@ -44,7 +44,7 @@ void RleBitmap::pack(uint8_t *u, unsigned int len, uint8_t *p)
     }
 }
 
-int RleBitmap::unpack(uint8_t *u, unsigned int len)
+int RleBitmap::unpack(uint8_t* u, unsigned int len)
 {
     unsigned int count = 0;
     uint8_t runOf;

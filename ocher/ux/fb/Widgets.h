@@ -6,8 +6,8 @@
 #ifndef OCHER_FB_WIDGETS_H
 #define OCHER_FB_WIDGETS_H
 
-#include "ocher/ux/Event.h"
-#include "ocher/ux/fb/FrameBuffer.h"
+#include "ux/Event.h"
+#include "ux/fb/FrameBuffer.h"
 
 #include <ev.h>
 
@@ -28,26 +28,26 @@ class Window;
 class FbScreen {
 public:
     FbScreen();
-    ~FbScreen();
+    ~FbScreen() = default;
 
-    void setFrameBuffer(FrameBuffer *fb);
-    void setEventLoop(EventLoop *loop);
+    void setFrameBuffer(FrameBuffer* fb);
+    void setEventLoop(EventLoop* loop);
 
     /**
      * Adds a child (transfers ownership).
      */
-    void addChild(Window *child);
+    void addChild(Window* child);
 
     /**
      * Adds a child (does not transfer ownership).
      */
 //	void addChild(Widget& child);
 
-    void removeChild(Window *child);
+    void removeChild(Window* child);
 
-    void dispatchEvent(const struct OcherEvent *);
+    void dispatchEvent(const struct OcherEvent*);
 
-    EventLoop *m_loop;
+    EventLoop* m_loop;
 
 protected:
     /**
@@ -58,17 +58,17 @@ protected:
 
     // std::vector<> m_invalidRects;
 
-    static void timeoutCb(EV_P_ ev_timer *w, int revents);
-    static void readyToIdle(EV_P_ ev_prepare *p, int revents);
-    static void waking(EV_P_ ev_check *c, int revents);
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+    static void readyToIdle(EV_P_ ev_prepare* p, int revents);
+    static void waking(EV_P_ ev_check* c, int revents);
 
-    FrameBuffer *m_fb;
+    FrameBuffer* m_fb;
     ev_timer m_timer;
     ev_prepare m_evPrepare;
     ev_check m_evCheck;
 
     Rect m_rect;
-    std::vector<Widget *> m_children;
+    std::vector<Widget*> m_children;
 };
 
 
@@ -84,13 +84,13 @@ public:
     /**
      * Adds a child (transfers ownership).
      */
-    void addChild(Widget *child);
+    void addChild(Widget* child);
     /**
      * Adds a child (does not transfer ownership).
      */
-    void addChild(Widget &child);
+    void addChild(Widget& child);
 
-    void removeChild(Widget *child);
+    void removeChild(Widget* child);
 
     void hide()
     {
@@ -121,7 +121,7 @@ public:
      * Invalidates a portion of the widget, so that it will be redrawn.
      * @param rect Widget-relative rectangle to invalidate
      */
-    virtual void invalidate(Rect *rect);
+    virtual void invalidate(Rect* rect);
 
     /**
      */
@@ -131,19 +131,19 @@ public:
     /**
      * @return -1 handled, -2 pass on, >=0 done
      */
-    virtual int evtKey(const struct OcherKeyEvent *)
+    virtual int evtKey(const struct OcherKeyEvent*)
     {
         return -2;
     }
-    virtual int evtMouse(const struct OcherMouseEvent *)
+    virtual int evtMouse(const struct OcherMouseEvent*)
     {
         return -2;
     }
-    virtual int evtApp(const struct OcherAppEvent *)
+    virtual int evtApp(const struct OcherAppEvent*)
     {
         return -2;
     }
-    virtual int evtDevice(const struct OcherDeviceEvent *)
+    virtual int evtDevice(const struct OcherDeviceEvent*)
     {
         return -2;
     }
@@ -160,9 +160,9 @@ public:
     }
 
 protected:
-    FrameBuffer *m_fb;
-    Widget *m_parent;
-    std::vector<Widget *> m_children;
+    FrameBuffer* m_fb;
+    Widget* m_parent;
+    std::vector<Widget*> m_children;
     // TODO focus
 };
 
@@ -172,15 +172,15 @@ class Window : public Widget {
 public:
     Window();
     Window(int x, int y, unsigned int w, unsigned int h);
-    ~Window();
+    ~Window() = default;
 
     void draw();
-    virtual void drawBorder(Rect *rect);
-    virtual void drawTitle(Rect *rect);
-    virtual void drawBg(Rect *rect);
-    virtual void drawContent(Rect *rect);
+    virtual void drawBorder(Rect* rect);
+    virtual void drawTitle(Rect* rect);
+    virtual void drawBg(Rect* rect);
+    virtual void drawContent(Rect* rect);
 
-    void setTitle(const char *title);
+    void setTitle(const char* title);
     void maximize();
 
     uint32_t m_bgColor;
@@ -199,17 +199,17 @@ protected:
 class Button : public Widget {
 public:
     Button(int x, int y, unsigned int w = 0, unsigned int h = 0);
-    ~Button();
+    ~Button() = default;
 
-    void setLabel(const char *label);
+    void setLabel(const char* label);
 
     void draw();
-    virtual void drawBorder(Rect *rect);
-    virtual void drawLabel(Rect *rect);
+    virtual void drawBorder(Rect* rect);
+    virtual void drawLabel(Rect* rect);
 
 protected:
-    int evtKey(const struct OcherKeyEvent *);
-    int evtMouse(const struct OcherMouseEvent *);
+    int evtKey(const struct OcherKeyEvent*);
+    int evtMouse(const struct OcherMouseEvent*);
 
     int border;
     std::string m_label;
@@ -233,7 +233,7 @@ class Menu : public Widget {
  */
 class Spinner : public Widget {
 public:
-    Spinner(EventLoop *loop);
+    Spinner(EventLoop* loop);
     Spinner(int x, int y, unsigned int w, unsigned int h);
     ~Spinner();
     void start();
@@ -245,8 +245,8 @@ protected:
     unsigned int m_steps;
     unsigned int m_delayMs;
 
-    static void timeoutCb(EV_P_ ev_timer *w, int revents);
-    EventLoop *m_loop;
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+    EventLoop* m_loop;
     ev_timer m_timer;
 };
 
@@ -271,7 +271,7 @@ class Label : public Widget {
 
 class Bitmap {
 public:
-    Bitmap(int _w, int _h, const unsigned char *_bmp) :
+    Bitmap(int _w, int _h, const unsigned char* _bmp) :
         w(_w),
         h(_h),
         bmp(_bmp)
@@ -279,12 +279,12 @@ public:
     }
     int w;
     int h;
-    const unsigned char *bmp;
+    const unsigned char* bmp;
 };
 
 class Icon : public Widget {
 public:
-    Icon(int x, int y, Bitmap *_bmp) :
+    Icon(int x, int y, Bitmap* _bmp) :
         Widget(x, y, _bmp->w, _bmp->h),
         bmp(_bmp)
     {
@@ -295,7 +295,7 @@ public:
 
     void draw();
 
-    Bitmap *bmp;
+    Bitmap* bmp;
 };
 
 #if 0

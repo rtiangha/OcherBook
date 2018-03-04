@@ -3,14 +3,15 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/device/Device.h"
-#include "ocher/ocher.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/StrUtil.h"
+#include "device/Device.h"
 
-#include <errno.h>
+#include "ocher.h"
+#include "util/Logger.h"
+#include "util/StrUtil.h"
+
+#include <cerrno>
+#include <cstring>
 #include <fcntl.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -59,7 +60,7 @@ void Device::sleep()
 //    fi
 
 // "echo 1 > /sys/power/state-extended"
-    const char *pwr = "/sys/power/state";
+    const char* pwr = "/sys/power/state";
     int fd = open(pwr, O_WRONLY);
     if (fd == -1) {
         Log::error(LOG_NAME, "%s: %s", pwr, strerror(errno));

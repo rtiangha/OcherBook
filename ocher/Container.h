@@ -70,43 +70,43 @@ public:
     /**
      * The list of all user experience drivers.
      */
-    std::vector<UxController *> uxControllers;
+    std::vector<UxController*> uxControllers;
 
     /**
      * Requires:
      */
-    EventLoop *loop;
+    EventLoop* loop;
 
     /**
      * Requires: EventLoop
      */
-    Device *device;
+    Device* device;
 
     /**
      * Requires:
      */
-    Battery *battery;
+    Battery* battery;
 
     /**
      * Requires:
      */
-    Filesystem *filesystem;
+    Filesystem* filesystem;
 
     /**
      * Requires: Filesystem
      */
-    Settings *settings;
+    Settings* settings;
 
-    Options *options;
+    Options* options;
 
     /**
      * Requires: EventLoop Device
      */
-    PowerSaver *powerSaver;
+    PowerSaver* powerSaver;
 
     /**
      */
-    UxController *uxController;
+    UxController* uxController;
 
     /**
      * May not exist, depending on Device.
@@ -114,7 +114,7 @@ public:
      *
      * Requires:
      */
-    FrameBuffer *frameBuffer;
+    FrameBuffer* frameBuffer;
 
     /**
      * May not exist, depending on Device.
@@ -123,13 +123,13 @@ public:
      * Requires:
      *  - Framebuffer
      */
-    FontEngine *fontEngine;
+    FontEngine* fontEngine;
 
     /**
      * Requires:
      *  - UxController
      */
-    Renderer *renderer;
+    Renderer* renderer;
 
     // TODO event source(s) (feeds to EventLoop.  eg: SdlThread, KoboEvents, BrowseFd.cpp:getKey, ncurses, ...)
     // TODO time (common timebase for events.  needed by event loop, clock, ...)

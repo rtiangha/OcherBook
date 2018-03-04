@@ -6,14 +6,14 @@
 #ifndef OCHER_FMT_TEXT_H
 #define OCHER_FMT_TEXT_H
 
-#include "ocher/fmt/Format.h"
+#include "fmt/Format.h"
 
 
 /** Plain-text file format reader
  */
 class Text : public Format {
 public:
-    Text(const std::string &filename);
+    Text(const std::string& filename);
 
     virtual ~Text()
     {

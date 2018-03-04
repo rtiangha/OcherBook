@@ -3,19 +3,20 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/fmt/epub/UnzipCache.h"
-#include "ocher/util/Buffer.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/Path.h"
+#include "fmt/epub/UnzipCache.h"
+
+#include "util/Buffer.h"
+#include "util/Logger.h"
+#include "util/Path.h"
 
 #include <fnmatch.h>
 
 #define LOG_NAME "ocher.epub.unzip"
 
 
-UnzipCache::UnzipCache(const char *filename, const char *password) :
-    m_uf(0),
-    m_root(0),
+UnzipCache::UnzipCache(const char* filename, const char* password) :
+    m_uf(nullptr),
+    m_root(nullptr),
     m_filename(filename),
     m_password(password ? password : "")
 {
@@ -38,11 +39,11 @@ void UnzipCache::clearCache()
 {
     if (m_root) {
         delete m_root;
-        m_root = 0;
+        m_root = nullptr;
     }
 }
 
-TreeFile *UnzipCache::getFile(const char *filename, const char *relative)
+TreeFile* UnzipCache::getFile(const char* filename, const char* relative)
 {
     std::string fullPath;
 
@@ -50,24 +51,24 @@ TreeFile *UnzipCache::getFile(const char *filename, const char *relative)
         fullPath = Path::join(relative, filename);
         filename = fullPath.c_str();
     }
-    TreeFile *f = m_root->findFile(filename);
+    TreeFile* f = m_root->findFile(filename);
     if (f)
         return f;
-    if (unzip(filename, NULL)) {
+    if (unzip(filename, nullptr)) {
         // Even if error, may have extracted.
         f = m_root->findFile(filename);
     }
     return f;
 }
 
-int UnzipCache::unzipFile(const char *pattern, std::string *matchedName)
+int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
 {
     char pathname[256];
     int err;
 
     unz_file_info64 file_info;
 
-    err = unzGetCurrentFileInfo64(m_uf, &file_info, pathname, sizeof(pathname), NULL, 0, NULL, 0);
+    err = unzGetCurrentFileInfo64(m_uf, &file_info, pathname, sizeof(pathname), nullptr, 0, nullptr, 0);
     if (err != UNZ_OK) {
         Log::error(LOG_NAME, "unzGetCurrentFileInfo: %d", err);
         return -1;
@@ -94,12 +95,12 @@ int UnzipCache::unzipFile(const char *pattern, std::string *matchedName)
 
     Buffer buffer;
     std::string filename;
-    TreeFile *tfile = 0;
+    TreeFile* tfile = nullptr;
 
-    char *start = pathname;
-    char *p = start;
-    TreeDirectory *root = m_root;
-    while (1) {
+    char* start = pathname;
+    char* p = start;
+    TreeDirectory* root = m_root;
+    while (true) {
         if (*p == '/' || *p == '\\' || *p == 0) {
             if (p - start) {
                 std::string name(start, p - start);
@@ -120,9 +121,9 @@ int UnzipCache::unzipFile(const char *pattern, std::string *matchedName)
     ;
 
     if (tfile) {
-        char *buf = buffer.lockBuffer(file_info.uncompressed_size);
+        char* buf = buffer.lockBuffer(file_info.uncompressed_size);
 
-        err = unzOpenCurrentFilePassword(m_uf, m_password.empty() ? NULL : m_password.c_str());
+        err = unzOpenCurrentFilePassword(m_uf, m_password.empty() ? nullptr : m_password.c_str());
         if (err != UNZ_OK) {
             Log::error(LOG_NAME, "unzOpenCurrentFilePassword: %d", err);
         } else {
@@ -150,7 +151,7 @@ int UnzipCache::unzipFile(const char *pattern, std::string *matchedName)
     return err == UNZ_OK ? match : -1;
 }
 
-int UnzipCache::unzip(const char *pattern, std::list<std::string> *matchedNames)
+int UnzipCache::unzip(const char* pattern, std::list<std::string>* matchedNames)
 {
     uLong i;
     unz_global_info64 gi;
@@ -173,7 +174,7 @@ int UnzipCache::unzip(const char *pattern, std::list<std::string> *matchedNames)
             if (!matchedName.empty())
                 matchedNames->push_back(matchedName);
         } else {
-            r = unzipFile(pattern, NULL);
+            r = unzipFile(pattern, nullptr);
         }
         if (r > 0) {
             ++numMatched;

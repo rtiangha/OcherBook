@@ -16,9 +16,9 @@ public:
     RendererFd();
 
     bool init();
-    int render(Pagination *pagination, unsigned int pageNum, bool doBlit);
+    int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
-    int outputWrapped(std::string *b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(std::string* b, unsigned int strOffset, bool doBlit);
 
 protected:
     int m_isTty;

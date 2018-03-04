@@ -3,21 +3,22 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/device/Device.h"
-#include "ocher/device/Filesystem.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/util/File.h"
-#include "ocher/util/StrUtil.h"
+#include "settings/Settings.h"
+
+#include "device/Device.h"
+#include "device/Filesystem.h"
+#include "util/File.h"
+#include "util/StrUtil.h"
 
 #include "json.hpp"
 
-#include <assert.h>
+#include <cassert>
 
 using nlohmann::json;
 
 Settings defaultSettings;
 
-const char *Settings::SecureLevelToString(SecureLevel s)
+const char* Settings::SecureLevelToString(SecureLevel s)
 {
     switch (s) {
     case SecureLevelOpen: return "open";
@@ -27,7 +28,7 @@ const char *Settings::SecureLevelToString(SecureLevel s)
     assert(0);
 }
 
-const char *Settings::SleepShowToString(SleepShow s)
+const char* Settings::SleepShowToString(SleepShow s)
 {
     switch (s) {
     case SleepShowSleeping: return "sleeping";
@@ -57,19 +58,20 @@ Settings::Settings() :
     smallSpace(10),
     medSpace(15),
     largeSpace(30),
-    m_fs(NULL),
+    m_fs(nullptr),
     m_j(new json)
 {
+    // TODO  Find these dynamically
 #ifdef OCHER_TARGET_KOBO
     fontRoot = "/usr/local/Trolltech/QtEmbedded-4.6.2-arm/lib/fonts";
+#elif defined __FreeBSD__
+    fontRoot = "/usr/local/share/fonts/";
 #else
-    // TODO fontRoot = ".:/usr/share/fonts/truetype/ttf-dejavu";
-    // fontRoot = "/usr/share/fonts/truetype/";
-    fontRoot = "/usr/local/lib/X11/fonts/";
+    fontRoot = "/usr/share/fonts/truetype/";
 #endif
 }
 
-void Settings::inject(Filesystem *fs)
+void Settings::inject(Filesystem* fs)
 {
     m_fs = fs;
 }
@@ -85,7 +87,7 @@ void Settings::load()
     load(s);
 }
 
-void Settings::load(const std::string &data)
+void Settings::load(const std::string& data)
 {
     // TODO: This seems ugly.  See the "nlohmann::json constructor" test.
     std::stringstream ss(data);
@@ -100,7 +102,7 @@ void Settings::load(const std::string &data)
     try {
         s = j["SecureLevel"];
         parsed = true;
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
         parsed = false;
     }
     if (parsed) {
@@ -114,7 +116,7 @@ void Settings::load(const std::string &data)
 
     try {
         trackReading = j["TrackReading"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
     if (trackReading < 0)
         trackReading = 0;
@@ -123,7 +125,7 @@ void Settings::load(const std::string &data)
 
     try {
         minutesUntilSleep = j["MinutesUntilSleep"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
     if (minutesUntilSleep > 24*60)
         minutesUntilSleep = 24*60;
@@ -131,7 +133,7 @@ void Settings::load(const std::string &data)
     try {
         s = j["SleepShow"];
         parsed = true;
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
         parsed = false;
     }
     if (parsed) {
@@ -147,12 +149,12 @@ void Settings::load(const std::string &data)
 
     try {
         sleepHtml = j["SleepHtml"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
 
     try {
         minutesUntilPowerOff = j["MinutesUntilPowerOff"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
     if (minutesUntilPowerOff > 24*60)
         minutesUntilPowerOff = 24*60;
@@ -161,27 +163,27 @@ void Settings::load(const std::string &data)
 
     try {
         sleepHtml = j["PowerOffHtml"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
 
     try {
         wirelessSsid = j["WirelessSSID"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
 
     try {
         wirelessPrompt = j["WirelessPrompt"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
 
     try {
         fullRefreshPages = j["FullRefreshPages"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
 
     try {
         showPageNumbers = j["ShowPageNumbers"];
-    } catch (std::domain_error &) {
+    } catch (const std::domain_error&) {
     }
 }
 

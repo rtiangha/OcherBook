@@ -9,13 +9,12 @@
 #include "Signal.h"
 #include <ev.h>
 
+#include <cstdint>
 #include <mutex>
-#include <stdint.h>
 #include <thread>
 #include <vector>
 
 using namespace Gallant;
-
 
 
 #define OEVT_KEYPRESS           0
@@ -96,11 +95,19 @@ struct OcherEvent {
     };
 };
 
+/** The event loop runs on the main thread.
+ */
 class EventLoop {
 public:
     EventLoop();
-    ~EventLoop();
 
+    /** Runs the event loop on the current thread.  Returns after stop is called (whether internally
+     * or externally).
+     *
+     * @note  SIGINT may be caught and handled internally.
+     *
+     * @return 0 if normal termination
+     */
     int run();
     void stop();
     /** Defines a new epoch; events timestamped prior to this are silently dropped. */
@@ -109,19 +116,24 @@ public:
     /** Injects events to be dispatched as if they had ocurred within the EventLoop.  This allows
      * external event loops to be integrated.  The event will be dispatched as soon as possible.
      */
-    void injectEvent(const struct OcherEvent &event);
+    void injectEvent(const struct OcherEvent& event);
 
-    /** Connect to be notified of events.  Your event handlers must be fast; ideally non-blocking.
+    /** Connect (@sa Gallant::Signal1::Connect) to be notified of events.  Your event handlers must
+     * be fast; ideally non-blocking.
+     *
+     * Note that, unlike many event dispatching systems, multiple observers may be receiving the
+     * events in unspecified order.  The EventLoop does not enforce an ordering or specify a way to
+     * exclusively handle the event.
      */
-    Signal1<const struct OcherEvent *> emitEvent;
+    Signal1<const struct OcherEvent*> emitEvent;
 
-    struct ev_loop *evLoop;
-
-    uint32_t m_epoch;
+    struct ev_loop* evLoop;
 
 protected:
+    uint32_t m_epoch;
+
     ev_async m_async;
-    static void emitInjectedCb(EV_P_ ev_async *w, int revents);
+    static void emitInjectedCb(EV_P_ ev_async* w, int revents);
     void emitInjected();
 
     std::mutex m_lock;
@@ -136,7 +148,7 @@ class EventWork {
 public:
     /** Derived class must call start() / join().
      */
-    EventWork(EventLoop *loop);
+    EventWork(EventLoop* loop);
     virtual ~EventWork();
 
     void start();
@@ -157,9 +169,9 @@ protected:
     {
     }
 
-    static void completeCb(EV_P_ ev_async *w, int revents);
+    static void completeCb(EV_P_ ev_async* w, int revents);
     ev_async m_async;
-    EventLoop *m_loop;
+    EventLoop* m_loop;
     std::thread m_thread;
 };
 

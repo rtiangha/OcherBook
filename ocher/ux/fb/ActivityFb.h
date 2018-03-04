@@ -6,8 +6,8 @@
 #ifndef OCHER_UX_FB_ACTIVITY_H
 #define OCHER_UX_FB_ACTIVITY_H
 
-#include "ocher/ux/Activity.h"
-#include "ocher/ux/fb/Widgets.h"
+#include "ux/Activity.h"
+#include "ux/fb/Widgets.h"
 
 class UxControllerFb;
 
@@ -15,7 +15,7 @@ class UxControllerFb;
  */
 class ActivityFb : public Activity, public Window {
 public:
-    ActivityFb(UxControllerFb *uxController) :
+    ActivityFb(UxControllerFb* uxController) :
         m_uxController(uxController)
     {
     }
@@ -27,7 +27,7 @@ public:
     virtual void onAttached() = 0;
     virtual void onDetached() = 0;
 
-    UxControllerFb *m_uxController;
+    UxControllerFb* m_uxController;
 };
 
 #endif

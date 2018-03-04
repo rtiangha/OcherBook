@@ -3,16 +3,16 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/device/Device.h"
-#include "ocher/ux/fb/FontEngine.h"
-#include "ocher/ux/fb/SleepActivityFb.h"
-#include "ocher/ux/fb/UxControllerFb.h"
+#include "ux/fb/SleepActivityFb.h"
+
+#include "Container.h"
+#include "device/Device.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/UxControllerFb.h"
 
 #include <unistd.h>
 
-
-SleepActivityFb::SleepActivityFb(UxControllerFb *c) :
+SleepActivityFb::SleepActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer()),
     m_device(g_container.device),

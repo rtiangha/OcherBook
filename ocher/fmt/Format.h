@@ -6,7 +6,7 @@
 #ifndef OCHER_FMT_H
 #define OCHER_FMT_H
 
-#include "ocher/shelf/Meta.h"
+#include "shelf/Meta.h"
 
 #include <string>
 
@@ -19,7 +19,7 @@ public:
     {
     }
 
-    virtual void loadMeta(Meta *)
+    virtual void loadMeta(Meta*)
     {
     }
 
@@ -27,9 +27,9 @@ public:
     std::string m_author;
 };
 
-Fmt detectFormat(const char *file, Encoding *encoding);
+Fmt detectFormat(const char* file, Encoding* encoding);
 
-#include "ocher/fmt/epub/Epub.h"
-#include "ocher/fmt/text/Text.h"
+#include "fmt/epub/Epub.h"
+#include "fmt/text/Text.h"
 
 #endif

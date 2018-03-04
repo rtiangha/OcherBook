@@ -30,7 +30,7 @@ public:
      */
     void set(unsigned int page, unsigned int layoutOffset, unsigned int strOffset /* TODO attrs */);
 
-    bool get(unsigned int page, unsigned int *layoutOffset, unsigned int *strOffset /* TODO attrs */);
+    bool get(unsigned int page, unsigned int* layoutOffset, unsigned int* strOffset /* TODO attrs */);
 
     unsigned int numPages() const
     {
@@ -47,7 +47,7 @@ protected:
         /* TODO attrs */
     };
     static const unsigned int pagesPerChunk = 100;
-    std::vector<PageMapping *> m_pages;
+    std::vector<PageMapping*> m_pages;
     unsigned int m_numPages;
 };
 

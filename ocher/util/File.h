@@ -1,10 +1,10 @@
-#ifndef LIBCLC_FILE_H
-#define LIBCLC_FILE_H
+#ifndef OCHER_UTIL_FILE_H
+#define OCHER_UTIL_FILE_H
 
 #include "Buffer.h"
 
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdint>
+#include <cstdio>
 #include <string>
 #include <time.h>
 
@@ -42,13 +42,13 @@ public:
      *      match [rwa]b?+?b?[xut]?
      *  @throw  std::system_error if open failed
      */
-    File(const std::string &filename, const char *mode = "r");
-    File(const char *filename, const char *mode = "r");
+    File(std::string filename, const char* mode = "r");
+    File(const char* filename, const char* mode = "r");
 
     /** Like constructor, but does not throw.
      */
-    int setTo(const std::string &filename, const char *mode = "r");
-    int setTo(const char *filename, const char *mode = "r");
+    int setTo(const std::string& filename, const char* mode = "r");
+    int setTo(const char* filename, const char* mode = "r");
 
     /** Closes the file, and returns the object to an uninitialized state.
      */
@@ -62,7 +62,7 @@ public:
      *  unique files).
      *  @return The name of the file.
      */
-    const std::string &getName() const
+    const std::string& getName() const
     {
         return m_filename;
     }
@@ -84,7 +84,7 @@ public:
      *  @return  The number of bytes read.  Less than requested indicates EOF.
      *  @throw  std::system_error on error (EOF is not an error)
      */
-    uint32_t read(char *buffer, uint32_t numBytes);
+    uint32_t read(char* buffer, uint32_t numBytes);
 
     /** Reads a line, up to any and including any line terminator.
      *  @param keepEol Whether to keep or strip the end of line character, if any.
@@ -97,18 +97,18 @@ public:
     /** Reads numBytes into buffer at offset.
      *  @throw  std::system_error on error (EOF is not an error)
      */
-    uint32_t read(Buffer &buffer, uint32_t numBytes, uint32_t offset = 0);
+    uint32_t read(Buffer& buffer, uint32_t numBytes, uint32_t offset = 0);
 
     /** Reads and returns the remainder of the file, appending it to the string.
      *  @param[out] b  Rest of file is appended to this buffer.
      *  @throw  std::system_error on error (EOF is not an error)
      */
-    void readRest(std::string &b);
+    void readRest(std::string& b);
 
     /** @throw  std::system_error
      */
-    void write(const char *buf, uint32_t numBytes);
-    void write(const std::string &buf)
+    void write(const char* buf, uint32_t numBytes);
+    void write(const std::string& buf)
     {
         write(buf.c_str(), buf.length());
     }
@@ -119,7 +119,7 @@ public:
 
     /**
      */
-    void getTimes(time_t &accessTime, time_t &modifyTime, time_t &changeTime);
+    void getTimes(time_t& accessTime, time_t& modifyTime, time_t& changeTime);
 
     /** Flush any buffered writes to disk.
      */
@@ -134,10 +134,10 @@ public:
      */
     bool isEof() const;
 
-    FILE *m_fd;
+    FILE* m_file;
 
 protected:
-    int init(const char *mode);
+    int init(const char* mode);
 
     std::string m_filename;
     bool m_temp;

@@ -3,6 +3,8 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/ux/fb/ReadActivityFb.h"
+
 #ifdef OCHER_EPUB
 #include "ocher/fmt/epub/Epub.h"
 #include "ocher/fmt/epub/LayoutEpub.h"
@@ -15,7 +17,6 @@
 #include "ocher/settings/Settings.h"
 #include "ocher/shelf/Meta.h"
 #include "ocher/ux/Renderer.h"
-#include "ocher/ux/fb/ReadActivityFb.h"
 #include "ocher/ux/fb/UxControllerFb.h"
 #include "ocher/util/Debug.h"
 #include "ocher/util/Logger.h"
@@ -23,7 +24,7 @@
 #define LOG_NAME "ocher.ux.Read"
 
 
-int ReadActivityFb::evtKey(const struct OcherKeyEvent *evt)
+int ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
@@ -54,10 +55,10 @@ int ReadActivityFb::evtKey(const struct OcherKeyEvent *evt)
     return -2;
 }
 
-int ReadActivityFb::evtMouse(const struct OcherMouseEvent *evt)
+int ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
-    SystemBar *systemBar = m_uxController->m_systemBar;
-    NavBar *navBar = m_uxController->m_navBar;
+    SystemBar* systemBar = m_uxController->m_systemBar;
+    NavBar* navBar = m_uxController->m_navBar;
 
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
@@ -99,11 +100,11 @@ int ReadActivityFb::evtMouse(const struct OcherMouseEvent *evt)
     return -2;
 }
 
-ReadActivityFb::ReadActivityFb(UxControllerFb *c) :
+ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer()),
     m_settings(g_container.settings),
-    m_layout(0),
+    m_layout(nullptr),
     atEnd(1),
     m_pagesSinceRefresh(0)
 {
@@ -131,11 +132,11 @@ void ReadActivityFb::onAttached()
     Log::debug(LOG_NAME, "selected %p", meta);
 
     m_fb->clear();
-    m_fb->update(NULL);
+    m_fb->update(nullptr);
 
-    ASSERT(m_layout == 0);
+    ASSERT(m_layout == nullptr);
     Buffer memLayout;
-    const char *file = meta->relPath.c_str();
+    const char* file = meta->relPath.c_str();
     Log::info(LOG_NAME, "Loading %s: %s", Meta::fmtToStr(meta->format), file);
     switch (meta->format) {
     case OCHER_FMT_TEXT: {
@@ -153,15 +154,15 @@ void ReadActivityFb::onAttached()
             if (epub.getSpineItemByIndex(i, html) != 0)
                 break;
 #if 1
-            mxml_node_t *tree = epub.parseXml(html);
+            mxml_node_t* tree = epub.parseXml(html);
             if (tree) {
-                static_cast<LayoutEpub *>(m_layout)->append(tree);
+                static_cast<LayoutEpub*>(m_layout)->append(tree);
                 mxmlDelete(tree);
             } else {
                 Log::warn(LOG_NAME, "No tree found for spine item %d", i);
             }
 #else
-            ((LayoutEpub *)m_layout)->append(html);
+            ((LayoutEpub*)m_layout)->append(html);
 #endif
         }
         memLayout = m_layout->unlock();
@@ -192,8 +193,8 @@ void ReadActivityFb::onAttached()
     }
 #endif
 
-    SystemBar *systemBar = m_uxController->m_systemBar;
-    NavBar *navBar = m_uxController->m_navBar;
+    SystemBar* systemBar = m_uxController->m_systemBar;
+    NavBar* navBar = m_uxController->m_navBar;
 
     addChild(systemBar);
     systemBar->m_sep = true;
@@ -220,6 +221,6 @@ void ReadActivityFb::onDetached()
 
     if (m_layout) {
         delete m_layout;
-        m_layout = 0;
+        m_layout = nullptr;
     }
 }

@@ -3,7 +3,7 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/Renderer.h"
+#include "ux/Renderer.h"
 
 
 #if 0

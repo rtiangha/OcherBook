@@ -3,16 +3,17 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/ux/fb/LibraryActivityFb.h"
+
 #include "ocher/Container.h"
 #include "ocher/resources/Bitmaps.h"
 #include "ocher/settings/Settings.h"
 #include "ocher/shelf/Meta.h"
+#include "ocher/util/Logger.h"
+#include "ocher/util/StrUtil.h"
 #include "ocher/ux/fb/FontEngine.h"
-#include "ocher/ux/fb/LibraryActivityFb.h"
 #include "ocher/ux/fb/UxControllerFb.h"
 #include "ocher/ux/fb/Widgets.h"
-#include "ocher/util/Buffer.h"
-#include "ocher/util/Logger.h"
 
 #define LOG_NAME "ocher.ux.Library"
 
@@ -21,7 +22,6 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     ActivityFb(c),
     m_systemBar(c->m_systemBar),
     m_settings(g_container.settings),
-    m_library(0),
     m_pageNum(0)
 {
     maximize();
@@ -76,8 +76,9 @@ int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
+        const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
         for (unsigned int i = 0; i < m_booksPerPage; i++) {
-            Meta *meta = (*m_library)[i + m_pageNum * m_booksPerPage];
+            Meta* meta = library[i + m_pageNum * m_booksPerPage];
             if (!meta)
                 break;
             if (m_bookRects[i].contains(&pos)) {
@@ -113,13 +114,12 @@ void LibraryActivityFb::draw()
     m_fb->setFg(0, 0, 0);
 
     FontEngine fe(m_fb);
-    Buffer str;
     Pos pos;
     Rect clip = m_fb->bbox;
 
     fe.setSize(10);
     fe.apply();
-    str.format("PG. %u OF %u", m_pageNum + 1, m_pages);
+    std::string str = format("PG. %u OF %u", m_pageNum + 1, m_pages);
     pos.x = 0;
     pos.y = clip.h - m_settings->smallSpace - fe.m_cur.descender;
     fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCENTER);
@@ -128,8 +128,9 @@ void LibraryActivityFb::draw()
     clip.y = m_systemBar->m_rect.y + m_systemBar->m_rect.h + m_settings->medSpace;
     clip.x = m_settings->medSpace;
     clip.w -= m_settings->medSpace * 2;
+    const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
     for (unsigned int i = 0; i < m_booksPerPage; ++i) {
-        Meta *meta = (*m_library)[i + m_pageNum * m_booksPerPage];
+        Meta *meta = library[i + m_pageNum * m_booksPerPage];
         if (!meta)
             break;
 
@@ -143,7 +144,7 @@ void LibraryActivityFb::draw()
 
         fe.setSize(10);
         fe.apply();
-        str.format("%u%% read   |   %s", meta->percentRead(), meta->fmtToStr(meta->format));
+        str = format("%u%% read   |   %s", meta->percentRead(), meta->fmtToStr(meta->format));
         fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCLIP);
 
         m_bookRects[i] = clip;
@@ -158,9 +159,9 @@ void LibraryActivityFb::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
-    m_library = m_uxController->ctx.library.getList();
-    m_pages = (m_library->size() + m_booksPerPage - 1) / m_booksPerPage;
-    Log::info(LOG_NAME, "%u books across %u pages", (unsigned)m_library->size(), m_pages);
+    const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
+    m_pages = (library.size() + m_booksPerPage - 1) / m_booksPerPage;
+    Log::info(LOG_NAME, "%u books across %u pages", (unsigned)library.size(), m_pages);
 
     m_systemBar->m_sep = false;
     m_systemBar->m_title.clear();

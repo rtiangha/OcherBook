@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_FB_RLEIMAGE_H
 #define OCHER_UX_FB_RLEIMAGE_H
 
-#include <stdint.h>
+#include <cstdint>
 
 
 /**
@@ -21,12 +21,12 @@ public:
     /**
      * Imports the uncompressed buffer.
      */
-    static void pack(uint8_t *u, unsigned int len, uint8_t *p);
+    static void pack(uint8_t* u, unsigned int len, uint8_t* p);
 
     /**
      * Unpacks the next chunk (scanline?)
      */
-    int unpack(uint8_t *d, unsigned int len);
+    int unpack(uint8_t* d, unsigned int len);
 
     inline void resetUnpack()
     {
@@ -34,7 +34,7 @@ public:
     }
 
 protected:
-    uint8_t *m_p;
+    uint8_t* m_p;
     unsigned int m_len;  ///< Length of packed data
     unsigned int m_off;  ///< Offset of next byte to unpack
 };

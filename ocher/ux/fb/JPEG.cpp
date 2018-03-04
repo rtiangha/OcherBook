@@ -3,9 +3,9 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include <setjmp.h>
-#include <stddef.h>
-#include <stdio.h>
+#include <csetjmp>
+#include <cstddef>
+#include <cstdio>
 
 // #include "jpeglib.h"
 

@@ -14,7 +14,7 @@
 #define LOG_NAME "ocher.ux.Boot"
 
 
-BootActivityFb::BootActivityFb(UxControllerFb *c) :
+BootActivityFb::BootActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer())
 {
@@ -31,10 +31,6 @@ BootActivityFb::BootActivityFb(UxControllerFb *c) :
     apps[1].w = apps[0].w;
     apps[1].h = apps[0].h;
     apps[1].y = apps[0].y;
-}
-
-BootActivityFb::~BootActivityFb()
-{
 }
 
 void BootActivityFb::onAttached()
@@ -58,7 +54,7 @@ void BootActivityFb::highlight(int i)
     m_fb->sync();
 }
 
-int BootActivityFb::evtMouse(const struct OcherMouseEvent *evt)
+int BootActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
@@ -96,7 +92,7 @@ void BootActivityFb::draw()
         m_fb->roundRect(&r, 1);
         r.inset(2);
 
-        const char *label = i == 0 ? "OcherBook" : "Kobo" /* or "Nickel" ? */;
+        const char* label = i == 0 ? "OcherBook" : "Kobo" /* or "Nickel" ? */;
         pos.x = 0;
         pos.y = r.h / 2;
         fe.renderString(label, strlen(label), &pos, &r, FE_XCENTER);

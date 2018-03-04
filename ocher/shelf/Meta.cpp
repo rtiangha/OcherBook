@@ -3,16 +3,17 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/fmt/Format.h"
-#include "ocher/shelf/Meta.h"
-#include "ocher/util/File.h"
+#include "shelf/Meta.h"
 
-#include <time.h>
+#include "fmt/Format.h"
+#include "util/File.h"
+
+#include <ctime>
 
 
 void BookRecord::touch()
 {
-    touched = time(NULL);
+    touched = time(nullptr);
 }
 
 Meta::Meta() :
@@ -22,7 +23,7 @@ Meta::Meta() :
 {
 }
 
-const char *Meta::fmtToStr(Fmt fmt)
+const char* Meta::fmtToStr(Fmt fmt)
 {
     switch (fmt) {
     case OCHER_FMT_EPUB:
@@ -36,7 +37,7 @@ const char *Meta::fmtToStr(Fmt fmt)
     }
 }
 
-void loadMeta(Meta *meta)
+void loadMeta(Meta* meta)
 {
     switch (meta->format) {
     case OCHER_FMT_TEXT: {
@@ -61,7 +62,7 @@ void loadMeta(Meta *meta)
     }
 
     // TODO:  Hack: use filename until epub parser can pull out the real title.
-    const char *path = strrchr(meta->relPath.c_str(), '/');
+    const char* path = strrchr(meta->relPath.c_str(), '/');
     meta->title = path ? path + 1 : meta->relPath.c_str();
 }
 

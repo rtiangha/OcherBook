@@ -41,21 +41,6 @@ TEST_CASE("Buffer utf8") {
     CHECK(10U == a.length());
 }
 
-TEST_CASE("Buffer format") {
-    Buffer a;
-
-    a.format("Big number: %x", 0x12345678);
-    CHECK(20U == a.length());
-}
-
-TEST_CASE("Buffer appendFormat") {
-    Buffer a;
-
-    a = "Big number";
-    a.appendFormat(": %x", 0x12345678);
-    CHECK(20U == a.length());
-}
-
 TEST_CASE("Buffer copyOnWrite") {
     Buffer a("Hello World");
     Buffer b(a);

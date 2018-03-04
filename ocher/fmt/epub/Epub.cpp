@@ -3,34 +3,35 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/fmt/epub/Epub.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/Path.h"
+#include "fmt/epub/Epub.h"
+
+#include "util/Logger.h"
+#include "util/Path.h"
 
 #include "mxml.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 #define LOG_NAME "ocher.epub"
 
 
-static bool stripUtf8Bom(Buffer &data)
+static bool stripUtf8Bom(Buffer& data)
 {
     // Unicode standard does not recommend BOM for UTF8.
     // UTF8 is assumed anyway.
     if (data.length() >= 3 &&
-        ((unsigned char *)data.c_str())[0] == 0xef &&
-        ((unsigned char *)data.c_str())[1] == 0xbb &&
-        ((unsigned char *)data.c_str())[2] == 0xbf) {
+        ((unsigned char*)data.c_str())[0] == 0xef &&
+        ((unsigned char*)data.c_str())[1] == 0xbb &&
+        ((unsigned char*)data.c_str())[2] == 0xbf) {
         data.erase(0, 3);
         return true;
     }
     return false;
 }
 
-TreeFile *Epub::findSpine()
+TreeFile* Epub::findSpine()
 {
-    TreeFile *mimetype = m_zip->getFile("mimetype");
+    TreeFile* mimetype = m_zip->getFile("mimetype");
 
     if (!mimetype) {
         Log::warn(LOG_NAME, "Missing '/mimetype'");
@@ -43,17 +44,17 @@ TreeFile *Epub::findSpine()
         }
     }
 
-    mxml_node_t *tree = 0;
-    const char *fullPath = 0;
-    TreeFile *container = m_zip->getFile("META-INF/container.xml");
+    mxml_node_t* tree = nullptr;
+    const char* fullPath = nullptr;
+    TreeFile* container = m_zip->getFile("META-INF/container.xml");
     if (!container) {
         Log::error(LOG_NAME, "Missing 'META-INF/container.xml'");
     } else {
         stripUtf8Bom(container->data);
-        tree = mxmlLoadString(NULL, container->data.c_str(), MXML_IGNORE_CALLBACK);
+        tree = mxmlLoadString(nullptr, container->data.c_str(), MXML_IGNORE_CALLBACK);
         // Must be a "rootfiles" element, with one or more "rootfile" children.
         // First "rootfile" is the default. [OCF 3.0 2.5.1]
-        mxml_node_t *rootfile = mxmlFindPath(tree, "container/rootfiles/rootfile");
+        mxml_node_t* rootfile = mxmlFindPath(tree, "container/rootfiles/rootfile");
         if (!rootfile) {
             Log::error(LOG_NAME, "Missing rootfile node");
         } else {
@@ -73,7 +74,7 @@ TreeFile *Epub::findSpine()
         }
     }
 
-    TreeFile *spine = 0;
+    TreeFile* spine = nullptr;
     if (fullPath) {
         spine = m_zip->getFile(fullPath);
         if (!spine)
@@ -86,7 +87,7 @@ TreeFile *Epub::findSpine()
     return spine;
 }
 
-const char *_mxmlElementGetAttr(mxml_node_t *n, const char *name)
+const char* _mxmlElementGetAttr(mxml_node_t* n, const char* name)
 {
     Log::trace(LOG_NAME, "attrs %d", n->value.element.num_attrs);
 
@@ -97,16 +98,16 @@ const char *_mxmlElementGetAttr(mxml_node_t *n, const char *name)
         }
         Log::trace(LOG_NAME, "mismatch %s", n->value.element.attrs[i].name);
     }
-    return NULL;
+    return nullptr;
 }
 
-void Epub::parseSpine(TreeFile *spineFile)
+void Epub::parseSpine(TreeFile* spineFile)
 {
     stripUtf8Bom(spineFile->data);
 
-    mxml_node_t *tree = mxmlLoadString(NULL, spineFile->data.c_str(), MXML_IGNORE_CALLBACK);
+    mxml_node_t* tree = mxmlLoadString(nullptr, spineFile->data.c_str(), MXML_IGNORE_CALLBACK);
 
-    mxml_node_t *package = mxmlFindPath(tree, "package");
+    mxml_node_t* package = mxmlFindPath(tree, "package");
     if (!package) {
         Log::warn(LOG_NAME, "Missing 'package' element");
     } else {
@@ -115,13 +116,13 @@ void Epub::parseSpine(TreeFile *spineFile)
         m_epubVersion = _mxmlElementGetAttr(package, "version");
     }
 
-    mxml_node_t *metadata = mxmlFindPath(tree, "package/metadata");
+    mxml_node_t* metadata = mxmlFindPath(tree, "package/metadata");
     if (!metadata) {
         Log::warn(LOG_NAME, "Missing 'metadata' element");
     } else {
         Log::debug(LOG_NAME, "Found 'metadata'");
-        for (mxml_node_t *node = mxmlGetFirstChild(metadata); node; node = mxmlGetNextSibling(node)) {
-            const char *name = node->value.element.name;
+        for (mxml_node_t* node = mxmlGetFirstChild(metadata); node; node = mxmlGetNextSibling(node)) {
+            const char* name = node->value.element.name;
             if (node->type == MXML_ELEMENT) {
                 if (strcasecmp(name, "dc:title") == 0) {
                     Log::debug(LOG_NAME, "Found dc:title");
@@ -137,18 +138,18 @@ void Epub::parseSpine(TreeFile *spineFile)
         m_title = metadata->value.opaque;
     }
 
-    mxml_node_t *manifest = mxmlFindPath(tree, "package/manifest");
+    mxml_node_t* manifest = mxmlFindPath(tree, "package/manifest");
     if (!manifest) {
         Log::warn(LOG_NAME, "Missing 'manifest' element");
     } else {
         Log::trace(LOG_NAME, "Found 'manifest' type %d", manifest->type);
-        for (mxml_node_t *i = manifest->child; i; i = i->next) {
+        for (mxml_node_t* i = manifest->child; i; i = i->next) {
             if (i->type != MXML_ELEMENT || strcmp(i->value.element.name, "item"))
                 continue;
             Log::trace(LOG_NAME, "Found 'manifest' item");
-            const char *id = _mxmlElementGetAttr(i, "id");
-            const char *href = _mxmlElementGetAttr(i, "href");
-            const char *mediaType = _mxmlElementGetAttr(i, "media-type");
+            const char* id = _mxmlElementGetAttr(i, "id");
+            const char* href = _mxmlElementGetAttr(i, "href");
+            const char* mediaType = _mxmlElementGetAttr(i, "media-type");
             if (id && href) {
                 EpubItem item;
                 item.href = href;
@@ -160,16 +161,16 @@ void Epub::parseSpine(TreeFile *spineFile)
         }
     }
 
-    mxml_node_t *spine = mxmlFindPath(tree, "package/spine");
+    mxml_node_t* spine = mxmlFindPath(tree, "package/spine");
     if (!spine) {
         Log::warn(LOG_NAME, "Missing 'spine' element");
     } else {
         Log::trace(LOG_NAME, "Found 'spine'");
         // TODO: toc
-        for (mxml_node_t *i = spine->child; i; i = i->next) {
+        for (mxml_node_t* i = spine->child; i; i = i->next) {
             if (i->type != MXML_ELEMENT || strcmp(i->value.element.name, "itemref"))
                 continue;
-            const char *idref = _mxmlElementGetAttr(i, "idref");
+            const char* idref = _mxmlElementGetAttr(i, "idref");
             if (idref) {
                 std::string _idref(idref);
                 m_spine.push_back(_idref);
@@ -180,13 +181,13 @@ void Epub::parseSpine(TreeFile *spineFile)
         mxmlDelete(tree);
 }
 
-int Epub::getSpineItemByIndex(unsigned int i, std::string &item)
+int Epub::getSpineItemByIndex(unsigned int i, std::string& item)
 {
     if (i < m_spine.size()) {
-        std::string &idref = m_spine[i];
-        std::map<std::string, EpubItem>::iterator it = m_items.find(idref);
+        const std::string& idref = m_spine[i];
+        auto it = m_items.find(idref);
         if (it != m_items.end()) {
-            TreeFile *f = m_zip->getFile((*it).second.href.c_str(), m_contentPath.c_str());
+            TreeFile* f = m_zip->getFile((*it).second.href.c_str(), m_contentPath.c_str());
             if (f) {
                 item = f->data;
                 return 0;
@@ -197,7 +198,7 @@ int Epub::getSpineItemByIndex(unsigned int i, std::string &item)
     return -1;
 }
 
-int Epub::getManifestItemById(unsigned int i, std::string &item)
+int Epub::getManifestItemById(unsigned int i, std::string& item)
 {
     // TODO
     (void)i;
@@ -205,7 +206,7 @@ int Epub::getManifestItemById(unsigned int i, std::string &item)
     return -1;
 }
 
-int Epub::getContentByHref(const char *href, std::string &item)
+int Epub::getContentByHref(const char* href, std::string& item)
 {
     // TODO
     (void)href;
@@ -213,20 +214,20 @@ int Epub::getContentByHref(const char *href, std::string &item)
     return -1;
 }
 
-Epub::Epub(FileCache *fileCache) :
+Epub::Epub(FileCache* fileCache) :
     m_zip(fileCache)
 {
-    TreeFile *spine = findSpine();
+    TreeFile* spine = findSpine();
 
     if (spine) {
         parseSpine(spine);
     }
 }
 
-Epub::Epub(const std::string &filename, const char *password) :
+Epub::Epub(const std::string& filename, const char* password) :
     m_zip(new UnzipCache(filename.c_str(), password))
 {
-    TreeFile *spine = findSpine();
+    TreeFile* spine = findSpine();
 
     if (spine) {
         parseSpine(spine);
@@ -238,9 +239,9 @@ Epub::~Epub()
     delete m_zip;
 }
 
-mxml_node_t *Epub::parseXml(std::string &xml)
+mxml_node_t* Epub::parseXml(std::string& xml)
 {
-    mxml_node_t *tree = mxmlLoadString(NULL, xml.c_str(), MXML_OPAQUE_CALLBACK);
+    mxml_node_t* tree = mxmlLoadString(nullptr, xml.c_str(), MXML_OPAQUE_CALLBACK);
 
     return tree;
 }

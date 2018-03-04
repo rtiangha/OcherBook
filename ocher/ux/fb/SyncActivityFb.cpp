@@ -3,15 +3,16 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/fmt/Format.h"
-#include "ocher/settings/Options.h"
-#include "ocher/ux/fb/SyncActivityFb.h"
-#include "ocher/ux/fb/UxControllerFb.h"
-#include "ocher/util/DirIter.h"
-#include "ocher/util/File.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/Path.h"
+#include "ux/fb/SyncActivityFb.h"
+
+#include "Container.h"
+#include "fmt/Format.h"
+#include "settings/Options.h"
+#include "ux/fb/UxControllerFb.h"
+#include "util/DirIter.h"
+#include "util/File.h"
+#include "util/Logger.h"
+#include "util/Path.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -21,7 +22,7 @@
 
 class SyncActivityWork : public EventWork {
 public:
-    SyncActivityWork(UxControllerFb *controller, const char **files) :
+    SyncActivityWork(UxControllerFb* controller, const char** files) :
         EventWork(g_container.loop),
         m_files(files),
         m_uxController(controller)
@@ -29,19 +30,19 @@ public:
         start();
     }
 
-    ~SyncActivityWork()
+    ~SyncActivityWork() override
     {
         join();
     }
 
 protected:
-    const char **m_files;
-    UxControllerFb *m_uxController;
+    const char** m_files;
+    UxControllerFb* m_uxController;
 
     void work() override;
     void notifyComplete() override;
 
-    void processFile(const char *file);
+    void processFile(const char* file);
 };
 
 void SyncActivityWork::work()
@@ -49,7 +50,7 @@ void SyncActivityWork::work()
     Log::info(LOG_NAME "Work", "working");
 
     if (m_files) {
-        for (const char *file = *m_files; file; file = *++m_files) {
+        for (const char* file = *m_files; file; file = *++m_files) {
             processFile(file);
         }
     }
@@ -62,7 +63,7 @@ void SyncActivityWork::notifyComplete()
     m_uxController->setNextActivity(ACTIVITY_HOME);
 }
 
-void SyncActivityWork::processFile(const char *file)
+void SyncActivityWork::processFile(const char* file)
 {
     struct stat s;
 
@@ -74,7 +75,7 @@ void SyncActivityWork::processFile(const char *file)
             Fmt format = detectFormat(file, &encoding);
             Log::debug(LOG_NAME, "%s: %s", file, Meta::fmtToStr(format));
             if (format != OCHER_FMT_UNKNOWN) {
-                Meta *m = new Meta;
+                auto m = new Meta;
                 m->format = format;
                 m->relPath = file;
                 loadMeta(m);
@@ -99,7 +100,7 @@ void SyncActivityFb::draw()
     m_fb->fillRect(&m_rect);
 }
 
-SyncActivityFb::SyncActivityFb(UxControllerFb *c) :
+SyncActivityFb::SyncActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer()),
     m_spinner(g_container.loop)
@@ -117,7 +118,7 @@ void SyncActivityFb::onAttached()
 
     // TODO:  sync files passed on command line once.  Sync filesystem->m_libraries.  etc.
     m_work = new SyncActivityWork(m_uxController, g_container.options->files);
-    g_container.options->files = NULL;
+    g_container.options->files = nullptr;
     m_spinner.start();
     invalidate();
 }

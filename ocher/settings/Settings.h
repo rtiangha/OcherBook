@@ -30,7 +30,7 @@ public:
         SecureLevelPersonal,
         SecureLevelPrivate,
     };
-    static const char *SecureLevelToString(SecureLevel s);
+    static const char* SecureLevelToString(SecureLevel s);
 
     enum SleepShow {
         SleepShowSleeping,
@@ -38,15 +38,15 @@ public:
         SleepShowCover,
         SleepShowBlank,
     };
-    static const char *SleepShowToString(SleepShow s);
+    static const char* SleepShowToString(SleepShow s);
 
     void reset();
 
     void load();
-    void load(const std::string &json);
+    void load(const std::string& json);
     void save();
 
-    void inject(Filesystem *fs);
+    void inject(Filesystem* fs);
 
     /** A security level can protect a user's reading history.
      *
@@ -152,9 +152,9 @@ public:
     // home page arrangement
 
 protected:
-    Filesystem *m_fs;
+    Filesystem* m_fs;
 
-    nlohmann::json *m_j;
+    nlohmann::json* m_j;
 };
 
 #endif

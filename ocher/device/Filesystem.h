@@ -21,17 +21,22 @@ public:
     Filesystem();
     ~Filesystem();
 
-    Filesystem(const Filesystem &) = delete;
-    Filesystem &operator=(const Filesystem &) = delete;
+    Filesystem(const Filesystem&) = delete;
+    Filesystem& operator=(const Filesystem&) = delete;
 
-    const char **m_libraries;
-    char *m_home;
-    char *m_settings;
+    const char** m_libraries;
+    char* m_home;
+    char* m_settings;
 
-    void initWatches(Options *options);
+    void initWatches(Options* options);
     void deinitWatches();
     void fireEvents();
-    Signal2<const char *, const char *> dirChanged;
+
+    /**
+     * @param name  The file or directory with the event
+     * @param what  Description of the event
+     */
+    Signal2<const char*, const char*> dirChanged;
 
 protected:
     int m_infd;

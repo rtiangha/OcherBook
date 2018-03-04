@@ -1,5 +1,5 @@
-#ifndef LIBCLC_LOG_APPENDER_FILE_H
-#define LIBCLC_LOG_APPENDER_FILE_H
+#ifndef LOG_APPENDER_FILE_H
+#define LOG_APPENDER_FILE_H
 
 #include "util/File.h"
 #include "util/LogAppenders.h"
@@ -14,9 +14,9 @@ public:
      *  @param filename  The filename to log to.  Relative paths will be interpreted relative to
      *      the standard logging directory.
      */
-    LogAppenderFile(const char *filename);
+    LogAppenderFile(const char* filename);
     ~LogAppenderFile();
-    void append(std::string const &s);
+    void append(std::string const& s);
 
 protected:
     File m_file;

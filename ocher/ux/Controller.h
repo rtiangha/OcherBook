@@ -6,8 +6,8 @@
 #ifndef OCHER_UX_CONTROLLER_H
 #define OCHER_UX_CONTROLLER_H
 
-#include "ocher/shelf/Shelf.h"
-#include "ocher/ux/Activity.h"
+#include "shelf/Shelf.h"
+#include "ux/Activity.h"
 
 class Device;
 class EventLoop;
@@ -31,7 +31,7 @@ public:
     Library library;
     ShortList shortList;
 
-    Meta *selected;
+    Meta* selected;
 };
 
 /**
@@ -47,35 +47,35 @@ public:
     UxController();
     virtual ~UxController();
 
-    virtual const char *getName() const = 0;
+    virtual const char* getName() const = 0;
 
     virtual bool init() = 0;
 
-    virtual FrameBuffer *getFrameBuffer()
+    virtual FrameBuffer* getFrameBuffer()
     {
-        return (FrameBuffer *)0;
+        return nullptr;
     }
 
-    virtual FontEngine *getFontEngine()
+    virtual FontEngine* getFontEngine()
     {
-        return (FontEngine *)0;
+        return nullptr;
     }
-    virtual Renderer *getRenderer() = 0;
+    virtual Renderer* getRenderer() = 0;
 
     // TODO: in general, need more control (when running a new activity, is the prior
     // one destroyed?  or suspended?
     virtual void setNextActivity(enum ActivityType a) = 0;
 
     void onWantToSleep();
-    void onDirChanged(const char *dir, const char *file);
-    void handleEvent(const struct OcherEvent *evt);
+    void onDirChanged(const char* dir, const char* file);
+    void handleEvent(const struct OcherEvent* evt);
 
     ReadingContext ctx;
 
 protected:
-    Filesystem *m_filesystem;
-    PowerSaver *m_powerSaver;
-    EventLoop *m_loop;
+    Filesystem* m_filesystem;
+    PowerSaver* m_powerSaver;
+    EventLoop* m_loop;
 };
 
 /**
@@ -84,8 +84,8 @@ protected:
  */
 class Controller {
 public:
-    Controller(Options *options);
-    ~Controller();
+    Controller(Options* options);
+    ~Controller() = default;
 
     void run();
 
@@ -94,7 +94,7 @@ protected:
     void initLog();
     void initDebug();
 
-    UxController *m_uxController;
+    UxController* m_uxController;
 };
 
 #endif

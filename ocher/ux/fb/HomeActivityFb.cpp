@@ -14,7 +14,7 @@
 #define LOG_NAME "ocher.ux.Home"
 
 
-HomeActivityFb::HomeActivityFb(UxControllerFb *c) :
+HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     coverRatio(1.6)
 {
@@ -49,22 +49,18 @@ HomeActivityFb::HomeActivityFb(UxControllerFb *c) :
     books[4].h = books[4].w * coverRatio;
 }
 
-HomeActivityFb::~HomeActivityFb()
-{
-}
-
-int HomeActivityFb::evtKey(const struct OcherKeyEvent *)
+int HomeActivityFb::evtKey(const struct OcherKeyEvent*)
 {
     return -1;
 }
 
-int HomeActivityFb::evtMouse(const struct OcherMouseEvent *evt)
+int HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
         auto metas = m_uxController->ctx.library.getList();
-        for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; i++) {
-            Meta *meta = (*metas)[i];
+        for (unsigned int i = 0; i < metas.size() && i < NUM_CLUSTER_BOOKS; i++) {
+            Meta* meta = metas[i];
             if (!meta) {
                 Log::trace(LOG_NAME, "book %d has no meta", i);
                 continue;
@@ -114,7 +110,7 @@ void HomeActivityFb::draw()
         m_fb->roundRect(&r, 1);
         r.inset(2);
 
-        Meta *meta = (*metas)[i];
+        Meta* meta = i < metas.size() ? metas[i] : nullptr;
         uint8_t c = meta ? 0xf0 : 0xd0;
         m_fb->setFg(c, c, c);
         m_fb->fillRect(&r);
@@ -148,8 +144,8 @@ void HomeActivityFb::draw()
         Rect lbox;
         lbox.x = 0;
         lbox.y = pos.y;
-        Glyph *glyphs[13];
-        const char *text = "Browse all...";
+        Glyph* glyphs[13];
+        const char* text = "Browse all...";
         fe.plotString(text, strlen(text), &glyphs[0], &lbox);
         // TODO  right justify against lbox (remove plotString call); get bbox returned
         pos.x = m_rect.w - books[0].x - lbox.w;
@@ -200,7 +196,7 @@ void HomeActivityFb::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
-    SystemBar *systemBar = m_uxController->m_systemBar;
+    SystemBar* systemBar = m_uxController->m_systemBar;
 
     addChild(systemBar);
     systemBar->m_sep = false;
@@ -213,7 +209,7 @@ void HomeActivityFb::onAttached()
 void HomeActivityFb::onDetached()
 {
     Log::info(LOG_NAME, "detached");
-    SystemBar *systemBar = m_uxController->m_systemBar;
+    SystemBar* systemBar = m_uxController->m_systemBar;
 
     removeChild(systemBar);
 }

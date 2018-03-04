@@ -1,11 +1,11 @@
-#ifndef LIBCLC_CLOCK_H
-#define LIBCLC_CLOCK_H
+#ifndef OCHER_UTIL_CLOCK_H
+#define OCHER_UTIL_CLOCK_H
 
 /** @file
  *  Cross-platform clock class.
  */
 
-#include <stdint.h>
+#include <cstdint>
 #include <sys/time.h>
 #ifdef __MACH__
 #include <mach/mach_time.h>
@@ -41,7 +41,7 @@ public:
      *  @param usec  Number of microseconds in the future
      *  @param ts  Modified
      */
-    static void futureUsec(unsigned int usec, struct timespec *ts);
+    static void futureUsec(unsigned int usec, struct timespec* ts);
 
 #if !defined(__BEOS__) && !defined(__HAIKU__)
     /**
@@ -50,7 +50,7 @@ public:
      *  @param tv  The base time, as a timeval
      *  @return The future time, as a timespec
      */
-    static struct timespec futureUsec(unsigned int usec, const struct timeval *tv);
+    static struct timespec futureUsec(unsigned int usec, const struct timeval* tv);
 
     /**
      *  Calculates a time in the future, relative to the current realtime (ie, wall) clock.

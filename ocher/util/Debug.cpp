@@ -1,11 +1,10 @@
 #include "util/Debug.h"
 
-#include "util/Buffer.h"
 #include "util/StrUtil.h"
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #if defined(__linux__)
 #include <sys/prctl.h>
@@ -16,7 +15,7 @@ int Debugger::enter()
 {
     volatile int r = 0;
 
-#ifdef HAVE_BUILTIN_TRAP
+#ifdef HAVE_BUILTIN_TRAP  // TODO set
     __builtin_trap();
 #else
     abort();
@@ -24,22 +23,17 @@ int Debugger::enter()
     return r;
 }
 
-void Debugger::print(char const *str)
+void Debugger::print(char const* str)
 {
     printf("%s", str);
 }
 
-void Debugger::printf(const Buffer &b)
-{
-    Debugger::print(b.c_str());
-}
-
-void Debugger::printf(char const *fmt, va_list ap)
+void Debugger::printf(char const* fmt, va_list ap)
 {
     vprintf(fmt, ap);  // TODO:  various destinations
 }
 
-void Debugger::printf(char const *fmt, ...)
+void Debugger::printf(char const* fmt, ...)
 {
     va_list ap;
 
@@ -48,7 +42,7 @@ void Debugger::printf(char const *fmt, ...)
     va_end(ap);
 }
 
-int Debugger::asserted(char const *file, int line, char const *expr)
+int Debugger::asserted(char const* file, int line, char const* expr)
 {
     Debugger::printf("%s:%d: failed assertion `%s'\n", file, line, expr);
     int r = Debugger::enter();
@@ -58,7 +52,7 @@ int Debugger::asserted(char const *file, int line, char const *expr)
     return r;
 }
 
-void Debugger::nameThread(const char *fmt, ...)
+void Debugger::nameThread(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);

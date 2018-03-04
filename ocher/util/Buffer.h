@@ -2,9 +2,9 @@
 #define UTIL_BUFFER_H
 
 #include <atomic>
-#include <stdarg.h>
-#include <stdint.h>
-#include <string.h>
+#include <cstdarg>
+#include <cstdint>
+#include <cstring>
 #include <sys/types.h>
 
 /**
@@ -24,7 +24,7 @@
  */
 class Buffer {
 private:
-    char *m_data;
+    char* m_data;
 
 public:
     /**
@@ -33,38 +33,38 @@ public:
     static const size_t NotFound = ((size_t)-1);
 
     Buffer();
-    Buffer(const char *string);
-    Buffer(const Buffer &string);
-    Buffer(const char *string, size_t maxLength);
+    Buffer(const char* string);
+    Buffer(const Buffer& string);
+    Buffer(const char* string, size_t maxLength);
     Buffer(size_t prealloc);
     ~Buffer();
 
     // Drop-in for std::string:
-    char *c_str()
+    char* c_str()
     {
         return m_data;
     }
 
-    const char *c_str() const
+    const char* c_str() const
     {
         return m_data;
     }
 
-    operator char *() {
+    operator char* () {
         return m_data;
     }
 
-    operator const char *() const
+    operator const char* () const
     {
         return m_data;
     }
 
-    char *data()
+    char* data()
     {
         return m_data;
     }
 
-    const char *data() const
+    const char* data() const
     {
         return m_data;
     }
@@ -102,16 +102,11 @@ public:
 
     // Assignment
     Buffer &operator=(const Buffer &string);
-    Buffer &operator=(const char *string);
+    Buffer &operator=(const char* string);
     Buffer &operator=(char c);
 
-    Buffer &formatList(const char *fmt, va_list argList);
-    Buffer &format(const char *fmt, ...);
-    Buffer &appendFormatList(const char *fmt, va_list argList);
-    Buffer &appendFormat(const char *fmt, ...);
-
-    Buffer &setTo(const char *string);
-    Buffer &setTo(const char *string, size_t maxLength);
+    Buffer &setTo(const char* string);
+    Buffer &setTo(const char* string, size_t maxLength);
 
     Buffer &setTo(const Buffer &string);
     Buffer &adopt(Buffer &from);
@@ -123,31 +118,31 @@ public:
 
     // Substring copying
     Buffer &copyInto(Buffer &into, size_t fromOffset, size_t length) const;
-    void copyInto(char *into, size_t fromOffset, size_t length) const;
+    void copyInto(char* into, size_t fromOffset, size_t length) const;
 
     // Appending
     Buffer &operator+=(const Buffer &string);
-    Buffer &operator+=(const char *string);
+    Buffer &operator+=(const char* string);
     Buffer &operator+=(char c);
 
     Buffer &append(const Buffer &string);
-    Buffer &append(const char *string);
+    Buffer &append(const char* string);
 
     Buffer &append(const Buffer &string, size_t length);
-    Buffer &append(const char *string, size_t length);
+    Buffer &append(const char* string, size_t length);
     Buffer &append(char c, size_t count);
 
     // Prepending
-    Buffer &prepend(const char *string);
+    Buffer &prepend(const char* string);
     Buffer &prepend(const Buffer &string);
-    Buffer &prepend(const char *string, size_t length);
+    Buffer &prepend(const char* string, size_t length);
     Buffer &prepend(const Buffer &string, size_t length);
     Buffer &prepend(char c, size_t count);
 
     // Inserting
-    Buffer &insert(const char *string, ssize_t position);
-    Buffer &insert(const char *string, size_t length, ssize_t position);
-    Buffer &insert(const char *string, size_t fromOffset, size_t length, ssize_t position);
+    Buffer &insert(const char* string, ssize_t position);
+    Buffer &insert(const char* string, size_t length, ssize_t position);
+    Buffer &insert(const char* string, size_t fromOffset, size_t length, ssize_t position);
     Buffer &insert(const Buffer &string, ssize_t position);
     Buffer &insert(const Buffer &string, size_t length, ssize_t position);
     Buffer &insert(const Buffer &string, size_t fromOffset, size_t length, ssize_t position);
@@ -161,14 +156,14 @@ public:
     Buffer &removeLast(const Buffer &string);
     Buffer &removeAll(const Buffer &string);
 
-    Buffer &removeFirst(const char *string);
-    Buffer &removeLast(const char *string);
-    Buffer &removeAll(const char *string);
+    Buffer &removeFirst(const char* string);
+    Buffer &removeLast(const char* string);
+    Buffer &removeAll(const char* string);
 
-    Buffer &removeSet(const char *setOfCharsToRemove);
+    Buffer &removeSet(const char* setOfCharsToRemove);
 
     Buffer &moveInto(Buffer &into, size_t from, size_t length);
-    void moveInto(char *into, size_t from, size_t length);
+    void moveInto(char* into, size_t from, size_t length);
 
     // Compare functions
     bool operator<(const Buffer &string) const;
@@ -178,12 +173,12 @@ public:
     bool operator>(const Buffer &string) const;
     bool operator!=(const Buffer &string) const;
 
-    bool operator<(const char *string) const;
-    bool operator<=(const char *string) const;
-    bool operator==(const char *string) const;
-    bool operator>=(const char *string) const;
-    bool operator>(const char *string) const;
-    bool operator!=(const char *string) const;
+    bool operator<(const char* string) const;
+    bool operator<=(const char* string) const;
+    bool operator==(const char* string) const;
+    bool operator>=(const char* string) const;
+    bool operator>(const char* string) const;
+    bool operator!=(const char* string) const;
 
     /**
      *  Compares two strings.
@@ -192,7 +187,7 @@ public:
     /**
      *  Compares a string against a C string.
      */
-    int compare(const char *string) const;
+    int compare(const char* string) const;
     /**
      *  Compares two strings, at most the first len characters.
      */
@@ -200,7 +195,7 @@ public:
     /**
      *  Compares a string against a C string.
      */
-    int compare(const char *string, size_t len) const;
+    int compare(const char* string, size_t len) const;
     /**
      *  Compares two C strings, case insensitive.
      */
@@ -208,7 +203,7 @@ public:
     /**
      *  Compares two C strings, case insensitive.
      */
-    int compareI(const char *string) const;
+    int compareI(const char* string) const;
     /**
      *  Compares two C strings, case insensitive, at most the first len characters.
      */
@@ -216,54 +211,54 @@ public:
     /**
      *  Compares two C strings, case insensitive, at most the first len characters.
      */
-    int compareI(const char *string, size_t len) const;
+    int compareI(const char* string, size_t len) const;
 
     // Searching
     size_t findFirst(const Buffer &string) const;
-    size_t findFirst(const char *string) const;
+    size_t findFirst(const char* string) const;
     size_t findFirst(const Buffer &string, size_t fromOffset) const;
-    size_t findFirst(const char *string, size_t fromOffset) const;
+    size_t findFirst(const char* string, size_t fromOffset) const;
     size_t findFirst(char c) const;
     size_t findFirst(char c, size_t fromOffset) const;
 
     size_t findLast(const Buffer &string) const;
-    size_t findLast(const char *string) const;
+    size_t findLast(const char* string) const;
     size_t findLast(const Buffer &string, size_t beforeOffset) const;
-    size_t findLast(const char *string, size_t beforeOffset) const;
+    size_t findLast(const char* string, size_t beforeOffset) const;
     size_t findLast(char c) const;
     size_t findLast(char c, size_t beforeOffset) const;
 
     size_t findFirstI(const Buffer &string) const;
-    size_t findFirstI(const char *string) const;
+    size_t findFirstI(const char* string) const;
     size_t findFirstI(const Buffer &string, size_t fromOffset) const;
-    size_t findFirstI(const char *string, size_t fromOffset) const;
+    size_t findFirstI(const char* string, size_t fromOffset) const;
 
     size_t findLastI(const Buffer &string) const;
-    size_t findLastI(const char *string) const;
+    size_t findLastI(const char* string) const;
     size_t findLastI(const Buffer &string, size_t beforeOffset) const;
-    size_t findLastI(const char *string, size_t beforeOffset) const;
+    size_t findLastI(const char* string, size_t beforeOffset) const;
 
     // Replacing
     Buffer &replaceFirst(char replaceThis, char withThis);
     Buffer &replaceLast(char replaceThis, char withThis);
     Buffer &replaceAll(char replaceThis, char withThis, size_t fromOffset = 0);
     Buffer &replace(char replaceThis, char withThis, unsigned int maxReplaceCount, size_t fromOffset = 0);
-    Buffer &replaceFirst(const char *replaceThis, const char *withThis);
-    Buffer &replaceLast(const char *replaceThis, const char *withThis);
-    Buffer &replaceAll(const char *replaceThis, const char *withThis, size_t fromOffset = 0);
-    Buffer &replace(const char *replaceThis, const char *withThis, unsigned int maxReplaceCount, size_t fromOffset = 0);
+    Buffer &replaceFirst(const char* replaceThis, const char* withThis);
+    Buffer &replaceLast(const char* replaceThis, const char* withThis);
+    Buffer &replaceAll(const char* replaceThis, const char* withThis, size_t fromOffset = 0);
+    Buffer &replace(const char* replaceThis, const char* withThis, unsigned int maxReplaceCount, size_t fromOffset = 0);
 
     Buffer &replaceFirstI(char replaceThis, char withThis);
     Buffer &replaceLastI(char replaceThis, char withThis);
     Buffer &replaceAllI(char replaceThis, char withThis, size_t fromOffset = 0);
     Buffer &replaceI(char replaceThis, char withThis, unsigned int maxReplaceCount, size_t fromOffset = 0);
-    Buffer &replaceFirstI(const char *replaceThis, const char *withThis);
-    Buffer &replaceLastI(const char *replaceThis, const char *withThis);
-    Buffer &replaceAllI(const char *replaceThis, const char *withThis, size_t fromOffset = 0);
-    Buffer &replaceI(const char *replaceThis, const char *withThis, unsigned int maxReplaceCount, size_t fromOffset = 0);
+    Buffer &replaceFirstI(const char* replaceThis, const char* withThis);
+    Buffer &replaceLastI(const char* replaceThis, const char* withThis);
+    Buffer &replaceAllI(const char* replaceThis, const char* withThis, size_t fromOffset = 0);
+    Buffer &replaceI(const char* replaceThis, const char* withThis, unsigned int maxReplaceCount, size_t fromOffset = 0);
 
-    Buffer &replaceSet(const char *setOfChars, char with);
-    Buffer &replaceSet(const char *setOfChars, const char *with);
+    Buffer &replaceSet(const char* setOfChars, char with);
+    Buffer &replaceSet(const char* setOfChars, const char* with);
 
     // Unchecked char access
     char operator[](size_t index) const;
@@ -279,7 +274,7 @@ public:
      *  (Or the object can be destroyed safely).
      *  @return  A buffer which may be written directly to, up to maxLength chars.
      */
-    char *lockBuffer(size_t maxLength);
+    char* lockBuffer(size_t maxLength);
     /**
      *  @param length  The amount of the locked buffer that was filled.  Default (0) implies
      *      using strlen to determine the length.
@@ -291,13 +286,13 @@ public:
     Buffer &toUpper();
 
     // Escaping and De-escaping
-    Buffer &characterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith);
-    Buffer &characterEscape(const char *setOfCharsToEscape, char escapeWith);
-    Buffer &characterDeescape(const char *original, char escapeChar);
+    Buffer &characterEscape(const char* original, const char* setOfCharsToEscape, char escapeWith);
+    Buffer &characterEscape(const char* setOfCharsToEscape, char escapeWith);
+    Buffer &characterDeescape(const char* original, char escapeChar);
     Buffer &characterDeescape(char escapeChar);
 
     // Insert
-    Buffer &operator<<(const char *string);
+    Buffer &operator<<(const char* string);
     Buffer &operator<<(const Buffer &string);
     Buffer &operator<<(char c);
     Buffer &operator<<(unsigned int value);
@@ -311,36 +306,36 @@ private:
     class PosVect;
 
     // Management
-    char *_alloc(size_t length, bool adoptReferenceCount = true);
-    char *_realloc(size_t length);
-    void _init(const char *src, size_t length);
-    char *_clone(const char *data, size_t length);
-    char *_openAtBy(size_t offset, size_t length);
-    char *_shrinkAtBy(size_t offset, size_t length);
-    void _detachWith(const char *string, size_t dataLen, size_t totalLen);
+    char* _alloc(size_t length, bool adoptReferenceCount = true);
+    char* _realloc(size_t length);
+    void _init(const char* src, size_t length);
+    char* _clone(const char* data, size_t length);
+    char* _openAtBy(size_t offset, size_t length);
+    char* _shrinkAtBy(size_t offset, size_t length);
+    void _detachWith(const char* string, size_t dataLen, size_t totalLen);
 
     // Data
     void _setLength(size_t length);
-    void _doAppend(const char *string, size_t length);
-    void _doPrepend(const char *string, size_t length);
-    void _doInsert(const char *string, size_t offset, size_t length);
+    void _doAppend(const char* string, size_t length);
+    void _doPrepend(const char* string, size_t length);
+    void _doInsert(const char* string, size_t offset, size_t length);
 
     // Search
-    size_t _shortFindAfter(const char *string, size_t len) const;
-    size_t _findAfter(const char *string, size_t offset, size_t strlen) const;
-    size_t _findAfterI(const char *string, size_t offset, size_t strlen) const;
+    size_t _shortFindAfter(const char* string, size_t len) const;
+    size_t _findAfter(const char* string, size_t offset, size_t strlen) const;
+    size_t _findAfterI(const char* string, size_t offset, size_t strlen) const;
 
-    size_t _findBefore(const char *string, size_t offset, size_t strlen) const;
-    size_t _findBeforeI(const char *string, size_t offset, size_t strlen) const;
+    size_t _findBefore(const char* string, size_t offset, size_t strlen) const;
+    size_t _findBeforeI(const char* string, size_t offset, size_t strlen) const;
 
     // Escape
-    Buffer &_doCharacterEscape(const char *string, const char *setOfCharsToEscape, char escapeChar);
-    Buffer &_doCharacterDeescape(const char *string, char escapeChar);
+    Buffer &_doCharacterEscape(const char* string, const char* setOfCharsToEscape, char escapeChar);
+    Buffer &_doCharacterDeescape(const char* string, char escapeChar);
 
     // Replace
-    Buffer &_doReplace(const char *findThis, const char *replaceWith, unsigned int maxReplaceCount,
+    Buffer &_doReplace(const char* findThis, const char* replaceWith, unsigned int maxReplaceCount,
             size_t fromOffset, bool ignoreCase);
-    void _replaceAtPositions(const PosVect *positions, size_t searchLen, const char *with,
+    void _replaceAtPositions(const PosVect* positions, size_t searchLen, const char* with,
             size_t withLen);
 
     std::atomic<int32_t> &refCount();
@@ -354,27 +349,27 @@ private:
 
 
 // Commutative compare operators
-bool operator<(const char *a, const Buffer &b);
-bool operator<=(const char *a, const Buffer &b);
-bool operator==(const char *a, const Buffer &b);
-bool operator>(const char *a, const Buffer &b);
-bool operator>=(const char *a, const Buffer &b);
-bool operator!=(const char *a, const Buffer &b);
+bool operator<(const char* a, const Buffer &b);
+bool operator<=(const char* a, const Buffer &b);
+bool operator==(const char* a, const Buffer &b);
+bool operator>(const char* a, const Buffer &b);
+bool operator>=(const char* a, const Buffer &b);
+bool operator!=(const char* a, const Buffer &b);
 
 
 // Non-member compare for sorting, etc.
 int compare(const Buffer &a, const Buffer &b);
 int compareI(const Buffer &a, const Buffer &b);
-int compare(const Buffer *a, const Buffer *b);
-int compareI(const Buffer *a, const Buffer *b);
+int compare(const Buffer* a, const Buffer* b);
+int compareI(const Buffer* a, const Buffer* b);
 
 
 inline size_t Buffer::length() const
 {
-    return *(((size_t *)m_data) - 1);
+    return *(((size_t*)m_data) - 1);
 }
 
-inline Buffer &Buffer::setTo(const char *string)
+inline Buffer &Buffer::setTo(const char* string)
 {
     return operator=(string);
 }
@@ -408,7 +403,7 @@ inline Buffer &Buffer::append(const Buffer &string)
     return *this;
 }
 
-inline Buffer &Buffer::append(const char *string)
+inline Buffer &Buffer::append(const char* string)
 {
     return operator+=(string);
 }
@@ -443,37 +438,37 @@ inline bool Buffer::operator!=(const Buffer &string) const
     return compare(string) != 0;
 }
 
-inline bool Buffer::operator!=(const char *string) const
+inline bool Buffer::operator!=(const char* string) const
 {
     return !operator==(string);
 }
 
-inline bool operator<(const char *str, const Buffer &string)
+inline bool operator<(const char* str, const Buffer &string)
 {
     return string > str;
 }
 
-inline bool operator<=(const char *str, const Buffer &string)
+inline bool operator<=(const char* str, const Buffer &string)
 {
     return string >= str;
 }
 
-inline bool operator==(const char *str, const Buffer &string)
+inline bool operator==(const char* str, const Buffer &string)
 {
     return string == str;
 }
 
-inline bool operator>(const char *str, const Buffer &string)
+inline bool operator>(const char* str, const Buffer &string)
 {
     return string < str;
 }
 
-inline bool operator>=(const char *str, const Buffer &string)
+inline bool operator>=(const char* str, const Buffer &string)
 {
     return string <= str;
 }
 
-inline bool operator!=(const char *str, const Buffer &string)
+inline bool operator!=(const char* str, const Buffer &string)
 {
     return string != str;
 }

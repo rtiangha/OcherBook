@@ -6,24 +6,26 @@
 #ifndef OCHER_UX_CDK_RENDERER_H
 #define OCHER_UX_CDK_RENDERER_H
 
-#include "ocher/ux/Renderer.h"
+#include "ux/Renderer.h"
 
 // TODO: smaller include fails later:  #include <cdk/cdkscreen.h>
 #include <cdk.h>
+
+#include <string>
 
 class Pagination;
 
 class RendererCdk : public Renderer {
 public:
-    RendererCdk(WINDOW *scr, CDKSCREEN *m_screen);
+    RendererCdk(WINDOW* scr, CDKSCREEN* m_screen);
 
-    int render(Pagination *pagination, unsigned int pageNum, bool doBlit);
+    int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
-    int outputWrapped(std::string *b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(std::string* b, unsigned int strOffset, bool doBlit);
 
 protected:
-    WINDOW *m_scr;
-    CDKSCREEN *m_screen;
+    WINDOW* m_scr;
+    CDKSCREEN* m_screen;
     int m_width;
     int m_height;
     int m_x;

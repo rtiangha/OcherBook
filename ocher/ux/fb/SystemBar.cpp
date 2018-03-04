@@ -3,12 +3,13 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/fb/SystemBar.h"
+#include "ux/fb/SystemBar.h"
+
+#include "Container.h"
+#include "settings/Settings.h"
 
 
-SystemBar::SystemBar(FrameBuffer *fb, Battery *battery) :
+SystemBar::SystemBar(FrameBuffer* fb, Battery* battery) :
     Window(0, 0, fb->width(), 30 /* TODO */),
     m_sep(false),
     m_fb(fb),
@@ -23,7 +24,7 @@ SystemBar::SystemBar(FrameBuffer *fb, Battery *battery) :
 }
 
 
-void SystemBar::drawContent(Rect *r)
+void SystemBar::drawContent(Rect* r)
 {
     m_fb->setFg(0xff, 0xff, 0xff);
     m_fb->fillRect(&m_rect);

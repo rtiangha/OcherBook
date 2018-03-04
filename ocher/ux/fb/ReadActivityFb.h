@@ -8,29 +8,30 @@
 
 #include "ocher/ux/fb/ActivityFb.h"
 
-
-class Renderer;
 class Layout;
+class Meta;
+class Renderer;
+class Settings;
 
 class ReadActivityFb : public ActivityFb {
 public:
-    ReadActivityFb(UxControllerFb *c);
+    ReadActivityFb(UxControllerFb* c);
 
 protected:
-    int evtKey(const struct OcherKeyEvent *);
-    int evtMouse(const struct OcherMouseEvent *);
+    int evtKey(const struct OcherKeyEvent*);
+    int evtMouse(const struct OcherMouseEvent*);
 
     void onAttached();
     void onDetached();
 
     void draw();
 
-    FrameBuffer *m_fb;
-    Settings *m_settings;
+    FrameBuffer* m_fb;
+    Settings* m_settings;
 
-    Layout *m_layout;
-    Renderer *m_renderer;
-    Meta *meta;
+    Layout* m_layout;
+    Renderer* m_renderer;
+    Meta* meta;
     unsigned int m_pageNum;
     int atEnd;
     unsigned int m_pagesSinceRefresh;

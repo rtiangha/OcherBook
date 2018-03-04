@@ -1,33 +1,12 @@
 #include "util/Path.h"
 
+#include <cerrno>
+#include <cstring>
 #include <dirent.h>
-#include <errno.h>
 #include <fnmatch.h>
-#include <new>
 #include <string>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#define clc_statstruct stat
-#define clc_fstat(fd, statbuf) ::fstat(fd, statbuf)
-#define clc_stat(path, statbuf) ::stat(path, statbuf)
-#define clc_mkdir(path, mode) ::mkdir(path, mode)
-#define clc_rmdir(path) ::rmdir(path)
-#define clc_seek(fd, offset, whence) ::fseeko(fd, offset, whence)
-#define clc_tell(fd) ::ftello(fd)
-#define clc_unlink(pathname) ::unlink(pathname)
 
 #define PATH_SEP '/'
-
-#if 0
-static bool isFile(const std::string &pathname)
-{
-    struct stat stat_info;
-
-    return ::lstat(pathname.c_str(), &stat_info) == 0 && S_ISREG(stat_info.st_mode);
-}
-#endif
 
 bool Path::isAbsolute(const char *path)
 {
@@ -51,34 +30,21 @@ std::string Path::join(const char *base, const char *leaf)
     return path;
 }
 
-void Path::split(const char *path, std::string &base, std::string &file)
-{
-    const char *slash = strrchr(path, PATH_SEP);
-
-    if (slash) {
-        base.assign(path, slash - path + 1);
-        file = slash + 1;
-    } else {
-        base = "./";
-        file = path;
-    }
-}
-
 int Path::list(const char *dir, const char *glob, std::list<std::string> &files)
 {
     int r = -1;
 
     try {
         DIR *dp;
-        if ((dp = opendir(dir)) == NULL) {
+        if ((dp = opendir(dir)) == nullptr) {
             r = errno;
         } else {
             r = 0;
             struct dirent *dir_entry;
-            while ((dir_entry = readdir(dp)) != NULL) {
+            while ((dir_entry = readdir(dp)) != nullptr) {
                 const char *name = dir_entry->d_name;
                 if (!glob || fnmatch(glob, name, 0) == 0) {
-                    files.push_back(std::string(name));
+                    files.emplace_back(std::string(name));
                 }
             }
             closedir(dp);
@@ -97,12 +63,4 @@ std::string Path::getDirectory(std::string &path)
     if (pos != std::string::npos)
         dir.resize(pos + 1);
     return dir;
-}
-
-bool Path::exists(const char *path)
-{
-    struct clc_statstruct statbuf;
-    int r = clc_stat(path, &statbuf);
-
-    return r == 0;
 }

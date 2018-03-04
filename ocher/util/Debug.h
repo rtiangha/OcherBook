@@ -1,17 +1,14 @@
-#ifndef LIBCLC_DEBUG_H
-#define LIBCLC_DEBUG_H
+#ifndef OCHER_DEBUG_H
+#define OCHER_DEBUG_H
 
 /** @file
  *  Debugger access.
  */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
 
-
-class Buffer;
 
 class Debugger {
 public:
@@ -20,21 +17,19 @@ public:
      */
     static int enter();
 
-    static void print(char const *str);
+    static void print(char const* str);
 
-    static void printf(const Buffer &b);
+    static void printf(const char* fmt, va_list ap);
 
-    static void printf(const char *fmt, va_list ap);
+    static void printf(char const* fmt, ...);
 
-    static void printf(char const *fmt, ...);
-
-    static int asserted(char const *file, int line, char const *expr);
+    static int asserted(char const* file, int line, char const* expr);
 
     /**
      * Names the thread, so that the name is visible in the debugger.
      * @note only in debug builds
      */
-    static void nameThread(const char *name, ...);
+    static void nameThread(const char* name, ...);
 };
 
 #if DEBUG

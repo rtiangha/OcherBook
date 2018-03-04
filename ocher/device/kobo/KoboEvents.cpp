@@ -3,14 +3,15 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/device/kobo/KoboEvents.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "device/kobo/KoboEvents.h"
 
-#include <errno.h>
+#include "util/Debug.h"
+#include "util/Logger.h"
+
+#include <cerrno>
+#include <cstring>
 #include <fcntl.h>
 #include <linux/input.h>
-#include <string.h>
 #include <unistd.h>
 
 #define LOG_NAME "ocher.dev.kobo"
@@ -44,7 +45,7 @@ struct KoboButtonEvent {
 };
 
 KoboEvents::KoboEvents() :
-    m_loop(0)
+    m_loop(nullptr)
 {
     m_buttonFd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
     m_touchFd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
@@ -60,7 +61,7 @@ KoboEvents::~KoboEvents()
     }
 }
 
-void KoboEvents::setEventLoop(EventLoop *loop)
+void KoboEvents::setEventLoop(EventLoop* loop)
 {
     m_loop = loop;
 
@@ -76,14 +77,14 @@ void KoboEvents::setEventLoop(EventLoop *loop)
     }
 }
 
-void KoboEvents::buttonCb(struct ev_loop *, ev_io *watcher, int)
+void KoboEvents::buttonCb(struct ev_loop* , ev_io* watcher, int)
 {
-    static_cast<KoboEvents *>(watcher->data)->pollButton();
+    static_cast<KoboEvents*>(watcher->data)->pollButton();
 }
 
 void KoboEvents::pollButton()
 {
-    while (1) {
+    while (true) {
         struct KoboButtonEvent kbe;
         int r = read(m_buttonFd, &kbe, sizeof(kbe));
         if (r == -1) {
@@ -113,9 +114,9 @@ void KoboEvents::pollButton()
     }
 }
 
-void KoboEvents::touchCb(struct ev_loop *, ev_io *watcher, int)
+void KoboEvents::touchCb(struct ev_loop*, ev_io* watcher, int)
 {
-    static_cast<KoboEvents *>(watcher->data)->pollTouch();
+    static_cast<KoboEvents*>(watcher->data)->pollTouch();
 }
 
 void KoboEvents::pollTouch()

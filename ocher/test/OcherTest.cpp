@@ -12,9 +12,9 @@
 #include "ocher/fmt/Format.h"
 #include "ocher/fmt/epub/TreeMem.h"
 #include "ocher/settings/Options.h"
-#include "ocher/util/Buffer.h"
 #include "ocher/util/LogAppenders.h"
 #include "ocher/util/Path.h"
+#include "ocher/util/StrUtil.h"
 #include "ocher/ux/PowerSaver.h"
 
 #define CATCH_CONFIG_MAIN
@@ -138,9 +138,7 @@ TEST_CASE("Epub") {
         void createContainerXml(const char *contentOpfPath)
         {
             TreeDirectory *metaInfDir = m_root->createDirectory("META-INF");
-            Buffer containerXml;
-
-            containerXml.format(
+            auto containerXml = format(
                     "<?xml version=\"1.0\"?>"
                     "<container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">"
                     "<rootfiles>"
@@ -152,9 +150,7 @@ TEST_CASE("Epub") {
 
         void createContentOpf(TreeDirectory *containingDir, const char *title)
         {
-            Buffer contentOpf;
-
-            contentOpf.format(
+            auto contentOpf = format(
                     "<?xml version=\"1.0\"?>"
                     "<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">"
                     "    <metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">"

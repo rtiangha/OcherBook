@@ -1,15 +1,15 @@
 #include "util/StrUtil.h"
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 
 namespace str {
 
 #if 0
-Buffer hexToBin(const Buffer &hex)
+Buffer hexToBin(const Buffer& hex)
 {
     Buffer bin;
     size_t bytes = hex.length();
@@ -24,7 +24,7 @@ Buffer hexToBin(const Buffer &hex)
     return bin;
 }
 
-Buffer binToHex(const Buffer &bin)
+Buffer binToHex(const Buffer& bin)
 {
     Buffer hex;
     size_t bytes = bin.length();
@@ -74,7 +74,7 @@ void hexStringToBytes(const char *hex, size_t bufferlen, unsigned char *buffer)
     }
 }
 
-std::ostream &operator<<(std::ostream &out, Buffer const &s)
+std::ostream& operator<<(std::ostream& out, const Buffer& s)
 {
     for (size_t i = 0; i < s.length(); ++i) {
         out << s[i];
@@ -111,7 +111,7 @@ Buffer format(const char *fmt, va_list argList)
     return s;
 }
 
-void appendFormat(Buffer &s, const char *fmt, ...)
+void appendFormat(Buffer& s, const char *fmt, ...)
 {
     va_list argList;
 
@@ -120,7 +120,7 @@ void appendFormat(Buffer &s, const char *fmt, ...)
     va_end(argList);
 }
 
-void appendFormat(Buffer &s, const char *fmt, va_list argList)
+void appendFormat(Buffer& s, const char *fmt, va_list argList)
 {
     char *buf;
     int len = vasprintf(&buf, fmt, argList);
@@ -131,7 +131,7 @@ void appendFormat(Buffer &s, const char *fmt, va_list argList)
     }
 }
 
-uint64_t toUInt(Buffer const &s, bool *valid)
+uint64_t toUInt(const Buffer& s, bool *valid)
 {
     uint64_t v = 0;
     size_t i = 0;
@@ -149,7 +149,7 @@ uint64_t toUInt(Buffer const &s, bool *valid)
     return v;
 }
 
-Buffer getLine(Buffer const &s, size_t fromOffset)
+Buffer getLine(const Buffer& s, size_t fromOffset)
 {
     size_t offset = s.FindFirst('\n', fromOffset);
     const char *start = s.c_str() + fromOffset;
@@ -184,14 +184,14 @@ unsigned int parseDottedDecimal(const char *src, int *dsts, unsigned int ndsts)
     return i;
 }
 
-int trimLeading(Buffer &s, char c)
+int trimLeading(Buffer& s, char c)
 {
     char setOfChars[] = { c, 0 };
 
     return trimLeadingOfSet(s, setOfChars);
 }
 
-int trimLeadingOfSet(Buffer &s, const char *setOfChars)
+int trimLeadingOfSet(Buffer& s, const char *setOfChars)
 {
     const char *data = s.c_str();
     size_t len = s.length();
@@ -204,7 +204,7 @@ int trimLeadingOfSet(Buffer &s, const char *setOfChars)
     return toTrim;
 }
 
-bool trimLeading(Buffer &haystack, Buffer const &needle)
+bool trimLeading(Buffer& haystack, const Buffer& needle)
 {
     if (startsWith(haystack, needle)) {
         haystack.remove(0, needle.length());
@@ -213,14 +213,14 @@ bool trimLeading(Buffer &haystack, Buffer const &needle)
     return false;
 }
 
-void trimTrailing(Buffer &s, char c)
+void trimTrailing(Buffer& s, char c)
 {
     char setOfChars[] = { c, 0 };
 
     trimTrailingOfSet(s, setOfChars);
 }
 
-void trimTrailingOfSet(Buffer &s, const char *setOfChars)
+void trimTrailingOfSet(Buffer& s, const char *setOfChars)
 {
     const char *data = s.c_str();
     size_t len = s.length();
@@ -232,13 +232,13 @@ void trimTrailingOfSet(Buffer &s, const char *setOfChars)
     s.truncate(newLen);
 }
 
-void trimWhitespace(Buffer &s)
+void trimWhitespace(Buffer& s)
 {
     trimTrailingOfSet(s, " \t\v\r\n");
     trimLeadingOfSet(s, " \t\v\r\n");
 }
 
-bool startsWith(Buffer &haystack, Buffer const &needle)
+bool startsWith(Buffer& haystack, const Buffer& needle)
 {
     return haystack.length() >= needle.length() &&
            memcmp(haystack.c_str(), needle.c_str(), needle.length()) == 0;
@@ -261,7 +261,7 @@ std::string formatList(const char *fmt, va_list argList)
 #else
     va_list argList2;
     va_copy(argList2, argList);
-    int len = vsnprintf(NULL, 0, fmt, argList2) + 1;  // measure,
+    int len = vsnprintf(nullptr, 0, fmt, argList2) + 1;  // measure,
     va_end(argList2);
     char *buf = (char *)alloca(len);
     int printed = vsnprintf(buf, len, fmt, argList); // format,
@@ -282,7 +282,7 @@ std::string format(const char *fmt, ...)
     return s;
 }
 
-std::string &appendFormatList(std::string &s, const char *fmt, va_list argList)
+std::string& appendFormatList(std::string& s, const char *fmt, va_list argList)
 {
 #if 1  // TODO:  HAVE_VASPRINTF
     char *buf;
@@ -294,7 +294,7 @@ std::string &appendFormatList(std::string &s, const char *fmt, va_list argList)
 #else
     va_list argList2;
     va_copy(argList2, argList);
-    int len = vsnprintf(NULL, 0, fmt, argList2) + 1;  // measure,
+    int len = vsnprintf(nullptr, 0, fmt, argList2) + 1;  // measure,
     va_end(argList2);
     char *buf = (char *)alloca(len);
     int printed = vsnprintf(buf, len, fmt, argList); // format,
@@ -305,7 +305,7 @@ std::string &appendFormatList(std::string &s, const char *fmt, va_list argList)
     return s;
 }
 
-std::string &appendFormat(std::string &s, const char *fmt, ...)
+std::string& appendFormat(std::string& s, const char *fmt, ...)
 {
     va_list argList;
 

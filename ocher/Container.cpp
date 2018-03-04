@@ -3,33 +3,34 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/device/Battery.h"
-#include "ocher/device/Device.h"
-#include "ocher/device/Filesystem.h"
-#include "ocher/settings/Options.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/Controller.h"
-#include "ocher/ux/PowerSaver.h"
-#include "ocher/ux/Renderer.h"
-#include "ocher/ux/fb/FontEngine.h"
-#include "ocher/ux/fb/FrameBuffer.h"
+#include "Container.h"
+
+#include "device/Battery.h"
+#include "device/Device.h"
+#include "device/Filesystem.h"
+#include "settings/Options.h"
+#include "settings/Settings.h"
+#include "ux/Controller.h"
+#include "ux/PowerSaver.h"
+#include "ux/Renderer.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/FrameBuffer.h"
 
 
 Container g_container;
 
 Container::Container() :
-    loop(0),
-    device(0),
-    battery(0),
-    filesystem(0),
-    settings(0),
-    options(0),
-    powerSaver(0),
-    uxController(0),
-    frameBuffer(0),
-    fontEngine(0),
-    renderer(0)
+    loop(nullptr),
+    device(nullptr),
+    battery(nullptr),
+    filesystem(nullptr),
+    settings(nullptr),
+    options(nullptr),
+    powerSaver(nullptr),
+    uxController(nullptr),
+    frameBuffer(nullptr),
+    fontEngine(nullptr),
+    renderer(nullptr)
 {
 }
 

@@ -3,11 +3,12 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/fmt/Layout.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "fmt/Layout.h"
 
-#include <ctype.h>
+#include "util/Debug.h"
+#include "util/Logger.h"
+
+#include <cctype>
 
 Layout::Layout() :
     m_dataLen(0),
@@ -25,16 +26,16 @@ Layout::~Layout()
 {
     // Walk the bytecode and delete embedded strings
     const unsigned int N = m_data.size();
-    const char *raw = m_data.data();
+    const char* raw = m_data.data();
 
     for (unsigned int i = 0; i < N; ) {
-        uint16_t code = *(uint16_t *)(raw + i);
+        uint16_t code = *(uint16_t*)(raw + i);
         i += 2;
         unsigned int opType = (code >> 12) & 0xf;
         unsigned int op = (code >> 8) & 0xf;
         if (opType == OpCmd && op == CmdOutputStr) {
-            delete *(Buffer **)(raw + i);
-            i += sizeof(Buffer *);
+            delete *(Buffer**)(raw + i);
+            i += sizeof(Buffer*);
         }
     }
 
@@ -45,37 +46,37 @@ Buffer Layout::unlock()
 {
     flushText();
     delete m_buffer;
-    m_buffer = 0;
+    m_buffer = nullptr;
 
     m_data.unlockBuffer(m_dataLen);
     return m_data;
 }
 
-char *Layout::checkAlloc(unsigned int n)
+char* Layout::checkAlloc(unsigned int n)
 {
     if (m_dataLen + n > m_data.size()) {
         m_data.unlockBuffer(m_data.size());
         m_data.lockBuffer(m_dataLen + n + chunk);
     }
-    char *p = m_data.c_str() + m_dataLen;
+    char* p = m_data.c_str() + m_dataLen;
     m_dataLen += n;
     return p;
 }
 
 void Layout::push(unsigned int opType, unsigned int op, unsigned int arg)
 {
-    char *p = checkAlloc(2);
+    char* p = checkAlloc(2);
     uint16_t i = (opType << 12) | (op << 8) | arg;
 
-    *(uint16_t *)p = i;
+    *(uint16_t*)p = i;
 }
 
-void Layout::pushPtr(void *ptr)
+void Layout::pushPtr(void* ptr)
 {
     int n = sizeof(ptr);
-    char *p = checkAlloc(n);
+    char* p = checkAlloc(n);
 
-    *((char **)p) = (char *)ptr;
+    *((char**)p) = (char*)ptr;
 }
 
 void Layout::pushTextAttr(TextAttr attr, uint8_t arg)

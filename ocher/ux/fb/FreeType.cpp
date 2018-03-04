@@ -3,18 +3,19 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/fb/FreeType.h"
-#include "ocher/util/Logger.h"
+#include "ux/fb/FreeType.h"
 
-#include <ctype.h>
+#include "Container.h"
+#include "settings/Settings.h"
+#include "util/Logger.h"
+
+#include <cctype>
 
 #define LOG_NAME "ocher.freetype"
 
 
 
-static const char *ttfFiles[] = {
+static const char* ttfFiles[] = {
     // TODO
 #ifdef OCHER_TARGET_KOBO
     "Delima.ttf",
@@ -37,7 +38,8 @@ static const char *ttfFiles[] = {
 };
 
 FreeType::FreeType(unsigned int dpi) :
-    m_lib(0),
+    m_face(nullptr),
+    m_lib(nullptr),
     m_dpi(dpi)
 {
 }
@@ -81,7 +83,7 @@ void FreeType::setSize(unsigned int points)
     FT_Set_Char_Size(m_face, 0, points * 64, m_dpi, m_dpi);
 }
 
-int FreeType::plotGlyph(GlyphDescr *f, Glyph *g)
+int FreeType::plotGlyph(GlyphDescr* f, Glyph* g)
 {
     unsigned int glyphIndex = FT_Get_Char_Index(m_face, f->c);
     int r = FT_Load_Glyph(m_face, glyphIndex, FT_LOAD_DEFAULT);

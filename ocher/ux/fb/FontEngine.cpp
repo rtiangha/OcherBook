@@ -3,21 +3,18 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/ux/fb/FontEngine.h"
+
 #include "ocher/Container.h"
 #include "ocher/settings/Settings.h"
-#include "ocher/ux/fb/FontEngine.h"
 #include "ocher/ux/fb/FrameBuffer.h"
 #include "ocher/util/Logger.h"
 
-#include <ctype.h>
-#include <stddef.h>
+#include <cctype>
+#include <cstddef>
 
 #define LOG_NAME "ocher.ux.FontEngine"
 
-
-GlyphCache::GlyphCache()
-{
-}
 
 GlyphCache::~GlyphCache()
 {
@@ -27,7 +24,7 @@ GlyphCache::~GlyphCache()
     }
 }
 
-void GlyphCache::put(GlyphDescr &f, Glyph *g)
+void GlyphCache::put(GlyphDescr& f, Glyph* g)
 {
     auto search = m_cache.find(f);
     if (search != m_cache.end()) {
@@ -36,17 +33,17 @@ void GlyphCache::put(GlyphDescr &f, Glyph *g)
     m_cache[f] = g;
 }
 
-Glyph *GlyphCache::get(GlyphDescr &f)
+Glyph* GlyphCache::get(GlyphDescr& f)
 {
     auto search = m_cache.find(f);
     if (search != m_cache.end()) {
         return search->second;
     } else {
-        return NULL;
+        return nullptr;
     }
 }
 
-FontEngine::FontEngine(FrameBuffer *fb) :
+FontEngine::FontEngine(FrameBuffer* fb) :
     m_ft(fb->dpi())
 {
     m_next.faceId = 0;
@@ -56,32 +53,31 @@ FontEngine::FontEngine(FrameBuffer *fb) :
     m_next.italic = 0;
     memset(&m_cur, 0xff, sizeof(m_cur));
     dirty = 1;
-}
 
-FontEngine::~FontEngine()
-{
+    // XXX move to FreeType constructor
+    m_ft.init();
 }
 
 void FontEngine::scanForFonts()
 {
-    const char *search;
+    const char* search;
 
     if (g_container.settings->fontRoot.length() == 0)
         search = ".";
     else
         search = g_container.settings->fontRoot.c_str();
 
-    const char *p = search;
-    const char *colon;
+    const char* p = search;
+    const char* colon;
     colon = strchr(p, ':');
     if (colon) {
         // TODO
     }
 }
 
-static int utf8ToUtf32(const char *_p, uint32_t *u32)
+static int utf8ToUtf32(const char* _p, uint32_t* u32)
 {
-    const unsigned char *p = (const unsigned char *)_p;
+    auto p = (const unsigned char*)_p;
     int len = 1;
     uint32_t c = *p;
 
@@ -164,7 +160,7 @@ void FontEngine::apply()
     }
 }
 
-void FontEngine::plotString(const char *p, unsigned int len, Glyph **glyphs, Rect *bbox)
+void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rect* bbox)
 {
     GlyphDescr d;
 
@@ -176,10 +172,10 @@ void FontEngine::plotString(const char *p, unsigned int len, Glyph **glyphs, Rec
 
     bbox->w = 0;
     unsigned int i = 0;
-    for (const char *end = p + len; p < end; ) {
+    for (const char* end = p + len; p < end; ) {
         p += utf8ToUtf32(p, &d.c);
 
-        Glyph *g = m_cache.get(d);
+        Glyph* g = m_cache.get(d);
         if (!g) {
             // Log::trace(LOG_NAME, "%d pt %c is not cached", d.face.points, d.c);
             g = new Glyph;
@@ -197,14 +193,14 @@ void FontEngine::plotString(const char *p, unsigned int len, Glyph **glyphs, Rec
         bbox->w += g->advanceX;
     }
     bbox->h = m_cur.lineHeight;
-    glyphs[i] = 0;
+    glyphs[i] = nullptr;
 }
 
 // TODO:  return array of arrays of glyphs, and starting pos for each array
 // or callback:  str, offset, len, bbox
-unsigned int FontEngine::renderString(const char *str, unsigned int len, Pos *pen, const Rect *r, unsigned int flags, Rect *bbox)
+unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags, Rect* bbox)
 {
-    const char *p = str;
+    const char* p = str;
     bool wordWrapped = false;
 
     if (bbox)
@@ -232,7 +228,7 @@ unsigned int FontEngine::renderString(const char *str, unsigned int len, Pos *pe
             if (w < len)
                 ++w;
 
-            Glyph *glyphs[w + 1];
+            Glyph* glyphs[w + 1];
             Rect wordBox;
             wordBox.x = pen->x;
             wordBox.y = pen->y;

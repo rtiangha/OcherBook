@@ -3,29 +3,29 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/settings/Options.h"
-#include "ocher/ux/Controller.h"
+#include "Container.h"
+#include "settings/Options.h"
+#include "ux/Controller.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <exception>
 #include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 
-void usage(const char *msg)
+void usage(const char* msg = nullptr)
 {
     printf(
             "OcherBook  Copyright (C) 2015 Chuck Coffing  <clc@alum.mit.edu>\n"
             "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
             "\n");
-    if (msg) {
+    if (msg != nullptr) {
         printf("%s\n\n", msg);
     }
     printf(
-            // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+          // 12345678901234567890123456789012345678901234567890123456789012345678901234567890
             "Usage:  ocher [OPTIONS]... [FILE]...\n"
             "\n"
             "-b,--boot              Present boot menu; nonzero exit means run other firmware.\n"
@@ -43,33 +43,33 @@ void usage(const char *msg)
             "platform specific search paths.  Directories will be searched recursively.\n"
             "\n"
             );
-    exit(msg ? 0 : 1);
+    exit(msg != nullptr ? 0 : 1);
 }
 
 #define OPT_KEY 256
 #define OPT_DRIVER 257
 #define OPT_LIST_DRIVERS 258
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     bool listDrivers = false;
-    Options *opt = new Options;
+    auto opt = new Options;
 
     struct option long_options[] =
     {
-        { "boot",         no_argument,       0, 'b' },
-        { "flatten",      no_argument,       0, 'f' },
-        { "help",         no_argument,       0, 'h' },
-        { "quiet",        no_argument,       0, 'q' },
-        { "test",         no_argument,       0, 't' },
-        { "verbose",      no_argument,       0, 'v' },
-        { "key",          required_argument, 0, OPT_KEY },
-        { "driver",       required_argument, 0, OPT_DRIVER },
-        { "list-drivers", no_argument,       0, OPT_LIST_DRIVERS },
-        { 0, 0, 0, 0 }
+        { "boot",         no_argument,       nullptr, 'b' },
+        { "flatten",      no_argument,       nullptr, 'f' },
+        { "help",         no_argument,       nullptr, 'h' },
+        { "quiet",        no_argument,       nullptr, 'q' },
+        { "test",         no_argument,       nullptr, 't' },
+        { "verbose",      no_argument,       nullptr, 'v' },
+        { "key",          required_argument, nullptr, OPT_KEY },
+        { "driver",       required_argument, nullptr, OPT_DRIVER },
+        { "list-drivers", no_argument,       nullptr, OPT_LIST_DRIVERS },
+        { nullptr, 0, nullptr, 0 }
     };
 
-    while (1) {
+    while (true) {
         // getopt_long stores the option index here.
         int option_index = 0;
 
@@ -89,11 +89,11 @@ int main(int argc, char **argv)
             opt->verbose--;
             break;
         case 'h':
-            usage(0);
+            usage();
             break;
         case OPT_KEY:
         {
-            char *split = strchr(optarg, '=');
+            char* split = strchr(optarg, '=');
             if (split) {
                 *split = 0;
                 opt->keys[optarg] = split + 1;
@@ -115,22 +115,21 @@ int main(int argc, char **argv)
     }
 
     if (optind < argc) {
-        opt->files = (const char **)&argv[optind];
+        opt->files = (const char**)&argv[optind];
     }
 
     try {
         Controller c(opt);
 
         if (listDrivers) {
-            for (unsigned int i = 0; i < g_container.uxControllers.size(); ++i) {
-                UxController *controller = g_container.uxControllers[i];
+            for (UxController* controller : g_container.uxControllers) {
                 printf("\t%s\n", controller->getName());
             }
             return 0;
         }
 
         c.run();
-    } catch (std::exception &e) {
+    } catch (std::exception& e) {
         fprintf(stderr, "%s\n", e.what());
     }
 

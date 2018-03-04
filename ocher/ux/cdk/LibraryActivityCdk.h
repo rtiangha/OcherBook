@@ -6,13 +6,15 @@
 #ifndef OCHER_UX_CDK_LIBRARYACTIVITY_H
 #define OCHER_UX_CDK_LIBRARYACTIVITY_H
 
-#include "ocher/ux/cdk/ActivityCdk.h"
+#include "ux/cdk/ActivityCdk.h"
+
+#include <vector>
 
 class Meta;
 
 class LibraryActivityCdk : public ActivityCdk {
 public:
-    LibraryActivityCdk(UxControllerCdk *uxController);
+    LibraryActivityCdk(UxControllerCdk* uxController);
 
     ~LibraryActivityCdk()
     {
@@ -21,9 +23,8 @@ public:
     void onAttached();
     void onDetached();
 
-    Meta *browse(std::vector<Meta *> &meta);
-    void read(Meta *meta);
+    Meta* browse(std::vector<Meta*>& meta);
+    void read(Meta* meta);
 };
-
 
 #endif

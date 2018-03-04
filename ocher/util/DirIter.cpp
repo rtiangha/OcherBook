@@ -1,26 +1,27 @@
 #include "util/DirIter.h"
+
 #include "util/Path.h"
 
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <dirent.h>
-#include <errno.h>
 #include <fnmatch.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 
 DirIter::DirIter() :
     m_flags(0),
-    m_dp(0)
+    m_dp(nullptr)
 {
 }
 
-DirIter::DirIter(const char *dir, unsigned int flags) :
+DirIter::DirIter(const char* dir, unsigned int flags) :
     m_name(dir),
     m_flags(flags),
-    m_dp(0)
+    m_dp(nullptr)
 {
 }
 
@@ -33,18 +34,18 @@ void DirIter::close()
 {
     if (m_dp) {
         closedir(m_dp);
-        m_dp = 0;
+        m_dp = nullptr;
     }
 }
 
-void DirIter::setTo(const char *dir, unsigned int flags)
+void DirIter::setTo(const char* dir, unsigned int flags)
 {
     close();
     m_name = dir;
     m_flags = flags;
 }
 
-int DirIter::getNext(std::string &entryName)
+int DirIter::getNext(std::string& entryName)
 {
     entryName.clear();
     if (!m_dp && !m_name.length())
@@ -55,7 +56,7 @@ int DirIter::getNext(std::string &entryName)
             return errno;
     }
     errno = 0;
-    struct dirent *de;
+    struct dirent* de;
     do {
         de = readdir(m_dp);
     } while (de && !(m_flags & IMPLICIT) && (strcmp(de->d_name, ".") == 0 || strcmp(de->d_name, "..") == 0));

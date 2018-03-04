@@ -12,7 +12,7 @@ class Battery;
 
 class BatteryIcon : public Widget {
 public:
-    BatteryIcon(int x, int y, Battery *battery);
+    BatteryIcon(int x, int y, Battery* battery);
 
     void draw();
 

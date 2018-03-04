@@ -6,14 +6,14 @@
 #ifndef OCHER_UX_SYNCACTIVITY_H
 #define OCHER_UX_SYNCACTIVITY_H
 
-#include "ocher/ux/fb/ActivityFb.h"
+#include "ux/fb/ActivityFb.h"
 
 
 class SyncActivityWork;
 
 class SyncActivityFb : public ActivityFb {
 public:
-    SyncActivityFb(UxControllerFb *c);
+    SyncActivityFb(UxControllerFb* c);
 
     void draw();
 
@@ -21,8 +21,8 @@ protected:
     void onAttached();
     void onDetached();
 
-    FrameBuffer *m_fb;
-    SyncActivityWork *m_work;
+    FrameBuffer* m_fb;
+    SyncActivityWork* m_work;
     Spinner m_spinner;
 };
 

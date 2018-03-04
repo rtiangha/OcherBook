@@ -6,12 +6,12 @@
 #ifndef OCHER_UX_FB_SETTINGSACTIVITY_H
 #define OCHER_UX_FB_SETTINGSACTIVITY_H
 
-#include "ocher/ux/fb/ActivityFb.h"
+#include "ux/fb/ActivityFb.h"
 
 
 class SettingsActivityFb : public ActivityFb {
 public:
-    SettingsActivityFb(UxControllerFb *c);
+    SettingsActivityFb(UxControllerFb* c);
 
 protected:
     void onAttached();

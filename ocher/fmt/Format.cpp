@@ -3,11 +3,11 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/fmt/Format.h"
-#include "ocher/util/File.h"
+#include "fmt/Format.h"
+#include "util/File.h"
 
 
-Fmt detectFormat(const char *file, Encoding *encoding)
+Fmt detectFormat(const char* file, Encoding* encoding)
 {
     Fmt format = OCHER_FMT_UNKNOWN;
 
@@ -16,7 +16,7 @@ Fmt detectFormat(const char *file, Encoding *encoding)
     File f;
     if (f.setTo(file) == 0) {
         unsigned char buf[4];
-        ssize_t r = f.read((char *)buf, 4);
+        ssize_t r = f.read((char*)buf, 4);
         if (r >= 4 && buf[0] == 'P' && buf[1] == 'K' && buf[2] == 0x03 && buf[3] == 0x04) {
             format = OCHER_FMT_EPUB;
         } else {

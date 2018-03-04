@@ -10,7 +10,7 @@
  * Rough layout of a book.
  */
 
-#include "ocher/util/Buffer.h"
+#include "util/Buffer.h"
 
 /**
  *  Contains the rough layout of the book's chapters in a file format independent and output device
@@ -79,8 +79,8 @@ public:
     Layout();
     ~Layout();
 
-    Layout(const Layout &) = delete;
-    Layout &operator=(const Layout &) = delete;
+    Layout(const Layout& ) = delete;
+    Layout& operator=(const Layout&) = delete;
 
     // virtual void append(...) = 0;
 
@@ -91,7 +91,7 @@ public:
 
 protected:
     void push(unsigned int opType, unsigned int op, unsigned int arg);
-    void pushPtr(void *ptr);
+    void pushPtr(void* ptr);
 
     void pushTextAttr(TextAttr attr, uint8_t arg);
     void popTextAttr(unsigned int n = 1);
@@ -106,7 +106,7 @@ protected:
     void outputPageBreak();
 
     /** Ensure m_data can hold n additional bytes */
-    char *checkAlloc(unsigned int n);
+    char* checkAlloc(unsigned int n);
 
     Buffer m_data;
     unsigned int m_dataLen;
@@ -114,7 +114,7 @@ protected:
     int nl;
     int ws;
     int pre;
-    Buffer *m_buffer;
+    Buffer* m_buffer;
     unsigned int m_bufferLen;
 
     // Image* m_images[];

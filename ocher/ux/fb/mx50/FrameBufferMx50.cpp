@@ -3,15 +3,16 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/mx50/FrameBufferMx50.h"
-#include "ocher/util/Logger.h"
+#include "ux/fb/mx50/FrameBufferMx50.h"
 
-#include <errno.h>
+#include "util/Logger.h"
+
+#include <cerrno>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -29,7 +30,7 @@
 
 FrameBufferMx50::FrameBufferMx50() :
     m_fd(-1),
-    m_fb(0),
+    m_fb(nullptr),
     m_fbSize(0),
     m_marker(0),
     m_needFull(true)
@@ -38,7 +39,7 @@ FrameBufferMx50::FrameBufferMx50() :
 
 bool FrameBufferMx50::init()
 {
-    const char *dev = "/dev/fb0";
+    const char* dev = "/dev/fb0";
 
     m_fd = open(dev, O_RDWR);
     if (m_fd == -1) {
@@ -77,7 +78,7 @@ bool FrameBufferMx50::init()
     m_fbSize = vinfo.xres_virtual * vinfo.yres_virtual * vinfo.bits_per_pixel / 8;
 
     // Map the device to memory
-    m_fb = (char *)mmap(0, m_fbSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
+    m_fb = (char*)mmap(nullptr, m_fbSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_fd, 0);
     if (m_fb == MAP_FAILED) {
         Log::error(LOG_NAME, "mmap: %s", strerror(errno));
         goto fail1;
@@ -85,7 +86,7 @@ bool FrameBufferMx50::init()
 
     setBg(0xff, 0xff, 0xff);
     clear();
-    update(NULL, true);
+    update(nullptr, true);
 
     bbox.x = bbox.y = 0;
     bbox.w = width();
@@ -147,7 +148,7 @@ void FrameBufferMx50::clear()
 
 void FrameBufferMx50::pset(int x, int y)
 {
-    *(((unsigned char *)m_fb) + y * vinfo.xres_virtual + x) = m_fgColor;
+    *(((unsigned char*)m_fb) + y * vinfo.xres_virtual + x) = m_fgColor;
 }
 
 inline void FrameBufferMx50::hline(int x1, int y, int x2)
@@ -159,7 +160,7 @@ inline void FrameBufferMx50::hline(int x1, int y, int x2)
     memset(m_fb + y * vinfo.xres_virtual + x1, m_fgColor, dx + 1);
 }
 
-void FrameBufferMx50::fillRect(Rect *r)
+void FrameBufferMx50::fillRect(Rect* r)
 {
     int y2 = r->y + r->h;
 
@@ -168,16 +169,16 @@ void FrameBufferMx50::fillRect(Rect *r)
     }
 }
 
-void FrameBufferMx50::byLine(Rect *r, void (*fn)(void *p, size_t n))
+void FrameBufferMx50::byLine(Rect* r, void (*fn)(void* p, size_t n))
 {
     int y2 = r->y + r->h;
 
     for (int y = r->y; y < y2; ++y) {
-        fn(((unsigned char *)m_fb) + y * vinfo.xres_virtual + r->x, r->w);
+        fn(((unsigned char*)m_fb) + y * vinfo.xres_virtual + r->x, r->w);
     }
 }
 
-void FrameBufferMx50::blit(const unsigned char *p, int x, int y, int w, int h, const Rect *userClip)
+void FrameBufferMx50::blit(const unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
     Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
     int rectWidth = w;
@@ -213,7 +214,7 @@ void FrameBufferMx50::blit(const unsigned char *p, int x, int y, int w, int h, c
     }
 
     Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
-    unsigned char *dst = ((unsigned char *)m_fb) + y * vinfo.xres_virtual + x;
+    unsigned char* dst = ((unsigned char*)m_fb) + y * vinfo.xres_virtual + x;
     for (int i = 0; i < h; ++i) {
         memAnd(dst, p, w);
         dst += vinfo.xres_virtual;
@@ -221,7 +222,7 @@ void FrameBufferMx50::blit(const unsigned char *p, int x, int y, int w, int h, c
     }
 }
 
-int FrameBufferMx50::update(Rect *r, bool full)
+int FrameBufferMx50::update(Rect* r, bool full)
 {
     Rect _r;
 

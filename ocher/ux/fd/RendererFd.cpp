@@ -3,7 +3,7 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#define __USE_GNU  // for memrchr
+#include "ocher/ux/fd/RendererFd.h"
 
 #include "ocher/Container.h"
 #include "ocher/fmt/Layout.h"
@@ -11,12 +11,11 @@
 #include "ocher/util/Debug.h"
 #include "ocher/util/Logger.h"
 #include "ocher/ux/Pagination.h"
-#include "ocher/ux/fd/RendererFd.h"
 
-#include <ctype.h>
-#include <errno.h>
-#include <stdint.h>
-#include <string.h>
+#include <cctype>
+#include <cerrno>
+#include <cstdint>
+#include <cstring>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -111,11 +110,11 @@ void RendererFd::popAttrs()
     applyAttrs(-1);
 }
 
-int RendererFd::outputWrapped(std::string *b, unsigned int strOffset, bool doBlit)
+int RendererFd::outputWrapped(std::string* b, unsigned int strOffset, bool doBlit)
 {
     unsigned int len = b->size();
-    const unsigned char *start = (const unsigned char *)b->data();
-    const unsigned char *p = start;
+    auto start = (const unsigned char*)b->data();
+    auto p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;
@@ -133,17 +132,17 @@ int RendererFd::outputWrapped(std::string *b, unsigned int strOffset, bool doBli
         }
 
         // How many chars should go out on this line?
-        const unsigned char *nl = 0;
+        const unsigned char* nl = nullptr;
         unsigned int n = w;
         if (w >= len) {
             n = len;
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
         } else {
-            nl = (const unsigned char *)memchr(p, '\n', n);
+            nl = (const unsigned char*)memchr(p, '\n', n);
             if (!nl) {
                 // don't break words
                 if (!isspace(*(p + n - 1)) && !isspace(*(p + n))) {
-                    unsigned char *space = (unsigned char *)memrchr(p, ' ', n);
+                    auto space = (unsigned char*)memrchr(p, ' ', n);
                     if (space) {
                         nl = space;
                     }
@@ -176,7 +175,7 @@ int RendererFd::outputWrapped(std::string *b, unsigned int strOffset, bool doBli
 }
 
 
-int RendererFd::render(Pagination *pagination, unsigned int pageNum, bool doBlit)
+int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
 {
     Log::info(LOG_NAME, "render page %u %u", pageNum, doBlit);
 
@@ -199,11 +198,11 @@ int RendererFd::render(Pagination *pagination, unsigned int pageNum, bool doBlit
     }
 
     const unsigned int N = m_layout.size();
-    const char *raw = m_layout.data();
+    const char* raw = m_layout.data();
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i + 2 <= N);
-        uint16_t code = *(uint16_t *)(raw + i);
+        uint16_t code = *(uint16_t*)(raw + i);
         i += 2;
 
         unsigned int opType = (code >> 12) & 0xf;
@@ -272,8 +271,8 @@ int RendererFd::render(Pagination *pagination, unsigned int pageNum, bool doBlit
                 break;
             case Layout::CmdOutputStr: {
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
-                ASSERT(i + sizeof(std::string *) <= N);
-                std::string *str = *(std::string **)(raw + i);
+                ASSERT(i + sizeof(std::string*) <= N);
+                std::string* str = *(std::string**)(raw + i);
                 ASSERT(strOffset <= str->size());
                 int breakOffset = outputWrapped(str, strOffset, doBlit);
                 strOffset = 0;
@@ -282,7 +281,7 @@ int RendererFd::render(Pagination *pagination, unsigned int pageNum, bool doBlit
                     Log::debug(LOG_NAME, "page %u break", pageNum);
                     return 0;
                 }
-                i += sizeof(std::string *);
+                i += sizeof(std::string*);
                 break;
             }
             case Layout::CmdForcePage:

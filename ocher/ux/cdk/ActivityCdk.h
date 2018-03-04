@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_CDK_ACTIVITY_H
 #define OCHER_UX_CDK_ACTIVITY_H
 
-#include "ocher/ux/Activity.h"
+#include "ux/Activity.h"
 
 class UxControllerCdk;
 
@@ -14,7 +14,7 @@ class UxControllerCdk;
  */
 class ActivityCdk : public Activity {
 public:
-    ActivityCdk(UxControllerCdk *uxController) :
+    ActivityCdk(UxControllerCdk* uxController) :
         m_uxController(uxController)
     {
     }
@@ -26,7 +26,7 @@ public:
     virtual void onAttached() = 0;
     virtual void onDetached() = 0;
 
-    UxControllerCdk *m_uxController;
+    UxControllerCdk* m_uxController;
 };
 
 #endif

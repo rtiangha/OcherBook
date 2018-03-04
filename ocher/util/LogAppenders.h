@@ -3,7 +3,7 @@
 
 #include "Logger.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 
 class Logger;
@@ -14,7 +14,7 @@ class Logger;
  */
 class LogAppenderNull : public LogAppender {
 public:
-    void append(std::string const &)
+    void append(const std::string&)
     {
     }
 };
@@ -26,7 +26,7 @@ public:
  */
 class LogAppenderDebugger : public LogAppender {
 public:
-    void append(std::string const &s)
+    void append(const std::string& s)
     {
         Debugger::printf(s);
     }
@@ -39,18 +39,18 @@ public:
  */
 class LogAppenderCFile : public LogAppender {
 public:
-    LogAppenderCFile(FILE *f) :
+    LogAppenderCFile(FILE* f) :
         m_f(f)
     {
     }
 
-    void append(std::string const &s)
+    void append(const std::string& s)
     {
         fprintf(m_f, "%s", s.c_str());
     }
 
 protected:
-    FILE *m_f;
+    FILE* m_f;
 };
 
 #endif

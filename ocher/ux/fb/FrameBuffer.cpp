@@ -3,18 +3,18 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/FrameBuffer.h"
+#include "ux/fb/FrameBuffer.h"
 
-#include <stddef.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
 
 
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
-void invert(void *p, size_t n)
+void invert(void* p, size_t n)
 {
-    uint8_t *p1 = (uint8_t *)p;
+    auto p1 = (uint8_t*)p;
 
     while (((ptrdiff_t)p1 & 3) && n) {
         *p1 = ~*p1;
@@ -22,7 +22,7 @@ void invert(void *p, size_t n)
         --n;
     }
 
-    uint32_t *p4 = (uint32_t *)p1;
+    auto p4 = (uint32_t*)p1;
     size_t n4 = n >> 2;
     for (size_t i = 0; i < n4; ++i) {
         p4[i] = ~p4[i];
@@ -33,18 +33,18 @@ void invert(void *p, size_t n)
     }
 }
 
-void dim(void *p, size_t n)
+void dim(void* p, size_t n)
 {
-    uint8_t *p1 = (uint8_t *)p;
+    auto p1 = (uint8_t*)p;
 
     for (size_t i = 0; i < n; ++i) {
         p1[i] >>= 1;
     }
 }
 
-void fade(void *p, size_t n)
+void fade(void* p, size_t n)
 {
-    uint8_t *p1 = (uint8_t *)p;
+    auto p1 = (uint8_t*)p;
 
     for (size_t i = 0; i < n; ++i) {
         if (p1[i] & 0x80)
@@ -54,27 +54,27 @@ void fade(void *p, size_t n)
     }
 }
 
-void memAnd(void *dst, const void *src, size_t n)
+void memAnd(void* dst, const void* src, size_t n)
 {
-    uint8_t *d = (uint8_t *)dst;
-    const uint8_t *s = (uint8_t *)src;
+    auto d = (uint8_t*)dst;
+    auto s = (const uint8_t*)src;
 
     while (n--) {
         *d++ &= *s++;
     }
 }
 
-void memOr(void *dst, const void *src, size_t n)
+void memOr(void* dst, const void* src, size_t n)
 {
-    uint8_t *d = (uint8_t *)dst;
-    const uint8_t *s = (uint8_t *)src;
+    auto d = (uint8_t*)dst;
+    auto s = (const uint8_t*)src;
 
     while (n--) {
         *d++ |= *s++;
     }
 }
 
-void Rect::unionRect(Rect *r)
+void Rect::unionRect(Rect* r)
 {
     if (!valid()) {
         *this = *r;
@@ -97,7 +97,7 @@ void Rect::unionRect(Rect *r)
         h = max(y1, y2) - y;
 }
 
-void Rect::unionRects(Rect *r1, Rect *r2)
+void Rect::unionRects(Rect* r1, Rect* r2)
 {
     if (!r1->valid()) {
         *this = *r2;
@@ -140,7 +140,7 @@ void FrameBuffer::line(int x0, int y0, int x1, int y1)
 #endif
     int err = dx - dy;
 
-    while (1) {
+    while (true) {
         pset(x0, y0);
         if (x0 == x1 && y0 == y1)
             break;
@@ -156,7 +156,7 @@ void FrameBuffer::line(int x0, int y0, int x1, int y1)
     }
 }
 
-void FrameBuffer::rect(Rect *r)
+void FrameBuffer::rect(Rect* r)
 {
     hline(r->x, r->y, r->x + r->w - 1);
     hline(r->x, r->y + r->h - 1, r->x + r->w - 1);
@@ -164,7 +164,7 @@ void FrameBuffer::rect(Rect *r)
     vline(r->x + r->w - 1, r->y, r->y + r->h - 1);
 }
 
-void FrameBuffer::roundRect(Rect *r, unsigned int radius)
+void FrameBuffer::roundRect(Rect* r, unsigned int radius)
 {
     hline(r->x + radius, r->y, r->x + r->w - 1 - radius);
     hline(r->x + radius, r->y + r->h - 1, r->x + r->w - 1 - radius);
@@ -175,10 +175,10 @@ void FrameBuffer::roundRect(Rect *r, unsigned int radius)
     }
 }
 
-void FrameBuffer::blitGlyphs(Glyph **glyphs, Pos *pen, const Rect *clip)
+void FrameBuffer::blitGlyphs(Glyph* *glyphs, Pos* pen, const Rect* clip)
 {
     for (unsigned int i = 0; glyphs[i]; ++i) {
-        Glyph *g = glyphs[i];
+        Glyph* g = glyphs[i];
         blit(g->bitmap, pen->x + g->offsetX, pen->y - g->offsetY, g->w, g->h, clip);
         pen->x += g->advanceX;
         pen->y += g->advanceY;

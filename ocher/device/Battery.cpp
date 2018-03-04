@@ -3,13 +3,14 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/device/Battery.h"
-#include "ocher/util/Logger.h"
+#include "device/Battery.h"
 
-#include <errno.h>
+#include "util/Logger.h"
+
+#include <cerrno>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
 #define LOG_NAME "ocher.dev.battery"

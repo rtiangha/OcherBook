@@ -1,9 +1,9 @@
-#ifndef LIBCLC_STOPWATCH_H
-#define LIBCLC_STOPWATCH_H
+#ifndef STOPWATCH_H
+#define STOPWATCH_H
 
 #include "util/Clock.h"
 
-#include <stdint.h>
+#include <cstdint>
 
 
 class Stopwatch {

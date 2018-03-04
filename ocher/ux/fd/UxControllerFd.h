@@ -24,7 +24,7 @@ public:
 
     bool init();
 
-    Renderer *getRenderer()
+    Renderer* getRenderer()
     {
         return m_renderer;
     }
@@ -32,7 +32,7 @@ public:
     void setNextActivity(enum ActivityType a);
 
 protected:
-    Renderer *m_renderer;
+    Renderer* m_renderer;
 };
 
 #endif

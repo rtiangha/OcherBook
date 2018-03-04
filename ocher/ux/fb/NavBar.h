@@ -11,11 +11,11 @@
 
 class NavBar : public Window {
 public:
-    NavBar(FrameBuffer *fb);
+    NavBar(FrameBuffer* fb);
 
 protected:
-    FrameBuffer *m_fb;
-    void drawContent(Rect *);
+    FrameBuffer* m_fb;
+    void drawContent(Rect*);
 };
 
 #endif

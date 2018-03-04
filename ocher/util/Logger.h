@@ -29,7 +29,7 @@ public:
 
     /** Clears all references to the LogAppender.
      */
-    void clearAppender(LogAppender *);
+    void clearAppender(LogAppender*);
 
     /** Creates a default root Logger.
      */
@@ -39,15 +39,15 @@ public:
      *  with the Loggers.
      *  @param[in] name  The name of the logger, in dotted form.
      */
-    Logger *get(const char *name);
+    Logger* get(const char* name);
 
 protected:
     friend class Logger;  // Logger instances share the lock
     std::mutex m_lock;
 
-    void clearAppenderUnchecked(LogAppender *);
+    void clearAppenderUnchecked(LogAppender*);
 
-    std::map<std::string, Logger *> m_loggers;
+    std::map<std::string, Logger*> m_loggers;
     bool m_init;  // To avoid using during shutdown after static instance is dead
 };
 
@@ -85,7 +85,7 @@ public:
      *      by stripping off the last dot-separated component.
      *  @return The specified Logger.
      */
-    static Logger *get(const char *name);
+    static Logger* get(const char* name);
 
     /**
      *  Convenience methods to log to a specific logger.  If the logger's level includes the
@@ -95,43 +95,43 @@ public:
      * @param fmt  Format string
      * @param args  Arguments for the format string
      */
-    static void log(const char *name, Log::Level, const char *fmt, va_list args);
+    static void log(const char* name, Log::Level, const char* fmt, va_list args);
     /**
      * @param name  Identifies the receiving Logger.
      * @param level  Level to log at
      * @param fmt  Format string
      */
-    static void log(const char *name, Log::Level, const char *fmt, ...) __attribute__((format(printf, 3, 4)));
+    static void log(const char* name, Log::Level, const char* fmt, ...) __attribute__((format(printf, 3, 4)));
     /**
      * @param name  Identifies the receiving Logger.
      * @param fmt  Format string
      */
-    static void trace(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    static void trace(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      * @param fmt  Format string
      */
-    static void debug(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    static void debug(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      * @param fmt  Format string
      */
-    static void info(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    static void info(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      * @param fmt  Format string
      */
-    static void warn(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    static void warn(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      * @param fmt  Format string
      */
-    static void error(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    static void error(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
     /**
      * @param name  Identifies the receiving Logger.
      * @param fmt  Format string
      */
-    static void fatal(const char *name, const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    static void fatal(const char* name, const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
 protected:
     static Loggers loggers;
@@ -162,9 +162,9 @@ public:
      *  Derived classes must implement this in a threadsafe manner.
      *  Any exceptions thrown from this method will be consumed and ignored by the Logger.
      */
-    virtual void append(std::string const &s) = 0;
+    virtual void append(std::string const& s) = 0;
 
-    void setLoggers(Loggers *loggers)
+    void setLoggers(Loggers* loggers)
     {
         assert(!m_loggers || !loggers || m_loggers == loggers);
         m_loggers = loggers;
@@ -182,7 +182,7 @@ protected:
     /**
      *  The set of Loggers using this Appender, or 0 if none.
      */
-    Loggers *m_loggers;
+    Loggers* m_loggers;
 };
 
 /**
@@ -198,12 +198,12 @@ public:
     /**
      *  @return The parent logger in the heirarchy, or 0 if this is the root ("") logger.
      */
-    Logger *getParent();
+    Logger* getParent();
 
     /**
      *  @return The full dotted name of this logger.  Empty string for the root logger.
      */
-    const std::string &getName() const
+    const std::string& getName() const
     {
         return m_name;
     }
@@ -224,14 +224,14 @@ public:
      *  Loggers.
      *  @param[in] appender  The Appender to use.  Ownership remains with the caller.
      */
-    void setAppender(LogAppender *appender);
+    void setAppender(LogAppender* appender);
 
     /**
      *  Log the message at the specified level.
      *  @param level  Level to log at
      *  @param fmt  Format string
      */
-    void log(Log::Level level, const char *fmt, ...);
+    void log(Log::Level level, const char* fmt, ...);
 
     /**
      *  Log the message at the specified level.
@@ -239,62 +239,62 @@ public:
      * @param fmt  Format string
      * @param args  Arguments for the format string
      */
-    void log(Log::Level level, const char *fmt, va_list args);
+    void log(Log::Level level, const char* fmt, va_list args);
 
     /**
      * @param fmt  Format string
      */
-    void trace(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    void trace(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      * @param fmt  Format string
      */
-    void debug(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    void debug(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      * @param fmt  Format string
      */
-    void info(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    void info(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      * @param fmt  Format string
      */
-    void warn(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    void warn(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      * @param fmt  Format string
      */
-    void error(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    void error(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
     /**
      * @param fmt  Format string
      */
-    void fatal(const char *fmt, ...) __attribute__((format(printf, 2, 3)));
+    void fatal(const char* fmt, ...) __attribute__((format(printf, 2, 3)));
 
 protected:
     /**
      *  @param appender  The Appender to clear, or 0 for all.
      */
-    void clearAppender(LogAppender *appender = 0);
+    void clearAppender(LogAppender* appender = 0);
 
-    Logger(Loggers *loggers, Logger *parent, std::string &name);
+    Logger(Loggers* loggers, Logger* parent, std::string& name);
 
-    Logger(Loggers *loggers, Logger *parent, const char *name, int32_t nameLen = 0x7fffffff);
+    Logger(Loggers* loggers, Logger* parent, const char* name, int32_t nameLen = 0x7fffffff);
 
     /**
      *  If level is appropriate, logs s.  Recursively appends to parent.
      */
-    void append(Log::Level level, std::string const &s);
+    void append(Log::Level level, const std::string& s);
 
-    Loggers *const m_loggers;
-    Logger *const m_parent;
+    Loggers* const m_loggers;
+    Logger* const m_parent;
     std::string m_name;
     Log::Level m_level;
-    std::set<LogAppender *> m_appenders;
+    std::set<LogAppender*> m_appenders;
 };
 
 #if defined(LOG_LEVEL) && LOG_LEVEL >= 5
-inline void Log::trace(const char *name, const char *fmt, ...)
+inline void Log::trace(const char* name, const char* fmt, ...)
 {
     va_list ap;
 
@@ -303,7 +303,7 @@ inline void Log::trace(const char *name, const char *fmt, ...)
     va_end(ap);
 }
 
-inline void Logger::trace(const char *fmt, ...)
+inline void Logger::trace(const char* fmt, ...)
 {
     va_list ap;
 
@@ -313,18 +313,18 @@ inline void Logger::trace(const char *fmt, ...)
 }
 
 #else
-inline void Log::trace(const char *, const char *, ...)
+inline void Log::trace(const char*, const char*, ...)
 {
 }
 
-inline void Logger::trace(const char *, ...)
+inline void Logger::trace(const char*, ...)
 {
 }
 
 #endif
 
 #if defined(LOG_LEVEL) && LOG_LEVEL >= 4
-inline void Log::debug(const char *name, const char *fmt, ...)
+inline void Log::debug(const char* name, const char* fmt, ...)
 {
     va_list ap;
 
@@ -333,7 +333,7 @@ inline void Log::debug(const char *name, const char *fmt, ...)
     va_end(ap);
 }
 
-inline void Logger::debug(const char *fmt, ...)
+inline void Logger::debug(const char* fmt, ...)
 {
     va_list ap;
 
@@ -343,18 +343,18 @@ inline void Logger::debug(const char *fmt, ...)
 }
 
 #else
-inline void Log::debug(const char *, const char *, ...)
+inline void Log::debug(const char*, const char*, ...)
 {
 }
 
-inline void Logger::debug(const char *, ...)
+inline void Logger::debug(const char*, ...)
 {
 }
 
 #endif
 
 #if defined(LOG_LEVEL) && LOG_LEVEL >= 3
-inline void Log::info(const char *name, const char *fmt, ...)
+inline void Log::info(const char* name, const char* fmt, ...)
 {
     va_list ap;
 
@@ -363,7 +363,7 @@ inline void Log::info(const char *name, const char *fmt, ...)
     va_end(ap);
 }
 
-inline void Logger::info(const char *fmt, ...)
+inline void Logger::info(const char* fmt, ...)
 {
     va_list ap;
 
@@ -373,18 +373,18 @@ inline void Logger::info(const char *fmt, ...)
 }
 
 #else
-inline void Log::info(const char *, const char *, ...)
+inline void Log::info(const char*, const char*, ...)
 {
 }
 
-inline void Logger::info(const char *, ...)
+inline void Logger::info(const char*, ...)
 {
 }
 
 #endif
 
 #if defined(LOG_LEVEL) && LOG_LEVEL >= 2
-inline void Log::warn(const char *name, const char *fmt, ...)
+inline void Log::warn(const char* name, const char* fmt, ...)
 {
     va_list ap;
 
@@ -393,7 +393,7 @@ inline void Log::warn(const char *name, const char *fmt, ...)
     va_end(ap);
 }
 
-inline void Logger::warn(const char *fmt, ...)
+inline void Logger::warn(const char* fmt, ...)
 {
     va_list ap;
 
@@ -403,18 +403,18 @@ inline void Logger::warn(const char *fmt, ...)
 }
 
 #else
-inline void Log::warn(const char *, const char *, ...)
+inline void Log::warn(const char*, const char*, ...)
 {
 }
 
-inline void Logger::warn(const char *, ...)
+inline void Logger::warn(const char*, ...)
 {
 }
 
 #endif
 
 #if defined(LOG_LEVEL) && LOG_LEVEL >= 1
-inline void Log::error(const char *name, const char *fmt, ...)
+inline void Log::error(const char* name, const char* fmt, ...)
 {
     va_list ap;
 
@@ -423,7 +423,7 @@ inline void Log::error(const char *name, const char *fmt, ...)
     va_end(ap);
 }
 
-inline void Logger::error(const char *fmt, ...)
+inline void Logger::error(const char* fmt, ...)
 {
     va_list ap;
 
@@ -433,18 +433,18 @@ inline void Logger::error(const char *fmt, ...)
 }
 
 #else
-inline void Log::error(const char *, const char *, ...)
+inline void Log::error(const char*, const char*, ...)
 {
 }
 
-inline void Logger::error(const char *, ...)
+inline void Logger::error(const char*, ...)
 {
 }
 
 #endif
 
 #if defined(LOG_LEVEL) && LOG_LEVEL >= 0
-inline void Log::fatal(const char *name, const char *fmt, ...)
+inline void Log::fatal(const char* name, const char* fmt, ...)
 {
     va_list ap;
 
@@ -453,7 +453,7 @@ inline void Log::fatal(const char *name, const char *fmt, ...)
     va_end(ap);
 }
 
-inline void Logger::fatal(const char *fmt, ...)
+inline void Logger::fatal(const char* fmt, ...)
 {
     va_list ap;
 
@@ -463,11 +463,11 @@ inline void Logger::fatal(const char *fmt, ...)
 }
 
 #else
-inline void Log::fatal(const char *, const char *, ...)
+inline void Log::fatal(const char*, const char*, ...)
 {
 }
 
-inline void Logger::fatal(const char *, ...)
+inline void Logger::fatal(const char*, ...)
 {
 }
 

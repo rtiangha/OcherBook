@@ -11,13 +11,12 @@
 
 class HomeActivityFb : public ActivityFb {
 public:
-    HomeActivityFb(UxControllerFb *c);
-    ~HomeActivityFb();
+    HomeActivityFb(UxControllerFb* c);
 
     void draw();
 
-    int evtKey(const struct OcherKeyEvent *);
-    int evtMouse(const struct OcherMouseEvent *);
+    int evtKey(const struct OcherKeyEvent*);
+    int evtMouse(const struct OcherMouseEvent*);
 
 protected:
     void onAttached();

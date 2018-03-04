@@ -23,19 +23,19 @@ public:
     SdlThread();
     ~SdlThread();
 
-    void setEventLoop(EventLoop *loop);
+    void setEventLoop(EventLoop* loop);
 
     void start(std::promise<SDL_Surface*>& screenPromise);
     void stop();
 
 protected:
-    SDL_Surface *init();
+    SDL_Surface* init();
     void run();
 
     std::thread m_thread;
     bool m_stop;
 
-    EventLoop *m_loop;
+    EventLoop* m_loop;
     std::promise<SDL_Surface*> m_screenPromise;
 };
 

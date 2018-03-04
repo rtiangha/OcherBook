@@ -3,17 +3,17 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher/ux/fd/UxControllerFd.h"
+
 #include "ocher/ux/Event.h"
 #include "ocher/ux/Renderer.h"
 #include "ocher/ux/fd/RendererFd.h"
-#include "ocher/ux/fd/UxControllerFd.h"
 #include "ocher/util/Logger.h"
 
-#define LOG_NAME ""
-// TODO
+#define LOG_NAME "ocher.ux.ctrl"
 
 UxControllerFd::UxControllerFd() :
-    m_renderer(0)
+    m_renderer(nullptr)
 {
 }
 

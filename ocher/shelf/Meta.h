@@ -6,7 +6,7 @@
 #ifndef OCHER_META_H
 #define OCHER_META_H
 
-#include "ocher/ux/Pagination.h"
+#include "ux/Pagination.h"
 
 #include <string>
 #include <sys/time.h>
@@ -64,7 +64,7 @@ class Meta {
 public:
     Meta();
 
-    static const char *fmtToStr(Fmt fmt);
+    static const char* fmtToStr(Fmt fmt);
 
     Fmt format;
     Encoding encoding;
@@ -85,6 +85,6 @@ public:
     unsigned int percentRead();
 };
 
-void loadMeta(Meta *meta);
+void loadMeta(Meta* meta);
 
 #endif

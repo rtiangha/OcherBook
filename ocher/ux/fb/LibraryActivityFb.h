@@ -14,24 +14,23 @@ class Settings;
 
 class LibraryActivityFb : public ActivityFb {
 public:
-    LibraryActivityFb(UxControllerFb *c);
+    LibraryActivityFb(UxControllerFb* c);
     ~LibraryActivityFb();
 
     void draw();
 
-    int evtKey(const struct OcherKeyEvent *);
-    int evtMouse(const struct OcherMouseEvent *);
+    int evtKey(const struct OcherKeyEvent*);
+    int evtMouse(const struct OcherMouseEvent*);
 
 protected:
     void onAttached();
     void onDetached();
 
-    SystemBar *m_systemBar;
-    FrameBuffer *m_fb;
-    Settings *m_settings;
-    const std::vector<Meta *> *m_library;
+    SystemBar* m_systemBar;
+    FrameBuffer* m_fb;
+    Settings* m_settings;
 #define BOOKS_PER_PAGE 11
-    Rect *m_bookRects;
+    Rect* m_bookRects;
     int itemHeight;
     unsigned int m_booksPerPage;
     unsigned int m_pages;

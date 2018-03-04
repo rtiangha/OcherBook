@@ -4,6 +4,7 @@
  */
 
 #include "ocher/ux/fb/sdl/SdlThread.h"
+
 #include "ocher/util/Logger.h"
 
 #include <SDL.h>
@@ -13,7 +14,7 @@
 
 SdlThread::SdlThread() :
     m_stop(false),
-    m_loop(0)
+    m_loop(nullptr)
 {
 }
 
@@ -23,7 +24,7 @@ SdlThread::~SdlThread()
         m_thread.join();
 }
 
-void SdlThread::setEventLoop(EventLoop *loop)
+void SdlThread::setEventLoop(EventLoop* loop)
 {
     m_loop = loop;
 }
@@ -42,18 +43,18 @@ void SdlThread::stop()
         m_thread.join();
 }
 
-SDL_Surface *SdlThread::init()
+SDL_Surface* SdlThread::init()
 {
-    SDL_Surface *screen = 0;
+    SDL_Surface* screen = nullptr;
 
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        const char *err = SDL_GetError();
+        const char* err = SDL_GetError();
         Log::error(LOG_NAME, "SDL_Init failed: %s", err);
     } else {
         // TODO:  store window size in user settings
         screen = SDL_SetVideoMode(600, 800, 8, SDL_SWSURFACE | SDL_HWPALETTE);
         if (!screen) {
-            const char *err = SDL_GetError();
+            const char* err = SDL_GetError();
             Log::error(LOG_NAME, "SDL_SetVideoMode failed: %s", err);
             SDL_Quit();
         } else {
@@ -70,6 +71,7 @@ void SdlThread::run()
     if (!screen)
         return;
 
+    SDL_Delay(1000); // XXX
     SDL_Event event;
 
     while (!m_stop) {
@@ -85,8 +87,10 @@ void SdlThread::run()
             if (event.active.state & SDL_APPACTIVE) {
                 evt.type = OEVT_APP;
                 if (event.active.gain) {
+                    Log::info(LOG_NAME, "SDL app active");
                     evt.app.subtype = OEVT_APP_ACTIVATE;
                 } else {
+                    Log::info(LOG_NAME, "SDL app inactive");
                     evt.app.subtype = OEVT_APP_DEACTIVATE;
                 }
             }
@@ -94,6 +98,7 @@ void SdlThread::run()
         }
         case SDL_QUIT:
         {
+            Log::info(LOG_NAME, "SDL quit");
             evt.type = OEVT_APP;
             evt.app.subtype = OEVT_APP_CLOSE;
             break;
@@ -155,6 +160,8 @@ void SdlThread::run()
             break;
         }
         }
+        Log::info(LOG_NAME, "SDL injecting event");
         m_loop->injectEvent(evt);
     }
+    Log::info(LOG_NAME, "SdlThread exiting");
 }

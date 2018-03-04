@@ -3,10 +3,10 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/Event.h"
+#include "ux/Event.h"
 
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
 
 #include <ev.h>
 
@@ -21,10 +21,6 @@ EventLoop::EventLoop() :
     ev_async_init(&m_async, emitInjectedCb);
     m_async.data = this;
     ev_async_start(evLoop, &m_async);
-}
-
-EventLoop::~EventLoop()
-{
 }
 
 int EventLoop::run()
@@ -46,7 +42,7 @@ void EventLoop::setEpoch()
     /* TODO m_epoch = SDL_GetTick() */
 }
 
-void EventLoop::injectEvent(const struct OcherEvent &event)
+void EventLoop::injectEvent(const struct OcherEvent& event)
 {
     {
         lock_guard<mutex> lock(m_lock);
@@ -56,16 +52,16 @@ void EventLoop::injectEvent(const struct OcherEvent &event)
     ev_async_send(evLoop, &m_async);
 }
 
-void EventLoop::emitInjectedCb(EV_P_ ev_async *w, int revents)
+void EventLoop::emitInjectedCb(EV_P_ ev_async* w, int revents)
 {
-    EventLoop *self = static_cast<EventLoop *>(w->data);
+    auto self = static_cast<EventLoop*>(w->data);
 
     self->emitInjected();
 }
 
 void EventLoop::emitInjected()
 {
-    while (1) {
+    while (true) {
         m_lock.lock();
 
         if (m_events.size() == 0) {
@@ -82,7 +78,7 @@ void EventLoop::emitInjected()
     }
 }
 
-EventWork::EventWork(EventLoop *loop) :
+EventWork::EventWork(EventLoop* loop) :
     m_loop(loop)
 {
     ev_async_init(&m_async, completeCb);
@@ -92,6 +88,7 @@ EventWork::EventWork(EventLoop *loop) :
 
 EventWork::~EventWork()
 {
+    ev_async_stop(m_loop->evLoop, &m_async);
 }
 
 void EventWork::start()
@@ -112,9 +109,9 @@ void EventWork::run()
     ev_async_send(m_loop->evLoop, &m_async);
 }
 
-void EventWork::completeCb(EV_P_ ev_async *w, int revents)
+void EventWork::completeCb(EV_P_ ev_async* w, int revents)
 {
-    EventWork *self = static_cast<EventWork *>(w->data);
+    auto self = static_cast<EventWork*>(w->data);
 
     self->notifyComplete();
 }

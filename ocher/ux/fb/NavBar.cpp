@@ -7,13 +7,13 @@
 #include "ocher/ux/fb/NavBar.h"
 
 
-NavBar::NavBar(FrameBuffer *fb) :
+NavBar::NavBar(FrameBuffer* fb) :
     Window(0, fb->height() - 50, fb->width(), 50),
     m_fb(fb)
 {
 }
 
-void NavBar::drawContent(Rect *pos)
+void NavBar::drawContent(Rect* pos)
 {
     m_rect.y++;
     m_rect.h--;
