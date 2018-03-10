@@ -18,8 +18,6 @@ public:
     FreeType(unsigned int dpi);
     ~FreeType();
 
-    bool init();
-
     bool setFace(int i, int b);
     void setSize(unsigned int points);
     int getDescender()

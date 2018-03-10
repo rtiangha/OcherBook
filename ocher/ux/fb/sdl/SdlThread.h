@@ -10,7 +10,9 @@
 
 #include <SDL.h>
 
+#include <condition_variable>
 #include <future>
+#include <mutex>
 #include <thread>
 
 /**
@@ -23,9 +25,9 @@ public:
     SdlThread();
     ~SdlThread();
 
-    void setEventLoop(EventLoop* loop);
-
+    // If a screen is returned, you must set an event loop
     void start(std::promise<SDL_Surface*>& screenPromise);
+    void setEventLoop(EventLoop* loop);
     void stop();
 
 protected:
@@ -33,6 +35,8 @@ protected:
     void run();
 
     std::thread m_thread;
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
     bool m_stop;
 
     EventLoop* m_loop;

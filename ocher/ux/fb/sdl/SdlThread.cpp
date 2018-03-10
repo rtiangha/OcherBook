@@ -26,7 +26,9 @@ SdlThread::~SdlThread()
 
 void SdlThread::setEventLoop(EventLoop* loop)
 {
+    std::unique_lock<std::mutex> lock(m_mutex);
     m_loop = loop;
+    m_cond.notify_all();
 }
 
 void SdlThread::start(std::promise<SDL_Surface*>& screenPromise)
@@ -68,12 +70,15 @@ void SdlThread::run()
 {
     SDL_Surface* screen = init();
     m_screenPromise.set_value(screen);
-    if (!screen)
+    if (!screen) {
         return;
+    } else {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        while (m_loop == nullptr)
+            m_cond.wait(lock);
+    }
 
-    SDL_Delay(1000); // XXX
     SDL_Event event;
-
     while (!m_stop) {
         if (SDL_WaitEvent(&event) == 0) {
             Log::error(LOG_NAME, "SDL_WaitEvent: %s", SDL_GetError());

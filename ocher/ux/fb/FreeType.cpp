@@ -42,23 +42,17 @@ FreeType::FreeType(unsigned int dpi) :
     m_lib(nullptr),
     m_dpi(dpi)
 {
+    int r = FT_Init_FreeType(&m_lib);
+    if (r) {
+        Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
+        throw std::runtime_error("FT_Init_FreeType failed"); // XXX
+    }
+    setFace(0, 0);  // XXX internal error state on failure
 }
 
 FreeType::~FreeType()
 {
     FT_Done_FreeType(m_lib);
-}
-
-bool FreeType::init()
-{
-    int r;
-
-    r = FT_Init_FreeType(&m_lib);
-    if (r) {
-        Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
-        return false;
-    }
-    return setFace(0, 0);
 }
 
 bool FreeType::setFace(int i, int b)

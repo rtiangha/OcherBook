@@ -59,10 +59,6 @@ bool UxControllerFb::init()
     do {
 #ifdef UX_FB_SDL
         frameBuffer = new FrameBufferSdl();
-        // XXX  This is getting called from Controller.cpp:130
-        // which starts the SDL thread
-        // which tries to inject an SDL event into the event loop,
-        // but that's set from Controller.cpp:146
         if (frameBuffer->init()) {
             m_name += ".sdl";
             break;

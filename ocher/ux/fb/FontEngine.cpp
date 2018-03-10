@@ -53,9 +53,6 @@ FontEngine::FontEngine(FrameBuffer* fb) :
     m_next.italic = 0;
     memset(&m_cur, 0xff, sizeof(m_cur));
     dirty = 1;
-
-    // XXX move to FreeType constructor
-    m_ft.init();
 }
 
 void FontEngine::scanForFonts()

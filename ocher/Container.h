@@ -20,42 +20,6 @@ class Renderer;
 class Settings;
 class UxController;
 
-#if 0
-template<T>
-class Dependency {
-public:
-    Dependency(baseName, isSingleton, a);
-    const char *baseName;
-    bool singleton;
-    T *singletonInstance;
-    T *allocate()
-    {
-        return m_allocator();
-    }
-    things - to - inject;
-
-protected:
-};
-
-
-get(T * &t) {
-    lock();
-    Dependency<T> d = find dependency;
-    if (d->singleton) {
-        if (!d->singletonInstance) {
-            d->singletonInstance = d->allocate();
-            inject;
-        }
-        t = d->singletonInstance;
-    } else {
-        t = d->allocate();
-        inject;
-    }
-    unlock();
-}
-
-#endif
-
 /**
  * A container for instances.
  *
