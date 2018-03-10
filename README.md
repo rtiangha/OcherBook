@@ -7,10 +7,10 @@
 OcherBook is an open-source ebook reader, supporting multiple file formats and
 output devices.  The major goals are:
 
-    - Return control and privacy of the reading experience to the reader
-    - Portable
-    - Modular design
-    - Small with few external dependencies.
+- Return control and privacy of the reading experience to the reader
+- Portable
+- Modular design
+- Small with few external dependencies.
 
 ## Target Devices
 
@@ -47,14 +47,7 @@ To get started, look in the doc directory, and/or try something simple like:
 
 To cross-compile, look in `cmake/toolchains` for a toolchain file for your
 device.  Each toolchain file should include some notes regarding how to acquire
-and install the cross-compiling toolchain.  Once you have the toolchain
-downloaded and installed appropriately, configure with it like this:
-
-    $ cd OcherBook
-    $ mkdir build
-    $ cd build
-    $ cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/kobo.cmake ..
-    $ make
+and install the cross-compiling toolchain, and how to configure CMake to use it.
 
 Many features are configurable.  Some feature libraries can be disabled, or
 enabled to build against the system's libraries, or enabled to download and
@@ -63,9 +56,9 @@ build from source (perhaps useful when cross-compiling).  For details, see
 
 ## License
 
-OcherBook itself is GPLv3.  See COPYING.
+OcherBook itself is GPLv3.  See `COPYING`.
 
-See doc/LICENSES for all relevant licenses.
+See `doc/LICENSES` for all relevant licenses.
 
 ## Links
 
