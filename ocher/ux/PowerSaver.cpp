@@ -5,7 +5,6 @@
 
 #include "ux/PowerSaver.h"
 
-#include "device/Device.h"
 #include "settings/Settings.h"
 #include "ux/fb/FontEngine.h"
 #include "util/Logger.h"
@@ -31,9 +30,8 @@ void PowerSaver::timeout()
 
 PowerSaver::PowerSaver() :
     m_loop(nullptr),
-    m_seconds(15 * 60),
+    m_seconds(15 * 60)
     // TODO settings
-    m_device(nullptr)
 {
 }
 
@@ -44,11 +42,6 @@ void PowerSaver::inject(EventLoop* loop)
     m_loop->emitEvent.Connect(this, &PowerSaver::dispatchEvent);
 
     resetTimeout();
-}
-
-void PowerSaver::inject(Device* device)
-{
-    m_device = device;
 }
 
 void PowerSaver::setTimeout(unsigned int seconds)
@@ -74,9 +67,4 @@ void PowerSaver::dispatchEvent(const struct OcherEvent* evt)
         else
             resetTimeout();
     }
-}
-
-void PowerSaver::sleep()
-{
-    m_device->sleep();
 }

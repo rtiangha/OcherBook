@@ -64,7 +64,9 @@ void UxController::onWantToSleep()
 {
     Log::info(LOG_NAME, "onWantToSleep");
 
-    // TODO
+    // TODO  notify
+
+    g_container.device->sleep();
 }
 
 void UxController::handleEvent(const struct OcherEvent* evt)
@@ -91,7 +93,6 @@ Controller::Controller(Options* options)
     //   TODO setters vs constructors vs hitting g_container
     //   TODO here or in Container?
     g_container.settings->inject(g_container.filesystem);
-    g_container.powerSaver->inject(g_container.device);
     g_container.powerSaver->inject(g_container.loop);
 
     initDebug();

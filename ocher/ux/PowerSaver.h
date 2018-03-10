@@ -11,21 +11,16 @@
 #include "Signal.h"
 using namespace Gallant;
 
-class Device;
-
 
 class PowerSaver {
 public:
     PowerSaver();
 
     void inject(EventLoop* loop);
-    void inject(Device* device);
 
     void setTimeout(unsigned int seconds);
 
     Signal0<> wantToSleep;
-
-    void sleep();
 
     void onAttached();
     void onDetached();
@@ -41,8 +36,6 @@ protected:
     EventLoop* m_loop;
     ev_timer m_timer;
     unsigned int m_seconds;
-
-    Device* m_device;
 };
 
 #endif
