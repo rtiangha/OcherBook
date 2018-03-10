@@ -112,8 +112,10 @@ void Epub::parseSpine(TreeFile* spineFile)
         Log::warn(LOG_NAME, "Missing 'package' element");
     } else {
         Log::trace(LOG_NAME, "Found 'package' type %d", package->type);
-        m_uid = _mxmlElementGetAttr(package, "unique-identifier");
-        m_epubVersion = _mxmlElementGetAttr(package, "version");
+        const char* uid = _mxmlElementGetAttr(package, "unique-identifier");
+        m_uid = uid ? uid : "";
+        const char* epubVersion = _mxmlElementGetAttr(package, "version");
+        m_epubVersion = epubVersion ? epubVersion : "";
     }
 
     mxml_node_t* metadata = mxmlFindPath(tree, "package/metadata");
@@ -153,7 +155,7 @@ void Epub::parseSpine(TreeFile* spineFile)
             if (id && href) {
                 EpubItem item;
                 item.href = href;
-                item.mediaType = mediaType;
+                item.mediaType = mediaType ? mediaType : "";
                 Log::trace(LOG_NAME, "%s -> %s", id, href);
                 std::string _id(id);
                 m_items.insert(std::pair<std::string, EpubItem>(_id, item));
