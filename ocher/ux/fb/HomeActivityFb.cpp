@@ -150,7 +150,6 @@ void HomeActivityFb::draw()
         // TODO  right justify against lbox (remove plotString call); get bbox returned
         pos.x = m_rect.w - books[0].x - lbox.w;
         fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
-        m_browseLabel.inset(g_container.settings->smallSpace);
     }
 
     pos.y += fe.m_cur.underlinePos + g_container.settings->smallSpace;

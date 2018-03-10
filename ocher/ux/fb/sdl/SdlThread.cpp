@@ -165,7 +165,7 @@ void SdlThread::run()
             break;
         }
         }
-        Log::info(LOG_NAME, "SDL injecting event");
+        Log::trace(LOG_NAME, "SDL injecting event");
         m_loop->injectEvent(evt);
     }
     Log::info(LOG_NAME, "SdlThread exiting");

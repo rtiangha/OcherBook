@@ -5,12 +5,10 @@
 
 #include "ux/fb/FrameBuffer.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 
-
-#define min(a, b) (((a) < (b)) ? (a) : (b))
-#define max(a, b) (((a) > (b)) ? (a) : (b))
 
 void invert(void* p, size_t n)
 {
@@ -83,18 +81,14 @@ void Rect::unionRect(Rect* r)
     if (!r->valid()) {
         return;
     }
-    if (r->x < x)
-        x = r->x;
-    if (r->y < y)
-        y = r->y;
-    int x1 = x + w;
-    int x2 = r->x + r->w;
-    if (x2 > x1)
-        w = max(x1, x2) - x;
-    int y1 = y + h;
-    int y2 = r->y + r->h;
-    if (y2 > y1)
-        h = max(y1, y2) - y;
+    int x1 = std::min(x, r->x);
+    int y1 = std::min(y, r->y);
+    int x2 = std::max(x + w, r->x + r->w);
+    int y2 = std::max(y + h, r->y + r->h);
+    x = x1;
+    y = y1;
+    w = x2 - x1;
+    h = y2 - y1;
 }
 
 void Rect::unionRects(Rect* r1, Rect* r2)
@@ -107,14 +101,10 @@ void Rect::unionRects(Rect* r1, Rect* r2)
         *this = *r1;
         return;
     }
-    x = min(r1->x, r2->x);
-    y = min(r1->y, r2->y);
-    int x1 = r1->x + r1->w;
-    int x2 = r2->x + r2->w;
-    w = max(x1, x2) - x;
-    int y1 = r1->y + r1->h;
-    int y2 = r2->y + r2->h;
-    h = max(y1, y2) - h;
+    x = std::min(r1->x, r2->x);
+    y = std::min(r1->y, r2->y);
+    w = std::max(r1->x + r1->w, r2->x + r2->w) - x;
+    h = std::max(r1->y + r1->h, r2->y + r2->h) - y;
 }
 
 void FrameBuffer::line(int x0, int y0, int x1, int y1)

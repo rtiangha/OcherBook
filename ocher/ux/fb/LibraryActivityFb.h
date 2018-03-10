@@ -27,7 +27,6 @@ protected:
     void onDetached();
 
     SystemBar* m_systemBar;
-    FrameBuffer* m_fb;
     Settings* m_settings;
 #define BOOKS_PER_PAGE 11
     Rect* m_bookRects;

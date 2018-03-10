@@ -78,9 +78,10 @@ int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
         Pos pos(evt->x, evt->y);
         const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
         for (unsigned int i = 0; i < m_booksPerPage; i++) {
-            Meta* meta = library[i + m_pageNum * m_booksPerPage];
-            if (!meta)
+            size_t idx = i + m_pageNum * m_booksPerPage;
+            if (idx >= library.size())
                 break;
+            Meta* meta = library[idx];
             if (m_bookRects[i].contains(&pos)) {
                 m_uxController->ctx.selected = meta;
                 m_uxController->setNextActivity(ACTIVITY_READ);
@@ -130,9 +131,10 @@ void LibraryActivityFb::draw()
     clip.w -= m_settings->medSpace * 2;
     const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
     for (unsigned int i = 0; i < m_booksPerPage; ++i) {
-        Meta *meta = library[i + m_pageNum * m_booksPerPage];
-        if (!meta)
+        size_t idx = i + m_pageNum * m_booksPerPage;
+        if (idx >= library.size())
             break;
+        Meta* meta = library[idx];
 
         fe.setSize(12);
         fe.apply();
