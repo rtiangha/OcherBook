@@ -3,8 +3,8 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/ClockIcon.h"
-#include "ocher/ux/fb/Widgets.h"
+#include "ux/fb/ClockIcon.h"
+#include "ux/fb/Widgets.h"
 
 ClockIcon::ClockIcon(int x, int y) :
     Widget(x, y, 30, 30),

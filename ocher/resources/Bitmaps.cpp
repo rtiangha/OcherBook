@@ -3,6 +3,6 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/resources/Bitmaps.h"
-#include "ocher/resources/LeftArrow.h"
-#include "ocher/resources/RightArrow.h"
+#include "resources/Bitmaps.h"
+#include "resources/LeftArrow.h"
+#include "resources/RightArrow.h"

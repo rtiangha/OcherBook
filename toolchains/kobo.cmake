@@ -14,20 +14,17 @@
 #   $ cd OcherBook
 #   $ mkdir build
 #   $ cd build
-#   $ cmake -DOCHER_TOOLCHAIN_ROOT=$HOME/toolchains -DCMAKE_TOOLCHAIN_FILE=../cmake/toolchains/kobo.cmake ..
+#   $ cmake -DOCHER_TOOLCHAIN_ROOT=$HOME/toolchains -DCMAKE_TOOLCHAIN_FILE=../toolchains/kobo.cmake ..
 #   $ make
 
 
 set(OCHER_TARGET kobo)
 set(OCHER_TARGET_KOBO TRUE)
 
-set(WITH_FREETYPE_DEFAULT ON)
-set(WITH_FRAMEBUFFER_DEFAULT ON)
-set(WITH_SYSTEM_LIBEV_DEFAULT OFF)
+set(SDL FALSE CACHE BOOL "Kobo does not use SDL" FORCE)
 
 set(CMAKE_SYSTEM_NAME Linux)
 
-message("Using toolchain in ${OCHER_TOOLCHAIN_ROOT}/${OCHER_TARGET}")
 set(CMAKE_C_COMPILER      "${OCHER_TOOLCHAIN_ROOT}/${OCHER_TARGET}/bin/arm-linux-gnueabihf-gcc")
 set(CMAKE_CXX_COMPILER    "${OCHER_TOOLCHAIN_ROOT}/${OCHER_TARGET}/bin/arm-linux-gnueabihf-g++")
 set(CMAKE_FIND_ROOT_PATH  "${OCHER_TOOLCHAIN_ROOT}/${OCHER_TARGET}/arm-linux-gnueabihf/")

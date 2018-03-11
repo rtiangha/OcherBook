@@ -1,4 +1,4 @@
-#include "ocher/util/Buffer.h"
+#include "util/Buffer.h"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"

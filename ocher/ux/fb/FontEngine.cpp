@@ -3,12 +3,12 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/FontEngine.h"
+#include "ux/fb/FontEngine.h"
 
-#include "ocher/Container.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/ux/fb/FrameBuffer.h"
-#include "ocher/util/Logger.h"
+#include "Container.h"
+#include "settings/Settings.h"
+#include "ux/fb/FrameBuffer.h"
+#include "util/Logger.h"
 
 #include <cctype>
 #include <cstddef>

@@ -3,7 +3,7 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/RleBitmap.h"
+#include "ux/fb/RleBitmap.h"
 
 
 RleBitmap::RleBitmap() :

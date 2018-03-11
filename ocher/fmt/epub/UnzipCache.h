@@ -7,8 +7,7 @@
 #define OCHER_UNZIP_CACHE_H
 
 #include "fmt/epub/TreeMem.h"
-
-#include "unzip.h"
+#include "fmt/minizip/unzip.h"
 
 #include <list>
 #include <string>

@@ -3,9 +3,9 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/sdl/SdlThread.h"
+#include "ux/fb/sdl/SdlThread.h"
 
-#include "ocher/util/Logger.h"
+#include "util/Logger.h"
 
 #include <SDL.h>
 

@@ -25,7 +25,9 @@
 #include "util/LogAppenders.h"
 #include "util/Logger.h"
 
-#include "airbag_fd/airbag_fd.h"
+#ifdef AIRBAG_FD
+#include "airbag_fd.h"
+#endif
 
 #include <stdexcept>
 
@@ -161,7 +163,7 @@ Controller::Controller(Options* options)
 void Controller::initCrash()
 {
     // TODO:  Could pass on to m_uxController...
-#ifdef OCHER_AIRBAG_FD
+#ifdef AIRBAG_FD
     airbag_init_fd(2, 0);
 #endif
 }

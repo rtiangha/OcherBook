@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_FB_HOMEACTIVITY_H
 #define OCHER_UX_FB_HOMEACTIVITY_H
 
-#include "ocher/ux/fb/ActivityFb.h"
+#include "ux/fb/ActivityFb.h"
 
 
 class HomeActivityFb : public ActivityFb {

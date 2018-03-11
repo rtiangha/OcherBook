@@ -1,0 +1,19 @@
+#ifndef OCHER_CONFIG_H
+#define OCHER_CONFIG_H
+
+#define OCHER_MAJOR @OCHER_MAJOR@
+#define OCHER_MINOR @OCHER_MINOR@
+#define OCHER_PATCH @OCHER_PATCH@
+
+#cmakedefine AIRBAG_FD
+#cmakedefine FMT_EPUB
+#cmakedefine FMT_HTML
+#cmakedefine FMT_JPEG
+#cmakedefine FMT_PNG
+#cmakedefine UX_CDK
+#cmakedefine UX_FB
+#cmakedefine UX_FB_MX50
+#cmakedefine UX_FB_SDL
+#cmakedefine UX_FD
+
+#endif

@@ -107,7 +107,7 @@ Logger* Loggers::get(const char* name)
     return logger;
 }
 
-std::string getLogDirectory()
+std::string Log::getLogDirectory()
 {
     // TODO
     return "/tmp";

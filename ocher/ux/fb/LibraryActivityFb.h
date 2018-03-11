@@ -6,8 +6,8 @@
 #ifndef OCHER_UX_FB_LIBRARYACTIVITY_H
 #define OCHER_UX_FB_LIBRARYACTIVITY_H
 
-#include "ocher/ux/fb/ActivityFb.h"
-#include "ocher/ux/fb/SystemBar.h"
+#include "ux/fb/ActivityFb.h"
+#include "ux/fb/SystemBar.h"
 
 class Meta;
 class Settings;

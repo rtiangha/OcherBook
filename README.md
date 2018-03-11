@@ -37,22 +37,22 @@ To get the code:
 
 ## Building
 
-To get started, look in the doc directory, and/or try something simple like:
+To get started, try something simple like:
 
     $ cd OcherBook
-    $ mkdir build
-    $ cd build
+    $ mkdir build-cmake
+    $ cd build-cmake
     $ cmake ..
     $ make
 
-To cross-compile, look in `cmake/toolchains` for a toolchain file for your
+To cross-compile, look in `toolchains` for a toolchain file for your
 device.  Each toolchain file should include some notes regarding how to acquire
 and install the cross-compiling toolchain, and how to configure CMake to use it.
 
 Many features are configurable.  Some feature libraries can be disabled, or
 enabled to build against the system's libraries, or enabled to download and
 build from source (perhaps useful when cross-compiling).  For details, see
-`cmake/config.cmake` or run CMake in interactive mode.
+`cmake_options.cmake` or run CMake in interactive mode.
 
 ## License
 

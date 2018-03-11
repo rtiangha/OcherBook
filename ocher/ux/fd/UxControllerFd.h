@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_FD_UXCONTROLLER_H
 #define OCHER_UX_FD_UXCONTROLLER_H
 
-#include "ocher/ux/Controller.h"
+#include "ux/Controller.h"
 
 class Renderer;
 
@@ -17,7 +17,7 @@ public:
     UxControllerFd();
     ~UxControllerFd();
 
-    const char *getName() const
+    const char* getName() const
     {
         return "fd";
     }

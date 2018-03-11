@@ -1,17 +1,20 @@
 #ifndef UTIL_LOGGER_H
 #define UTIL_LOGGER_H
 
+#include <cassert>
+#include <cstdarg>
 #include <map>
 #include <mutex>
 #include <set>
-#include <stdarg.h>
 #include <string>
 
 #ifndef LOG_LEVEL
+#ifdef DEBUG
 #define LOG_LEVEL 5
+#else
+#define LOG_LEVEL 2
 #endif
-
-#include <assert.h>
+#endif
 
 class Logger;
 class LogAppender;

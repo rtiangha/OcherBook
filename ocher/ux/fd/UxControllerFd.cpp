@@ -3,12 +3,12 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fd/UxControllerFd.h"
+#include "ux/fd/UxControllerFd.h"
 
-#include "ocher/ux/Event.h"
-#include "ocher/ux/Renderer.h"
-#include "ocher/ux/fd/RendererFd.h"
-#include "ocher/util/Logger.h"
+#include "ux/Event.h"
+#include "ux/Renderer.h"
+#include "ux/fd/RendererFd.h"
+#include "util/Logger.h"
 
 #define LOG_NAME "ocher.ux.ctrl"
 

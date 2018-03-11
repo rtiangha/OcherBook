@@ -3,8 +3,8 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/ux/fb/NavBar.h"
+#include "Container.h"
+#include "ux/fb/NavBar.h"
 
 
 NavBar::NavBar(FrameBuffer* fb) :

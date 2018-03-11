@@ -3,17 +3,17 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/LibraryActivityFb.h"
+#include "ux/fb/LibraryActivityFb.h"
 
-#include "ocher/Container.h"
-#include "ocher/resources/Bitmaps.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/shelf/Meta.h"
-#include "ocher/util/Logger.h"
-#include "ocher/util/StrUtil.h"
-#include "ocher/ux/fb/FontEngine.h"
-#include "ocher/ux/fb/UxControllerFb.h"
-#include "ocher/ux/fb/Widgets.h"
+#include "Container.h"
+#include "resources/Bitmaps.h"
+#include "settings/Settings.h"
+#include "shelf/Meta.h"
+#include "util/Logger.h"
+#include "util/StrUtil.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/UxControllerFb.h"
+#include "ux/fb/Widgets.h"
 
 #define LOG_NAME "ocher.ux.Library"
 

@@ -48,7 +48,7 @@ void loadMeta(Meta* meta)
         break;
     }
     case OCHER_FMT_EPUB: {
-#ifdef OCHER_EPUB
+#ifdef FMT_EPUB
         Epub epub(meta->relPath);
         meta->title = epub.m_title;
         meta->author = epub.m_author;

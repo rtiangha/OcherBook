@@ -6,7 +6,7 @@
 #ifndef OCHER_ICON_RIGHTARROW_H
 #define OCHER_ICON_RIGHTARROW_H
 
-#include "ocher/ux/fb/Widgets.h"
+#include "ux/fb/Widgets.h"
 
 
 static const unsigned char _RightArrow[] = {

@@ -22,10 +22,3 @@
  * @copyright OcherBook itself is GPLv3.  See COPYING.
  * See doc/LICENSES for all relevant licenses.
  */
-
-#ifndef OCHER_APP_H
-#define OCHER_APP_H
-
-#include "version.h"
-
-#endif

@@ -16,6 +16,7 @@
 #include <cstring>
 #include <unistd.h>
 
+#define LOG_NAME "ocher.ux.cdk"
 
 // TODO:  page size
 // TODO:  margins (not the same as margins for fb?)
@@ -28,6 +29,7 @@ RendererCdk::RendererCdk(WINDOW* scr, CDKSCREEN* screen) :
     ai(1)
 {
     getmaxyx(m_scr, m_height, m_width);
+    Log::info(LOG_NAME, "Window is %dx%d", m_width, m_height);
 }
 
 void RendererCdk::enableUl()

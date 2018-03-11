@@ -6,16 +6,16 @@
 #undef LOG_LEVEL
 #define LOG_LEVEL 5
 
-#include "ocher/Container.h"
-#include "ocher/device/Battery.h"
-#include "ocher/device/Device.h"
-#include "ocher/fmt/Format.h"
-#include "ocher/fmt/epub/TreeMem.h"
-#include "ocher/settings/Options.h"
-#include "ocher/util/LogAppenders.h"
-#include "ocher/util/Path.h"
-#include "ocher/util/StrUtil.h"
-#include "ocher/ux/PowerSaver.h"
+#include "Container.h"
+#include "device/Battery.h"
+#include "device/Device.h"
+#include "fmt/Format.h"
+#include "fmt/epub/TreeMem.h"
+#include "settings/Options.h"
+#include "util/LogAppenders.h"
+#include "util/Path.h"
+#include "util/StrUtil.h"
+#include "ux/PowerSaver.h"
 
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"

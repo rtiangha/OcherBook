@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_FD_ACTIVITY_H
 #define OCHER_UX_FD_ACTIVITY_H
 
-#include "ocher/ux/Activity.h"
+#include "ux/Activity.h"
 
 class UxControllerFd;
 

@@ -25,6 +25,8 @@ enum ActivityType {
  */
 class Activity {
 public:
+    virtual ~Activity() = default;
+
     virtual void onAttached() = 0;
     virtual void onDetached() = 0;
 };

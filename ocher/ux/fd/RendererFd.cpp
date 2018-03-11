@@ -3,14 +3,14 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fd/RendererFd.h"
+#include "ux/fd/RendererFd.h"
 
-#include "ocher/Container.h"
-#include "ocher/fmt/Layout.h"
-#include "ocher/settings/Options.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
-#include "ocher/ux/Pagination.h"
+#include "Container.h"
+#include "fmt/Layout.h"
+#include "settings/Options.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
+#include "ux/Pagination.h"
 
 #include <cctype>
 #include <cerrno>

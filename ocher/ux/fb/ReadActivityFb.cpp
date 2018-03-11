@@ -3,23 +3,21 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/ux/fb/ReadActivityFb.h"
+#include "ux/fb/ReadActivityFb.h"
 
-#ifdef OCHER_EPUB
-#include "ocher/fmt/epub/Epub.h"
-#include "ocher/fmt/epub/LayoutEpub.h"
+#ifdef FMT_EPUB
+#include "fmt/epub/Epub.h"
+#include "fmt/epub/LayoutEpub.h"
 #endif
-#if 1
-#include "ocher/fmt/text/LayoutText.h"
-#include "ocher/fmt/text/Text.h"
-#endif
-#include "ocher/Container.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/shelf/Meta.h"
-#include "ocher/ux/Renderer.h"
-#include "ocher/ux/fb/UxControllerFb.h"
-#include "ocher/util/Debug.h"
-#include "ocher/util/Logger.h"
+#include "Container.h"
+#include "fmt/text/LayoutText.h"
+#include "fmt/text/Text.h"
+#include "settings/Settings.h"
+#include "shelf/Meta.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
+#include "ux/Renderer.h"
+#include "ux/fb/UxControllerFb.h"
 
 #define LOG_NAME "ocher.ux.Read"
 
@@ -145,7 +143,7 @@ void ReadActivityFb::onAttached()
         memLayout = m_layout->unlock();
         break;
     }
-#ifdef OCHER_EPUB
+#ifdef FMT_EPUB
     case OCHER_FMT_EPUB: {
         Epub epub(file);
         m_layout = new LayoutEpub(&epub);

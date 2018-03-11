@@ -3,13 +3,13 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "ocher/Container.h"
-#include "ocher/settings/Settings.h"
-#include "ocher/shelf/Meta.h"
-#include "ocher/ux/fb/FontEngine.h"
-#include "ocher/ux/fb/HomeActivityFb.h"
-#include "ocher/ux/fb/UxControllerFb.h"
-#include "ocher/util/Logger.h"
+#include "Container.h"
+#include "settings/Settings.h"
+#include "shelf/Meta.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/HomeActivityFb.h"
+#include "ux/fb/UxControllerFb.h"
+#include "util/Logger.h"
 
 #define LOG_NAME "ocher.ux.Home"
 

@@ -6,7 +6,7 @@
 #ifndef OCHER_UX_FD_BROWSE_H
 #define OCHER_UX_FD_BROWSE_H
 
-#include "ocher/ux/Browse.h"
+#include "ux/Browse.h"
 
 class BrowseFd : public Browse {
 public:
@@ -16,8 +16,8 @@ public:
     }
 
     bool init();
-    Meta *browse(std::vector<Meta *> &meta);
-    void read(Meta *meta);
+    Meta* browse(std::vector<Meta*>& meta);
+    void read(Meta* meta);
 
 protected:
     int m_in;
