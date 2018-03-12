@@ -54,6 +54,13 @@ enabled to build against the system's libraries, or enabled to download and
 build from source (perhaps useful when cross-compiling).  For details, see
 `cmake_options.cmake` or run CMake in interactive mode.
 
+The meson build system is also supported (experimentally).
+
+    $ cd OcherBook
+    $ meson build-meson
+    $ cd build-meson
+    $ ninja
+
 ## License
 
 OcherBook itself is GPLv3.  See `COPYING`.

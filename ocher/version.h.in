@@ -1,8 +1,0 @@
-#ifndef OCHER_VERSION_H
-#define OCHER_VERSION_H
-
-#define OCHER_MAJOR @OCHER_MAJOR@
-#define OCHER_MINOR @OCHER_MINOR@
-#define OCHER_PATCH @OCHER_PATCH@
-
-#endif

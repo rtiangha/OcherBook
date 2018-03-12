@@ -1,0 +1,40 @@
+option('airbag_fd',
+    type : 'boolean',
+    value : false,
+    description : 'Use airbag_fd crash handler (only for unix)')
+option('freetype',
+    type : 'boolean',
+    value : true,
+    description : 'Use Freetype for font rendering')
+option('ux_fd',
+    type : 'boolean',
+    value : true,
+    description : 'File descriptor user interface')
+option('ux_cdk',
+    type : 'boolean',
+    value : false,
+    description : 'CDK (ncurses) user interface')
+option('ux_fb',
+    type : 'boolean',
+    value : true,
+    description : 'Framebuffer user interface')
+option('sdl',
+    type : 'boolean',
+    value : true,
+    description : 'SDL backend for the fb driver')
+option('epub',
+    type : 'boolean',
+    value : true,
+    description : 'Support EPUB books')
+option('html',
+    type : 'boolean',
+    value : true,
+    description : 'Support HTML books')
+option('jpeg',
+    type : 'boolean',
+    value : true,
+    description : 'Support JPEG images')
+option('png',
+    type : 'boolean',
+    value : true,
+    description : 'Support PNG images')
