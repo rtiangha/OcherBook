@@ -1,0 +1,11 @@
+[wrap-file]
+directory = libev-4.24
+
+source_url = http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz
+source_filename = libev-4.24.tar.gz
+source_hash = 973593d3479abdf657674a55afe5f78624b0e440614e2b8cb3a07f16d4d7f821
+
+patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
+patch_filename = libev-4.24-wrap.tar
+patch_hash = f72586c917c83095b619d7ea1e44659bcc759f6157d106eb3b921d23807a6797
+

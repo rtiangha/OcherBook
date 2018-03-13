@@ -11,6 +11,15 @@ conf_data = configuration_data()
 
 thread_dep = dependency('threads')
 
+catch_sp = subproject('catch')
+catch_dep = catch_sp.get_variable('catch_dep')
+
+Signals_sp = subproject('Signals')
+Signals_dep = Signals_sp.get_variable('Signals_dep')
+
+json_sp = subproject('json')
+json_dep = json_sp.get_variable('json_dep')
+
 if get_option('airbag_fd')
     airbag_fd_sp = subproject('airbag_fd')
     airbag_fd_dep = airbag_fd_sp.get_variable('airbag_fd_dep')
@@ -21,15 +30,9 @@ if airbag_fd_dep.found()
     conf_data.set('AIRBAG_FD', true)
 endif
 
-Signals_sp = subproject('Signals')
-Signals_dep = Signals_sp.get_variable('Signals_dep')
+zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'])
 
-json_sp = subproject('json')
-json_dep = json_sp.get_variable('json_dep')
-
-zlib_dep = dependency('zlib')
-
-libev_dep = dependency('libev')
+libev_dep = dependency('libev', fallback : ['libev', 'libev_dep'])
 
 mxml_dep = dependency('mxml')
 

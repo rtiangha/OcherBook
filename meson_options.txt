@@ -20,7 +20,7 @@ option('ux_fb',
     description : 'Framebuffer user interface')
 option('sdl',
     type : 'boolean',
-    value : true,
+    value : false,
     description : 'SDL backend for the fb driver')
 option('epub',
     type : 'boolean',
