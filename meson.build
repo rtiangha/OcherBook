@@ -34,7 +34,7 @@ zlib_dep = dependency('zlib', fallback : ['zlib', 'zlib_dep'])
 
 libev_dep = dependency('libev', fallback : ['libev', 'libev_dep'])
 
-mxml_dep = dependency('mxml')
+mxml_dep = dependency('mxml', fallback : ['mxml', 'mxml_dep'])
 
 freetype_dep = dependency('freetype2')
 
