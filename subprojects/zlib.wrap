@@ -7,5 +7,5 @@ source_hash = c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
 patch_filename = zlib-1.2.11-wrap.tar
-patch_hash = 07a689f19803bb1e7d0f1cf9409003f3ef0dc46c9a202370de2bcbb345d1df7c
+patch_hash = bed7ca6e434ffeaca8e34762dbbcbd89d7d7b323bd0b89c52535ca913d8e9f59
 

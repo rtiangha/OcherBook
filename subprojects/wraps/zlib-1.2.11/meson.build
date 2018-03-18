@@ -21,7 +21,7 @@ src = files([
     'gzwrite.c',
 ])
 
-zlib = library('z', src,
+zlib = static_library('z', src,
     c_args : ['-Wno-implicit-function-declaration']
 )
 

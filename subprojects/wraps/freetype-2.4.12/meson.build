@@ -60,7 +60,7 @@ src = files([
 
 incdir = include_directories('include')
 
-freetype = library('freetype', src,
+freetype = static_library('freetype', src,
     include_directories : incdir,
     c_args : ['-DFT2_BUILD_LIBRARY'],
 )

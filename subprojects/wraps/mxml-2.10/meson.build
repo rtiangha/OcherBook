@@ -31,12 +31,13 @@ configure_file(
 
 thread_dep = dependency('threads')
 
-mxml = library('mxml', src,
+mxml = static_library('mxml', src,
     dependencies : thread_dep,
 )
 
 incdir = include_directories('.')
 
 mxml_dep = declare_dependency(
+    link_with : mxml,
     include_directories : incdir,
 )

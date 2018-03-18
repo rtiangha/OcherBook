@@ -37,7 +37,7 @@ configure_file(output : 'config.h',
 cc = meson.get_compiler('c')
 m_dep = cc.find_library('m', required : false)
 
-libev = library('libev', src,
+libev = static_library('libev', src,
     c_args : ['-Wno-unused-value', '-Wno-unused-function'],
     dependencies : m_dep
 )

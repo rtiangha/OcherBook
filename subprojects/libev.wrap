@@ -7,5 +7,5 @@ source_hash = 973593d3479abdf657674a55afe5f78624b0e440614e2b8cb3a07f16d4d7f821
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
 patch_filename = libev-4.24-wrap.tar
-patch_hash = 4a238188a171817fa8f1bcf0cc6a8842d6feceb8ec25287b5723c9d426818b66
+patch_hash = 0e7fc0c67940f1978a7af0f9b922416971547978b2baac93d0da6450e57be5fc
 

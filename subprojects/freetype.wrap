@@ -7,5 +7,5 @@ source_hash = a78a17486689ab6852a9e1a759b179827ac9dfd7e2f237ddf169c73398c85381
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
 patch_filename = freetype-2.4.12-wrap.tar
-#patch_hash = 4c22c917e1617090721154add0cafafe8d46cbf4d9f749e2eacb400cf9404d2e
+patch_hash = ba617963cf9a2f75f8567dbf8b585a22294d1456b580dc146730a59c7e452f48
 

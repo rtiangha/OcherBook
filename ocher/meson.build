@@ -47,6 +47,12 @@ ocher_sources = [
     'ux/PowerSaver.cpp',
     'ux/Renderer.cpp',
 ]
+if conf_data.get('OCHER_TARGET_KOBO', false)
+    ocher_sources += [
+        'device/kobo/KoboEvents.cpp',
+        'device/kobo/KoboEvents.h',
+    ]
+endif
 if conf_data.get('UX_FD', false)
     ocher_sources += [
         'ux/fd/ActivityFd.h',
@@ -136,6 +142,13 @@ ocherbook = static_library('ocherbook', ocher_sources,
         mxml_dep,
     ])
 
+link_args = []
+if meson.is_cross_build()
+    link_args = ['-static']
+endif
+
 ocher = executable('ocher', ['ocher.cpp', 'ocher.h'],
     dependencies : [thread_dep],
-    link_with : [ocherbook])
+    link_args : link_args,
+    link_with : [ocherbook],
+)
