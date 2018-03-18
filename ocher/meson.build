@@ -114,6 +114,7 @@ endif
 
 version = meson.project_version()
 ver_arr = version.split('.')
+conf_data.set_quoted('OCHER_VERSION', version)
 conf_data.set('OCHER_MAJOR', ver_arr[0])
 conf_data.set('OCHER_MINOR', ver_arr[1])
 conf_data.set('OCHER_PATCH', ver_arr[2])

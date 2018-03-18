@@ -7,5 +7,5 @@ source_hash = 267ff58b64ddc767170d71dab0c729c06f45e1df9a9b6f75180b564f09767891
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
 patch_filename = mxml-2.10-wrap.tar
-patch_hash = fbb9fe38362fa943bb3355d805f83310e6446619ddf04d0f6f0ff3312e69fc5c
+patch_hash = 3b009e7eb3799076112fdc8d6a67c6c3d11df565b126821a3308963f1d496dce
 

@@ -8,6 +8,7 @@ if(NOT OCHER_TOOLCHAIN_ROOT)
 endif()
 
 project(ocher VERSION 0.1.0 LANGUAGES CXX C)
+set(TOP_SRCDIR "${CMAKE_SOURCE_DIR}")
 
 include(cmake_options.cmake)
 
@@ -30,7 +31,7 @@ endif()
 include(subprojects/zlib.cmake)
 include(subprojects/libev.cmake)
 include(subprojects/mxml.cmake)
-add_subdirectory(subprojects/freetype)
+include(subprojects/freetype.cmake)
 if(SDL)
     add_subdirectory(subprojects/sdl)
     set(UX_FB TRUE)

@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <ctype.h>
+
+#define MXML_VERSION	"Mini-XML v@VERSION@"
+#mesondefine HAVE_LONG_LONG
+#mesondefine HAVE_SNPRINTF
+#mesondefine HAVE_VSNPRINTF
+#mesondefine HAVE_STRDUP
+#mesondefine HAVE_PTHREAD_H
+
+extern char	*_mxml_strdupf(const char *, ...);
+extern char	*_mxml_vstrdupf(const char *, va_list);
+

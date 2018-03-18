@@ -1,2 +1,6 @@
 build*/
-subprojects/packagecache/
+
+subprojects/packagecache/freetype-2.4.12.tar.bz2
+subprojects/packagecache/libev-4.24.tar.gz
+subprojects/packagecache/mxml-2.10.tar.gz
+subprojects/packagecache/zlib-1.2.11.tar.gz

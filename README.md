@@ -37,29 +37,24 @@ To get the code:
 
 ## Building
 
+Building is supported with Meson (native and cross-compile) and CMake
+(currently only native).
+
 To get started, try something simple like:
 
     $ cd OcherBook
-    $ mkdir build-cmake
-    $ cd build-cmake
-    $ cmake ..
-    $ make
+    $ meson builddir
+    $ cd builddir
+    $ ninja
 
 To cross-compile, look in `toolchains` for a toolchain file for your
 device.  Each toolchain file should include some notes regarding how to acquire
-and install the cross-compiling toolchain, and how to configure CMake to use it.
+and install the cross-compiling toolchain, and how to configure OcherBook for it.
 
 Many features are configurable.  Some feature libraries can be disabled, or
 enabled to build against the system's libraries, or enabled to download and
 build from source (perhaps useful when cross-compiling).  For details, see
-`cmake_options.cmake` or run CMake in interactive mode.
-
-The meson build system is also supported (experimentally).
-
-    $ cd OcherBook
-    $ meson build-meson
-    $ cd build-meson
-    $ ninja
+`meson_options.txt` or `cmake_options.cmake`.
 
 ## License
 

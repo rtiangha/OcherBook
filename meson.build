@@ -8,6 +8,7 @@ if get_option('buildtype').startswith('debug')
 endif
 
 conf_data = configuration_data()
+conf_data.set('TOP_SRCDIR', meson.source_root())
 
 thread_dep = dependency('threads')
 
@@ -36,7 +37,7 @@ libev_dep = dependency('libev', fallback : ['libev', 'libev_dep'])
 
 mxml_dep = dependency('mxml', fallback : ['mxml', 'mxml_dep'])
 
-freetype_dep = dependency('freetype2')
+freetype_dep = dependency('freetype2', fallback : ['freetype', 'freetype_dep'])
 
 if get_option('sdl')
     sdl_dep = dependency('sdl')

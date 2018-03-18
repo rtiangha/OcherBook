@@ -144,7 +144,7 @@ void HomeActivityFb::draw()
         Rect lbox;
         lbox.x = 0;
         lbox.y = pos.y;
-        Glyph* glyphs[13];
+        Glyph* glyphs[14];
         const char* text = "Browse all...";
         fe.plotString(text, strlen(text), &glyphs[0], &lbox);
         // TODO  right justify against lbox (remove plotString call); get bbox returned
