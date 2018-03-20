@@ -1,0 +1,22 @@
+# Build for kobo on x86 Ubuntu:
+#
+# Install Ubuntu.
+#   $ sudo apt install build-essential meson g++-arm-linux-gnueabi gcc-arm-linux-gnueabi
+#   $ cd OcherBook
+#   $ meson build --cross-file toolchains/kobo-ubuntu.meson -Dkobo=true
+#   $ cd build
+#   $ ninja
+
+[binaries]
+c =         '/usr/bin/arm-linux-gnueabi-gcc'
+cpp =       '/usr/bin/arm-linux-gnueabi-g++'
+ar =        '/usr/bin/arm-linux-gnueabi-ar'
+strip =     '/usr/bin/arm-linux-gnueabi-strip'
+pkgconfig = '/usr/bin/arm-linux-gnueabi-pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = 'arm'
+cpu = 'cortex-a8'
+endian = 'little'
+
