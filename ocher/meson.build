@@ -20,8 +20,6 @@ ocher_sources = [
     'util/Bitops.h',
     'util/Buffer.cpp',
     'util/Buffer.h',
-    'util/Clock.cpp',
-    'util/Clock.h',
     'util/Debug.cpp',
     'util/Debug.h',
     'util/DirIter.cpp',

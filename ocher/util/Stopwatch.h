@@ -1,16 +1,13 @@
 #ifndef STOPWATCH_H
 #define STOPWATCH_H
 
-#include "util/Clock.h"
-
+#include <chrono>
 #include <cstdint>
 
 
 class Stopwatch {
 public:
-    Stopwatch(bool autoStart = true) :
-        m_startUSec(0),
-        m_elapsedUSec(0)
+    Stopwatch(bool autoStart = true)
     {
         if (autoStart)
             start();
@@ -23,19 +20,19 @@ public:
      */
     uint64_t elapsedUSec()
     {
-        if (m_startUSec)
-            return Clock::monotonicUSec() - m_startUSec;
+        if (running())
+            return (std::chrono::steady_clock::now() - m_startUSec).count();
         else
-            return m_elapsedUSec;
+            return m_elapsedUSec.count();
     }
 
     uint64_t lap()
     {
-        if (m_startUSec) {
-            uint64_t now = Clock::monotonicUSec();
-            uint64_t elapsed = now - m_startUSec;
+        if (running()) {
+            auto now = std::chrono::steady_clock::now();
+            auto elapsed = now - m_startUSec;
             m_startUSec = now;
-            return elapsed;
+            return elapsed.count();
         } else {
             start();
             return 0;
@@ -44,8 +41,8 @@ public:
 
     void start()
     {
-        m_startUSec = Clock::monotonicUSec();
-        m_elapsedUSec = 0;
+        m_startUSec = std::chrono::steady_clock::now();
+        m_elapsedUSec = std::chrono::microseconds(0);
     }
 
     /**
@@ -54,21 +51,21 @@ public:
      */
     uint64_t stop()
     {
-        if (m_startUSec) {
-            m_elapsedUSec = Clock::monotonicUSec() - m_startUSec;
-            m_startUSec = 0;
+        if (running()) {
+            m_elapsedUSec = std::chrono::steady_clock::now() - m_startUSec;
+            m_startUSec = {};
         }
-        return m_elapsedUSec;
+        return m_elapsedUSec.count();
     }
 
     bool running()
     {
-        return m_startUSec != 0;
+        return m_startUSec.time_since_epoch().count() != 0;
     }
 
 protected:
-    uint64_t m_startUSec;
-    uint64_t m_elapsedUSec;
+    std::chrono::time_point<std::chrono::steady_clock> m_startUSec;
+    std::chrono::microseconds m_elapsedUSec;
 };
 
 #endif
