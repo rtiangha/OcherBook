@@ -15,5 +15,6 @@
 #mesondefine UX_FB_MX50
 #mesondefine UX_FB_SDL
 #mesondefine UX_FD
+#mesondefine OCHER_TARGET_KOBO
 
 #endif

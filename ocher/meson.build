@@ -49,6 +49,8 @@ if conf_data.get('OCHER_TARGET_KOBO', false)
     ocher_sources += [
         'device/kobo/KoboEvents.cpp',
         'device/kobo/KoboEvents.h',
+        'ux/fb/mx50/FrameBufferMx50.cpp',
+        'ux/fb/mx50/FrameBufferMx50.h',
     ]
 endif
 if conf_data.get('UX_FD', false)
@@ -99,7 +101,9 @@ endif
 if conf_data.get('UX_FB_SDL', false)
     ocher_sources += [
         'ux/fb/sdl/FrameBufferSdl.cpp',
+        'ux/fb/sdl/FrameBufferSdl.h',
         'ux/fb/sdl/SdlThread.cpp',
+        'ux/fb/sdl/SdlThread.h',
     ]
 endif
 if conf_data.get('FMT_EPUB', false)
@@ -125,7 +129,8 @@ conf_data.set('OCHER_PATCH', ver_arr[2])
 configure_file(input : 'meson_config.h.in',
                output : 'ocher_config.h',
                configuration : conf_data)
-add_project_arguments(['-include', 'ocher_config.h'], language : 'cpp')
+# TODO  How best to make linux kernel headers available?  KoboLabs has them in their repo.
+add_project_arguments(['-include', 'ocher_config.h', '-I../ocher/linux-2.6.35.3/include'], language : 'cpp')
 add_project_arguments('-Wno-c++1z-compat', language : 'cpp')
 
 ocherbook = static_library('ocherbook', ocher_sources,

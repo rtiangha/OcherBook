@@ -29,7 +29,9 @@
 #include "airbag_fd.h"
 #endif
 
+#include <chrono>
 #include <stdexcept>
+#include <thread>
 
 #define LOG_NAME "ocher.controller"
 
@@ -219,7 +221,7 @@ void Controller::run()
     // Kill that here (so it doesn't overlay the boot menu) to simplify installation steps.
     // TODO: Remove when more closely integrated.
     system("killall on-animator.sh");
-    sleep(1);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
 
     ActivityType a = g_container.options->bootMenu ? ACTIVITY_BOOT : ACTIVITY_SYNC;

@@ -38,3 +38,7 @@ option('png',
     type : 'boolean',
     value : true,
     description : 'Support PNG images')
+option('kobo',
+    type : 'boolean',
+    value : false,
+    description : 'Target a Kobo device')

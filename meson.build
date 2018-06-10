@@ -1,5 +1,6 @@
 project('ocher', ['cpp', 'c'],
     version: '0.1.0',
+    meson_version: '>=0.44.0',
     default_options : 'cpp_std=c++11',
     license: 'GPL3')
 
@@ -9,6 +10,12 @@ endif
 
 conf_data = configuration_data()
 conf_data.set('TOP_SRCDIR', meson.source_root())
+
+if get_option('kobo')
+    conf_data.set('OCHER_TARGET_KOBO', true)
+    # TODO  set hardware per submodel
+    conf_data.set('UX_FB_MX50', true)
+endif
 
 thread_dep = dependency('threads')
 

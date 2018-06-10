@@ -17,6 +17,6 @@ pkgconfig = '/usr/bin/arm-linux-gnueabi-pkg-config'
 [host_machine]
 system = 'linux'
 cpu_family = 'arm'
-cpu = 'cortex-a8'
+cpu = 'armv7l'
 endian = 'little'
 

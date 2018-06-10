@@ -7,6 +7,9 @@
 
 #include "Container.h"
 #include "ux/fb/RendererFb.h"
+#ifdef UX_FB_MX50
+#include "ux/fb/mx50/FrameBufferMx50.h"
+#endif
 #ifdef UX_FB_SDL
 #include "ux/fb/sdl/FrameBufferSdl.h"
 #endif
@@ -64,7 +67,7 @@ bool UxControllerFb::init()
             break;
         }
 #endif
-#ifdef OCHER_TARGET_KOBO
+#ifdef UX_FB_MX50
         frameBuffer = new FrameBufferMx50();
         if (frameBuffer->init()) {
             m_name += ".mx50";

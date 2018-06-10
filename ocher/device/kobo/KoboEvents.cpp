@@ -94,14 +94,15 @@ void KoboEvents::pollButton()
             break;
         } else if (r == sizeof(kbe)) {
             bool fire = true;
-            OcherKeyEvent evt;
+            OcherEvent evt;
+            evt.type = OEVT_KEY;
             Log::debug(LOG_NAME, "button type %x", kbe.button);
             if (kbe.button == 0x66) {
-                evt.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
-                evt.key = OEVTK_HOME;
+                evt.key.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                evt.key.key = OEVTK_HOME;
             } else if (kbe.button == 0x74) {
-                evt.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
-                evt.key = OEVTK_POWER;
+                evt.key.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                evt.key.key = OEVTK_POWER;
             } else {
                 fire = false;
             }
@@ -135,6 +136,8 @@ void KoboEvents::pollTouch()
 
     // http://www.kernel.org/doc/Documentation/input/event-codes.txt
     int syn = 0;
+    m_evt.type = OEVT_MOUSE;
+    OcherMouseEvent* evt = &m_evt.mouse;
     for (unsigned int i = 0; i < n; ++i) {
         Log::debug(LOG_NAME, "type %d code %d value %d", kevt[i].type, kevt[i].code,
                 kevt[i].value);
@@ -143,29 +146,29 @@ void KoboEvents::pollTouch()
         } else if (kevt[i].type == EV_ABS) {
             uint16_t code = kevt[i].code;
             if (code == ABS_X) {
-                m_evt.x = kevt[i].value;
+                evt->x = kevt[i].value;
             } else if (code == ABS_Y) {
-                m_evt.y = kevt[i].value;
+                evt->y = kevt[i].value;
             } else if (code == ABS_PRESSURE) {
                 unsigned int pressure = kevt[i].value;
                 if (pressure == 0)
-                    m_evt.subtype = OEVT_MOUSE1_UP;
+                    evt->subtype = OEVT_MOUSE1_UP;
                 else {
                     // TODO: 100 down, 101 drag
-                    m_evt.subtype = OEVT_MOUSE1_DOWN;
+                    evt->subtype = OEVT_MOUSE1_DOWN;
                 }
             }
         }
 
         if (syn) {
 #if 1       // TODO: Why do down vs up coordinate systems differ??
-            if (m_evt.subtype == OEVT_MOUSE1_DOWN) {
-                m_evt.x = 600 - m_evt.y;
-                m_evt.y = m_evt.x;
+            if (evt->subtype == OEVT_MOUSE1_DOWN) {
+                evt->x = 600 - evt->y;
+                evt->y = evt->x;
             }
 #endif
-            Log::info(LOG_NAME, "mouse %u, %u %s", m_evt.x, m_evt.y,
-                    m_evt.subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
+            Log::info(LOG_NAME, "mouse %u, %u %s", evt->x, evt->y,
+                    evt->subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
             m_loop->emitEvent(&m_evt);
         }
     }

@@ -1,4 +1,4 @@
-# Build for kobo on x86 Linux, using the Linaro toolchain that Kobo references::
+# Build for kobo on x86 Linux, using the Linaro toolchain that Kobo references:
 #
 #   $ git clone https://github.com/kobolabs/Kobo-Reader.git
 #   $ sudo mkdir /toolchains
@@ -18,6 +18,6 @@ pkgconfig = '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_lin
 [host_machine]
 system = 'linux'
 cpu_family = 'arm'
-cpu = 'cortex-a8'
+cpu = 'armv7l'
 endian = 'little'
 

@@ -15,5 +15,6 @@
 #cmakedefine UX_FB_MX50
 #cmakedefine UX_FB_SDL
 #cmakedefine UX_FD
+#cmakedefine OCHER_TARGET_KOBO
 
 #endif

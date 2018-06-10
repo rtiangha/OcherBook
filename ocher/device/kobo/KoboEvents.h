@@ -30,7 +30,7 @@ protected:
     void pollTouch();
 
     EventLoop* m_loop;
-    OcherMouseEvent m_evt;
+    OcherEvent m_evt;
 };
 
 #endif
