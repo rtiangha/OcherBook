@@ -6,6 +6,11 @@
 #include "device/Battery.h"
 
 #include "util/Logger.h"
+#ifndef DOCTEST_CONFIG_DISABLE
+#include "Container.h"
+#endif
+
+#include "doctest.h"
 
 #include <cerrno>
 #include <cstdlib>
@@ -82,4 +87,30 @@ unknown:
 #endif
     m_status = Status::Unknown;
     return -1;
+}
+
+TEST_CASE("Battery Capacity") {
+    Battery b; // XXX
+    int r;
+
+    r = b.readCapacity();
+    if (r == -1) {
+        CHECK(b.m_percent == -1);
+    } else {
+        CHECK(b.m_percent >= 0);
+        CHECK(b.m_percent <= 100);
+    }
+}
+
+TEST_CASE("Battery Status") {
+    Battery b; // XXX
+    int r;
+
+    r = b.readStatus();
+    if (r == -1) {
+        CHECK(b.m_status == Battery::Status::Unknown);
+    } else {
+        if (b.m_status != Battery::Status::Charging && b.m_status != Battery::Status::Discharging)
+            CHECK(b.m_status == Battery::Status::Charging);
+    }
 }

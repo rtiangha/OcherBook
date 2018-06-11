@@ -5,10 +5,6 @@
 #define OCHER_MINOR @OCHER_MINOR@
 #define OCHER_PATCH @OCHER_PATCH@
 
-#if defined(NDEBUG) || !defined(DEBUG)
-#define DOCTEST_CONFIG_DISABLE
-#endif
-
 #mesondefine AIRBAG_FD
 #mesondefine FMT_EPUB
 #mesondefine FMT_HTML
@@ -20,5 +16,9 @@
 #mesondefine UX_FB_SDL
 #mesondefine UX_FD
 #mesondefine OCHER_TARGET_KOBO
+
+#if defined(NDEBUG) || !defined(DEBUG)
+#define DOCTEST_CONFIG_DISABLE
+#endif
 
 #endif

@@ -14,6 +14,7 @@
 class Options {
 public:
     Options() :
+        test(false),
         verbose(0),
         bootMenu(false),
         driverName(0),
@@ -23,6 +24,8 @@ public:
         outFd(1)
     {
     }
+
+    bool test;
 
     int verbose;
 

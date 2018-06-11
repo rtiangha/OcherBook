@@ -7,6 +7,9 @@
 #include "settings/Options.h"
 #include "ux/Controller.h"
 
+#define DOCTEST_CONFIG_IMPLEMENT
+#include "doctest.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -30,7 +33,6 @@ void usage(const char* msg = nullptr)
             "\n"
             "-b,--boot              Present boot menu; nonzero exit means run other firmware.\n"
             "-f,--flatten           Flatten (do not show to user) the directory heirarchy.\n"
-            "-t,--test              Test (validate) the epubs rather than view.\n"
             "-h,--help              Help.\n"
             "-v,--verbose           Increase logging verbosity.\n"
             "-q,--quiet             Quiet; decrease logging verbosity.\n"
@@ -38,6 +40,10 @@ void usage(const char* msg = nullptr)
             "   --list-drivers      List all available output drivers.  Each driver consists of\n"
             "                       a font renderer driving a hardware device.\n"
             "   --driver <driver>   Use a specific driver.\n"
+#ifndef DOCTEST_CONFIG_DISABLE
+            "   --test ...          Runs unit tests, before fully launching.  Remaining\n"
+            "                       arguments are passed to doctest.\n"
+#endif
             "\n"
             "Multiple files and/or directories may be specified, and will override any\n"
             "platform specific search paths.  Directories will be searched recursively.\n"
@@ -49,6 +55,7 @@ void usage(const char* msg = nullptr)
 #define OPT_KEY 256
 #define OPT_DRIVER 257
 #define OPT_LIST_DRIVERS 258
+#define OPT_TEST 259
 
 int main(int argc, char** argv)
 {
@@ -61,11 +68,13 @@ int main(int argc, char** argv)
         { "flatten",      no_argument,       nullptr, 'f' },
         { "help",         no_argument,       nullptr, 'h' },
         { "quiet",        no_argument,       nullptr, 'q' },
-        { "test",         no_argument,       nullptr, 't' },
         { "verbose",      no_argument,       nullptr, 'v' },
         { "key",          required_argument, nullptr, OPT_KEY },
         { "driver",       required_argument, nullptr, OPT_DRIVER },
         { "list-drivers", no_argument,       nullptr, OPT_LIST_DRIVERS },
+#ifndef DOCTEST_CONFIG_DISABLE
+        { "test",         no_argument,       nullptr, OPT_TEST },
+#endif
         { nullptr, 0, nullptr, 0 }
     };
 
@@ -73,7 +82,7 @@ int main(int argc, char** argv)
         // getopt_long stores the option index here.
         int option_index = 0;
 
-        int ch = getopt_long(argc, argv, "d:bfhtvq", long_options, &option_index);
+        int ch = getopt_long(argc, argv, "d:bfhvq", long_options, &option_index);
         if (ch == -1)
             break;
         switch (ch) {
@@ -108,6 +117,12 @@ int main(int argc, char** argv)
         case OPT_LIST_DRIVERS:
             listDrivers = true;
             break;
+        case OPT_TEST:
+        {
+            //context.applyCommandLine(argc - optind + 1, argv + optind - 1);
+            opt->test = true;
+            break;
+        }
         default:
             usage("Unknown argument");
             break;

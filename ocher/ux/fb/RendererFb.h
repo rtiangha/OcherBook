@@ -23,7 +23,7 @@ public:
 
     int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
 
-protected:
+//protected: // XXX
     int outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit);
     void applyAttrs();
 

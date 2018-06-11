@@ -224,6 +224,10 @@ void Controller::run()
     std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
 
+    if (g_container.options->test) {
+        testContext.run();
+    }
+
     Activity::Type a = g_container.options->bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
     m_uxController->setNextActivity(a);
     g_container.loop->run();

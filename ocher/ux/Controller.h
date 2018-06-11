@@ -9,6 +9,8 @@
 #include "shelf/Shelf.h"
 #include "ux/Activity.h"
 
+#include "doctest.h"
+
 class Device;
 class EventLoop;
 class Filesystem;
@@ -88,6 +90,8 @@ public:
     ~Controller() = default;
 
     void run();
+
+    doctest::Context testContext;
 
 protected:
     void initCrash();

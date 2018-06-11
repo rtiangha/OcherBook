@@ -14,6 +14,8 @@
 #include "util/Logger.h"
 #include "util/Stopwatch.h"
 
+#include "doctest.h"
+
 #include <cctype>
 
 #define LOG_NAME "ocher.render.fb"
@@ -327,4 +329,15 @@ done:
             (unsigned int)(totalChars * 1000 / ((totalUSec < 1000 ? 1000 : totalUSec) / 1000)));
 #endif
     return r;
+}
+
+TEST_CASE("RendererFb") {
+    // XXX How to test without messing up m_settings?
+    //int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
+    RendererFb* r = dynamic_cast<RendererFb*>(g_container.renderer);
+    if (r == nullptr)
+        return;
+
+    Buffer b("blah blah blah blah blah");
+    r->outputWrapped(&b, 0, true);
 }

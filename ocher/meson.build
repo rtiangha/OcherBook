@@ -152,7 +152,10 @@ if meson.is_cross_build()
 endif
 
 ocher = executable('ocher', ['ocher.cpp', 'ocher.h'],
-    dependencies : [thread_dep],
+    dependencies : [
+        thread_dep,
+        doctest_dep,
+    ],
     link_args : link_args,
     link_with : [ocherbook],
 )

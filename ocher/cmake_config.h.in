@@ -5,10 +5,6 @@
 #define OCHER_MINOR @OCHER_MINOR@
 #define OCHER_PATCH @OCHER_PATCH@
 
-#if defined(NDEBUG) || !defined(DEBUG)
-#define DOCTEST_CONFIG_DISABLE
-#endif
-
 #cmakedefine AIRBAG_FD
 #cmakedefine FMT_EPUB
 #cmakedefine FMT_HTML
@@ -20,5 +16,9 @@
 #cmakedefine UX_FB_SDL
 #cmakedefine UX_FD
 #cmakedefine OCHER_TARGET_KOBO
+
+#if defined(NDEBUG) || !defined(DEBUG)
+#define DOCTEST_CONFIG_DISABLE
+#endif
 
 #endif

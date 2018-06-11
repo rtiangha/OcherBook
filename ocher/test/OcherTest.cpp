@@ -29,51 +29,6 @@
 char *resourcesDir;
 Options opt;
 
-TEST_CASE("PowerSaver") {
-}
-
-TEST_CASE("Container construction", "[Container]") {
-    Container c;
-
-    SECTION("nothing") {
-    }
-
-    SECTION("default init") {
-        // TODO
-    }
-
-    SECTION("default init and inject") {
-        // TODO
-        // c.inject();
-    }
-}
-
-TEST_CASE("Battery Capacity", "[Battery]") {
-    Battery b;
-    int r;
-
-    r = b.readCapacity();
-    if (r == -1) {
-        CHECK(b.m_percent == -1);
-    } else {
-        CHECK(b.m_percent >= 0);
-        CHECK(b.m_percent <= 100);
-    }
-}
-
-TEST_CASE("Battery Status", "[Battery]") {
-    Battery b;
-    int r;
-
-    r = b.readStatus();
-    if (r == -1) {
-        CHECK(b.m_status == Battery::Status::Unknown);
-    } else {
-        if (b.m_status != Battery::Status::Charging && b.m_status != Battery::Status::Discharging)
-            CHECK(b.m_status == Battery::Status::Charging);  // catch only does binary comparisons
-    }
-}
-
 TEST_CASE("Detect format") {
     REQUIRE_RESOURCES_DIR;
 
