@@ -126,7 +126,9 @@ Logger* Log::get(const char* name)
 
 void Log::log(const char* name, Log::Level level, const char* fmt, va_list args)
 {
-    get(name)->log(level, fmt, args);
+    auto logger = get(name);
+    if (logger)
+        logger->log(level, fmt, args);
 }
 
 void Log::log(const char* name, Log::Level level, const char* fmt, ...)
@@ -134,7 +136,9 @@ void Log::log(const char* name, Log::Level level, const char* fmt, ...)
     va_list ap;
 
     va_start(ap, fmt);
-    get(name)->log(level, fmt, ap);
+    auto logger = get(name);
+    if (logger)
+        logger->log(level, fmt, ap);
     va_end(ap);
 }
 
