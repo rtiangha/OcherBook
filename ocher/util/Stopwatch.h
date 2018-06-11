@@ -23,7 +23,7 @@ public:
         if (running())
             return (std::chrono::steady_clock::now() - m_startUSec).count();
         else
-            return m_elapsedUSec.count();
+            return std::chrono::duration_cast<std::chrono::microseconds>(m_elapsed).count();
     }
 
     uint64_t lap()
@@ -32,7 +32,7 @@ public:
             auto now = std::chrono::steady_clock::now();
             auto elapsed = now - m_startUSec;
             m_startUSec = now;
-            return elapsed.count();
+            return std::chrono::duration_cast<std::chrono::microseconds>(elapsed).count();
         } else {
             start();
             return 0;
@@ -42,7 +42,7 @@ public:
     void start()
     {
         m_startUSec = std::chrono::steady_clock::now();
-        m_elapsedUSec = std::chrono::microseconds(0);
+        m_elapsed = {};
     }
 
     /**
@@ -52,10 +52,10 @@ public:
     uint64_t stop()
     {
         if (running()) {
-            m_elapsedUSec = std::chrono::steady_clock::now() - m_startUSec;
+            m_elapsed = std::chrono::steady_clock::now() - m_startUSec;
             m_startUSec = {};
         }
-        return m_elapsedUSec.count();
+        return std::chrono::duration_cast<std::chrono::microseconds>(m_elapsed).count();
     }
 
     bool running()
@@ -65,7 +65,7 @@ public:
 
 protected:
     std::chrono::time_point<std::chrono::steady_clock> m_startUSec;
-    std::chrono::microseconds m_elapsedUSec;
+    std::chrono::steady_clock::duration m_elapsed;
 };
 
 #endif
