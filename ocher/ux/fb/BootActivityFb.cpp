@@ -61,6 +61,7 @@ int BootActivityFb::evtMouse(const struct OcherMouseEvent* evt)
         Pos pos(evt->x, evt->y);
         if (apps[0].contains(&pos)) {
             highlight(0);
+            m_uxController->setNextActivity(Activity::Type::Sync);
             return 0;
         } else if (apps[1].contains(&pos)) {
             highlight(1);
@@ -98,4 +99,5 @@ void BootActivityFb::draw()
         pos.y = r.h / 2;
         fe.renderString(label, strlen(label), &pos, &r, FE_XCENTER);
     }
+    m_fb->update(nullptr);
 }
