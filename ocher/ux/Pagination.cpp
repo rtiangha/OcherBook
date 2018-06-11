@@ -24,10 +24,10 @@ Pagination::~Pagination()
 void Pagination::flush()
 {
     m_numPages = 0;
-    for (auto it = m_pages.begin(); it < m_pages.end(); ++it) {
-        delete *it;
+    for (auto chunk : m_chunks) {
+        delete chunk;
     }
-    m_pages.clear();
+    m_chunks.clear();
 }
 
 void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned int strOffset /* TODO attrs */)
@@ -35,11 +35,11 @@ void Pagination::set(unsigned int pageNum, unsigned int layoutOffset, unsigned i
     ASSERT(pageNum <= m_numPages);
     unsigned int chunk = pageNum / pagesPerChunk;
     if (pageNum == m_numPages) {
-        if (chunk == m_pages.size()) {
-            m_pages.push_back(new PageMapping[pagesPerChunk]);
+        if (chunk == m_chunks.size()) {
+            m_chunks.push_back(new PageMapping[pagesPerChunk]);
         }
     }
-    auto mapping = m_pages[chunk];
+    auto mapping = m_chunks[chunk];
     mapping += pageNum % pagesPerChunk;
     if (mapping->layoutOffset != layoutOffset || mapping->strOffset != strOffset) {
         mapping->layoutOffset = layoutOffset;
@@ -57,10 +57,10 @@ bool Pagination::get(unsigned int pageNum, unsigned int* layoutOffset, unsigned 
     if (pageNum > m_numPages)
         return false;
     unsigned int chunk = pageNum / pagesPerChunk;
-    if (chunk > m_pages.size()) {
+    if (chunk > m_chunks.size()) {
         return false;
     }
-    auto mapping = m_pages[chunk];
+    auto mapping = m_chunks[chunk];
     mapping += pageNum % pagesPerChunk;
     *layoutOffset = mapping->layoutOffset;
     *strOffset = mapping->strOffset;

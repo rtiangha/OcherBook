@@ -42,12 +42,12 @@ protected:
         /** @todo to handle large epubs on small machines, may need to break up
          * the layout per spine index */
         // unsigned int spineIndex;
-        unsigned int layoutOffset;    /* TODO xxx  this is uninitialized */
-        unsigned int strOffset;
+        unsigned int layoutOffset = 0;
+        unsigned int strOffset = 0;
         /* TODO attrs */
     };
     static const unsigned int pagesPerChunk = 100;
-    std::vector<PageMapping*> m_pages;
+    std::vector<PageMapping*> m_chunks;
     unsigned int m_numPages;
 };
 
