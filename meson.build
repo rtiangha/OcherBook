@@ -19,8 +19,8 @@ endif
 
 thread_dep = dependency('threads')
 
-catch_sp = subproject('catch')
-catch_dep = catch_sp.get_variable('catch_dep')
+doctest_sp = subproject('doctest')
+doctest_dep = doctest_sp.get_variable('doctest_dep')
 
 Signals_sp = subproject('Signals')
 Signals_dep = Signals_sp.get_variable('Signals_dep')

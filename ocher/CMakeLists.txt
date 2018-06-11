@@ -156,6 +156,7 @@ target_link_libraries(ocherbook
     mxml
     pthread
     bz2  # TODO freetype (may!) want this
+    doctest
 )
 if(SDL)
     target_link_libraries(ocherbook ${SDL_LIBRARY})
@@ -169,5 +170,3 @@ endif()
 
 add_executable(ocher ocher.cpp)
 target_link_libraries(ocher ocherbook)
-
-add_subdirectory(test)

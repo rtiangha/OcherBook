@@ -28,7 +28,7 @@ else()
     enable_testing()
 endif()
 
-add_subdirectory(subprojects/catch)
+add_subdirectory(subprojects/doctest)
 add_subdirectory(subprojects/Signals)
 add_subdirectory(subprojects/json)
 if(AIRBAG_FD)

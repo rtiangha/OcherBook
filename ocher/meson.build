@@ -143,6 +143,7 @@ ocherbook = static_library('ocherbook', ocher_sources,
         freetype_dep,
         sdl_dep,
         mxml_dep,
+        doctest_dep,
     ])
 
 link_args = []
