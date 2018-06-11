@@ -67,10 +67,10 @@ TEST_CASE("Battery Status", "[Battery]") {
 
     r = b.readStatus();
     if (r == -1) {
-        CHECK(b.m_status == Battery::Unknown);
+        CHECK(b.m_status == Battery::Status::Unknown);
     } else {
-        if (b.m_status != Battery::Charging && b.m_status != Battery::Discharging)
-            CHECK(b.m_status == Battery::Charging);  // catch only does binary comparisons
+        if (b.m_status != Battery::Status::Charging && b.m_status != Battery::Status::Discharging)
+            CHECK(b.m_status == Battery::Status::Charging);  // catch only does binary comparisons
     }
 }
 

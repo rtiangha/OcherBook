@@ -48,7 +48,7 @@ public:
     SystemBar* m_systemBar;
     NavBar* m_navBar;
 
-    void setNextActivity(enum ActivityType a);
+    void setNextActivity(Activity::Type a);
 
 protected:
     ActivityFb* m_activity;

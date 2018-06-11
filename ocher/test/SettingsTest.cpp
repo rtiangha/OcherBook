@@ -14,13 +14,13 @@ TEST_CASE("SecureLevel") {
     CHECK(s.secureLevel == defaultSettings.secureLevel);
 
     s.load("{ \"SecureLevel\": \"open\" }");
-    CHECK(s.secureLevel == Settings::SecureLevelOpen);
+    CHECK(s.secureLevel == Settings::SecureLevel::Open);
 
     s.load("{ \"SecureLevel\": \"personal\" }");
-    CHECK(s.secureLevel == Settings::SecureLevelPersonal);
+    CHECK(s.secureLevel == Settings::SecureLevel::Personal);
 
     s.load("{ \"SecureLevel\": \"private\" }");
-    CHECK(s.secureLevel == Settings::SecureLevelPrivate);
+    CHECK(s.secureLevel == Settings::SecureLevel::Private);
 }
 
 TEST_CASE("TrackReading") {

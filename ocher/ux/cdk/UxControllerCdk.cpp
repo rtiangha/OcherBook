@@ -41,36 +41,36 @@ bool UxControllerCdk::init()
     return true;
 }
 
-void UxControllerCdk::setNextActivity(enum ActivityType a)
+void UxControllerCdk::setNextActivity(Activity::Type a)
 {
-    Log::info(LOG_NAME, "next activity: %d", a);
-    if (a == ACTIVITY_QUIT) {
+    Log::info(LOG_NAME, "next activity: %d", (int)a);
+    if (a == Activity::Type::Quit) {
         m_loop->stop();
     } else {
 
         // TODO:  this just sends an event to the CDK thread
         switch (a) {
-        case ACTIVITY_BOOT:
+        case Activity::Type::Boot:
             // TODO
-            setNextActivity(ACTIVITY_HOME);
+            setNextActivity(Activity::Type::Home);
             break;
-        case ACTIVITY_SLEEP:
+        case Activity::Type::Sleep:
             // TODO
-            setNextActivity(ACTIVITY_HOME);
+            setNextActivity(Activity::Type::Home);
             break;
-        case ACTIVITY_SYNC:
+        case Activity::Type::Sync:
             // TODO
-            setNextActivity(ACTIVITY_HOME);
+            setNextActivity(Activity::Type::Home);
             break;
-        case ACTIVITY_HOME:
+        case Activity::Type::Home:
             break;
-        case ACTIVITY_READ:
+        case Activity::Type::Read:
             break;
-        case ACTIVITY_LIBRARY:
+        case Activity::Type::Library:
             break;
-        case ACTIVITY_SETTINGS:
+        case Activity::Type::Settings:
             // TODO
-            setNextActivity(ACTIVITY_HOME);
+            setNextActivity(Activity::Type::Home);
             break;
         default:
             ASSERT(false);

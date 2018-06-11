@@ -25,18 +25,18 @@ class Settings {
 public:
     Settings();
 
-    enum SecureLevel {
-        SecureLevelOpen,
-        SecureLevelPersonal,
-        SecureLevelPrivate,
+    enum class SecureLevel {
+        Open,
+        Personal,
+        Private,
     };
     static const char* SecureLevelToString(SecureLevel s);
 
-    enum SleepShow {
-        SleepShowSleeping,
-        SleepShowHtml,
-        SleepShowCover,
-        SleepShowBlank,
+    enum class SleepShow {
+        Sleeping,
+        Html,
+        Cover,
+        Blank,
     };
     static const char* SleepShowToString(SleepShow s);
 

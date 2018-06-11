@@ -75,12 +75,12 @@ int HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 m_fb->update(&r);
                 m_fb->sync();
                 m_uxController->ctx.selected = meta;
-                m_uxController->setNextActivity(ACTIVITY_READ);
+                m_uxController->setNextActivity(Activity::Type::Read);
                 return -1;
             }
         }
         if (m_browseLabel.contains(&pos)) {
-            m_uxController->setNextActivity(ACTIVITY_LIBRARY);
+            m_uxController->setNextActivity(Activity::Type::Library);
             return -1;
         }
         // TODO: look at shortlist

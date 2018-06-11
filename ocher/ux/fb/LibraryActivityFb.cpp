@@ -51,7 +51,7 @@ int LibraryActivityFb::evtKey(const struct OcherKeyEvent *evt)
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
             Log::info(LOG_NAME, "home");
-            m_uxController->setNextActivity(ACTIVITY_HOME);
+            m_uxController->setNextActivity(Activity::Type::Home);
             return -1;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             Log::info(LOG_NAME, "back from page %u", m_pageNum);
@@ -84,7 +84,7 @@ int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
             Meta* meta = library[idx];
             if (m_bookRects[i].contains(&pos)) {
                 m_uxController->ctx.selected = meta;
-                m_uxController->setNextActivity(ACTIVITY_READ);
+                m_uxController->setNextActivity(Activity::Type::Read);
                 return -1;
             }
         }

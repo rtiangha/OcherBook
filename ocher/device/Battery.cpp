@@ -19,7 +19,7 @@
 
 Battery::Battery() :
     m_percent(-1),
-    m_status(Unknown)
+    m_status(Status::Unknown)
 {
     readAll();
 }
@@ -71,15 +71,15 @@ int Battery::readStatus()
     if (r == 4) {
         buf[4] = 0;
         if (strcmp(buf, "Char") == 0) {
-            m_status = Charging;
+            m_status = Status::Charging;
             return 0;
         } else if (strcmp(buf, "Disc") == 0) {
-            m_status = Discharging;
+            m_status = Status::Discharging;
             return 0;
         }
     }
 unknown:
 #endif
-    m_status = Unknown;
+    m_status = Status::Unknown;
     return -1;
 }

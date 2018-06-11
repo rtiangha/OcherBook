@@ -28,7 +28,7 @@ int ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
         if (evt->key == OEVTK_HOME) {
             Log::info(LOG_NAME, "home");
             // TODO  visually turn page down
-            m_uxController->setNextActivity(ACTIVITY_HOME);
+            m_uxController->setNextActivity(Activity::Type::Home);
             return -1;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             Log::info(LOG_NAME, "back from page %d", m_pageNum);

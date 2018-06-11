@@ -64,7 +64,7 @@ public:
 
     // TODO: in general, need more control (when running a new activity, is the prior
     // one destroyed?  or suspended?
-    virtual void setNextActivity(enum ActivityType a) = 0;
+    virtual void setNextActivity(Activity::Type a) = 0;
 
     void onWantToSleep();
     void onDirChanged(const char* dir, const char* file);

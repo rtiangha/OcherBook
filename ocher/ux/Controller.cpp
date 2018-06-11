@@ -76,7 +76,7 @@ void UxController::onWantToSleep()
 void UxController::handleEvent(const struct OcherEvent* evt)
 {
     if (evt->type == OEVT_APP && evt->app.subtype == OEVT_APP_CLOSE) {
-        setNextActivity(ACTIVITY_QUIT);
+        setNextActivity(Activity::Type::Quit);
     }
 }
 
@@ -224,7 +224,7 @@ void Controller::run()
     std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
 
-    ActivityType a = g_container.options->bootMenu ? ACTIVITY_BOOT : ACTIVITY_SYNC;
+    Activity::Type a = g_container.options->bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
     m_uxController->setNextActivity(a);
     g_container.loop->run();
 

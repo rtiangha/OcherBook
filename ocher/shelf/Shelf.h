@@ -45,9 +45,9 @@ public:
     Shelf() = default;
     ~Shelf() = default;
 
-    enum SortKeys {
-        ByAuthor,
-        ByTitle,
+    enum class SortBy {
+        Author,
+        Title,
     };
 
     /**

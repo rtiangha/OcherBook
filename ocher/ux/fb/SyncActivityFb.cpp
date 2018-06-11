@@ -60,7 +60,7 @@ void SyncActivityWork::work()
 
 void SyncActivityWork::notifyComplete()
 {
-    m_uxController->setNextActivity(ACTIVITY_HOME);
+    m_uxController->setNextActivity(Activity::Type::Home);
 }
 
 void SyncActivityWork::processFile(const char* file)

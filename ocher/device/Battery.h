@@ -12,7 +12,7 @@ class Battery {
 public:
     Battery();
 
-    enum Status {
+    enum class Status {
         Charging,
         Discharging,
         Unknown

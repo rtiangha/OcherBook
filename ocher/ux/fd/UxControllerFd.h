@@ -29,7 +29,7 @@ public:
         return m_renderer;
     }
 
-    void setNextActivity(enum ActivityType a);
+    void setNextActivity(Activity::Type a);
 
 protected:
     Renderer* m_renderer;

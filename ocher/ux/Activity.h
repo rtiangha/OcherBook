@@ -7,24 +7,22 @@
 #define OCHER_UX_ACTIVITY_H
 
 
-enum ActivityType {
-    ACTIVITY_BOOT,
-    ACTIVITY_SLEEP,
-    ACTIVITY_SYNC,
-    ACTIVITY_HOME,
-    ACTIVITY_READ,
-    ACTIVITY_LIBRARY,
-    ACTIVITY_SETTINGS,
-
-    ACTIVITY_PREVIOUS,
-    ACTIVITY_QUIT,
-};
-
-
 /** A logical portion of user interaction.
  */
 class Activity {
 public:
+    enum class Type {
+        Boot,
+        Sleep,
+        Sync,
+        Home,
+        Read,
+        Library,
+        Settings,
+        Previous,
+        Quit,
+    };
+
     virtual ~Activity() = default;
 
     virtual void onAttached() = 0;

@@ -29,10 +29,10 @@ bool UxControllerFd::init()
     return true;
 }
 
-void UxControllerFd::setNextActivity(enum ActivityType a)
+void UxControllerFd::setNextActivity(Activity::Type a)
 {
-    Log::info(LOG_NAME, "next activity: %d", a);
-    if (a == ACTIVITY_QUIT) {
+    Log::info(LOG_NAME, "next activity: %d", (int)a);
+    if (a == Activity::Type::Quit) {
         m_loop->stop();
     } else {
         // TODO

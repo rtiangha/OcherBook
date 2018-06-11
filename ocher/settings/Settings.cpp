@@ -21,29 +21,29 @@ Settings defaultSettings;
 const char* Settings::SecureLevelToString(SecureLevel s)
 {
     switch (s) {
-    case SecureLevelOpen: return "open";
-    case SecureLevelPersonal: return "personal";
-    case SecureLevelPrivate: return "private";
+    case SecureLevel::Open: return "open";
+    case SecureLevel::Personal: return "personal";
+    case SecureLevel::Private: return "private";
+    default: assert(0); return "";
     }
-    assert(0);
 }
 
 const char* Settings::SleepShowToString(SleepShow s)
 {
     switch (s) {
-    case SleepShowSleeping: return "sleeping";
-    case SleepShowHtml: return "html";
-    case SleepShowCover: return "cover";
-    case SleepShowBlank: return "blank";
+    case SleepShow::Sleeping: return "sleeping";
+    case SleepShow::Html: return "html";
+    case SleepShow::Cover: return "cover";
+    case SleepShow::Blank: return "blank";
+    default: assert(0); return "";
     }
-    assert(0);
 }
 
 Settings::Settings() :
-    secureLevel(SecureLevelOpen),
+    secureLevel(SecureLevel::Open),
     trackReading(0),
     minutesUntilSleep(15),
-    sleepShow(SleepShowSleeping),
+    sleepShow(SleepShow::Sleeping),
     sleepHtml("<center>Custom sleep message</center>"),
     minutesUntilPowerOff(60),
     powerOffHtml("<center>Off</center>"),
@@ -106,12 +106,12 @@ void Settings::load(const std::string& data)
         parsed = false;
     }
     if (parsed) {
-        if (s == SecureLevelToString(SecureLevelOpen))
-            secureLevel = SecureLevelOpen;
-        else if (s == SecureLevelToString(SecureLevelPersonal))
-            secureLevel = SecureLevelPersonal;
-        else if (s == SecureLevelToString(SecureLevelPrivate))
-            secureLevel = SecureLevelPrivate;
+        if (s == SecureLevelToString(SecureLevel::Open))
+            secureLevel = SecureLevel::Open;
+        else if (s == SecureLevelToString(SecureLevel::Personal))
+            secureLevel = SecureLevel::Personal;
+        else if (s == SecureLevelToString(SecureLevel::Private))
+            secureLevel = SecureLevel::Private;
     }
 
     try {
@@ -137,14 +137,14 @@ void Settings::load(const std::string& data)
         parsed = false;
     }
     if (parsed) {
-        if (s == SleepShowToString(SleepShowBlank))
-            sleepShow = SleepShowBlank;
-        else if (s == SleepShowToString(SleepShowSleeping))
-            sleepShow = SleepShowSleeping;
-        else if (s == SleepShowToString(SleepShowHtml))
-            sleepShow = SleepShowHtml;
-        else if (s == SleepShowToString(SleepShowCover))
-            sleepShow = SleepShowCover;
+        if (s == SleepShowToString(SleepShow::Blank))
+            sleepShow = SleepShow::Blank;
+        else if (s == SleepShowToString(SleepShow::Sleeping))
+            sleepShow = SleepShow::Sleeping;
+        else if (s == SleepShowToString(SleepShow::Html))
+            sleepShow = SleepShow::Html;
+        else if (s == SleepShowToString(SleepShow::Cover))
+            sleepShow = SleepShow::Cover;
     }
 
     try {

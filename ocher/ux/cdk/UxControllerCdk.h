@@ -33,7 +33,7 @@ public:
         return m_renderer;
     }
 
-    void setNextActivity(enum ActivityType a);
+    void setNextActivity(Activity::Type a);
 
     WINDOW* m_scr;
     CDKSCREEN* m_screen;

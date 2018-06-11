@@ -98,10 +98,10 @@ bool UxControllerFb::init()
     return true;
 }
 
-void UxControllerFb::setNextActivity(enum ActivityType a)
+void UxControllerFb::setNextActivity(Activity::Type a)
 {
-    Log::info(LOG_NAME, "next activity: %d", a);
-    if (a == ACTIVITY_QUIT) {
+    Log::info(LOG_NAME, "next activity: %d", (int)a);
+    if (a == Activity::Type::Quit) {
         m_loop->stop();
     } else {
         if (m_activity) {
@@ -110,25 +110,25 @@ void UxControllerFb::setNextActivity(enum ActivityType a)
         }
 
         switch (a) {
-        case ACTIVITY_BOOT:
+        case Activity::Type::Boot:
             m_activity = m_bootActivity;
             break;
-        case ACTIVITY_SLEEP:
+        case Activity::Type::Sleep:
             m_activity = m_sleepActivity;
             break;
-        case ACTIVITY_SYNC:
+        case Activity::Type::Sync:
             m_activity = m_syncActivity;
             break;
-        case ACTIVITY_HOME:
+        case Activity::Type::Home:
             m_activity = m_homeActivity;
             break;
-        case ACTIVITY_READ:
+        case Activity::Type::Read:
             m_activity = m_readActivity;
             break;
-        case ACTIVITY_LIBRARY:
+        case Activity::Type::Library:
             m_activity = m_libraryActivity;
             break;
-        case ACTIVITY_SETTINGS:
+        case Activity::Type::Settings:
             m_activity = m_settingsActivity;
             break;
         default:
