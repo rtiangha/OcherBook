@@ -49,6 +49,10 @@ if conf_data.get('OCHER_TARGET_KOBO', false)
     ocher_sources += [
         'device/kobo/KoboEvents.cpp',
         'device/kobo/KoboEvents.h',
+    ]
+endif
+if conf_data.get('UX_FB_MX50', false)
+    ocher_sources += [
         'ux/fb/mx50/FrameBufferMx50.cpp',
         'ux/fb/mx50/FrameBufferMx50.h',
     ]
@@ -133,6 +137,7 @@ configure_file(input : 'meson_config.h.in',
 add_project_arguments(['-include', 'ocher_config.h', '-I../ocher/linux-2.6.35.3/include'], language : 'cpp')
 add_project_arguments('-Wno-c++1z-compat', language : 'cpp')
 
+ocherbook_inc = include_directories('.')
 ocherbook = static_library('ocherbook', ocher_sources,
     dependencies : [
         thread_dep,
@@ -143,15 +148,24 @@ ocherbook = static_library('ocherbook', ocher_sources,
         freetype_dep,
         sdl_dep,
         mxml_dep,
-    ])
+    ],
+)
+
+ocherbook_dep = declare_dependency(
+    include_directories : ocherbook_inc,
+    link_with: ocherbook,
+    dependencies : [
+        thread_dep,
+        Signals_dep,
+        libev_dep,
+    ],
+)
 
 link_args = []
 if meson.is_cross_build()
     link_args = ['-static']
 endif
-
 ocher = executable('ocher', ['ocher.cpp', 'ocher.h'],
-    dependencies : [thread_dep],
+    dependencies : [ocherbook_dep],
     link_args : link_args,
-    link_with : [ocherbook],
 )

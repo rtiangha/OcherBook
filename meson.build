@@ -91,3 +91,4 @@ endif
 
 subdir('ocher')
 subdir('doc')
+subdir('tools')

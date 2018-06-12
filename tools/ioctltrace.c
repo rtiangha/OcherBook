@@ -1,13 +1,13 @@
 /**
  * usage:
- * LD_PRELOAD=/path/to/libioctldumper.so /bin/ebrmain
+ * LD_PRELOAD=/path/to/libioctltrace.so program
  */
 #define _GNU_SOURCE 1
-#include <stdio.h>
-#include <stdarg.h>
 #include <dlfcn.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 
 static int _fd = -1;
 
@@ -68,11 +68,11 @@ int ioctl(int fd, int request, ...)
 
             /**
              * struct ioctl_command {
-             *	u32 x;
-             * 	u32 y;
-             *	u32 width;
-             *	u32 height;
-             *	uchar buf[800 * 600];
+             *  u32 x;
+             *  u32 y;
+             *  u32 width;
+             *  u32 height;
+             *  uchar buf[800 * 600];
              * };
              */
             printf("\tpartial update: %u %u %u %u %u %u ", x[0], x[1], x[2], x[3], x[4], x[5]);

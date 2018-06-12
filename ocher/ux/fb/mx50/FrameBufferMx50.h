@@ -6,7 +6,6 @@
 #ifndef MX50_FB_H
 #define MX50_FB_H
 
-#include "device/kobo/KoboEvents.h"
 #include "ux/fb/FrameBuffer.h"
 
 #include <linux/mxcfb.h>
@@ -19,30 +18,25 @@ public:
 
     bool init();
 
-    unsigned int height();
-    unsigned int width();
-    unsigned int dpi();
+    unsigned int height() override;
+    unsigned int width() override;
+    unsigned int dpi() override;
 
-    void inject(EventLoop* loop)
-    {
-        m_events.setEventLoop(loop);
-    }
-
-    void setFg(uint8_t r, uint8_t b, uint8_t g);
-    void setBg(uint8_t r, uint8_t b, uint8_t g);
-    void clear();
-    void pset(int x, int y);
-    void hline(int x1, int y, int x2);
-    inline void vline(int x, int y1, int y2)
+    void setFg(uint8_t r, uint8_t b, uint8_t g) override;
+    void setBg(uint8_t r, uint8_t b, uint8_t g) override;
+    void clear() override;
+    void fillRect(Rect* r) override;
+    void byLine(Rect* r, void (*fn)(void* p, size_t n)) override;
+    void pset(int x, int y) override;
+    void hline(int x1, int y, int x2) override;
+    inline void vline(int x, int y1, int y2) override
     {
         line(x, y1, x, y2);
     }
-    void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip);
-    void fillRect(Rect* r);
-    void byLine(Rect* r, void (*fn)(void* p, size_t n));
-    int update(Rect* r, bool full = false);
-    void sync();
-    void needFull()
+    void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip) override;
+    int update(Rect* r, bool full = false) override;
+    void sync() override;
+    void needFull() override
     {
         m_needFull = true;
     }
@@ -57,8 +51,6 @@ public:
     void setAutoUpdateMode(bool autoUpdate);
 
 protected:
-    KoboEvents m_events;  // TODO abstract
-
     int m_fd;
     char* m_fb;
     size_t m_fbSize;

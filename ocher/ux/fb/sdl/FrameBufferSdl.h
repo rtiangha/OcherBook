@@ -17,24 +17,24 @@ public:
     FrameBufferSdl();
     virtual ~FrameBufferSdl();
 
-    bool init();
+    bool init() override;
 
-    unsigned int height();
-    unsigned int width();
-    unsigned int dpi();
+    unsigned int height() override;
+    unsigned int width() override;
+    unsigned int dpi() override;
 
-    void inject(EventLoop* loop);
+    void inject(EventLoop* loop) override;
 
-    void setFg(uint8_t r, uint8_t b, uint8_t g);
-    void setBg(uint8_t r, uint8_t b, uint8_t g);
-    void clear();
-    void pset(int x, int y);
-    void hline(int x1, int y, int x2);
-    void vline(int x, int y1, int y2);
-    void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip);
-    void fillRect(Rect* r);
-    void byLine(Rect* r, void (*fn)(void* p, size_t n));
-    int update(Rect* r, bool full = false);
+    void setFg(uint8_t r, uint8_t b, uint8_t g) override;
+    void setBg(uint8_t r, uint8_t b, uint8_t g) override;
+    void clear() override;
+    void fillRect(Rect* r) override;
+    void byLine(Rect* r, void (*fn)(void* p, size_t n)) override;
+    void pset(int x, int y) override;
+    void hline(int x1, int y, int x2) override;
+    void vline(int x, int y1, int y2) override;
+    void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip) override;
+    int update(Rect* r, bool full = false) override;
 
 protected:
     SdlThread m_sdlThread;
