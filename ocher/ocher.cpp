@@ -52,7 +52,6 @@ void usage(const char* msg = nullptr)
 
 int main(int argc, char** argv)
 {
-    bool listDrivers = false;
     auto opt = new Options;
 
     struct option long_options[] =
@@ -73,7 +72,7 @@ int main(int argc, char** argv)
         // getopt_long stores the option index here.
         int option_index = 0;
 
-        int ch = getopt_long(argc, argv, "d:bfhtvq", long_options, &option_index);
+        int ch = getopt_long(argc, argv, "bfhtvq", long_options, &option_index);
         if (ch == -1)
             break;
         switch (ch) {
@@ -106,7 +105,7 @@ int main(int argc, char** argv)
             opt->driverName = optarg;
             break;
         case OPT_LIST_DRIVERS:
-            listDrivers = true;
+            opt->listDrivers = true;
             break;
         default:
             usage("Unknown argument");
@@ -120,14 +119,6 @@ int main(int argc, char** argv)
 
     try {
         Controller c(opt);
-
-        if (listDrivers) {
-            for (UxController* controller : g_container.uxControllers) {
-                printf("\t%s\n", controller->getName());
-            }
-            return 0;
-        }
-
         c.run();
     } catch (std::exception& e) {
         fprintf(stderr, "%s\n", e.what());

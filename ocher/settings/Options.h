@@ -13,35 +13,22 @@
  */
 class Options {
 public:
-    Options() :
-        verbose(0),
-        bootMenu(false),
-        driverName(0),
-        files(0),
-        watches(0),
-        inFd(0),
-        outFd(1)
-    {
-    }
-
-    int verbose;
+    int verbose = 0;
 
     /** Start at boot menu?
      */
-    bool bootMenu;
+    bool bootMenu = false;
 
-    const char *driverName;
+    bool listDrivers = false;
+
+    const char *driverName = nullptr;
 
     /** Files and/or directories passed on the command line, to be synced once.
      */
-    const char **files;
+    const char **files = nullptr;
 
-    /** @todo directories to watch
-     */
-    const char **watches;
-
-    int inFd;
-    int outFd;
+    int inFd = 0;
+    int outFd = 1;
 
     std::map<std::string, std::string> keys;
 

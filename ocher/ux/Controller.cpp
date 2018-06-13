@@ -81,7 +81,6 @@ void UxController::handleEvent(const struct OcherEvent* evt)
 }
 
 Controller::Controller(Options* options)
-    : m_uxController(nullptr)
 {
     g_container.options = options;
     initLog();
@@ -106,47 +105,41 @@ Controller::Controller(Options* options)
     // Sort UxController list based on desirability
     // (assume native >> toolkits >> framebuffer >> tui >> text)
 #ifdef UX_FB
-    g_container.uxControllers.push_back(new UxControllerFb);
-#endif
-#ifdef UX_CDK
-    g_container.uxControllers.push_back(new UxControllerCdk);
-#endif
-#ifdef UX_FD
-    g_container.uxControllers.push_back(new UxControllerFd);
-#endif
-
-    // TODO....  move to run() or init()
-
-    UxController* uxController = nullptr;
-    for (UxController* c : g_container.uxControllers) {
-        Log::info("ocher", "considering driver %s", c->getName());
-
-        if (g_container.options->driverName) {
-            if (strcmp(c->getName(), g_container.options->driverName) == 0) {
-                Log::debug("ocher", "Attempting to init the '%s' driver", g_container.options->driverName);
-                if (!c->init()) {
-                    Log::warn("ocher", "Failed to init the '%s' driver", g_container.options->driverName);
-                    throw std::runtime_error("failed to init driver"); // TODO
-                }
-                uxController = c;
-                break;
-            }
-        } else {
-            if (c->init() == true) {
-                uxController = c;
-                break;
-            } else {
-                Log::info("ocher", "driver %s failed to init", c->getName());
-            }
+    if (!g_container.uxController) {
+        try {
+            initUxController(std::unique_ptr<UxController>(new UxControllerFb));
+        } catch (...)
+        {
+            Log::warn(LOG_NAME, "Skipping fb driver");
         }
     }
-
-    if (uxController == nullptr) {
-        throw std::runtime_error("failed to find suitable output driver"); // TODO
+#endif
+#ifdef UX_CDK
+    if (!g_container.uxController) {
+        try {
+            initUxController(std::unique_ptr<UxController>(new UxControllerCdk));
+        } catch (...)
+        {
+            Log::warn(LOG_NAME, "Skipping cdk driver");
+        }
     }
-    Log::info("ocher", "Using the '%s' driver", uxController->getName());
+#endif
+#ifdef UX_FD
+    if (!g_container.uxController) {
+        try {
+            initUxController(std::unique_ptr<UxController>(new UxControllerFd));
+        } catch (...)
+        {
+            Log::warn(LOG_NAME, "Skipping fd driver");
+        }
+    }
+#endif
+    UxController* uxController = g_container.uxController.get();
+    if (!uxController) {
+        throw std::runtime_error("failed to find suitable output driver");
+    }
+    Log::info(LOG_NAME, "Using the '%s' driver", uxController->getName());
 
-    g_container.uxController = uxController;
 #ifdef UX_FB
     g_container.frameBuffer = uxController->getFrameBuffer();
     if (g_container.frameBuffer)
@@ -155,19 +148,36 @@ Controller::Controller(Options* options)
     g_container.fontEngine = uxController->getFontEngine();
     g_container.renderer = uxController->getRenderer();
 
-    m_uxController = g_container.uxController;
-
-    Log::info("ocher", "Done wiring the '%s' driver", uxController->getName());
+    Log::info(LOG_NAME, "Done wiring the '%s' driver", uxController->getName());
 
     initCrash();
 }
 
 void Controller::initCrash()
 {
-    // TODO:  Could pass on to m_uxController...
+    // TODO:  Could pass on to uxController...
 #ifdef AIRBAG_FD
     airbag_init_fd(2, 0);
 #endif
+}
+
+void Controller::initUxController(std::unique_ptr<UxController> c)
+{
+    Log::info(LOG_NAME, "considering driver %s", c->getName());
+
+    if (g_container.options->driverName &&
+            !strcmp(c->getName(), g_container.options->driverName)) {
+        throw std::runtime_error("skipping driver based on user pref");
+    }
+    if (g_container.options->listDrivers) {
+        printf("\t%s\n", c->getName());
+        throw std::runtime_error("skipping driver; only listing");
+    }
+    if (!c->init()) {
+        Log::warn(LOG_NAME, "Failed to init the '%s' driver", g_container.options->driverName);
+        throw std::runtime_error("failed to init driver");
+    }
+    g_container.uxController = std::move(c);
 }
 
 void Controller::initLog()
@@ -225,7 +235,7 @@ void Controller::run()
 #endif
 
     Activity::Type a = g_container.options->bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
-    m_uxController->setNextActivity(a);
+    g_container.uxController->setNextActivity(a);
     g_container.loop->run();
 
     // TODO: sync state out

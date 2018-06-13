@@ -27,7 +27,6 @@ Container::Container() :
     settings(nullptr),
     options(nullptr),
     powerSaver(nullptr),
-    uxController(nullptr),
     frameBuffer(nullptr),
     fontEngine(nullptr),
     renderer(nullptr)
@@ -36,7 +35,6 @@ Container::Container() :
 
 Container::~Container()
 {
-    delete uxController;
     delete battery;
     delete filesystem;
     delete settings;

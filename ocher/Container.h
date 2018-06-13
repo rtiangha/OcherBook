@@ -6,6 +6,7 @@
 #ifndef OCHER_CONTAINER_H
 #define OCHER_CONTAINER_H
 
+#include <memory>
 #include <vector>
 
 class Battery;
@@ -30,11 +31,6 @@ class Container {
 public:
     Container();
     ~Container();
-
-    /**
-     * The list of all user experience drivers.
-     */
-    std::vector<UxController*> uxControllers;
 
     /**
      * Requires:
@@ -70,7 +66,7 @@ public:
 
     /**
      */
-    UxController* uxController;
+    std::unique_ptr<UxController> uxController;
 
     /**
      * May not exist, depending on Device.

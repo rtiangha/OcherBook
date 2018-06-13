@@ -9,6 +9,8 @@
 #include "shelf/Shelf.h"
 #include "ux/Activity.h"
 
+#include <memory>
+
 class Device;
 class EventLoop;
 class Filesystem;
@@ -90,11 +92,10 @@ public:
     void run();
 
 protected:
+    void initUxController(std::unique_ptr<UxController> c);
     void initCrash();
     void initLog();
     void initDebug();
-
-    UxController* m_uxController;
 };
 
 #endif
