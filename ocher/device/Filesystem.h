@@ -6,6 +6,8 @@
 #ifndef OCHER_FILESYSTEM_H
 #define OCHER_FILESYSTEM_H
 
+#include "ux/Event.h"
+
 #include "Signal.h"
 using namespace Gallant;
 
@@ -24,13 +26,15 @@ public:
     Filesystem(const Filesystem&) = delete;
     Filesystem& operator=(const Filesystem&) = delete;
 
-    const char** m_libraries;
-    char* m_home;
-    char* m_settings;
+    // TODO  Filesystem should only offer up default library locations;
+    //       Settings should persist actual
+    const char** m_libraries = nullptr;
 
-    void initWatches(Options* options);
+    std::string m_home;
+    std::string m_settings;
+
+    void initWatches(Options* options, EventLoop* loop);
     void deinitWatches();
-    void fireEvents();
 
     /**
      * @param name  The file or directory with the event
@@ -39,7 +43,12 @@ public:
     Signal2<const char*, const char*> dirChanged;
 
 protected:
-    int m_infd;
+#ifdef __linux__
+    int m_notifyFd = -1;
+    struct ev_io m_watcher;
+    static void _watchCb(struct ev_loop* loop, ev_io* watcher, int revents);
+    void watchCb();
+#endif
 };
 
 #endif

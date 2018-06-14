@@ -67,13 +67,13 @@ void KoboEvents::setEventLoop(EventLoop* loop)
 
     if (m_buttonFd != -1) {
         ev_io_init(&m_buttonWatcher, buttonCb, m_buttonFd, EV_READ);
-        ev_io_start(m_loop->evLoop, &m_buttonWatcher);
         m_buttonWatcher.data = this;
+        ev_io_start(m_loop->evLoop, &m_buttonWatcher);
     }
     if (m_touchFd != -1) {
         ev_io_init(&m_touchWatcher, touchCb, m_touchFd, EV_READ);
-        ev_io_start(m_loop->evLoop, &m_touchWatcher);
         m_touchWatcher.data = this;
+        ev_io_start(m_loop->evLoop, &m_touchWatcher);
     }
 }
 

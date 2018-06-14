@@ -5,6 +5,8 @@
 
 #include "device/Filesystem.h"
 
+#include "ux/Event.h"
+
 #include "settings/Options.h"
 #include "util/File.h"
 #include "util/Logger.h"
@@ -30,14 +32,17 @@ static std::string settingsDir()
 #if defined(__HAIKU__)
     dir = "/boot/home/config/settings";
 #else
-    const char* e = getenv("HOME");
+    const char* e = nullptr;
+    if (!e)
+        e = getenv("HOME");
     if (!e) {
         struct passwd* p = getpwuid(getuid());
         if (p) {
             e = p->pw_dir;
-        } else {
-            e = "/tmp";
         }
+    }
+    if (!e) {
+        e = "/tmp";
     }
     dir = e;
 #if defined(__APPLE__)
@@ -49,9 +54,7 @@ static std::string settingsDir()
 }
 #endif
 
-Filesystem::Filesystem() :
-    m_libraries(nullptr),
-    m_infd(-1)
+Filesystem::Filesystem()
 {
 #ifdef OCHER_TARGET_KOBO
     m_libraries = new const char*[3];
@@ -67,41 +70,47 @@ Filesystem::Filesystem() :
 #else
     s = Path::join(s, ".OcherBook");
 #endif
-    m_home = strdup(s.c_str());
+    m_home = s;
     ::mkdir(s.c_str(), 0775);
     s = Path::join(s, "settings");
-    m_settings = strdup(s.c_str());
+    m_settings = s;
 #endif
 }
 
 Filesystem::~Filesystem()
 {
-#ifndef OCHER_TARGET_KOBO
-    free(m_home);
-    free(m_settings);
-#endif
-    delete m_libraries;
+    delete[] m_libraries;
 }
 
-void Filesystem::initWatches(Options* options)
+void Filesystem::initWatches(Options* options, EventLoop* loop)
 {
 #ifdef __linux__
-    m_infd = inotify_init();
-    if (m_infd == -1) {
-        Log::error(LOG_NAME, "inotify_init: %s", strerror(errno));
-        return;
+    if (m_notifyFd == -1) {
+        m_notifyFd = inotify_init();
+        if (m_notifyFd == -1) {
+            Log::error(LOG_NAME, "inotify_init failed: %s", strerror(errno));
+            return;
+        }
+
+        ev_io_init(&m_watcher, _watchCb, m_notifyFd, EV_READ);
+        m_watcher.data = this;
+        ev_io_start(loop->evLoop, &m_watcher);
     }
 
-    if (!options->files)
+    // TODO  Watch Settings->libraries instead
+    const char** files = options->files;
+
+    if (!files) {
+	Log::info(LOG_NAME, "No directories to watch");
         return;
-    for (int i = 0;; ++i) {
-        const char* lib = options->files[i]; // TODO  m_libraries[i];
-        if (!lib)
-            break;
-        int wd = inotify_add_watch(m_infd, lib, IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);
+    }
+    for (int i = 0; files[i]; ++i) {
+        int wd = inotify_add_watch(m_notifyFd, files[i], IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);
         if (wd == -1) {
-            Log::error(LOG_NAME, "inotify_add_watch(\"%s\"): %s", lib, strerror(errno));
+            Log::error(LOG_NAME, "inotify_add_watch(\"%s\") failed: %s", files[i], strerror(errno));
+            continue;
         }
+        Log::info(LOG_NAME, "Watching '%s'", files[i]);
     }
 #endif
 }
@@ -109,58 +118,68 @@ void Filesystem::initWatches(Options* options)
 void Filesystem::deinitWatches()
 {
 #ifdef __linux__
-    close(m_infd);
+    if (m_notifyFd != -1)
+        close(m_notifyFd);
 #endif
 }
 
-void Filesystem::fireEvents()
-{
 #ifdef __linux__
+void Filesystem::_watchCb(struct ev_loop* loop, ev_io* watcher, int revents)
+{
+    static_cast<Filesystem*>(watcher->data)->watchCb();
+}
+
+void Filesystem::watchCb()
+{
     char buff[4096];
-    ssize_t len = read(m_infd, buff, sizeof(buff));
+    ssize_t len = read(m_notifyFd, buff, sizeof(buff));
     ssize_t i = 0;
     while (i < len) {
         struct inotify_event* pevent = reinterpret_cast<struct inotify_event*>(&buff[i]);
 
-        // if (pevent->len)
-        //  pevent->name);
+        const char* filename = pevent->len == 0 ? "" : pevent->name;
 
         if (pevent->mask & IN_ACCESS) {
-        }      // " was read"
+            Log::debug(LOG_NAME, "inotify ACCESS \"%s\"", filename);
+        }
         if (pevent->mask & IN_ATTRIB) {
-        }      // " Metadata changed"
+            Log::debug(LOG_NAME, "inotify ATTRIB \"%s\"", filename);
+        }
         if (pevent->mask & IN_CLOSE_WRITE) {
-        }      // " opened for writing was closed"
+            Log::debug(LOG_NAME, "inotify CLOSE_WRITE \"%s\"", filename);
+        }
         if (pevent->mask & IN_CLOSE_NOWRITE) {
-        }      // " not opened for writing was closed"
+            Log::debug(LOG_NAME, "inotify CLOSE_NOWRITE \"%s\"", filename);
+        }
         if (pevent->mask & IN_CREATE) {
-        }      // " created in watched directory"
+            Log::debug(LOG_NAME, "inotify CREATE \"%s\"", filename);
+        }
         if (pevent->mask & IN_DELETE) {
-        }      // " deleted from watched directory"
+            Log::debug(LOG_NAME, "inotify DELETE \"%s\"", filename);
+        }
         if (pevent->mask & IN_DELETE_SELF) {
-        }      // "Watched file/directory was itself deleted"
+            Log::debug(LOG_NAME, "inotify DELETE_SELF \"%s\"", filename);
+        }
         if (pevent->mask & IN_MODIFY) {
-        }      // " was modified"
+            Log::debug(LOG_NAME, "inotify MODIFY \"%s\"", filename);
+        }
         if (pevent->mask & IN_MOVE_SELF) {
-        }      // "Watched file/directory was itself moved"
+            Log::debug(LOG_NAME, "inotify MOVE_SELF \"%s\"", filename);
+        }
         if (pevent->mask & IN_MOVED_FROM) {
-        }      // " moved out of watched directory"
+            Log::debug(LOG_NAME, "inotify MOVED_FROM \"%s\"", filename);
+        }
         if (pevent->mask & IN_MOVED_TO) {
-        }      // " moved into watched directory"
+            Log::debug(LOG_NAME, "inotify MOVED_TO \"%s\"", filename);
+        }
         if (pevent->mask & IN_OPEN) {
-        }      // " was opened"
+            Log::debug(LOG_NAME, "inotify OPEN \"%s\"", filename);
+        }
 
-        /*
-           printf ("wd=%d mask=%d cookie=%d len=%d dir=%s\n",
-           pevent->wd, pevent->mask, pevent->cookie, pevent->len,
-           (pevent->mask & IN_ISDIR)?"yes":"no");
-
-           if (pevent->len) printf ("name=%s\n", pevent->name);
-         */
-
-        dirChanged(pevent->name, "");
+        // TODO  Associate wd with the library and look up
+        dirChanged("", filename);
 
         i += sizeof(struct inotify_event) + pevent->len;
     }
-#endif
 }
+#endif

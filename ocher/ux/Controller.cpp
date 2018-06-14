@@ -45,7 +45,7 @@ UxController::UxController() :
     m_powerSaver = g_container.powerSaver;
 
     m_filesystem->dirChanged.Connect(this, &UxController::onDirChanged);
-    m_filesystem->initWatches(g_container.options);
+    m_filesystem->initWatches(g_container.options, g_container.loop);
 
     m_loop->emitEvent.Connect(this, &UxController::handleEvent);
     m_powerSaver->wantToSleep.Connect(this, &UxController::onWantToSleep);
@@ -93,7 +93,7 @@ Controller::Controller(Options* options)
     g_container.loop = new EventLoop();
 
     // Wire up
-    //   TODO setters vs constructors vs hitting g_container
+    //   TODO setters vs >>constructors<< vs hitting g_container
     //   TODO here or in Container?
     g_container.settings->inject(g_container.filesystem);
     g_container.powerSaver->inject(g_container.loop);
