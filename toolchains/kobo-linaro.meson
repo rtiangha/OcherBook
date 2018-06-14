@@ -1,8 +1,14 @@
 # Build for kobo on x86 Linux, using the Linaro toolchain that Kobo references:
 #
+# Get the Linaro toolchain:
 #   $ git clone https://github.com/kobolabs/Kobo-Reader.git
 #   $ sudo mkdir /toolchains
 #   $ sudo tar -C /toolchains -Jxf Kobo-Reader/toolchain/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux.tar.bz2
+#
+# Note that building on x86_64 Linux may require 32-bit stdc++ compatibility packages for the toolchain, eg:
+#   $ sudo apt install libstdc++6:i386
+#
+# Build OcherBook:
 #   $ cd OcherBook
 #   $ meson build --cross-file toolchains/kobo-linaro.meson -Dkobo=true
 #   $ cd build

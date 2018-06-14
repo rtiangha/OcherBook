@@ -2,8 +2,6 @@
 
 ![Ocher handprint](doc/hand.png)
 
-## About
-
 OcherBook is an open-source ebook reader, supporting multiple file formats and
 output devices.  The major goals are:
 
@@ -22,18 +20,9 @@ turn out to be a mistake, but for now it's an advantage that I'm running with.
 
 It also handles its own event loop and its own rendering, so it could
 potentially run on _very_ limited devices.  This is, perhaps, the singular charm
-of this project.  (OTOH, see branch `feature/qt-instead` -- but beware, this
-branch will be rebased).
+of this project.
 
-For embedded work, autotools can be better than the pretentiousness of CMake.  I
-was re-imagining things in branch `feature/ocher2` -- but beware, this branch
-will be rebased.
-
-## Code
-
-To get the code:
-
-    $ git clone git@github.com:ccoffing/OcherBook.git
+At the moment it's mostly tested on Kobo and SDL.
 
 ## Building
 

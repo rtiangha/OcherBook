@@ -1,5 +1,8 @@
 # Build for kobo on x86 Ubuntu:
 #
+# Note that this only includes the toolchain, no pre-built libraries, and so won't
+# work unless/until we build libstdc++ etc ourselves.
+#
 # Install Ubuntu.
 #   $ sudo apt install build-essential meson g++-arm-linux-gnueabi gcc-arm-linux-gnueabi
 #   $ cd OcherBook

@@ -14,7 +14,7 @@ unexpected.  Expect and handle the rest locally.
 
 # Formatting
 
-clang-format -style=WebKit
+`clang-format -style=WebKit`
 
 
 # Documentation
@@ -28,7 +28,7 @@ Documentation outside the code can be plain text, but prefer "github flavored
 markdown".  This allows useful docs to be uploaded to GitHub easily.  Wrap docs
 to 80 columns.
 
-http://github.github.com/github-flavored-markdown/
+https://help.github.com/categories/writing-on-github/
 
 
 # Naming
@@ -47,7 +47,7 @@ No `printf`s; use logging which can be compiled out.
 
 # Headers
 
-System headers are <>, local headers are "".
+System headers are `<>`, local headers are `""`.
 
 Includes should be ordered "most local first", to more quickly expose missing
 includes.
@@ -62,4 +62,4 @@ Strive for good unit test coverage.
 
 Valgrind should be silent.
 
-Write good error handling.  libfiu should never be able to trigger a crash.
+Write good error handling.  libfiu should never be able to trigger a crash in OcherBook code.

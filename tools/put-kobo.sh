@@ -1,6 +1,6 @@
 #!/bin/sh
 
-[ -z "$OCHER_IP" ] && OCHER_IP=192.168.1.69
+[ -z "$KOBO_IP" ] && KOBO_IP=192.168.1.128
 
 (
     sleep 1
@@ -8,17 +8,19 @@
     echo "cd /usr/local"
     echo "mkdir ocher"
     echo "cd ocher"
-    echo "lcd build"
+    echo "lcd ocher"
     echo "put ocher"
+    echo "chmod 0755 ocher"
     echo "quit"
-) | ftp $OCHER_IP
+) | ftp $KOBO_IP
 
 (
     sleep 1
     echo "root"
-    sleep 1
     echo "cd /usr/local/ocher"
-    echo "chmod +x ocher"
-) | telnet $OCHER_IP
-#    echo "killall nickel ocher"
-#    echo "nohup ./ocher -vv &"
+    echo "killall ocher"
+    echo "> nohup.out"
+    echo "nohup ./ocher -vvv"
+    echo "tail -f nohup.out"
+    while true; do sleep 10 ; done
+) | telnet $KOBO_IP
