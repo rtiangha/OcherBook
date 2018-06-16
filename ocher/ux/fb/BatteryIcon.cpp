@@ -5,16 +5,14 @@
 
 #include "ux/fb/BatteryIcon.h"
 
-#include "Container.h"
 #include "device/Battery.h"
-#include "ux/fb/Widgets.h"
 
 
 #define BBORDER 1
 #define BHEIGHT 18  // height of battery bounding box
 #define BWIDTH 25   // width  of battery bounding box
 
-BatteryIcon::BatteryIcon(int x, int y, Battery *battery) :
+BatteryIcon::BatteryIcon(int x, int y, Battery* battery) :
     Widget(x, y, 30, 29),
     // BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
     m_battery(battery)
@@ -23,7 +21,7 @@ BatteryIcon::BatteryIcon(int x, int y, Battery *battery) :
 
 void BatteryIcon::draw()
 {
-    FrameBuffer *fb = g_container.frameBuffer;
+    FrameBuffer* fb = m_screen->fb;
     Rect rect(m_rect);
 
     fb->setFg(0xff, 0xff, 0xff);

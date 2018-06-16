@@ -44,6 +44,7 @@ Glyph* GlyphCache::get(GlyphDescr& f)
 }
 
 FontEngine::FontEngine(FrameBuffer* fb) :
+    m_fb(fb),
     m_ft(fb->dpi())
 {
     m_next.faceId = 0;
@@ -260,7 +261,7 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
                 }
                 dst.x = pen->x + r->x + xOffset;
                 dst.y = pen->y + r->y;
-                g_container.frameBuffer->blitGlyphs(glyphs, &dst, r);
+                m_fb->blitGlyphs(glyphs, &dst, r);
                 pen->x = dst.x - r->x - xOffset;
                 pen->y = dst.y - r->y;
             }

@@ -22,14 +22,14 @@
 #define LOG_NAME "ocher.ux.Read"
 
 
-int ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
+EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
             Log::info(LOG_NAME, "home");
             // TODO  visually turn page down
             m_uxController->setNextActivity(Activity::Type::Home);
-            return -1;
+            return EventDisposition::Handled;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
@@ -38,7 +38,7 @@ int ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
                 m_uxController->m_navBar->hide();
                 invalidate();
             }
-            return -1;
+            return EventDisposition::Handled;
         } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
             Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (!atEnd) {
@@ -47,26 +47,26 @@ int ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
                 m_uxController->m_navBar->hide();
                 invalidate();
             }
-            return -1;
+            return EventDisposition::Handled;
         }
     }
-    return -2;
+    return EventDisposition::Pass;
 }
 
-int ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
+EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
     SystemBar* systemBar = m_uxController->m_systemBar;
     NavBar* navBar = m_uxController->m_navBar;
 
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
-        if (systemBar->m_rect.contains(&pos) || navBar->m_rect.contains(&pos)) {
+        if (systemBar->rect().contains(pos) || navBar->rect().contains(pos)) {
             if (systemBar->m_flags & WIDGET_HIDDEN) {
                 Log::info(LOG_NAME, "show system bar");
                 systemBar->show();
-                m_fb->update(&systemBar->m_rect);
+                m_fb->update(&systemBar->rect());
                 navBar->show();
-                m_fb->update(&navBar->m_rect);
+                m_fb->update(&navBar->rect());
             } else {
                 Log::info(LOG_NAME, "interact bar");
                 // TODO interact
@@ -93,9 +93,9 @@ int ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 }
             }
         }
-        return -1;
+        return EventDisposition::Handled;
     }
-    return -2;
+    return EventDisposition::Pass;
 }
 
 ReadActivityFb::ReadActivityFb(UxControllerFb* c) :

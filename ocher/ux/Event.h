@@ -6,6 +6,8 @@
 #ifndef OCHER_EVENT_H
 #define OCHER_EVENT_H
 
+#include "ux/Types.h"
+
 #include "Signal.h"
 #include <ev.h>
 
@@ -79,7 +81,11 @@ struct OcherAppEvent {
 #define OEVT_APP                3
 #define OEVT_DEVICE             4
 
-// TODO: model after sdl more
+enum class EventDisposition {
+    Handled = 0,
+    Pass = 1,
+};
+
 // TODO: timestamp
 struct OcherEvent {
     OcherEvent() :
@@ -109,7 +115,9 @@ public:
      * @return 0 if normal termination
      */
     int run();
+
     void stop();
+
     /** Defines a new epoch; events timestamped prior to this are silently dropped. */
     void setEpoch();
 

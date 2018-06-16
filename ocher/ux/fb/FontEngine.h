@@ -90,6 +90,7 @@ public:
 
     GlyphCache m_cache;
 
+    FrameBuffer* m_fb;
     FreeType m_ft;
 };
 

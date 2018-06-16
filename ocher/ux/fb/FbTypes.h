@@ -6,22 +6,10 @@
 #ifndef OCHER_UX_FB_TYPES_H
 #define OCHER_UX_FB_TYPES_H
 
+#include "ux/Types.h"
+
 #include <cstdint>
 
-
-struct Pos {
-    int16_t x, y;
-
-    Pos()
-    {
-    }
-
-    Pos(int16_t _x, int16_t _y) :
-        x(_x),
-        y(_y)
-    {
-    }
-};
 
 struct Rect {
     int16_t x, y;
@@ -31,6 +19,7 @@ struct Rect {
     {
         setInvalid();
     }
+
     Rect(int16_t _x, int16_t _y, uint16_t _w, uint16_t _h) :
         x(_x),
         y(_y),
@@ -38,30 +27,38 @@ struct Rect {
         h(_h)
     {
     }
-    const Pos *pos()
+
+    const Pos* pos() const
     {
-        return reinterpret_cast<const Pos *>(this);
+        return reinterpret_cast<const Pos*>(this);
     }
-    void offsetBy(Pos *p)
+
+    void offsetBy(const Pos* p)
     {
         x += p->x;
         y += p->y;
     }
-    void unionRect(Rect *r);
-    void unionRects(Rect *r1, Rect *r2);
-    bool contains(Pos *p)
+
+    void unionRect(const Rect* r);
+
+    void unionRects(const Rect* r1, const Rect* r2);
+
+    bool contains(const Pos& p) const
     {
-        return p->x >= x && p->y >= y && p->x < x + w && p->y < y + h;
+        return p.x >= x && p.y >= y && p.x < x + w && p.y < y + h;
     }
-    bool valid()
+
+    bool valid() const
     {
         return x + w >= 0 && y + h >= 0;
     }
+
     void setInvalid()
     {
         x = y = -1;
         w = h = 0;
     }
+
     void inset(int i)
     {
         x += i;
@@ -77,11 +74,13 @@ public:
         bitmap(0)
     {
     }
+
     ~Glyph()
     {
         delete[] bitmap;
     }
-    uint8_t *bitmap;
+
+    uint8_t* bitmap;
     uint8_t w;
     uint8_t h;
     int8_t offsetX;
@@ -93,6 +92,7 @@ public:
 
 struct GlyphDescr {
     GlyphDescr() : v(0) {}
+
     bool operator<(const GlyphDescr& r) const
     {
         return v < r.v;

@@ -15,7 +15,7 @@ public:
 
     void draw();
 
-    int evtMouse(const struct OcherMouseEvent*);
+    EventDisposition evtMouse(const struct OcherMouseEvent*);
 
     void onAttached();
     void onDetached();

@@ -104,15 +104,19 @@ void FrameBufferSdl::clear()
     SDL_UpdateRect(m_screen, 0, 0, 0, 0);
 }
 
-void FrameBufferSdl::fillRect(Rect* _r)
+void FrameBufferSdl::fillRect(const Rect* _r)
 {
-    // Ocher's Rect is chosen to match SDL's.
-    auto r = reinterpret_cast<SDL_Rect*>(_r);
+    SDL_Rect r {
+        .x = _r->x,
+        .y = _r->y,
+        .w = _r->w,
+        .h = _r->h,
+    };
 
-    SDL_FillRect(m_screen, r, m_fgColor);
+    SDL_FillRect(m_screen, &r, m_fgColor);
 }
 
-void FrameBufferSdl::byLine(Rect* r, void (*fn)(void* p, size_t n))
+void FrameBufferSdl::byLine(const Rect* r, void (*fn)(void* p, size_t n))
 {
     int y2 = r->y + r->h;
 
@@ -190,17 +194,21 @@ void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, co
     }
 }
 
-int FrameBufferSdl::update(Rect* r, bool /*full*/)
+int FrameBufferSdl::update(const Rect* _r, bool /*full*/)
 {
-    Rect _r;
+    SDL_Rect r;
 
-    if (!r) {
-        _r.x = _r.y = 0;
-        _r.w = width();
-        _r.h = height();
-        r = &_r;
+    if (_r) {
+        r.x = _r->x;
+        r.y = _r->y;
+        r.w = _r->w;
+        r.h = _r->h;
+    } else {
+        r.x = r.y = 0;
+        r.w = width();
+        r.h = height();
     }
-    Log::debug(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
-    SDL_UpdateRects(m_screen, 1, reinterpret_cast<SDL_Rect*>(r));
+    Log::debug(LOG_NAME, "update %d %d %u %u", r.x, r.y, r.w, r.h);
+    SDL_UpdateRects(m_screen, 1, &r);
     return 0;
 }

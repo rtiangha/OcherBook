@@ -9,6 +9,7 @@
 #include "ux/Event.h"
 #include "ux/fb/FrameBuffer.h"
 
+#include "Signal.h"
 #include <ev.h>
 
 #include <string>
@@ -28,9 +29,11 @@ class Window;
 class FbScreen {
 public:
     FbScreen();
+
     ~FbScreen() = default;
 
     void setFrameBuffer(FrameBuffer* fb);
+
     void setEventLoop(EventLoop* loop);
 
     /**
@@ -47,7 +50,8 @@ public:
 
     void dispatchEvent(const struct OcherEvent*);
 
-    EventLoop* m_loop;
+    EventLoop* loop;
+    FrameBuffer* fb;
 
 protected:
     /**
@@ -62,7 +66,6 @@ protected:
     static void readyToIdle(EV_P_ ev_prepare* p, int revents);
     static void waking(EV_P_ ev_check* c, int revents);
 
-    FrameBuffer* m_fb;
     ev_timer m_timer;
     ev_prepare m_evPrepare;
     ev_check m_evCheck;
@@ -73,18 +76,22 @@ protected:
 
 
 /**
- * Base class for all UI widgets
+ * Base class for all UI widgets.  Currently all coordinates are absolute,
+ * since things don't move around.
  */
 class Widget {
 public:
     Widget();
+
     Widget(int x, int y, unsigned int w, unsigned int h);
+
     virtual ~Widget();
 
     /**
      * Adds a child (transfers ownership).
      */
     void addChild(Widget* child);
+
     /**
      * Adds a child (does not transfer ownership).
      */
@@ -96,6 +103,7 @@ public:
     {
         m_flags |= WIDGET_HIDDEN;
     }
+
     void show()
     {
         m_flags &= ~WIDGET_HIDDEN;
@@ -108,8 +116,13 @@ public:
         m_rect.w = w;
         m_rect.h = h;
     }
-    void setPos(int x, int y);
-    void setSize(int w, int h);
+
+    void setPos(int x, int y)
+    {
+        m_rect.x = x;
+        m_rect.y = y;
+    }
+
     void resize(int dx, int dy);
 
     /**
@@ -126,41 +139,44 @@ public:
     /**
      */
     virtual void draw() = 0;
+
+    virtual void onAttached()
+    {
+    }
+
+    virtual void onDetached()
+    {
+    }
+
+    const Rect& rect() { return m_rect; }
+
     Rect drawChildren();
 
     /**
      * @return -1 handled, -2 pass on, >=0 done
      */
-    virtual int evtKey(const struct OcherKeyEvent*)
+    virtual EventDisposition evtKey(const struct OcherKeyEvent*)
     {
-        return -2;
-    }
-    virtual int evtMouse(const struct OcherMouseEvent*)
-    {
-        return -2;
-    }
-    virtual int evtApp(const struct OcherAppEvent*)
-    {
-        return -2;
-    }
-    virtual int evtDevice(const struct OcherDeviceEvent*)
-    {
-        return -2;
+        return EventDisposition::Pass;
     }
 
-    // TODO: abs or rel?
-    Rect m_rect;
+    virtual EventDisposition evtMouse(const struct OcherMouseEvent* evt);
+
+    virtual EventDisposition evtApp(const struct OcherAppEvent*)
+    {
+        return EventDisposition::Pass;
+    }
+
+    virtual EventDisposition evtDevice(const struct OcherDeviceEvent*)
+    {
+        return EventDisposition::Pass;
+    }
+
     unsigned int m_flags;
 
-    virtual void onAttached()
-    {
-    }
-    virtual void onDetached()
-    {
-    }
-
 protected:
-    FrameBuffer* m_fb;
+    Rect m_rect;
+    FbScreen* m_screen;
     Widget* m_parent;
     std::vector<Widget*> m_children;
     // TODO focus
@@ -204,15 +220,25 @@ public:
     void setLabel(const char* label);
 
     void draw();
-    virtual void drawBorder(Rect* rect);
-    virtual void drawLabel(Rect* rect);
+
+    Signal0<> pressed;
 
 protected:
-    int evtKey(const struct OcherKeyEvent*);
-    int evtMouse(const struct OcherMouseEvent*);
+    virtual void drawBorder(Rect* rect);
+    virtual void drawBg(Rect* rect);
+    virtual void drawLabel(Rect* rect);
+
+    EventDisposition evtKey(const struct OcherKeyEvent*);
+    EventDisposition evtMouse(const struct OcherMouseEvent*);
 
     int border;
     std::string m_label;
+
+    bool m_mouseDown;
+
+    ev_timer m_timer;
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+
     // icon;
 };
 
@@ -233,7 +259,7 @@ class Menu : public Widget {
  */
 class Spinner : public Widget {
 public:
-    Spinner(EventLoop* loop);
+    Spinner();
     Spinner(int x, int y, unsigned int w, unsigned int h);
     ~Spinner();
     void start();
@@ -246,7 +272,6 @@ protected:
     unsigned int m_delayMs;
 
     static void timeoutCb(EV_P_ ev_timer* w, int revents);
-    EventLoop* m_loop;
     ev_timer m_timer;
 };
 
@@ -289,6 +314,7 @@ public:
         bmp(_bmp)
     {
     }
+
     virtual ~Icon()
     {
     }

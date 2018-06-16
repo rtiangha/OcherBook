@@ -28,13 +28,13 @@ public:
     void setFg(uint8_t r, uint8_t b, uint8_t g) override;
     void setBg(uint8_t r, uint8_t b, uint8_t g) override;
     void clear() override;
-    void fillRect(Rect* r) override;
-    void byLine(Rect* r, void (*fn)(void* p, size_t n)) override;
+    void fillRect(const Rect* r) override;
+    void byLine(const Rect* r, void (*fn)(void* p, size_t n)) override;
     void pset(int x, int y) override;
     void hline(int x1, int y, int x2) override;
     void vline(int x, int y1, int y2) override;
     void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip) override;
-    int update(Rect* r, bool full = false) override;
+    int update(const Rect* r, bool full = false) override;
 
 protected:
     SdlThread m_sdlThread;

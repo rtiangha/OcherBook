@@ -39,11 +39,18 @@ ocher_sources = [
     'util/StrUtil.cpp',
     'util/StrUtil.h',
     'ux/Activity.cpp',
+    'ux/Activity.h',
     'ux/Controller.cpp',
+    'ux/Controller.h',
     'ux/Event.cpp',
+    'ux/Event.h',
     'ux/Pagination.cpp',
+    'ux/Pagination.h',
     'ux/PowerSaver.cpp',
+    'ux/PowerSaver.h',
     'ux/Renderer.cpp',
+    'ux/Renderer.h',
+    'ux/Types.h',
 ]
 if conf_data.get('OCHER_TARGET_KOBO', false)
     ocher_sources += [

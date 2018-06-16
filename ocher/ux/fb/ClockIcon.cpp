@@ -4,7 +4,6 @@
  */
 
 #include "ux/fb/ClockIcon.h"
-#include "ux/fb/Widgets.h"
 
 ClockIcon::ClockIcon(int x, int y) :
     Widget(x, y, 30, 30),

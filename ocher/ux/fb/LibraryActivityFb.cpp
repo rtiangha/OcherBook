@@ -46,33 +46,33 @@ LibraryActivityFb::~LibraryActivityFb()
     delete[] m_bookRects;
 }
 
-int LibraryActivityFb::evtKey(const struct OcherKeyEvent *evt)
+EventDisposition LibraryActivityFb::evtKey(const struct OcherKeyEvent *evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
         if (evt->key == OEVTK_HOME) {
             Log::info(LOG_NAME, "home");
             m_uxController->setNextActivity(Activity::Type::Home);
-            return -1;
+            return EventDisposition::Handled;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             Log::info(LOG_NAME, "back from page %u", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
                 invalidate();
             }
-            return -1;
+            return EventDisposition::Handled;
         } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
             Log::info(LOG_NAME, "forward from page %u", m_pageNum);
             if (m_pageNum + 1 < m_pages) {
                 m_pageNum++;
                 invalidate();
             }
-            return -1;
+            return EventDisposition::Handled;
         }
     }
-    return -2;
+    return EventDisposition::Pass;
 }
 
-int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
+EventDisposition LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
@@ -82,10 +82,10 @@ int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
             if (idx >= library.size())
                 break;
             Meta* meta = library[idx];
-            if (m_bookRects[i].contains(&pos)) {
+            if (m_bookRects[i].contains(pos)) {
                 m_uxController->ctx.selected = meta;
                 m_uxController->setNextActivity(Activity::Type::Read);
-                return -1;
+                return EventDisposition::Handled;
             }
         }
         // TODO buttons
@@ -95,28 +95,31 @@ int LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
                 m_pageNum--;
                 invalidate();
             }
+            return EventDisposition::Handled;
         } else {
             Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (m_pageNum + 1 < m_pages) {
                 m_pageNum++;
                 invalidate();
             }
+            return EventDisposition::Handled;
         }
     }
-    return -1;
+    return EventDisposition::Pass;
 }
 
 void LibraryActivityFb::draw()
 {
     Log::debug(LOG_NAME, "draw");
 
-    m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(&m_rect);
-    m_fb->setFg(0, 0, 0);
+    FrameBuffer* fb = m_screen->fb;
+    fb->setFg(0xff, 0xff, 0xff);
+    fb->fillRect(&m_rect);
+    fb->setFg(0, 0, 0);
 
-    FontEngine fe(m_fb);
+    FontEngine fe(fb);
     Pos pos;
-    Rect clip = m_fb->bbox;
+    Rect clip = fb->bbox;
 
     fe.setSize(10);
     fe.apply();
@@ -126,7 +129,7 @@ void LibraryActivityFb::draw()
     fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCENTER);
 // TODO        int maxY = pos.y - fe.m_cur.ascender;
 
-    clip.y = m_systemBar->m_rect.y + m_systemBar->m_rect.h + m_settings->medSpace;
+    clip.y = m_systemBar->rect().y + m_systemBar->rect().h + m_settings->medSpace;
     clip.x = m_settings->medSpace;
     clip.w -= m_settings->medSpace * 2;
     const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
@@ -153,7 +156,7 @@ void LibraryActivityFb::draw()
         m_bookRects[i].h = pos.y + fe.m_cur.descender + m_settings->smallSpace;
         clip.y = m_bookRects[i].y + m_bookRects[i].h;
 
-        m_fb->hline(clip.x, clip.y, clip.w);
+        fb->hline(clip.x, clip.y, clip.w);
     }
 }
 

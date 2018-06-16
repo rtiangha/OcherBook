@@ -48,11 +48,18 @@ list(APPEND LIB_SOURCES
     util/StrUtil.h
     util/intrinsics.h
     ux/Activity.cpp
+    ux/Activity.h
     ux/Controller.cpp
+    ux/Controller.h
     ux/Event.cpp
+    ux/Event.h
     ux/Pagination.cpp
+    ux/Pagination.h
     ux/PowerSaver.cpp
+    ux/PowerSaver.h
     ux/Renderer.cpp
+    ux/Renderer.h
+    ux/Types.h
 )
 if(UX_FD)
     list(APPEND LIB_SOURCES

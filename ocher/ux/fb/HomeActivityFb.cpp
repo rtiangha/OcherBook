@@ -3,13 +3,14 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ux/fb/HomeActivityFb.h"
+
 #include "Container.h"
 #include "settings/Settings.h"
 #include "shelf/Meta.h"
-#include "ux/fb/FontEngine.h"
-#include "ux/fb/HomeActivityFb.h"
-#include "ux/fb/UxControllerFb.h"
 #include "util/Logger.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/UxControllerFb.h"
 
 #define LOG_NAME "ocher.ux.Home"
 
@@ -49,13 +50,9 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
     books[4].h = books[4].w * coverRatio;
 }
 
-int HomeActivityFb::evtKey(const struct OcherKeyEvent*)
+EventDisposition HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
-    return -1;
-}
-
-int HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
-{
+    FrameBuffer* fb = m_screen->fb;
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
         auto metas = m_uxController->ctx.library.getList();
@@ -65,38 +62,35 @@ int HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 Log::trace(LOG_NAME, "book %d has no meta", i);
                 continue;
             }
-            if (books[i].contains(&pos)) {
+            if (books[i].contains(pos)) {
                 Log::info(LOG_NAME, "book %d selected %p", i, meta);
                 Rect r = books[i];
                 r.inset(-2);
-                m_fb->roundRect(&r, 3);
+                fb->roundRect(&r, 3);
                 r.inset(-1);
-                m_fb->roundRect(&r, 4);
-                m_fb->update(&r);
-                m_fb->sync();
+                fb->roundRect(&r, 4);
+                fb->update(&r);
+                fb->sync();
                 m_uxController->ctx.selected = meta;
                 m_uxController->setNextActivity(Activity::Type::Read);
-                return -1;
+                return EventDisposition::Handled;
             }
-        }
-        if (m_browseLabel.contains(&pos)) {
-            m_uxController->setNextActivity(Activity::Type::Library);
-            return -1;
         }
         // TODO: look at shortlist
     }
-    return -1;
+    return Widget::evtMouse(evt);
 }
 
 void HomeActivityFb::draw()
 {
     Log::debug(LOG_NAME, "draw");
 
-    m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(&m_rect);
-    m_fb->setFg(0, 0, 0);
+    FrameBuffer* fb = m_screen->fb;
+    fb->setFg(0xff, 0xff, 0xff);
+    fb->fillRect(&m_rect);
+    fb->setFg(0, 0, 0);
 
-    FontEngine fe(m_fb);
+    FontEngine fe(fb);
     fe.setSize(12);
     fe.apply();
     Rect r;
@@ -105,16 +99,16 @@ void HomeActivityFb::draw()
     for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
         r = books[i];
         r.inset(-1);
-        m_fb->rect(&r);
+        fb->rect(&r);
         r.inset(-1);
-        m_fb->roundRect(&r, 1);
+        fb->roundRect(&r, 1);
         r.inset(2);
 
         Meta* meta = i < metas.size() ? metas[i] : nullptr;
         uint8_t c = meta ? 0xf0 : 0xd0;
-        m_fb->setFg(c, c, c);
-        m_fb->fillRect(&r);
-        m_fb->setFg(0, 0, 0);
+        fb->setFg(c, c, c);
+        fb->fillRect(&r);
+        fb->setFg(0, 0, 0);
         if (meta) {
             pos.x = 0;
             pos.y = fe.m_cur.ascender;
@@ -136,7 +130,8 @@ void HomeActivityFb::draw()
     pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_container.settings->smallSpace;
     fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
 
-    // TODO simplify, abstract into labels
+    // TODO delete this in favor of real Button
+#if 0
     {
         fe.setSize(12);
         fe.setItalic(1);
@@ -149,13 +144,14 @@ void HomeActivityFb::draw()
         fe.plotString(text, strlen(text), &glyphs[0], &lbox);
         // TODO  right justify against lbox (remove plotString call); get bbox returned
         pos.x = m_rect.w - books[0].x - lbox.w;
-        fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
+        //fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
     }
+#endif
 
     pos.y += fe.m_cur.underlinePos + g_container.settings->smallSpace;
-    m_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+    fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
     pos.y++;
-    m_fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+    fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
 
     pos.x = books[0].x;
     pos.y += g_container.settings->smallSpace;
@@ -168,9 +164,9 @@ void HomeActivityFb::draw()
         int w = h / coverRatio;
         Rect sl(pos.x, pos.y, w, h);
         while (sl.x + sl.w <= m_rect.w - margin) {
-            m_fb->roundRect(&sl, 1);
+            fb->roundRect(&sl, 1);
             sl.inset(-1);
-            m_fb->roundRect(&sl, 2);
+            fb->roundRect(&sl, 2);
 
             sl.x += sl.w + g_container.settings->smallSpace;
 
@@ -180,14 +176,14 @@ void HomeActivityFb::draw()
     }
 
 #if 0
-    m_fb->byLine(&m_fb->bbox, dim);
+    fb->byLine(&fb->bbox, dim);
     Rect popup(25, 200, 550, 400);
-    m_fb->rect(&popup);
+    fb->rect(&popup);
     popup.inset(1);
-    m_fb->rect(&popup);
+    fb->rect(&popup);
     popup.inset(1);
-    m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(&popup);
+    fb->setFg(0xff, 0xff, 0xff);
+    fb->fillRect(&popup);
 #endif
 }
 
@@ -202,7 +198,21 @@ void HomeActivityFb::onAttached()
     systemBar->m_title = "HOME";
     systemBar->show();
 
+    // TODO
+    //  - italic
+    //  - widget packing
+    Button* button = new Button(300, 600, 90, 30);
+    button->setLabel("Browse all...");
+    button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
+    addChild(button);
+
     invalidate();
+}
+
+void HomeActivityFb::browseButtonPressed()
+{
+    Log::info(LOG_NAME, "Browse button pressed");
+    m_uxController->setNextActivity(Activity::Type::Library);
 }
 
 void HomeActivityFb::onDetached()

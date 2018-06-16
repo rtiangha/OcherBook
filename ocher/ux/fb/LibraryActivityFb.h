@@ -19,8 +19,8 @@ public:
 
     void draw();
 
-    int evtKey(const struct OcherKeyEvent*);
-    int evtMouse(const struct OcherMouseEvent*);
+    EventDisposition evtKey(const struct OcherKeyEvent*);
+    EventDisposition evtMouse(const struct OcherMouseEvent*);
 
 protected:
     void onAttached();

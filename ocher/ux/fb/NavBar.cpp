@@ -3,14 +3,13 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "Container.h"
 #include "ux/fb/NavBar.h"
 
 
-NavBar::NavBar(FrameBuffer* fb) :
-    Window(0, fb->height() - 50, fb->width(), 50),
-    m_fb(fb)
+NavBar::NavBar() :
+    m_fb(m_screen->fb)
 {
+    setRect(0, m_fb->height() - 50, m_fb->width(), 50);
 }
 
 void NavBar::drawContent(Rect* pos)

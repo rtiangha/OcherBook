@@ -9,13 +9,14 @@
 #include "settings/Settings.h"
 
 
-SystemBar::SystemBar(FrameBuffer* fb, Battery* battery) :
-    Window(0, 0, fb->width(), 30 /* TODO */),
+SystemBar::SystemBar(Battery* battery) :
     m_sep(false),
-    m_fb(fb),
+    m_fb(m_screen->fb),
     m_batteryIcon(g_container.settings->smallSpace, 0, battery),
     m_clockIcon(m_fb->width() - 50, 0)
 {
+    setRect(0, 0, m_fb->width(), 30);
+
     m_borderWidth = 0;
     addChild(m_batteryIcon);
     addChild(m_clockIcon);

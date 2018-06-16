@@ -55,20 +55,19 @@ void BootActivityFb::highlight(int i)
     m_fb->sync();
 }
 
-int BootActivityFb::evtMouse(const struct OcherMouseEvent* evt)
+EventDisposition BootActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
-        if (apps[0].contains(&pos)) {
+        if (apps[0].contains(pos)) {
             highlight(0);
             m_uxController->setNextActivity(Activity::Type::Sync);
-            return 0;
-        } else if (apps[1].contains(&pos)) {
+        } else if (apps[1].contains(pos)) {
             highlight(1);
             exit(1);
         }
     }
-    return -1;
+    return EventDisposition::Handled;
 }
 
 void BootActivityFb::draw()

@@ -43,10 +43,10 @@ public:
     virtual void setFg(uint8_t r, uint8_t b, uint8_t g) = 0;
     virtual void setBg(uint8_t r, uint8_t b, uint8_t g) = 0;
     virtual void clear() = 0;
-    virtual void rect(Rect* rect);
-    virtual void fillRect(Rect* r) = 0;
-    virtual void byLine(Rect* r, void (*fn)(void* p, size_t n)) = 0;
-    virtual void roundRect(Rect* rect, unsigned int radius);
+    virtual void rect(const Rect* rect);
+    virtual void fillRect(const Rect* r) = 0;
+    virtual void byLine(const Rect* r, void (*fn)(void* p, size_t n)) = 0;
+    virtual void roundRect(const Rect* rect, unsigned int radius);
 
     /**
      * Sets a pixel in the current color.
@@ -91,7 +91,7 @@ public:
      */
     void blitGlyphs(Glyph* *glyphs, Pos* pen, const Rect* clip = 0);
 
-    virtual int update(Rect* r, bool full = false) = 0;
+    virtual int update(const Rect* r, bool full = false) = 0;
 
     /**
      * Ensures that all prior updates have completed.

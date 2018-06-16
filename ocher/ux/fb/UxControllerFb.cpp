@@ -78,11 +78,13 @@ bool UxControllerFb::init()
     } while (false);
 
     g_container.frameBuffer = m_frameBuffer = frameBuffer;
+    m_screen.setFrameBuffer(frameBuffer);
+    m_screen.setEventLoop(g_container.loop);
     m_renderer = new RendererFb(m_frameBuffer);
     m_fontEngine = new FontEngine(m_frameBuffer);
 
-    m_systemBar = new SystemBar(m_frameBuffer, g_container.battery);
-    m_navBar = new NavBar(m_frameBuffer);
+    m_systemBar = new SystemBar(g_container.battery);
+    m_navBar = new NavBar();
 
     m_bootActivity = new BootActivityFb(this);
     m_homeActivity = new HomeActivityFb(this);
@@ -91,9 +93,6 @@ bool UxControllerFb::init()
     m_settingsActivity = new SettingsActivityFb(this);
     m_sleepActivity = new SleepActivityFb(this);
     m_syncActivity = new SyncActivityFb(this);
-
-    m_screen.setFrameBuffer(frameBuffer);
-    m_screen.setEventLoop(g_container.loop);
 
     return true;
 }

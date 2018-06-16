@@ -14,7 +14,7 @@
 
 class SystemBar : public Window {
 public:
-    SystemBar(FrameBuffer* fb, Battery* battery);
+    SystemBar(Battery* battery);
 
     bool m_sep;
 

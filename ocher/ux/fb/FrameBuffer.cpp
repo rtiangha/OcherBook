@@ -72,7 +72,7 @@ void memOr(void* dst, const void* src, size_t n)
     }
 }
 
-void Rect::unionRect(Rect* r)
+void Rect::unionRect(const Rect* r)
 {
     if (!valid()) {
         *this = *r;
@@ -91,7 +91,7 @@ void Rect::unionRect(Rect* r)
     h = y2 - y1;
 }
 
-void Rect::unionRects(Rect* r1, Rect* r2)
+void Rect::unionRects(const Rect* r1, const Rect* r2)
 {
     if (!r1->valid()) {
         *this = *r2;
@@ -146,7 +146,7 @@ void FrameBuffer::line(int x0, int y0, int x1, int y1)
     }
 }
 
-void FrameBuffer::rect(Rect* r)
+void FrameBuffer::rect(const Rect* r)
 {
     hline(r->x, r->y, r->x + r->w - 1);
     hline(r->x, r->y + r->h - 1, r->x + r->w - 1);
@@ -154,7 +154,7 @@ void FrameBuffer::rect(Rect* r)
     vline(r->x + r->w - 1, r->y, r->y + r->h - 1);
 }
 
-void FrameBuffer::roundRect(Rect* r, unsigned int radius)
+void FrameBuffer::roundRect(const Rect* r, unsigned int radius)
 {
     hline(r->x + radius, r->y, r->x + r->w - 1 - radius);
     hline(r->x + radius, r->y + r->h - 1, r->x + r->w - 1 - radius);

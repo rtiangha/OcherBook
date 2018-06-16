@@ -25,9 +25,6 @@
 #define LOG_NAME "ocher.mx50"
 
 
-// Kobo Touch: MX508
-// http://mediaz.googlecode.com/svn-history/r19/trunk/ReaderZ/native/einkfb/einkfb.c
-
 FrameBufferMx50::FrameBufferMx50() :
     m_fd(-1),
     m_fb(nullptr),
@@ -160,7 +157,7 @@ inline void FrameBufferMx50::hline(int x1, int y, int x2)
     memset(m_fb + y * vinfo.xres_virtual + x1, m_fgColor, dx + 1);
 }
 
-void FrameBufferMx50::fillRect(Rect* r)
+void FrameBufferMx50::fillRect(const Rect* r)
 {
     int y2 = r->y + r->h;
 
@@ -169,7 +166,7 @@ void FrameBufferMx50::fillRect(Rect* r)
     }
 }
 
-void FrameBufferMx50::byLine(Rect* r, void (*fn)(void* p, size_t n))
+void FrameBufferMx50::byLine(const Rect* r, void (*fn)(void* p, size_t n))
 {
     int y2 = r->y + r->h;
 
@@ -222,7 +219,7 @@ void FrameBufferMx50::blit(const unsigned char* p, int x, int y, int w, int h, c
     }
 }
 
-int FrameBufferMx50::update(Rect* r, bool full)
+int FrameBufferMx50::update(const Rect* r, bool full)
 {
     Rect _r;
 
