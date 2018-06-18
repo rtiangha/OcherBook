@@ -26,6 +26,9 @@ protected:
     void onAttached();
     void onDetached();
 
+    void leftIconPressed();
+    void rightIconPressed();
+
     SystemBar* m_systemBar;
     Settings* m_settings;
 #define BOOKS_PER_PAGE 11

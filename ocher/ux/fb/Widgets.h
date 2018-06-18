@@ -15,9 +15,10 @@
 #include <string>
 #include <vector>
 
-#define WIDGET_HIDDEN 1  ///< draw will not be called
-#define WIDGET_OWNED  2
-#define WIDGET_DIRTY  4
+#define WIDGET_HIDDEN     1  ///< draw will not be called
+#define WIDGET_OWNED      2
+#define WIDGET_DIRTY      4
+#define WIDGET_BORDERLESS 8
 
 
 class Widget;
@@ -200,8 +201,6 @@ public:
     void maximize();
 
     uint32_t m_bgColor;
-    uint32_t m_borderColor;
-    uint8_t m_borderWidth;
     uint32_t m_winflags;
 
     std::string m_title;
@@ -215,6 +214,7 @@ protected:
 class Button : public Widget {
 public:
     Button(int x, int y, unsigned int w = 0, unsigned int h = 0);
+    Button(const char* label);
     ~Button() = default;
 
     void setLabel(const char* label);
@@ -231,10 +231,10 @@ protected:
     EventDisposition evtKey(const struct OcherKeyEvent*);
     EventDisposition evtMouse(const struct OcherMouseEvent*);
 
-    int border;
+    static constexpr int m_pad = 10;  // TODO abitrary
     std::string m_label;
 
-    bool m_mouseDown;
+    bool m_mouseDown = false;
 
     ev_timer m_timer;
     static void timeoutCb(EV_P_ ev_timer* w, int revents);
@@ -315,13 +315,16 @@ public:
     {
     }
 
-    virtual ~Icon()
-    {
-    }
-
     void draw();
 
+    Signal0<> pressed;
+
+protected:
+    EventDisposition evtMouse(const struct OcherMouseEvent*);
+
     Bitmap* bmp;
+
+    bool m_mouseDown = false;
 };
 
 #if 0

@@ -71,7 +71,7 @@ struct Rect {
 class Glyph {
 public:
     Glyph() :
-        bitmap(0)
+        bitmap(nullptr)
     {
     }
 

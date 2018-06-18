@@ -15,7 +15,6 @@
 
 #define LOG_NAME "ocher.widgets"
 
-static const unsigned int borderWidth = 2;
 static const unsigned int roundRadius = 1;
 static FbScreen* g_screen;
 
@@ -124,8 +123,6 @@ EventDisposition Widget::evtMouse(const struct OcherMouseEvent* evt)
 Window::Window() :
     Widget(0, 0, 0, 0),
     m_bgColor(0xffffffff),
-    m_borderColor(0),
-    m_borderWidth(borderWidth),
     m_winflags(0)
 {
 }
@@ -133,8 +130,6 @@ Window::Window() :
 Window::Window(int x, int y, unsigned int w, unsigned int h) :
     Widget(x, y, w, h),
     m_bgColor(0xffffffff),
-    m_borderColor(0),
-    m_borderWidth(borderWidth),
     m_winflags(0)
 {
 }
@@ -164,13 +159,10 @@ void Window::draw()
 
 void Window::drawBorder(Rect* rect)
 {
-    if (m_borderWidth) {
+    if (!(m_flags & WIDGET_BORDERLESS)) {
         m_screen->fb->setFg(0, 0, 0);
         m_screen->fb->rect(rect);
-        rect->x += m_borderWidth;
-        rect->y += m_borderWidth;
-        rect->w -= m_borderWidth * 2;
-        rect->h -= m_borderWidth * 2;
+        rect->inset(1);
     }
 }
 
@@ -201,9 +193,25 @@ Button::Button(int x, int y, unsigned int w, unsigned int h) :
 {
 }
 
+Button::Button(const char* label)
+{
+    setLabel(label);
+}
+
 void Button::setLabel(const char* label)
 {
     m_label = label;
+
+    FontEngine fe(m_screen->fb);
+    // TODO  how to specify attributes? set GlyphFace on label?
+    fe.setSize(12);
+    fe.apply();
+
+    Rect lbox;
+    Glyph* glyphs[m_label.length() + 1]; // TODO glyphs not chars
+    fe.plotString(m_label.c_str(), m_label.length(), &glyphs[0], &lbox);
+    m_rect.w = lbox.w + m_pad * 2;
+    m_rect.h = fe.m_cur.lineHeight + m_pad * 2;
 }
 
 void Button::draw()
@@ -211,7 +219,6 @@ void Button::draw()
     Rect rect(m_rect);
 
     drawBorder(&rect);
-    rect.inset(1);
     drawBg(&rect);
     drawLabel(&rect);
     drawChildren();
@@ -222,8 +229,11 @@ void Button::draw()
 
 void Button::drawBorder(Rect* rect)
 {
-    m_screen->fb->setFg(0, 0, 0);
-    m_screen->fb->roundRect(rect, roundRadius);
+    if (!(m_flags & WIDGET_BORDERLESS)) {
+        m_screen->fb->setFg(0, 0, 0);
+        m_screen->fb->roundRect(rect, roundRadius);
+        rect->inset(1);
+    }
 }
 
 void Button::drawBg(Rect* rect)
@@ -238,9 +248,11 @@ void Button::drawLabel(Rect* rect)
         FontEngine fe(m_screen->fb);
         fe.setSize(12);
         fe.apply();
-        //   Pos pos;
-        //   pos.x = 0; pos.y = m_rect.h / 2;
-        //   fe.renderString(m_label.c_str(), m_label.length(), &pos, &m_rect, FE_XCENTER);
+
+        Pos pos;
+        pos.x = m_pad;
+        pos.y = m_rect.h - m_pad + fe.m_cur.descender;
+        fe.renderString(m_label.c_str(), m_label.length(), &pos, &m_rect, 0);
     }
 }
 
@@ -346,6 +358,17 @@ void Icon::draw()
         m_screen->fb->byLine(&m_rect, lighten);
     }
 #endif
+}
+
+EventDisposition Icon::evtMouse(const struct OcherMouseEvent* evt)
+{
+    if (evt->subtype == OEVT_MOUSE1_DOWN) {
+        m_mouseDown = true;
+    } else if (evt->subtype == OEVT_MOUSE1_UP && m_mouseDown) {
+        m_mouseDown = false;
+        pressed();
+    }
+    return EventDisposition::Handled;
 }
 
 FbScreen::FbScreen()

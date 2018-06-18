@@ -130,24 +130,6 @@ void HomeActivityFb::draw()
     pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_container.settings->smallSpace;
     fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
 
-    // TODO delete this in favor of real Button
-#if 0
-    {
-        fe.setSize(12);
-        fe.setItalic(1);
-        fe.apply();
-        Rect lbox;
-        lbox.x = 0;
-        lbox.y = pos.y;
-        Glyph* glyphs[14];
-        const char* text = "Browse all...";
-        fe.plotString(text, strlen(text), &glyphs[0], &lbox);
-        // TODO  right justify against lbox (remove plotString call); get bbox returned
-        pos.x = m_rect.w - books[0].x - lbox.w;
-        //fe.renderString(text, strlen(text), &pos, &m_rect, 0, &m_browseLabel);
-    }
-#endif
-
     pos.y += fe.m_cur.underlinePos + g_container.settings->smallSpace;
     fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
     pos.y++;
@@ -198,11 +180,10 @@ void HomeActivityFb::onAttached()
     systemBar->m_title = "HOME";
     systemBar->show();
 
-    // TODO
-    //  - italic
-    //  - widget packing
-    Button* button = new Button(300, 600, 90, 30);
-    button->setLabel("Browse all...");
+    // TODO set italic
+    Button* button = new Button("Browse all...");
+    button->m_flags |= WIDGET_BORDERLESS;
+    button->setPos(430, 575);  // TODO widget packing
     button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
     addChild(button);
 

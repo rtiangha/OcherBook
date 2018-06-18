@@ -85,11 +85,11 @@ public:
      * @param h
      * @param clip
      */
-    virtual void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip = 0) = 0;
+    virtual void blit(const unsigned char* p, int x, int y, int w, int h, const Rect* clip = nullptr) = 0;
 
     /**
      */
-    void blitGlyphs(Glyph* *glyphs, Pos* pen, const Rect* clip = 0);
+    void blitGlyphs(Glyph* *glyphs, Pos* pen, const Rect* clip = nullptr);
 
     virtual int update(const Rect* r, bool full = false) = 0;
 

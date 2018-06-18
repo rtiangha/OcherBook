@@ -17,7 +17,7 @@ SystemBar::SystemBar(Battery* battery) :
 {
     setRect(0, 0, m_fb->width(), 30);
 
-    m_borderWidth = 0;
+    m_flags |= WIDGET_BORDERLESS;
     addChild(m_batteryIcon);
     addChild(m_clockIcon);
 

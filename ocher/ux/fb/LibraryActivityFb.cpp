@@ -34,11 +34,14 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     m_systemBar->m_title = "LIBRARY";
     m_systemBar->show();
     addChild(m_systemBar);
-    addChild(new Icon(m_settings->medSpace + m_settings->largeSpace,
-                    m_rect.h - m_settings->medSpace - bmpLeftArrow.h, &bmpLeftArrow));
-    addChild(new Icon(m_rect.w - (m_settings->medSpace + m_settings->largeSpace + bmpRightArrow.w),
-                    m_rect.h - m_settings->medSpace - bmpRightArrow.h, &bmpRightArrow));
-
+    Icon* icon = new Icon(m_settings->medSpace + m_settings->largeSpace,
+            m_rect.h - m_settings->medSpace - bmpLeftArrow.h, &bmpLeftArrow);
+    icon->pressed.Connect(this, &LibraryActivityFb::leftIconPressed);
+    addChild(icon);
+    icon = new Icon(m_rect.w - (m_settings->medSpace + m_settings->largeSpace + bmpRightArrow.w),
+            m_rect.h - m_settings->medSpace - bmpRightArrow.h, &bmpRightArrow);
+    icon->pressed.Connect(this, &LibraryActivityFb::rightIconPressed);
+    addChild(icon);
 }
 
 LibraryActivityFb::~LibraryActivityFb()
@@ -88,24 +91,8 @@ EventDisposition LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
                 return EventDisposition::Handled;
             }
         }
-        // TODO buttons
-        if (pos.x < 300) {
-            Log::info(LOG_NAME, "back from page %d", m_pageNum);
-            if (m_pageNum > 0) {
-                m_pageNum--;
-                invalidate();
-            }
-            return EventDisposition::Handled;
-        } else {
-            Log::info(LOG_NAME, "forward from page %d", m_pageNum);
-            if (m_pageNum + 1 < m_pages) {
-                m_pageNum++;
-                invalidate();
-            }
-            return EventDisposition::Handled;
-        }
     }
-    return EventDisposition::Pass;
+    return Widget::evtMouse(evt);
 }
 
 void LibraryActivityFb::draw()
@@ -178,4 +165,22 @@ void LibraryActivityFb::onAttached()
 void LibraryActivityFb::onDetached()
 {
     Log::info(LOG_NAME, "detached");
+}
+
+void LibraryActivityFb::leftIconPressed()
+{
+    Log::info(LOG_NAME, "Left icon pressed");
+    if (m_pageNum > 0) {
+        m_pageNum--;
+        invalidate();
+    }
+}
+
+void LibraryActivityFb::rightIconPressed()
+{
+    Log::info(LOG_NAME, "Right icon pressed");
+    if (m_pageNum + 1 < m_pages) {
+        m_pageNum++;
+        invalidate();
+    }
 }

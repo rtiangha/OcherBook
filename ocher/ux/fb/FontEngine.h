@@ -63,6 +63,7 @@ public:
      *
      */
     void plotString(const char* str, unsigned int len, Glyph** glyphs, Rect* boundingBox);
+// TODO            int16_t bearingX, int16_t bearingY);
 
     /** Renders a string, in the current font.
      *
@@ -76,6 +77,7 @@ public:
      *      XCLIP    Render clipped char, or stop if char does not fit.  N/A if WRAP.
      *      YCLIP    Render clipped char, or stop if char does not fit.
      *      XCENTER  Centers horizontally within the rect.  Currently incompatible with WRAP.
+     *               TODO buggy
      * @param bbox Bounding box containing all output
      * @return offset of first unrendered character (==len if all fit).  May also stop early if len
      *      splits a multi-byte character.
@@ -86,7 +88,7 @@ public:
 #define FE_YCLIP    8
 #define FE_XCENTER 16
     unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags,
-            Rect* bbox = 0);
+            Rect* bbox = nullptr);
 
     GlyphCache m_cache;
 
