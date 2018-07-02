@@ -13,11 +13,11 @@ class ClockIcon : public Widget {
 public:
     ClockIcon(int x, int y);
 
-    void draw();
-
-    void onActivate(bool active);
-
 protected:
+    void onAttached() override;
+    void onDetached() override;
+    void draw() override;
+
     bool m_active;
 };
 

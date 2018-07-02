@@ -16,9 +16,8 @@
 #include <vector>
 
 #define WIDGET_HIDDEN     1  ///< draw will not be called
-#define WIDGET_OWNED      2
-#define WIDGET_DIRTY      4
-#define WIDGET_BORDERLESS 8
+#define WIDGET_DIRTY      2
+#define WIDGET_BORDERLESS 4
 
 
 class Widget;
@@ -29,30 +28,20 @@ class Window;
  */
 class FbScreen {
 public:
-    FbScreen();
+    FbScreen(EventLoop& loop);
 
     ~FbScreen() = default;
 
     void setFrameBuffer(FrameBuffer* fb);
 
-    void setEventLoop(EventLoop* loop);
+    void addChild(std::unique_ptr<Widget> child);
 
-    /**
-     * Adds a child (transfers ownership).
-     */
-    void addChild(Window* child);
-
-    /**
-     * Adds a child (does not transfer ownership).
-     */
-//	void addChild(Widget& child);
-
-    void removeChild(Window* child);
+    void removeChild(Widget* child);
 
     void dispatchEvent(const struct OcherEvent*);
 
-    EventLoop* loop;
-    FrameBuffer* fb;
+    EventLoop& loop;
+    FrameBuffer* fb = nullptr;
 
 protected:
     /**
@@ -72,7 +61,7 @@ protected:
     ev_check m_evCheck;
 
     Rect m_rect;
-    std::vector<Widget*> m_children;
+    std::vector<std::unique_ptr<Widget>> m_children;
 };
 
 
@@ -86,17 +75,9 @@ public:
 
     Widget(int x, int y, unsigned int w, unsigned int h);
 
-    virtual ~Widget();
+    virtual ~Widget() = default;
 
-    /**
-     * Adds a child (transfers ownership).
-     */
-    void addChild(Widget* child);
-
-    /**
-     * Adds a child (does not transfer ownership).
-     */
-    void addChild(Widget& child);
+    void addChild(std::unique_ptr<Widget> child);
 
     void removeChild(Widget* child);
 
@@ -179,7 +160,7 @@ protected:
     Rect m_rect;
     FbScreen* m_screen;
     Widget* m_parent;
-    std::vector<Widget*> m_children;
+    std::vector<std::unique_ptr<Widget>> m_children;
     // TODO focus
 };
 
@@ -191,21 +172,21 @@ public:
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window() = default;
 
-    void draw();
+    void draw() override;
     virtual void drawBorder(Rect* rect);
     virtual void drawTitle(Rect* rect);
     virtual void drawBg(Rect* rect);
     virtual void drawContent(Rect* rect);
 
-    void setTitle(const char* title);
+    void setTitle(const std::string& title);
     void maximize();
 
     uint32_t m_bgColor;
     uint32_t m_winflags;
 
+protected:
     std::string m_title;
 
-protected:
     // border style:  none, simple, raised
     // bubble arrow:  none, top, right, bottom, left
     // close
@@ -219,7 +200,7 @@ public:
 
     void setLabel(const char* label);
 
-    void draw();
+    void draw() override;
 
     Signal0<> pressed;
 
@@ -228,8 +209,8 @@ protected:
     virtual void drawBg(Rect* rect);
     virtual void drawLabel(Rect* rect);
 
-    EventDisposition evtKey(const struct OcherKeyEvent*);
-    EventDisposition evtMouse(const struct OcherMouseEvent*);
+    EventDisposition evtKey(const struct OcherKeyEvent*) override;
+    EventDisposition evtMouse(const struct OcherMouseEvent*) override;
 
     static constexpr int m_pad = 10;  // TODO abitrary
     std::string m_label;
@@ -264,7 +245,7 @@ public:
     ~Spinner();
     void start();
     void stop();
-    void draw();
+    void draw() override;
 
 protected:
     unsigned int m_state;
@@ -315,12 +296,12 @@ public:
     {
     }
 
-    void draw();
+    void draw() override;
 
     Signal0<> pressed;
 
 protected:
-    EventDisposition evtMouse(const struct OcherMouseEvent*);
+    EventDisposition evtMouse(const struct OcherMouseEvent*) override;
 
     Bitmap* bmp;
 

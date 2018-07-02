@@ -16,7 +16,7 @@ public:
      */
     LogAppenderFile(const char* filename);
     ~LogAppenderFile();
-    void append(std::string const& s);
+    void append(std::string const& s) override;
 
 protected:
     File m_file;

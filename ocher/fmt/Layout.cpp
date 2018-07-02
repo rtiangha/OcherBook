@@ -29,12 +29,12 @@ Layout::~Layout()
     const char* raw = m_data.data();
 
     for (unsigned int i = 0; i < N; ) {
-        uint16_t code = *(uint16_t*)(raw + i);
+        auto code = *(const uint16_t*)(raw + i);
         i += 2;
         unsigned int opType = (code >> 12) & 0xf;
         unsigned int op = (code >> 8) & 0xf;
         if (opType == OpCmd && op == CmdOutputStr) {
-            delete *(Buffer**)(raw + i);
+            delete *(Buffer* const*)(raw + i);
             i += sizeof(Buffer*);
         }
     }

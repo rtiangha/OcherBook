@@ -61,7 +61,7 @@ void Debugger::nameThread(const char* fmt, ...)
 
 #if DEBUG
 #if defined(__linux__)
-    prctl(PR_SET_NAME, (unsigned long)name.c_str());
+    prctl(PR_SET_NAME, reinterpret_cast<unsigned long>(name.c_str()));
 #endif
 #endif
 }

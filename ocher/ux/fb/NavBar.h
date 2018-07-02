@@ -14,7 +14,7 @@ public:
     NavBar();
 
 protected:
-    void drawContent(Rect*);
+    void drawContent(Rect*) override;
 
     FrameBuffer* m_fb;
 };

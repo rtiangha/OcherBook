@@ -3,7 +3,6 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "Container.h"
 #include "settings/Options.h"
 #include "ux/Controller.h"
 
@@ -52,7 +51,7 @@ void usage(const char* msg = nullptr)
 
 int main(int argc, char** argv)
 {
-    auto opt = new Options;
+    Options opt;
 
     struct option long_options[] =
     {
@@ -79,13 +78,13 @@ int main(int argc, char** argv)
         case 0:
             break;
         case 'b':
-            opt->bootMenu = true;
+            opt.bootMenu = true;
             break;
         case 'v':
-            opt->verbose++;
+            opt.verbose++;
             break;
         case 'q':
-            opt->verbose--;
+            opt.verbose--;
             break;
         case 'h':
             usage();
@@ -95,17 +94,17 @@ int main(int argc, char** argv)
             char* split = strchr(optarg, '=');
             if (split) {
                 *split = 0;
-                opt->keys[optarg] = split + 1;
+                opt.keys[optarg] = split + 1;
             } else {
-                opt->keys[optarg] = "";
+                opt.keys[optarg] = "";
             }
             break;
         }
         case OPT_DRIVER:
-            opt->driverName = optarg;
+            opt.driverName = optarg;
             break;
         case OPT_LIST_DRIVERS:
-            opt->listDrivers = true;
+            opt.listDrivers = true;
             break;
         default:
             usage("Unknown argument");
@@ -114,7 +113,7 @@ int main(int argc, char** argv)
     }
 
     if (optind < argc) {
-        opt->files = (const char**)&argv[optind];
+        opt.files = (const char* const*)&argv[optind];
     }
 
     try {

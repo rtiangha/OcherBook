@@ -15,7 +15,8 @@
 #define LOG_NAME "ocher.sdl"
 
 
-FrameBufferSdl::FrameBufferSdl() :
+FrameBufferSdl::FrameBufferSdl(EventLoop& loop) :
+    m_loop(loop),
     m_sdl(0),
     m_screen(nullptr)
 {
@@ -26,11 +27,6 @@ FrameBufferSdl::~FrameBufferSdl()
     m_sdlThread.stop();
     if (m_sdl)
         SDL_Quit();
-}
-
-void FrameBufferSdl::inject(EventLoop* loop)
-{
-    m_sdlThread.setEventLoop(loop);
 }
 
 bool FrameBufferSdl::init()
@@ -44,6 +40,8 @@ bool FrameBufferSdl::init()
     if (!m_screen) {
         return false;
     }
+
+    m_sdlThread.setEventLoop(&m_loop);
 
     SDL_Color colors[256];
     for (unsigned int i = 0; i < 256; ++i) {

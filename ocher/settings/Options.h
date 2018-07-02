@@ -21,11 +21,11 @@ public:
 
     bool listDrivers = false;
 
-    const char *driverName = nullptr;
+    const char* driverName = nullptr;
 
     /** Files and/or directories passed on the command line, to be synced once.
      */
-    const char **files = nullptr;
+    const char* const* files = nullptr;
 
     int inFd = 0;
     int outFd = 1;

@@ -106,6 +106,7 @@ struct OcherEvent {
 class EventLoop {
 public:
     EventLoop();
+    ~EventLoop();
 
     /** Runs the event loop on the current thread.  Returns after stop is called (whether internally
      * or externally).
@@ -156,7 +157,7 @@ class EventWork {
 public:
     /** Derived class must call start() / join().
      */
-    EventWork(EventLoop* loop);
+    EventWork(EventLoop& loop);
     virtual ~EventWork();
 
     void start();
@@ -179,7 +180,7 @@ protected:
 
     static void completeCb(EV_P_ ev_async* w, int revents);
     ev_async m_async;
-    EventLoop* m_loop;
+    EventLoop& m_loop;
     std::thread m_thread;
 };
 

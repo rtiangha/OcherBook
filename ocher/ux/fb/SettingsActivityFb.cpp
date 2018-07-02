@@ -9,11 +9,3 @@ SettingsActivityFb::SettingsActivityFb(UxControllerFb* c) :
     ActivityFb(c)
 {
 }
-
-void SettingsActivityFb::onAttached()
-{
-}
-
-void SettingsActivityFb::onDetached()
-{
-}

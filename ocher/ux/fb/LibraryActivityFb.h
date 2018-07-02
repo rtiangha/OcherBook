@@ -17,20 +17,17 @@ public:
     LibraryActivityFb(UxControllerFb* c);
     ~LibraryActivityFb();
 
-    void draw();
-
-    EventDisposition evtKey(const struct OcherKeyEvent*);
-    EventDisposition evtMouse(const struct OcherMouseEvent*);
-
 protected:
-    void onAttached();
-    void onDetached();
+    EventDisposition evtKey(const struct OcherKeyEvent*) override;
+    EventDisposition evtMouse(const struct OcherMouseEvent*) override;
+    void onAttached() override;
+    void draw() override;
 
     void leftIconPressed();
     void rightIconPressed();
 
-    SystemBar* m_systemBar;
-    Settings* m_settings;
+    Settings& m_settings;
+    SystemBar* m_systemBar = nullptr;
 #define BOOKS_PER_PAGE 11
     Rect* m_bookRects;
     int itemHeight;

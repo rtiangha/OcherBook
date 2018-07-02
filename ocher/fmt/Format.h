@@ -15,9 +15,7 @@
  */
 class Format {
 public:
-    virtual ~Format()
-    {
-    }
+    virtual ~Format() = default;
 
     virtual void loadMeta(Meta*)
     {

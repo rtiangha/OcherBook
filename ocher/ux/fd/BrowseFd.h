@@ -11,9 +11,7 @@
 class BrowseFd : public Browse {
 public:
     BrowseFd();
-    ~BrowseFd()
-    {
-    }
+    ~BrowseFd() = default;
 
     bool init();
     Meta* browse(std::vector<Meta*>& meta);

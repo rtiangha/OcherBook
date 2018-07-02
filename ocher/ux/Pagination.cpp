@@ -25,7 +25,7 @@ void Pagination::flush()
 {
     m_numPages = 0;
     for (auto chunk : m_chunks) {
-        delete chunk;
+        delete[] chunk;
     }
     m_chunks.clear();
 }

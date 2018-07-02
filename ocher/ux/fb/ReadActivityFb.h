@@ -7,27 +7,27 @@
 #define OCHER_UX_FB_READACTIVITY_H
 
 #include "ux/fb/ActivityFb.h"
+#include "ux/fb/NavBar.h"
+#include "ux/fb/SystemBar.h"
 
 class Layout;
 class Meta;
 class Renderer;
-class Settings;
 
 class ReadActivityFb : public ActivityFb {
 public:
     ReadActivityFb(UxControllerFb* c);
 
 protected:
-    EventDisposition evtKey(const struct OcherKeyEvent*);
-    EventDisposition evtMouse(const struct OcherMouseEvent*);
-
-    void onAttached();
-    void onDetached();
-
-    void draw();
+    EventDisposition evtKey(const struct OcherKeyEvent*) override;
+    EventDisposition evtMouse(const struct OcherMouseEvent*) override;
+    void onAttached() override;
+    void onDetached() override;
+    void draw() override;
 
     FrameBuffer* m_fb;
-    Settings* m_settings;
+    SystemBar* m_systemBar = nullptr;
+    NavBar* m_navBar = nullptr;
 
     Layout* m_layout;
     Renderer* m_renderer;

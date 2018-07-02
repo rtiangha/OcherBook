@@ -4,6 +4,13 @@
  */
 
 #include "ux/fb/UxControllerFb.h"
+#include "ux/fb/BootActivityFb.h"
+#include "ux/fb/HomeActivityFb.h"
+#include "ux/fb/LibraryActivityFb.h"
+#include "ux/fb/ReadActivityFb.h"
+#include "ux/fb/SettingsActivityFb.h"
+#include "ux/fb/SleepActivityFb.h"
+#include "ux/fb/SyncActivityFb.h"
 
 #include "Container.h"
 #include "ux/fb/RendererFb.h"
@@ -19,40 +26,9 @@
 #define LOG_NAME "ocher.ux.ctrl"
 
 UxControllerFb::UxControllerFb() :
-    m_systemBar(nullptr),
-    m_navBar(nullptr),
-    m_activity(nullptr),
-    m_bootActivity(nullptr),
-    m_homeActivity(nullptr),
-    m_libraryActivity(nullptr),
-    m_readActivity(nullptr),
-    m_settingsActivity(nullptr),
-    m_sleepActivity(nullptr),
-    m_syncActivity(nullptr),
-    m_renderer(nullptr),
-    m_fontEngine(nullptr),
-    m_frameBuffer(nullptr),
-    m_name("fb")
+    m_name("fb"),
+    m_screen(g_container.loop)
 {
-}
-
-UxControllerFb::~UxControllerFb()
-{
-    delete m_bootActivity;
-    delete m_homeActivity;
-    delete m_libraryActivity;
-    delete m_readActivity;
-    delete m_settingsActivity;
-    delete m_sleepActivity;
-    delete m_syncActivity;
-
-    delete m_systemBar;
-    delete m_navBar;
-
-    delete m_renderer;
-    delete m_fontEngine;
-    delete m_frameBuffer;
-
 }
 
 bool UxControllerFb::init()
@@ -61,7 +37,7 @@ bool UxControllerFb::init()
 
     do {
 #ifdef UX_FB_SDL
-        frameBuffer = new FrameBufferSdl();
+        frameBuffer = new FrameBufferSdl(g_container.loop);
         if (frameBuffer->init()) {
             m_name += ".sdl";
             break;
@@ -77,22 +53,10 @@ bool UxControllerFb::init()
         return false;
     } while (false);
 
-    g_container.frameBuffer = m_frameBuffer = frameBuffer;
+    m_frameBuffer = std::unique_ptr<FrameBuffer>(frameBuffer);
     m_screen.setFrameBuffer(frameBuffer);
-    m_screen.setEventLoop(g_container.loop);
-    m_renderer = new RendererFb(m_frameBuffer);
-    m_fontEngine = new FontEngine(m_frameBuffer);
-
-    m_systemBar = new SystemBar(g_container.battery);
-    m_navBar = new NavBar();
-
-    m_bootActivity = new BootActivityFb(this);
-    m_homeActivity = new HomeActivityFb(this);
-    m_libraryActivity = new LibraryActivityFb(this);
-    m_readActivity = new ReadActivityFb(this);
-    m_settingsActivity = new SettingsActivityFb(this);
-    m_sleepActivity = new SleepActivityFb(this);
-    m_syncActivity = new SyncActivityFb(this);
+    m_renderer = make_unique<RendererFb>(m_frameBuffer.get());
+    m_fontEngine = make_unique<FontEngine>(m_frameBuffer.get());
 
     return true;
 }
@@ -101,41 +65,42 @@ void UxControllerFb::setNextActivity(Activity::Type a)
 {
     Log::info(LOG_NAME, "next activity: %d", (int)a);
     if (a == Activity::Type::Quit) {
-        m_loop->stop();
+        g_container.loop.stop();
     } else {
         if (m_activity) {
             m_screen.removeChild(m_activity);
-            m_activity->onDetached();
         }
+
+        std::unique_ptr<ActivityFb> activity;
 
         switch (a) {
         case Activity::Type::Boot:
-            m_activity = m_bootActivity;
+            activity.reset(new BootActivityFb(this));
             break;
         case Activity::Type::Sleep:
-            m_activity = m_sleepActivity;
+            activity.reset(new SleepActivityFb(this));
             break;
         case Activity::Type::Sync:
-            m_activity = m_syncActivity;
+            activity.reset(new SyncActivityFb(this));
             break;
         case Activity::Type::Home:
-            m_activity = m_homeActivity;
+            activity.reset(new HomeActivityFb(this));
             break;
         case Activity::Type::Read:
-            m_activity = m_readActivity;
+            activity.reset(new ReadActivityFb(this));
             break;
         case Activity::Type::Library:
-            m_activity = m_libraryActivity;
+            activity.reset(new LibraryActivityFb(this));
             break;
         case Activity::Type::Settings:
-            m_activity = m_settingsActivity;
+            activity.reset(new SettingsActivityFb(this));
             break;
         default:
             ASSERT(0);
         }
 
-        m_screen.addChild(m_activity);
-        m_activity->onAttached();
+        m_activity = activity.get();  // remember for removal
+        m_screen.addChild(std::move(activity));
 
         m_frameBuffer->needFull();
     }

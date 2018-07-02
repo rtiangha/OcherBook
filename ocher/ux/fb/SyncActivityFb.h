@@ -15,15 +15,14 @@ class SyncActivityFb : public ActivityFb {
 public:
     SyncActivityFb(UxControllerFb* c);
 
-    void draw();
-
 protected:
-    void onAttached();
-    void onDetached();
+    void onAttached() override;
+    void onDetached() override;
+    void draw() override;
 
     FrameBuffer* m_fb;
-    SyncActivityWork* m_work;
-    Spinner m_spinner;
+    SyncActivityWork* m_work = nullptr;
+    Spinner* m_spinner = nullptr;
 };
 
 #endif

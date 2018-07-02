@@ -7,19 +7,17 @@
 #define OCHER_UX_FB_HOMEACTIVITY_H
 
 #include "ux/fb/ActivityFb.h"
+#include "ux/fb/SystemBar.h"
 
 
 class HomeActivityFb : public ActivityFb {
 public:
     HomeActivityFb(UxControllerFb* c);
 
-    void draw();
-
-    EventDisposition evtMouse(const struct OcherMouseEvent*);
-
 protected:
-    void onAttached();
-    void onDetached();
+    EventDisposition evtMouse(const struct OcherMouseEvent*) override;
+    void onAttached() override;
+    void draw() override;
 
     void browseButtonPressed();
 

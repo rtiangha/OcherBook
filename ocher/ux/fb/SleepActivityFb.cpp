@@ -15,7 +15,6 @@
 SleepActivityFb::SleepActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer()),
-    m_device(g_container.device),
     m_loop(g_container.loop)
 {
 }
@@ -42,11 +41,7 @@ void SleepActivityFb::onAttached()
     m_fb->sync();
     ::sleep(1);                  // TODO seems hackish but sync doesn't wait long enough!
 
-    m_device->sleep();
+    g_container.device.sleep();
 
-    m_loop->setEpoch();  // Toss old events
-}
-
-void SleepActivityFb::onDetached()
-{
+    m_loop.setEpoch();  // Toss old events
 }

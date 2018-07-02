@@ -7,32 +7,31 @@
 #define OCHER_UX_FD_UXCONTROLLER_H
 
 #include "ux/Controller.h"
-
-class Renderer;
+#include "ux/Renderer.h"
 
 /**
  */
 class UxControllerFd : public UxController {
 public:
-    UxControllerFd();
-    ~UxControllerFd();
+    UxControllerFd() = default;
+    ~UxControllerFd() = default;
 
-    const char* getName() const
+    const char* getName() const override
     {
         return "fd";
     }
 
-    bool init();
+    bool init() override;
 
-    Renderer* getRenderer()
+    Renderer* getRenderer() override
     {
-        return m_renderer;
+        return m_renderer.get();
     }
 
-    void setNextActivity(Activity::Type a);
+    void setNextActivity(Activity::Type a) override;
 
 protected:
-    Renderer* m_renderer;
+    std::unique_ptr<Renderer> m_renderer;
 };
 
 #endif

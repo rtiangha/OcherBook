@@ -51,8 +51,8 @@ void Library::add(Meta* meta)
 void ShortList::update(GroupOfBooks* changed)
 {
     m_meta.clear();
-    const std::vector<Meta*>& books = changed->getList();
-    for (Meta* meta : books) {
+    const auto& books = changed->getList();
+    for (auto meta : books) {
         if (meta->record.shortlist) {
             m_meta.push_back(meta);
         }

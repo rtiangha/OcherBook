@@ -28,18 +28,12 @@ void PowerSaver::timeout()
     wantToSleep();
 }
 
-PowerSaver::PowerSaver() :
-    m_loop(nullptr),
+PowerSaver::PowerSaver(EventLoop& loop) :
+    m_loop(loop),
     m_seconds(15 * 60)
     // TODO settings
 {
-}
-
-void PowerSaver::inject(EventLoop* loop)
-{
-    m_loop = loop;
-
-    m_loop->emitEvent.Connect(this, &PowerSaver::dispatchEvent);
+    m_loop.emitEvent.Connect(this, &PowerSaver::dispatchEvent);
 
     resetTimeout();
 }
@@ -53,7 +47,7 @@ void PowerSaver::setTimeout(unsigned int seconds)
 void PowerSaver::resetTimeout()
 {
     ev_timer_init(&m_timer, timeoutCb, m_seconds, 0.);
-    ev_timer_start(m_loop->evLoop, &m_timer);
+    ev_timer_start(m_loop.evLoop, &m_timer);
     m_timer.data = this;
 }
 

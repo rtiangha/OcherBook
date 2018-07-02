@@ -7,92 +7,33 @@
 #define OCHER_CONTAINER_H
 
 #include <memory>
-#include <vector>
 
-class Battery;
-class Device;
-class EventLoop;
-class Filesystem;
-class FontEngine;
-class FrameBuffer;
-class Options;
-class PowerSaver;
-class Renderer;
-class Settings;
-class UxController;
+#include "device/Battery.h"
+#include "device/Device.h"
+#include "device/Filesystem.h"
+#include "settings/Options.h"
+#include "settings/Settings.h"
+#include "ux/Controller.h"
+#include "ux/Event.h"
+#include "ux/PowerSaver.h"
 
-/**
- * A container for instances.
- *
- * This is trivial dependency injection.  The dependencies are hardcoded.  The Container owns the
- * instances.  Each instance is a singleton.
- */
 class Container {
 public:
     Container();
-    ~Container();
 
-    /**
-     * Requires:
-     */
-    EventLoop* loop;
+    EventLoop loop;
+    Filesystem filesystem;
+    Settings settings;
+    Options options;
+    Device device;
+    Battery battery;
+    PowerSaver powerSaver;
 
-    /**
-     * Requires: EventLoop
-     */
-    Device* device;
-
-    /**
-     * Requires:
-     */
-    Battery* battery;
-
-    /**
-     * Requires:
-     */
-    Filesystem* filesystem;
-
-    /**
-     * Requires: Filesystem
-     */
-    Settings* settings;
-
-    Options* options;
-
-    /**
-     * Requires: EventLoop Device
-     */
-    PowerSaver* powerSaver;
-
-    /**
-     */
     std::unique_ptr<UxController> uxController;
-
-    /**
-     * May not exist, depending on Device.
-     * May not actually be used, depending on UxController.
-     *
-     * Requires:
-     */
-    FrameBuffer* frameBuffer;
-
-    /**
-     * May not exist, depending on Device.
-     * May not actually be used, depending on UxController.
-     *
-     * Requires:
-     *  - Framebuffer
-     */
-    FontEngine* fontEngine;
-
-    /**
-     * Requires:
-     *  - UxController
-     */
-    Renderer* renderer;
 
     // TODO event source(s) (feeds to EventLoop.  eg: SdlThread, KoboEvents, BrowseFd.cpp:getKey, ncurses, ...)
     // TODO time (common timebase for events.  needed by event loop, clock, ...)
+
 };
 
 extern Container g_container;

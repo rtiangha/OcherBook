@@ -19,10 +19,9 @@ public:
     {
     }
 
-    virtual ~ActivityCdk()
-    {
-    }
+    virtual ~ActivityCdk() = default;
 
+protected:
     virtual void onAttached() = 0;
     virtual void onDetached() = 0;
 

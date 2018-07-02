@@ -12,7 +12,7 @@
 #define BHEIGHT 18  // height of battery bounding box
 #define BWIDTH 25   // width  of battery bounding box
 
-BatteryIcon::BatteryIcon(int x, int y, Battery* battery) :
+BatteryIcon::BatteryIcon(int x, int y, Battery& battery) :
     Widget(x, y, 30, 29),
     // BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
     m_battery(battery)
@@ -31,7 +31,7 @@ void BatteryIcon::draw()
     fb->setFg(0, 0, 0);
     fb->rect(&rect);
     rect.inset(2);
-    int percent = m_battery->m_percent;
+    int percent = m_battery.percent;
     if (percent < 0 || percent > 100)
         percent = 100;  // Cap craziness, and treat "unknown" as full (AC?)
     rect.w *= percent;
@@ -40,7 +40,8 @@ void BatteryIcon::draw()
     fb->fillRect(&rect);
 }
 
+// TODO  trigger this periodically
 void BatteryIcon::onUpdate()
 {
-    m_battery->readAll();
+    m_battery.readAll();
 }

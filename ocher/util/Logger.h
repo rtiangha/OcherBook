@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstdarg>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
@@ -50,7 +51,7 @@ protected:
 
     void clearAppenderUnchecked(LogAppender*);
 
-    std::map<std::string, Logger*> m_loggers;
+    std::map<std::string, std::unique_ptr<Logger>> m_loggers;
     bool m_init;  // To avoid using during shutdown after static instance is dead
 };
 
@@ -151,7 +152,7 @@ protected:
 class LogAppender {
 public:
     LogAppender() :
-        m_loggers(0)
+        m_loggers(nullptr)
     {
     }
 
@@ -178,7 +179,7 @@ protected:
     {
         if (m_loggers) {
             m_loggers->clearAppender(this);
-            m_loggers = 0;
+            m_loggers = nullptr;
         }
     }
 
@@ -278,7 +279,7 @@ protected:
     /**
      *  @param appender  The Appender to clear, or 0 for all.
      */
-    void clearAppender(LogAppender* appender = 0);
+    void clearAppender(LogAppender* appender = nullptr);
 
     Logger(Loggers* loggers, Logger* parent, std::string& name);
 

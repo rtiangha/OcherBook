@@ -26,7 +26,6 @@ ocher_sources = [
     'util/DirIter.h',
     'util/File.cpp',
     'util/File.h',
-    'util/intrinsics.h',
     'util/LogAppenderFile.cpp',
     'util/LogAppenderFile.h',
     'util/LogAppenders.cpp',
@@ -38,6 +37,8 @@ ocher_sources = [
     'util/Stopwatch.h',
     'util/StrUtil.cpp',
     'util/StrUtil.h',
+    'util/intrinsics.h',
+    'util/stdex.h',
     'ux/Activity.cpp',
     'ux/Activity.h',
     'ux/Controller.cpp',
@@ -142,7 +143,33 @@ configure_file(input : 'meson_config.h.in',
                configuration : conf_data)
 # TODO  How best to make linux kernel headers available?  KoboLabs has them in their repo.
 add_project_arguments(['-include', 'ocher_config.h', '-I../ocher/linux-2.6.35.3/include'], language : 'cpp')
-add_project_arguments('-Wno-c++1z-compat', language : 'cpp')
+
+compiler = meson.get_compiler('cpp')
+warning_flags = [
+    '-Wall',
+    '-Wextra',
+    #'-Wcast-align',                # TODO
+    #'-Wcast-align=strict',         # TODO
+    #'-Wold-style-cast',            # too many
+    #'-Wshadow',                    # libev, json too noisy
+    #'-Wuseless-cast',              # libev, json too noisy
+    #'-Wzero-as-null-pointer-constant', # json, Delegate too noisy
+    '-Wcast-qual',
+    '-Wduplicated-cond',
+    '-Werror=suggest-override',
+    '-Wformat=2',
+    '-Wframe-larger-than=16384',
+    '-Wlogical-op',
+    '-Wno-c++17-compat-mangling',   # libev too noisy
+    '-Wno-multichar',
+    '-Wno-unused-parameter',
+    '-Wnull-dereference',
+]
+foreach extra_arg : warning_flags
+    if compiler.has_argument(extra_arg)
+        add_project_arguments([extra_arg], language: 'cpp')
+    endif
+endforeach
 
 ocherbook_inc = include_directories('.')
 ocherbook = static_library('ocherbook', ocher_sources,

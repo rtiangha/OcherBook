@@ -2,6 +2,7 @@
 
 #include "util/LogAppenders.h"
 #include "util/StrUtil.h"
+#include "util/stdex.h"
 
 #include <cstring>
 #include <memory>
@@ -57,12 +58,12 @@ void Loggers::setRoot()
     // because I can't honor the contract.  Just don't do it.
     assert(m_init);
     if (m_init) {
-        auto root = new Logger(this, nullptr, "", 0);
+        auto root = std::unique_ptr<Logger>(new Logger(this, nullptr, "", 0));
         root->setLevel(Log::Warn);
 
         {
             lock_guard<mutex> lock(m_lock);
-            m_loggers[root->getName()] = root;
+            m_loggers[root->getName()] = std::move(root);
         }
     }
 }
@@ -73,7 +74,7 @@ Logger* Loggers::get(const char* name)
         return nullptr;
 
     m_lock.lock();
-    Logger* logger = m_loggers[name];
+    Logger* logger = m_loggers[name].get();
     m_lock.unlock();
 
     if (!logger) {
@@ -84,7 +85,7 @@ Logger* Loggers::get(const char* name)
         assert(nameLen > 0);
 
         lock_guard<mutex> lock(m_lock);
-        Logger* parent = m_loggers[""];
+        Logger* parent = m_loggers[""].get();
         assert(parent);
         do {
             unsigned int subnameLen;
@@ -96,10 +97,10 @@ Logger* Loggers::get(const char* name)
                 subnameLen = nameLen;
             }
             std::string subname(name, subnameLen);
-            logger = m_loggers[subname];
+            logger = m_loggers[subname].get();
             if (!logger) {
                 logger = new Logger(this, parent, subname);
-                m_loggers[subname] = logger;
+                m_loggers[subname] = std::unique_ptr<Logger>(logger);
             }
             parent = logger;
         } while (end);

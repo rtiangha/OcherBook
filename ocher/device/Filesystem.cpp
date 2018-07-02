@@ -45,10 +45,6 @@ static std::string settingsDir()
         e = "/tmp";
     }
     dir = e;
-#if defined(__APPLE__)
-    dir = Path::join(dir, "Library");
-    dir = Path::join(dir, "Application Support");
-#endif
 #endif
     return dir;
 }
@@ -65,7 +61,7 @@ Filesystem::Filesystem()
     m_settings = "/mnt/onboard/.ocher/settings";
 #else
     std::string s = settingsDir();
-#if defined(__HAIKU__) || defined(__APPLE__)
+#if defined(__HAIKU__)
     s = Path::join(s, "OcherBook");
 #else
     s = Path::join(s, ".OcherBook");
@@ -82,7 +78,7 @@ Filesystem::~Filesystem()
     delete[] m_libraries;
 }
 
-void Filesystem::initWatches(Options* options, EventLoop* loop)
+void Filesystem::initWatches(const Options& options, EventLoop& loop)
 {
 #ifdef __linux__
     if (m_notifyFd == -1) {
@@ -94,11 +90,11 @@ void Filesystem::initWatches(Options* options, EventLoop* loop)
 
         ev_io_init(&m_watcher, _watchCb, m_notifyFd, EV_READ);
         m_watcher.data = this;
-        ev_io_start(loop->evLoop, &m_watcher);
+        ev_io_start(loop.evLoop, &m_watcher);
     }
 
     // TODO  Watch Settings->libraries instead
-    const char** files = options->files;
+    const char* const* files = options.files;
 
     if (!files) {
 	Log::info(LOG_NAME, "No directories to watch");

@@ -6,6 +6,7 @@
 #ifndef OCHER_UX_ACTIVITY_H
 #define OCHER_UX_ACTIVITY_H
 
+#include "util/stdex.h"
 
 /** A logical portion of user interaction.
  */
@@ -22,11 +23,6 @@ public:
         Previous,
         Quit,
     };
-
-    virtual ~Activity() = default;
-
-    virtual void onAttached() = 0;
-    virtual void onDetached() = 0;
 };
 
 #endif

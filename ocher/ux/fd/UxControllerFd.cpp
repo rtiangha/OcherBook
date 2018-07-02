@@ -5,26 +5,17 @@
 
 #include "ux/fd/UxControllerFd.h"
 
+#include "Container.h"
+#include "util/Logger.h"
 #include "ux/Event.h"
 #include "ux/Renderer.h"
 #include "ux/fd/RendererFd.h"
-#include "util/Logger.h"
 
 #define LOG_NAME "ocher.ux.ctrl"
 
-UxControllerFd::UxControllerFd() :
-    m_renderer(nullptr)
-{
-}
-
-UxControllerFd::~UxControllerFd()
-{
-    delete m_renderer;
-}
-
 bool UxControllerFd::init()
 {
-    m_renderer = new RendererFd;
+    m_renderer = make_unique<RendererFd>();
 
     return true;
 }
@@ -33,7 +24,7 @@ void UxControllerFd::setNextActivity(Activity::Type a)
 {
     Log::info(LOG_NAME, "next activity: %d", (int)a);
     if (a == Activity::Type::Quit) {
-        m_loop->stop();
+        g_container.loop.stop();
     } else {
         // TODO
     }

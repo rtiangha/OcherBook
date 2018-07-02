@@ -26,8 +26,8 @@ RendererFb::RendererFb(FrameBuffer* fb) :
     m_fb(fb),
     m_fe(fb),
     m_settings(g_container.settings),
-    m_penX(m_settings->marginLeft),
-    m_penY(m_settings->marginTop),
+    m_penX(m_settings.marginLeft),
+    m_penY(m_settings.marginTop),
     ai(0)
 {
 }
@@ -35,7 +35,7 @@ RendererFb::RendererFb(FrameBuffer* fb) :
 bool RendererFb::init()
 {
     memset(&a[ai], 0, sizeof(a[ai]));
-    a[ai].pts = m_settings->fontPoints;
+    a[ai].pts = m_settings.fontPoints;
     return true;
 }
 
@@ -60,14 +60,14 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
     len -= strOffset;
     p += strOffset;
 
-    if (m_penY == m_settings->marginTop) {
+    if (m_penY == m_settings.marginTop) {
         while (*p == '\n') {
             ++p;
             --len;
         }
     }
-    if (m_penX == m_settings->marginLeft) {
-        if (m_penY >= (int)m_fb->height() - m_settings->marginBottom - m_fe.m_cur.descender) {
+    if (m_penX == m_settings.marginLeft) {
+        if (m_penY >= (int)m_fb->height() - m_settings.marginBottom - m_fe.m_cur.descender) {
             return 0;
         }
     }
@@ -76,7 +76,7 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
     int width = m_fb->width();
     do {
         // If at start of line, eat spaces
-        if (m_penX == m_settings->marginLeft) {
+        if (m_penX == m_settings.marginLeft) {
             while (*p != '\n' && isspace(*p)) {
                 ++p;
                 --len;
@@ -97,13 +97,13 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
             bbox.x = m_penX;
             bbox.y = m_penY;
             m_fe.plotString(p, w, glyphs, &bbox);
-            if (m_penX + bbox.w >= width - m_settings->marginRight &&
-                bbox.w <= width - m_settings->marginRight - m_settings->marginLeft) {
-                bbox.x = m_penX = m_settings->marginLeft;
+            if (m_penX + bbox.w >= width - m_settings.marginRight &&
+                bbox.w <= width - m_settings.marginRight - m_settings.marginLeft) {
+                bbox.x = m_penX = m_settings.marginLeft;
                 m_penY += m_fe.m_cur.lineHeight;
                 bbox.y = m_penY;
             }
-            if (m_penY >= (int)m_fb->height() - m_settings->marginBottom - m_fe.m_cur.descender)
+            if (m_penY >= (int)m_fb->height() - m_settings.marginBottom - m_fe.m_cur.descender)
                 return p - start;
             bbox.y -= m_fe.m_cur.ascender;
             bbox.h = m_fe.m_cur.lineHeight;
@@ -127,8 +127,8 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
         }
 
         // Word-wrap or hard linefeed, but avoid the two back-to-back.
-        if ((*p == '\n' && !wordWrapped) || m_penX >= width - 1 - m_settings->marginRight) {
-            m_penX = m_settings->marginLeft;
+        if ((*p == '\n' && !wordWrapped) || m_penX >= width - 1 - m_settings.marginRight) {
+            m_penX = m_settings.marginLeft;
             m_penY += m_fe.m_cur.lineHeight;
             if (*p == '\n') {
                 p++;
@@ -136,7 +136,7 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
             } else {
                 wordWrapped = true;
             }
-            if (m_penY >= (int)m_fb->height() - m_settings->marginBottom - m_fe.m_cur.descender)
+            if (m_penY >= (int)m_fb->height() - m_settings.marginBottom - m_fe.m_cur.descender)
                 return p - start;
         } else {
             if (*p == '\n') {
@@ -163,8 +163,8 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
     Log::info(LOG_NAME, "%s page %u of %u", doBlit ? "render" : "layout", pageNum, pagination->numPages());
 
     // TODO reapply font settings before relying on font metrics
-    m_penX = m_settings->marginLeft;
-    m_penY = m_settings->marginTop + m_fe.m_cur.ascender;
+    m_penX = m_settings.marginLeft;
+    m_penY = m_settings.marginTop + m_fe.m_cur.ascender;
     if (doBlit)
         m_fb->clear();
 
@@ -193,7 +193,7 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
     unsigned int i = layoutOffset;
     while (i < N) {
         ASSERT(i + 2 <= N);
-        uint16_t code = *(uint16_t*)(raw + i);
+        auto code = *(const uint16_t*)(raw + i);
         i += 2;
 
         unsigned int opType = (code >> 12) & 0xf;
@@ -269,16 +269,16 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                 applyAttrs();
                 break;
             case Layout::CmdOutputStr: {
-                m_fe.apply();
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
                 ASSERT(i + sizeof(Buffer*) <= N);
-                Buffer* str = *(Buffer**)(raw + i);
+                m_fe.apply();
+                auto str = *(Buffer* const*)(raw + i);
                 ASSERT(strOffset <= str->size());
 #ifdef CPS_STATS
                 chars += str->length();          // miscounts UTF8...
 #endif
-                Log::debug(LOG_NAME, "output (%d pts%s%s) %u bytes", a[ai].pts, a[ai].b ? " bold" : "",
-                        a[ai].em ? " italics" : "", (unsigned int)str->length());
+                Log::debug(LOG_NAME, "output (%d pts%s%s) %zu bytes", a[ai].pts, a[ai].b ? " bold" : "",
+                        a[ai].em ? " italics" : "", str->length());
                 int breakOffset = outputWrapped(str, strOffset, doBlit);
                 strOffset = 0;
                 if (breakOffset >= 0) {
@@ -323,7 +323,7 @@ done:
         ms = 1;
     Log::debug(LOG_NAME, "page %u %s; %u chars in %u ms, %u cps, avg %u cps", pageNum,
             r == 0 ? "break" : "done",
-            chars, ms, (unsigned int)(chars * 1000 / ms),
+            chars, ms, chars * 1000 / ms,
             (unsigned int)(totalChars * 1000 / ((totalUSec < 1000 ? 1000 : totalUSec) / 1000)));
 #endif
     return r;

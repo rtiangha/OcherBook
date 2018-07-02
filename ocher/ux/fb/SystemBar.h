@@ -6,25 +6,22 @@
 #ifndef OCHER_UX_FB_SYSTEMBAR_H
 #define OCHER_UX_FB_SYSTEMBAR_H
 
-#include "ux/fb/BatteryIcon.h"
-#include "ux/fb/ClockIcon.h"
 #include "ux/fb/Widgets.h"
 
 #include <string>
 
+class Battery;
+
 class SystemBar : public Window {
 public:
-    SystemBar(Battery* battery);
+    SystemBar(Battery& battery);
 
     bool m_sep;
 
 protected:
-    void drawContent(Rect*);
+    void drawContent(Rect*) override;
 
     FrameBuffer* m_fb;
-
-    BatteryIcon m_batteryIcon;
-    ClockIcon m_clockIcon;
 };
 
 #endif

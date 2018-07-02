@@ -32,22 +32,6 @@ Options opt;
 TEST_CASE("PowerSaver") {
 }
 
-TEST_CASE("Container construction", "[Container]") {
-    Container c;
-
-    SECTION("nothing") {
-    }
-
-    SECTION("default init") {
-        // TODO
-    }
-
-    SECTION("default init and inject") {
-        // TODO
-        // c.inject();
-    }
-}
-
 TEST_CASE("Battery Capacity", "[Battery]") {
     Battery b;
     int r;

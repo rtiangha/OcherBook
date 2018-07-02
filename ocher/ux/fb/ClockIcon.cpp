@@ -16,7 +16,12 @@ void ClockIcon::draw()
     // TODO
 }
 
-void ClockIcon::onActivate(bool active)
+void ClockIcon::onAttached()
 {
-    m_active = active;
+    m_active = true;
+}
+
+void ClockIcon::onDetached()
+{
+    m_active = false;
 }

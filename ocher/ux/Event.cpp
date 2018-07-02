@@ -15,12 +15,17 @@
 using namespace std;
 
 EventLoop::EventLoop() :
-    evLoop(EV_DEFAULT),
+    evLoop(ev_loop_new(EVFLAG_AUTO)),
     m_epoch(0)
 {
     ev_async_init(&m_async, emitInjectedCb);
     m_async.data = this;
     ev_async_start(evLoop, &m_async);
+}
+
+EventLoop::~EventLoop()
+{
+    ev_loop_destroy(evLoop);
 }
 
 int EventLoop::run()
@@ -78,17 +83,17 @@ void EventLoop::emitInjected()
     }
 }
 
-EventWork::EventWork(EventLoop* loop) :
+EventWork::EventWork(EventLoop& loop) :
     m_loop(loop)
 {
     ev_async_init(&m_async, completeCb);
     m_async.data = this;
-    ev_async_start(m_loop->evLoop, &m_async);
+    ev_async_start(m_loop.evLoop, &m_async);
 }
 
 EventWork::~EventWork()
 {
-    ev_async_stop(m_loop->evLoop, &m_async);
+    ev_async_stop(m_loop.evLoop, &m_async);
 }
 
 void EventWork::start()
@@ -104,9 +109,9 @@ void EventWork::join()
 
 void EventWork::run()
 {
-    Debugger::nameThread("EventWork %p", m_loop->evLoop);
+    Debugger::nameThread("EventWork %p", m_loop.evLoop);
     work();
-    ev_async_send(m_loop->evLoop, &m_async);
+    ev_async_send(m_loop.evLoop, &m_async);
 }
 
 void EventWork::completeCb(EV_P_ ev_async* w, int revents)

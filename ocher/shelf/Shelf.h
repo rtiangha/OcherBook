@@ -18,9 +18,7 @@ class Meta;
  */
 class GroupOfBooks {
 public:
-    virtual ~GroupOfBooks()
-    {
-    }
+    virtual ~GroupOfBooks() = default;
 
     void attach(GroupOfBooks* observer);
     void detach(GroupOfBooks* observer);
@@ -53,7 +51,7 @@ public:
     /**
      * Shelves watch other GroupOfBooks and must implement update().
      */
-    virtual void update(GroupOfBooks* changed) = 0;
+    virtual void update(GroupOfBooks* changed) override = 0;
 
 #if 0
     addFilterTag();
@@ -81,7 +79,7 @@ public:
      */
     void add(Meta*);
 
-    const std::vector<Meta*>& getList() const
+    const std::vector<Meta*>& getList() const override
     {
         return m_meta;
     }
@@ -106,9 +104,9 @@ public:
         m_base->detach(this);
     }
 
-    void update(GroupOfBooks* changed);
+    void update(GroupOfBooks* changed) override;
 
-    const std::vector<Meta*>& getList() const
+    const std::vector<Meta*>& getList() const override
     {
         return m_meta;
     }

@@ -15,11 +15,9 @@
 
 class FileCache {
 public:
-    virtual ~FileCache()
-    {
-    }
+    virtual ~FileCache() = default;
 
-    virtual TreeFile* getFile(const char* filename, const char* relative = 0) = 0;
+    virtual TreeFile* getFile(const char* filename, const char* relative = nullptr) = 0;
     virtual TreeDirectory* getRoot() = 0;
 };
 
@@ -28,14 +26,14 @@ public:
  */
 class UnzipCache : public FileCache {
 public:
-    UnzipCache(const char* zipFilename, const char* password = 0);
+    UnzipCache(const char* zipFilename, const char* password = nullptr);
     ~UnzipCache();
 
-    TreeFile* getFile(const char* filename, const char* relative = 0);
+    TreeFile* getFile(const char* filename, const char* relative = nullptr) override;
 
-    TreeDirectory* getRoot()
+    TreeDirectory* getRoot() override
     {
-        return m_root;
+        return m_root.get();
     }
 
 protected:
@@ -58,8 +56,8 @@ protected:
      */
     int unzip(const char* pattern, std::list<std::string>* matchedNames);
 
-    unzFile m_uf;
-    TreeDirectory* m_root;
+    unzFile m_uf = nullptr;
+    std::unique_ptr<TreeDirectory> m_root;
     std::string m_filename;
     std::string m_password;
 };

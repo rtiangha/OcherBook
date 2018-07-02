@@ -57,7 +57,7 @@ FreeType::~FreeType()
 
 bool FreeType::setFace(int i, int b)
 {
-    std::string file = g_container.settings->fontRoot;
+    std::string file = g_container.settings.fontRoot;
 
     i = i ? 1 : 0;
     b = b ? 1 : 0;

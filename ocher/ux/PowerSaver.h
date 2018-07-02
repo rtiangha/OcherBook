@@ -14,16 +14,11 @@ using namespace Gallant;
 
 class PowerSaver {
 public:
-    PowerSaver();
-
-    void inject(EventLoop* loop);
+    PowerSaver(EventLoop& loop);
 
     void setTimeout(unsigned int seconds);
 
     Signal0<> wantToSleep;
-
-    void onAttached();
-    void onDetached();
 
 protected:
     void resetTimeout();
@@ -33,7 +28,7 @@ protected:
 
     void dispatchEvent(const struct OcherEvent* evt);
 
-    EventLoop* m_loop;
+    EventLoop& m_loop;
     ev_timer m_timer;
     unsigned int m_seconds;
 };

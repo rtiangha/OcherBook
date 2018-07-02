@@ -105,6 +105,7 @@ void Epub::parseSpine(TreeFile* spineFile)
 {
     stripUtf8Bom(spineFile->data);
 
+    // TODO:OWNERSHIP exception safety
     mxml_node_t* tree = mxmlLoadString(nullptr, spineFile->data.c_str(), MXML_IGNORE_CALLBACK);
 
     mxml_node_t* package = mxmlFindPath(tree, "package");
@@ -216,7 +217,7 @@ int Epub::getContentByHref(const char* href, std::string& item)
     return -1;
 }
 
-Epub::Epub(FileCache* fileCache) :
+Epub::Epub(FileCache* fileCache) :  // TODO:OWNERSHIP
     m_zip(fileCache)
 {
     TreeFile* spine = findSpine();

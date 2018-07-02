@@ -40,9 +40,7 @@ public:
  */
 class Renderer {
 public:
-    virtual ~Renderer()
-    {
-    }
+    virtual ~Renderer() = default;
 
     virtual bool init()
     {
@@ -60,7 +58,7 @@ public:
      *  0 if reached the end of the page and it overflowed;
      *  1 if reached the end of the layout (no overflow)
      */
-    virtual int render(Pagination *pagination, unsigned int pageNum, bool doBlit) = 0;
+    virtual int render(Pagination* pagination, unsigned int pageNum, bool doBlit) = 0;
 
 protected:
     Buffer m_layout;

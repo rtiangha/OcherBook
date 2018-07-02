@@ -13,16 +13,11 @@ class BootActivityFb : public ActivityFb {
 public:
     BootActivityFb(UxControllerFb* uxController);
 
-    void draw();
-
-    EventDisposition evtMouse(const struct OcherMouseEvent*);
-
-    void onAttached();
-    void onDetached();
-
 protected:
-    FrameBuffer* m_fb;
+    EventDisposition evtMouse(const struct OcherMouseEvent*) override;
+    void draw() override;
 
+    FrameBuffer* m_fb;
     void highlight(int i);
     Rect apps[2];
 };

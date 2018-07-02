@@ -5,21 +5,24 @@
 
 #include "ux/fb/SystemBar.h"
 
+#include "ux/fb/BatteryIcon.h"
+#include "ux/fb/ClockIcon.h"
+
 #include "Container.h"
 #include "settings/Settings.h"
 
 
-SystemBar::SystemBar(Battery* battery) :
+SystemBar::SystemBar(Battery& battery) :
     m_sep(false),
-    m_fb(m_screen->fb),
-    m_batteryIcon(g_container.settings->smallSpace, 0, battery),
-    m_clockIcon(m_fb->width() - 50, 0)
+    m_fb(m_screen->fb)
 {
     setRect(0, 0, m_fb->width(), 30);
 
     m_flags |= WIDGET_BORDERLESS;
-    addChild(m_batteryIcon);
-    addChild(m_clockIcon);
+
+    addChild(make_unique<BatteryIcon>(g_container.settings.smallSpace, 0, battery));
+
+    addChild(make_unique<ClockIcon>(m_fb->width() - 50, 0));
 
     // TODO title label, centered
 }

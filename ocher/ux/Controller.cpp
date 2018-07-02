@@ -36,26 +36,20 @@
 #define LOG_NAME "ocher.controller"
 
 
-UxController::UxController() :
-    m_powerSaver(nullptr),
-    m_loop(nullptr)
+UxController::UxController()
 {
-    m_filesystem = g_container.filesystem;
-    m_loop = g_container.loop;
-    m_powerSaver = g_container.powerSaver;
+    g_container.filesystem.dirChanged.Connect(this, &UxController::onDirChanged);
+    g_container.filesystem.initWatches(g_container.options, g_container.loop);
 
-    m_filesystem->dirChanged.Connect(this, &UxController::onDirChanged);
-    m_filesystem->initWatches(g_container.options, g_container.loop);
-
-    m_loop->emitEvent.Connect(this, &UxController::handleEvent);
-    m_powerSaver->wantToSleep.Connect(this, &UxController::onWantToSleep);
+    g_container.loop.emitEvent.Connect(this, &UxController::handleEvent);
+    g_container.powerSaver.wantToSleep.Connect(this, &UxController::onWantToSleep);
 }
 
 UxController::~UxController()
 {
-    m_filesystem->dirChanged.Disconnect(this, &UxController::onDirChanged);
-    m_loop->emitEvent.Disconnect(this, &UxController::handleEvent);
-    m_powerSaver->wantToSleep.Disconnect(this, &UxController::onWantToSleep);
+    g_container.filesystem.dirChanged.Disconnect(this, &UxController::onDirChanged);
+    g_container.loop.emitEvent.Disconnect(this, &UxController::handleEvent);
+    g_container.powerSaver.wantToSleep.Disconnect(this, &UxController::onWantToSleep);
 }
 
 void UxController::onDirChanged(const char* dir, const char* file)
@@ -70,7 +64,7 @@ void UxController::onWantToSleep()
 
     // TODO  notify
 
-    g_container.device->sleep();
+    g_container.device.sleep();
 }
 
 void UxController::handleEvent(const struct OcherEvent* evt)
@@ -80,27 +74,14 @@ void UxController::handleEvent(const struct OcherEvent* evt)
     }
 }
 
-Controller::Controller(Options* options)
+Controller::Controller(const Options& options)
 {
     g_container.options = options;
+
     initLog();
-
-    g_container.settings = new Settings();
-    g_container.filesystem = new Filesystem();
-    g_container.powerSaver = new PowerSaver();
-    g_container.device = new Device();
-    g_container.battery = new Battery();
-    g_container.loop = new EventLoop();
-
-    // Wire up
-    //   TODO setters vs >>constructors<< vs hitting g_container
-    //   TODO here or in Container?
-    g_container.settings->inject(g_container.filesystem);
-    g_container.powerSaver->inject(g_container.loop);
-
     initDebug();
 
-    g_container.settings->load();
+    g_container.settings.load();
 
     // Sort UxController list based on desirability
     // (assume native >> toolkits >> framebuffer >> tui >> text)
@@ -140,16 +121,6 @@ Controller::Controller(Options* options)
     }
     Log::info(LOG_NAME, "Using the '%s' driver", uxController->getName());
 
-#ifdef UX_FB
-    g_container.frameBuffer = uxController->getFrameBuffer();
-    if (g_container.frameBuffer)
-        g_container.frameBuffer->inject(g_container.loop);
-#endif
-    g_container.fontEngine = uxController->getFontEngine();
-    g_container.renderer = uxController->getRenderer();
-
-    Log::info(LOG_NAME, "Done wiring the '%s' driver", uxController->getName());
-
     initCrash();
 }
 
@@ -165,16 +136,16 @@ void Controller::initUxController(std::unique_ptr<UxController> c)
 {
     Log::info(LOG_NAME, "considering driver %s", c->getName());
 
-    if (g_container.options->driverName &&
-            !strcmp(c->getName(), g_container.options->driverName)) {
+    if (g_container.options.driverName &&
+            !strcmp(c->getName(), g_container.options.driverName)) {
         throw std::runtime_error("skipping driver based on user pref");
     }
-    if (g_container.options->listDrivers) {
+    if (g_container.options.listDrivers) {
         printf("\t%s\n", c->getName());
         throw std::runtime_error("skipping driver; only listing");
     }
     if (!c->init()) {
-        Log::warn(LOG_NAME, "Failed to init the '%s' driver", g_container.options->driverName);
+        Log::warn(LOG_NAME, "Failed to init the '%s' driver", g_container.options.driverName);
         throw std::runtime_error("failed to init driver");
     }
     g_container.uxController = std::move(c);
@@ -187,16 +158,16 @@ void Controller::initLog()
 
     l->setAppender(&appender);
 
-    Options* opt = g_container.options;
-    if (opt->verbose < 0)
+    Options& opt = g_container.options;
+    if (opt.verbose < 0)
         l->setLevel(Log::Fatal);
-    else if (opt->verbose == 0)
+    else if (opt.verbose == 0)
         l->setLevel(Log::Error);
-    else if (opt->verbose == 1)
+    else if (opt.verbose == 1)
         l->setLevel(Log::Warn);
-    else if (opt->verbose == 2)
+    else if (opt.verbose == 2)
         l->setLevel(Log::Info);
-    else if (opt->verbose == 3)
+    else if (opt.verbose == 3)
         l->setLevel(Log::Debug);
     else
         l->setLevel(Log::Trace);
@@ -209,9 +180,9 @@ void Controller::initDebug()
     // Before proceeding with startup and initializing the framebuffer, check for a killswitch.
     // Useful when needing to bail to native stack (such as OcherBook vs native stack init-ing
     // framebuffer in incompatible ways).
-    if (g_container.device->fs.m_libraries) {
+    if (g_container.device.fs.m_libraries) {
         for (int i = 0;; ++i) {
-            const char* lib = g_container.device->fs.m_libraries[i];
+            const char* lib = g_container.device.fs.m_libraries[i];
             if (!lib)
                 break;
             std::string killswitch(1, "%s/.ocher/kill", lib);
@@ -234,9 +205,9 @@ void Controller::run()
     std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
 
-    Activity::Type a = g_container.options->bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
+    Activity::Type a = g_container.options.bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
     g_container.uxController->setNextActivity(a);
-    g_container.loop->run();
+    g_container.loop.run();
 
     // TODO: sync state out
 }

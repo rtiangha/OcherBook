@@ -13,7 +13,7 @@
 
 class FrameBufferMx50 : public FrameBuffer {
 public:
-    FrameBufferMx50();
+    FrameBufferMx50() = default;
     ~FrameBufferMx50();
 
     bool init();
@@ -51,15 +51,15 @@ public:
     void setAutoUpdateMode(bool autoUpdate);
 
 protected:
-    int m_fd;
-    char* m_fb;
-    size_t m_fbSize;
-    unsigned int m_marker;
+    int m_fd = -1;
+    char* m_fb = nullptr;
+    size_t m_fbSize = 0;
+    unsigned int m_marker = 0;
+    bool m_needFull = false;
     struct fb_var_screeninfo vinfo;
     struct fb_fix_screeninfo finfo;
     uint8_t m_fgColor;
     uint8_t m_bgColor;
-    bool m_needFull;
 };
 
 #endif

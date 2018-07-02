@@ -14,13 +14,11 @@ class SleepActivityFb : public ActivityFb {
 public:
     SleepActivityFb(UxControllerFb* c);
 
-    void onAttached();
-    void onDetached();
-
 protected:
+    void onAttached() override;
+
     FrameBuffer* m_fb;
-    Device* m_device;
-    EventLoop* m_loop;
+    EventLoop& m_loop;
 };
 
 #endif

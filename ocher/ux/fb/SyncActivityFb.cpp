@@ -22,7 +22,7 @@
 
 class SyncActivityWork : public EventWork {
 public:
-    SyncActivityWork(UxControllerFb* controller, const char** files) :
+    SyncActivityWork(UxControllerFb* controller, const char* const* files) :
         EventWork(g_container.loop),
         m_files(files),
         m_uxController(controller)
@@ -36,7 +36,7 @@ public:
     }
 
 protected:
-    const char** m_files;
+    const char* const* m_files;
     UxControllerFb* m_uxController;
 
     void work() override;
@@ -107,8 +107,10 @@ SyncActivityFb::SyncActivityFb(UxControllerFb* c) :
     maximize();
 
     int w = m_rect.w / 8;
-    m_spinner.setRect(m_rect.w / 2 - w / 2, m_rect.h / 2 - w - 2, w, w);
-    addChild(m_spinner);
+    auto spinner = make_unique<Spinner>();
+    spinner->setRect(m_rect.w / 2 - w / 2, m_rect.h / 2 - w - 2, w, w);
+    m_spinner = spinner.get();
+    addChild(std::move(spinner));
 }
 
 void SyncActivityFb::onAttached()
@@ -116,9 +118,9 @@ void SyncActivityFb::onAttached()
     Log::info(LOG_NAME, "attached");
 
     // TODO:  sync files passed on command line once.  Sync filesystem->m_libraries.  etc.
-    m_work = new SyncActivityWork(m_uxController, g_container.options->files);
-    g_container.options->files = nullptr;
-    m_spinner.start();
+    m_work = new SyncActivityWork(m_uxController, g_container.options.files);
+    g_container.options.files = nullptr;
+    m_spinner->start();
     invalidate();
 }
 
@@ -129,7 +131,7 @@ void SyncActivityFb::onDetached()
     // TODO:  Can be detached not due to work finishing, but being
     // forced out, eg, power saver.  Pause work, don't delete.
     delete m_work;
-    m_spinner.stop();
+    m_spinner->stop();
 
     m_uxController->ctx.library.notify();
 }

@@ -34,8 +34,8 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
             Log::info(LOG_NAME, "back from page %d", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
-                m_uxController->m_systemBar->hide();
-                m_uxController->m_navBar->hide();
+                m_systemBar->hide();
+                m_navBar->hide();
                 invalidate();
             }
             return EventDisposition::Handled;
@@ -43,8 +43,8 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
             Log::info(LOG_NAME, "forward from page %d", m_pageNum);
             if (!atEnd) {
                 m_pageNum++;
-                m_uxController->m_systemBar->hide();
-                m_uxController->m_navBar->hide();
+                m_systemBar->hide();
+                m_navBar->hide();
                 invalidate();
             }
             return EventDisposition::Handled;
@@ -55,27 +55,24 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
 
 EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
-    SystemBar* systemBar = m_uxController->m_systemBar;
-    NavBar* navBar = m_uxController->m_navBar;
-
     if (evt->subtype == OEVT_MOUSE1_UP) {
         Pos pos(evt->x, evt->y);
-        if (systemBar->rect().contains(pos) || navBar->rect().contains(pos)) {
-            if (systemBar->m_flags & WIDGET_HIDDEN) {
+        if (m_systemBar->rect().contains(pos) || m_navBar->rect().contains(pos)) {
+            if (m_systemBar->m_flags & WIDGET_HIDDEN) {
                 Log::info(LOG_NAME, "show system bar");
-                systemBar->show();
-                m_fb->update(&systemBar->rect());
-                navBar->show();
-                m_fb->update(&navBar->rect());
+                m_systemBar->show();
+                m_fb->update(&m_systemBar->rect());
+                m_navBar->show();
+                m_fb->update(&m_navBar->rect());
             } else {
                 Log::info(LOG_NAME, "interact bar");
                 // TODO interact
             }
         } else {
-            if (!(systemBar->m_flags & WIDGET_HIDDEN)) {
+            if (!(m_systemBar->m_flags & WIDGET_HIDDEN)) {
                 Log::info(LOG_NAME, "hide system bar");
-                systemBar->hide();
-                navBar->hide();
+                m_systemBar->hide();
+                m_navBar->hide();
                 invalidate();
             } else {
                 if (evt->x < m_fb->width() / 2) {
@@ -101,11 +98,20 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer()),
-    m_settings(g_container.settings),
     m_layout(nullptr),
     atEnd(1),
     m_pagesSinceRefresh(0)
 {
+    auto systemBar = make_unique<SystemBar>(g_container.battery);
+    systemBar->m_sep = true;
+    systemBar->hide();
+    m_systemBar = systemBar.get();
+    addChild(std::move(systemBar));
+
+    auto navBar = make_unique<NavBar>();
+    m_navBar = navBar.get();
+    addChild(std::move(navBar));
+
     maximize();
 }
 
@@ -114,7 +120,7 @@ void ReadActivityFb::draw()
     Log::debug(LOG_NAME, "draw");
 
     m_pagesSinceRefresh++;
-    if (m_pagesSinceRefresh >= m_settings->fullRefreshPages) {
+    if (m_pagesSinceRefresh >= g_container.settings.fullRefreshPages) {
         m_pagesSinceRefresh = 0;
         m_fb->needFull();
     }
@@ -128,6 +134,8 @@ void ReadActivityFb::onAttached()
     meta = m_uxController->ctx.selected;
     ASSERT(meta);
     Log::debug(LOG_NAME, "selected %p", meta);
+
+    m_systemBar->setTitle(meta->title);
 
     m_fb->clear();
     m_fb->update(nullptr);
@@ -172,7 +180,7 @@ void ReadActivityFb::onAttached()
     }
     }
 
-    m_renderer = g_container.renderer;
+    m_renderer = m_uxController->getRenderer();
     m_renderer->set(memLayout);
 
     // Optionally, run through all pages without blitting to get an accurate
@@ -191,16 +199,7 @@ void ReadActivityFb::onAttached()
     }
 #endif
 
-    SystemBar* systemBar = m_uxController->m_systemBar;
-    NavBar* navBar = m_uxController->m_navBar;
-
-    addChild(systemBar);
-    systemBar->m_sep = true;
-    systemBar->m_title = meta->title;
-    systemBar->hide();
-
-    navBar->hide();
-    addChild(navBar);
+    m_navBar->hide();
 
     meta->record.touch();
     m_pageNum = meta->record.activePage;
@@ -213,9 +212,6 @@ void ReadActivityFb::onDetached()
     Log::info(LOG_NAME, "Quitting on page %u", m_pageNum);
 
     meta->record.activePage = m_pageNum;
-
-    removeChild(m_uxController->m_systemBar);
-    removeChild(m_uxController->m_navBar);
 
     if (m_layout) {
         delete m_layout;

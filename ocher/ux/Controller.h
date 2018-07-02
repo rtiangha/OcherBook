@@ -11,13 +11,10 @@
 
 #include <memory>
 
-class Device;
-class EventLoop;
 class Filesystem;
 class FontEngine;
 class FrameBuffer;
 class Options;
-class PowerSaver;
 class Renderer;
 
 /** Holds the current reading state.
@@ -26,7 +23,7 @@ class ReadingContext {
 public:
     ReadingContext() :
         shortList(&library),
-        selected(0)
+        selected(nullptr)
     {
     }
 
@@ -62,10 +59,9 @@ public:
     {
         return nullptr;
     }
+
     virtual Renderer* getRenderer() = 0;
 
-    // TODO: in general, need more control (when running a new activity, is the prior
-    // one destroyed?  or suspended?
     virtual void setNextActivity(Activity::Type a) = 0;
 
     void onWantToSleep();
@@ -73,11 +69,6 @@ public:
     void handleEvent(const struct OcherEvent* evt);
 
     ReadingContext ctx;
-
-protected:
-    Filesystem* m_filesystem;
-    PowerSaver* m_powerSaver;
-    EventLoop* m_loop;
 };
 
 /**
@@ -86,7 +77,7 @@ protected:
  */
 class Controller {
 public:
-    Controller(Options* options);
+    Controller(const Options& options);
     ~Controller() = default;
 
     void run();

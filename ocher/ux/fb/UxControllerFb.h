@@ -7,66 +7,44 @@
 #define OCHER_UX_FB_UXCONTROLLER_H
 
 #include "ux/Controller.h"
-#include "ux/fb/BootActivityFb.h"
-#include "ux/fb/HomeActivityFb.h"
-#include "ux/fb/LibraryActivityFb.h"
-#include "ux/fb/NavBar.h"
-#include "ux/fb/ReadActivityFb.h"
-#include "ux/fb/SettingsActivityFb.h"
-#include "ux/fb/SleepActivityFb.h"
-#include "ux/fb/SyncActivityFb.h"
-#include "ux/fb/SystemBar.h"
+#include "ux/fb/ActivityFb.h"
 
-
-/**
- */
 class UxControllerFb : public UxController {
 public:
     UxControllerFb();
-    ~UxControllerFb();
+    ~UxControllerFb() = default;
 
-    const char* getName() const
+    const char* getName() const override
     {
         return m_name.c_str();
     }
 
-    bool init();
+    bool init() override;
 
-    FrameBuffer* getFrameBuffer()
+    FrameBuffer* getFrameBuffer() override
     {
-        return m_frameBuffer;
-    }
-    FontEngine* getFontEngine()
-    {
-        return m_fontEngine;
-    }
-    Renderer* getRenderer()
-    {
-        return m_renderer;
+        return m_frameBuffer.get();
     }
 
-    SystemBar* m_systemBar;
-    NavBar* m_navBar;
+    FontEngine* getFontEngine() override
+    {
+        return m_fontEngine.get();
+    }
 
-    void setNextActivity(Activity::Type a);
+    Renderer* getRenderer() override
+    {
+        return m_renderer.get();
+    }
+
+    void setNextActivity(Activity::Type a) override;
 
 protected:
-    ActivityFb* m_activity;
-
-    BootActivityFb* m_bootActivity;
-    HomeActivityFb* m_homeActivity;
-    LibraryActivityFb* m_libraryActivity;
-    ReadActivityFb* m_readActivity;
-    SettingsActivityFb* m_settingsActivity;
-    SleepActivityFb* m_sleepActivity;
-    SyncActivityFb* m_syncActivity;
-
-    Renderer* m_renderer;
-    FontEngine* m_fontEngine;
-    FrameBuffer* m_frameBuffer;
-    FbScreen m_screen;
-
     std::string m_name;
+    std::unique_ptr<Renderer> m_renderer;
+    std::unique_ptr<FontEngine> m_fontEngine;
+    std::unique_ptr<FrameBuffer> m_frameBuffer;
+    FbScreen m_screen;
+    ActivityFb* m_activity = nullptr;
 };
 
 #endif

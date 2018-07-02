@@ -13,10 +13,8 @@
 
 class KoboEvents {
 public:
-    KoboEvents();
+    KoboEvents(EventLoop& loop);
     ~KoboEvents();
-
-    void setEventLoop(EventLoop* loop);
 
 protected:
     int m_buttonFd;
@@ -29,7 +27,7 @@ protected:
     static void touchCb(struct ev_loop* loop, ev_io* watcher, int revents);
     void pollTouch();
 
-    EventLoop* m_loop;
+    EventLoop& m_loop;
     OcherEvent m_evt;
 };
 

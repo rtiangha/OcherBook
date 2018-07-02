@@ -34,14 +34,6 @@ BootActivityFb::BootActivityFb(UxControllerFb* c) :
     apps[1].y = apps[0].y;
 }
 
-void BootActivityFb::onAttached()
-{
-}
-
-void BootActivityFb::onDetached()
-{
-}
-
 void BootActivityFb::highlight(int i)
 {
     Log::debug(LOG_NAME, "highlight %d", i);

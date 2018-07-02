@@ -39,7 +39,7 @@ RendererFd::RendererFd() :
 
 bool RendererFd::init()
 {
-    m_fd = g_container.options->inFd;
+    m_fd = g_container.options.inFd;
     if (isatty(m_fd) == -1) {
         if (errno == EBADF) {
             Log::error(LOG_NAME, "bad file descriptor");
@@ -110,7 +110,7 @@ void RendererFd::popAttrs()
     applyAttrs(-1);
 }
 
-int RendererFd::outputWrapped(std::string* b, unsigned int strOffset, bool doBlit)
+int RendererFd::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
 {
     unsigned int len = b->size();
     auto start = (const unsigned char*)b->data();
@@ -142,7 +142,7 @@ int RendererFd::outputWrapped(std::string* b, unsigned int strOffset, bool doBli
             if (!nl) {
                 // don't break words
                 if (!isspace(*(p + n - 1)) && !isspace(*(p + n))) {
-                    auto space = (unsigned char*)memrchr(p, ' ', n);
+                    auto space = (const unsigned char*)memrchr(p, ' ', n);
                     if (space) {
                         nl = space;
                     }
@@ -202,7 +202,7 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i + 2 <= N);
-        uint16_t code = *(uint16_t*)(raw + i);
+        auto code = *(const uint16_t*)(raw + i);
         i += 2;
 
         unsigned int opType = (code >> 12) & 0xf;
@@ -271,8 +271,8 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                 break;
             case Layout::CmdOutputStr: {
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
-                ASSERT(i + sizeof(std::string*) <= N);
-                std::string* str = *(std::string**)(raw + i);
+                ASSERT(i + sizeof(Buffer*) <= N);
+                auto str = *(Buffer* const*)(raw + i);
                 ASSERT(strOffset <= str->size());
                 int breakOffset = outputWrapped(str, strOffset, doBlit);
                 strOffset = 0;
@@ -281,7 +281,7 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                     Log::debug(LOG_NAME, "page %u break", pageNum);
                     return 0;
                 }
-                i += sizeof(std::string*);
+                i += sizeof(Buffer*);
                 break;
             }
             case Layout::CmdForcePage:

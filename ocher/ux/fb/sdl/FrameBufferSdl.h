@@ -14,7 +14,7 @@
 
 class FrameBufferSdl : public FrameBuffer {
 public:
-    FrameBufferSdl();
+    FrameBufferSdl(EventLoop& loop);
     virtual ~FrameBufferSdl();
 
     bool init() override;
@@ -22,8 +22,6 @@ public:
     unsigned int height() override;
     unsigned int width() override;
     unsigned int dpi() override;
-
-    void inject(EventLoop* loop) override;
 
     void setFg(uint8_t r, uint8_t b, uint8_t g) override;
     void setBg(uint8_t r, uint8_t b, uint8_t g) override;
@@ -37,6 +35,7 @@ public:
     int update(const Rect* r, bool full = false) override;
 
 protected:
+    EventLoop& m_loop;
     SdlThread m_sdlThread;
 
     int m_sdl;

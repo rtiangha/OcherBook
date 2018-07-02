@@ -33,7 +33,7 @@ public:
     std::string m_home;
     std::string m_settings;
 
-    void initWatches(Options* options, EventLoop* loop);
+    void initWatches(const Options& options, EventLoop& loop);
     void deinitWatches();
 
     /**

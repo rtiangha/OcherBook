@@ -42,7 +42,6 @@ static char getKey()
 
 LibraryActivityFd::LibraryActivityFd(UxControllerFd* c) :
     ActivityFd(c),
-    m_settings(g_container.settings),
     m_library(nullptr),
     m_pageNum(0)
 {

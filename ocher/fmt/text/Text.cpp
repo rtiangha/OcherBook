@@ -16,5 +16,5 @@ Text::Text(const std::string& filename)
     File f(filename);
 
     f.readRest(m_text);
-    Log::debug(LOG_NAME, "Loaded %lu bytes", (unsigned long)m_text.size());
+    Log::debug(LOG_NAME, "Loaded %zu bytes", m_text.size());
 }

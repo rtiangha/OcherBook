@@ -8,7 +8,6 @@
 #include "Container.h"
 #include "fmt/epub/Epub.h"
 #include "fmt/epub/TreeMem.h"
-#include "settings/Settings.h"
 #include "util/Logger.h"
 
 #include "mxml.h"
@@ -18,8 +17,6 @@
 
 void LayoutEpub::processNode(mxml_node_t* node)
 {
-    Settings* settings = g_container.settings;
-
     if (node->type == MXML_ELEMENT) {
         const char* name = node->value.element.name;
         Log::trace(LOG_NAME, "found element '%s'", name);
@@ -52,7 +49,7 @@ void LayoutEpub::processNode(mxml_node_t* node)
             int inc = 3 - (name[1] - '0');
             if (inc < 0)
                 inc = 0;
-            pushTextAttr(AttrSizeAbs, settings->fontPoints + inc * 2);
+            pushTextAttr(AttrSizeAbs, g_container.settings.fontPoints + inc * 2);
             processSiblings(node->child);
             popTextAttr(2);
             outputNl();

@@ -18,8 +18,8 @@
 
 
 Battery::Battery() :
-    m_percent(-1),
-    m_status(Status::Unknown)
+    percent(-1),
+    status(Status::Unknown)
 {
     readAll();
 }
@@ -44,17 +44,17 @@ int Battery::readCapacity()
     } else {
         char buf[8];
         r = read(fd, buf, sizeof(buf) - 1);
+        close(fd);
         if (r > 0) {
             buf[r] = 0;
-            m_percent = atoi(buf);
-            Log::info(LOG_NAME, "Battery is %u%%", m_percent);
+            percent = atoi(buf);
+            Log::info(LOG_NAME, "Battery is %u%%", percent);
             r = 0;
         }
-        close(fd);
     }
 #endif
     if (r == -1)
-        m_percent = -1;
+        percent = -1;
     return r;
 }
 
@@ -71,15 +71,15 @@ int Battery::readStatus()
     if (r == 4) {
         buf[4] = 0;
         if (strcmp(buf, "Char") == 0) {
-            m_status = Status::Charging;
+            status = Status::Charging;
             return 0;
         } else if (strcmp(buf, "Disc") == 0) {
-            m_status = Status::Discharging;
+            status = Status::Discharging;
             return 0;
         }
     }
 unknown:
 #endif
-    m_status = Status::Unknown;
+    status = Status::Unknown;
     return -1;
 }

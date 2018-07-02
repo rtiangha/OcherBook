@@ -44,11 +44,22 @@ struct KoboButtonEvent {
     uint16_t res4;
 };
 
-KoboEvents::KoboEvents() :
-    m_loop(nullptr)
+KoboEvents::KoboEvents(EventLoop& loop) :
+    m_loop(loop)
 {
     m_buttonFd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
+    if (m_buttonFd != -1) {
+        ev_io_init(&m_buttonWatcher, buttonCb, m_buttonFd, EV_READ);
+        m_buttonWatcher.data = this;
+        ev_io_start(m_loop.evLoop, &m_buttonWatcher);
+    }
+
     m_touchFd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
+    if (m_touchFd != -1) {
+        ev_io_init(&m_touchWatcher, touchCb, m_touchFd, EV_READ);
+        m_touchWatcher.data = this;
+        ev_io_start(m_loop.evLoop, &m_touchWatcher);
+    }
 }
 
 KoboEvents::~KoboEvents()
@@ -58,22 +69,6 @@ KoboEvents::~KoboEvents()
     }
     if (m_touchFd != -1) {
         close(m_touchFd);
-    }
-}
-
-void KoboEvents::setEventLoop(EventLoop* loop)
-{
-    m_loop = loop;
-
-    if (m_buttonFd != -1) {
-        ev_io_init(&m_buttonWatcher, buttonCb, m_buttonFd, EV_READ);
-        m_buttonWatcher.data = this;
-        ev_io_start(m_loop->evLoop, &m_buttonWatcher);
-    }
-    if (m_touchFd != -1) {
-        ev_io_init(&m_touchWatcher, touchCb, m_touchFd, EV_READ);
-        m_touchWatcher.data = this;
-        ev_io_start(m_loop->evLoop, &m_touchWatcher);
     }
 }
 
@@ -107,7 +102,7 @@ void KoboEvents::pollButton()
                 fire = false;
             }
             if (fire) {
-                m_loop->emitEvent(&evt);
+                m_loop.emitEvent(&evt);
             }
         } else {
             break;
@@ -169,7 +164,7 @@ void KoboEvents::pollTouch()
 #endif
             Log::info(LOG_NAME, "mouse %u, %u %s", evt->x, evt->y,
                     evt->subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
-            m_loop->emitEvent(&m_evt);
+            m_loop.emitEvent(&m_evt);
         }
     }
 }

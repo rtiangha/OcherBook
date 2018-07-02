@@ -35,38 +35,21 @@ Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     assert(g_screen != nullptr);
 }
 
-Widget::~Widget()
+void Widget::addChild(std::unique_ptr<Widget> child)
 {
-    for (auto widget : m_children) {
-        if (widget->m_flags & WIDGET_OWNED)
-            delete widget;
+    auto widget = child.get();
+    m_children.push_back(std::move(child));
+    widget->onAttached();
+    if (!(widget->m_flags & WIDGET_HIDDEN)) {
+        widget->invalidate();
     }
 }
 
-void Widget::addChild(Widget* child)
+void Widget::removeChild(Widget* widget)
 {
-    Log::debug(LOG_NAME, "Widget %p gets child %p", this, child);
-    child->m_flags |= WIDGET_OWNED;
-    m_children.push_back(child);
-    if (!(child->m_flags & WIDGET_HIDDEN)) {
-        child->invalidate();
-    }
-}
-
-void Widget::addChild(Widget& child)
-{
-    Log::debug(LOG_NAME, "Widget %p loaned child %p", this, &child);
-    m_children.push_back(&child);
-    if (!(child.m_flags & WIDGET_HIDDEN)) {
-        child.invalidate();
-    }
-}
-
-void Widget::removeChild(Widget* child)
-{
-    child->m_flags &= ~WIDGET_OWNED;
     for (auto it = m_children.begin(); it < m_children.end(); ++it) {
-        if (*it == child) {
+        if (it->get() == widget) {
+            widget->onDetached();
             m_children.erase(it);
             break;
         }
@@ -76,7 +59,7 @@ void Widget::removeChild(Widget* child)
 void Widget::invalidate()
 {
     m_flags |= WIDGET_DIRTY;
-    for (auto w : m_children) {
+    for (auto& w : m_children) {
         w->invalidate();
     }
 }
@@ -90,10 +73,7 @@ void Widget::invalidate(Rect* rect)
 Rect Widget::drawChildren()
 {
     Rect drawn;
-    const size_t N = m_children.size();
-
-    for (unsigned int i = 0; i < N; ++i) {
-        Widget* w = m_children[i];
+    for (auto& w : m_children) {
         if (!(w->m_flags & WIDGET_HIDDEN)) {
             if (w->m_flags & WIDGET_DIRTY) {
                 w->draw();
@@ -110,7 +90,7 @@ Rect Widget::drawChildren()
 EventDisposition Widget::evtMouse(const struct OcherMouseEvent* evt)
 {
     Pos pos(evt->x, evt->y);
-    for (auto w : m_children) {
+    for (auto& w : m_children) {
         if (w->m_rect.contains(pos)) {
             EventDisposition r = w->evtMouse(evt);
             if (r != EventDisposition::Pass)
@@ -141,7 +121,7 @@ void Window::maximize()
     m_rect.h = m_screen->fb->height();
 }
 
-void Window::setTitle(const char* title)
+void Window::setTitle(const std::string& title)
 {
     m_title = title;
 }
@@ -305,7 +285,7 @@ void Spinner::start()
 
     ev_timer_init(&m_timer, timeoutCb, 0, m_delayMs / 1000.0);
     m_timer.data = this;
-    ev_timer_start(m_screen->loop->evLoop, &m_timer);
+    ev_timer_start(m_screen->loop.evLoop, &m_timer);
 }
 
 void Spinner::timeoutCb(EV_P_ ev_timer* timer, int)
@@ -323,7 +303,7 @@ void Spinner::stop()
 {
     Log::debug(LOG_NAME ".spinner", "stop");
 
-    ev_timer_stop(m_screen->loop->evLoop, &m_timer);
+    ev_timer_stop(m_screen->loop.evLoop, &m_timer);
 }
 
 void Spinner::draw()
@@ -371,32 +351,26 @@ EventDisposition Icon::evtMouse(const struct OcherMouseEvent* evt)
     return EventDisposition::Handled;
 }
 
-FbScreen::FbScreen()
-    : loop(nullptr)
+FbScreen::FbScreen(EventLoop& _loop) :
+    loop(_loop)
 {
-    // TODO hehe
+    // TODO For now I know the screen is constructed before widgets so this works
     g_screen = this;
-}
 
-void FbScreen::setEventLoop(EventLoop* _loop)
-{
-    Log::info(LOG_NAME ".screen", "setEventLoop");
-
-    loop = _loop;
-    loop->emitEvent.Connect(this, &FbScreen::dispatchEvent);
+    loop.emitEvent.Connect(this, &FbScreen::dispatchEvent);
 
     // TODO probe underlying framebuffer for desired refresh rate
     ev_timer_init(&m_timer, timeoutCb, 0.25, 0.25);
     m_timer.data = this;
-    ev_timer_start(loop->evLoop, &m_timer);
+    ev_timer_start(loop.evLoop, &m_timer);
 
     ev_prepare_init(&m_evPrepare, readyToIdle);
     m_evPrepare.data = this;
-    ev_prepare_start(loop->evLoop, &m_evPrepare);
+    ev_prepare_start(loop.evLoop, &m_evPrepare);
 
     ev_check_init(&m_evCheck, waking);
     m_evCheck.data = this;
-    ev_check_start(loop->evLoop, &m_evCheck);
+    ev_check_start(loop.evLoop, &m_evCheck);
 }
 
 void FbScreen::setFrameBuffer(FrameBuffer* _fb)
@@ -409,35 +383,21 @@ void FbScreen::setFrameBuffer(FrameBuffer* _fb)
     m_rect.h = fb->height();
 }
 
-void FbScreen::addChild(Window* child)
+void FbScreen::addChild(std::unique_ptr<Widget> child)
 {
-    Log::debug(LOG_NAME, "Screen %p gets child %p", this, child);
-    auto widget = dynamic_cast<Widget*>(child);
-
-    widget->m_flags |= WIDGET_OWNED;
-    m_children.push_back(widget);
+    auto widget = child.get();
+    m_children.push_back(std::move(child));
+    widget->onAttached();
     if (!(widget->m_flags & WIDGET_HIDDEN)) {
         widget->invalidate();
     }
 }
 
-#if 0
-void FbScreen::addChild(Widget& child)
+void FbScreen::removeChild(Widget* widget)
 {
-    m_children.push_back(&child);
-    if (!(child.m_flags & WIDGET_HIDDEN)) {
-        child.invalidate();
-    }
-}
-#endif
-
-void FbScreen::removeChild(Window* child)
-{
-    auto widget = dynamic_cast<Widget*>(child);
-
-    widget->m_flags &= ~WIDGET_OWNED;
     for (auto it = m_children.begin(); it < m_children.end(); ++it) {
-        if (*it == widget) {
+        if (it->get() == widget) {
+            widget->onDetached();
             m_children.erase(it);
             break;
         }
@@ -453,10 +413,7 @@ void FbScreen::update()
      *  - draw only invalid rects (not entire widget)
      */
     Rect drawn;
-    const size_t N = m_children.size();
-
-    for (unsigned int i = 0; i < N; ++i) {
-        Widget* w = m_children[i];
+    for (auto& w : m_children) {
         if (!(w->m_flags & WIDGET_HIDDEN)) {
             if (w->m_flags & WIDGET_DIRTY) {
                 w->draw();
@@ -509,14 +466,14 @@ void FbScreen::dispatchEvent(const struct OcherEvent* evt)
 {
     if (evt->type == OEVT_MOUSE) {
         /* TODO find the right child */
-        for (auto w : m_children) {
+        for (auto& w : m_children) {
             EventDisposition r = w->evtMouse(&evt->mouse);
             if (r != EventDisposition::Pass)
                 break;
         }
     } else if (evt->type == OEVT_KEY) {
         /* TODO one widget has focus */
-        for (auto w : m_children) {
+        for (auto& w : m_children) {
             EventDisposition r = w->evtKey(&evt->key);
             if (r != EventDisposition::Pass)
                 break;

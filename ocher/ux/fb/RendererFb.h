@@ -18,25 +18,21 @@ class RendererFb : public Renderer {
 public:
     RendererFb(FrameBuffer* fb);
 
-    bool init();
-    void deinit();
+    bool init() override;
 
-    int render(Pagination* pagination, unsigned int pageNum, bool doBlit);
+    int render(Pagination* pagination, unsigned int pageNum, bool doBlit) override;
 
 protected:
     int outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit);
     void applyAttrs();
+    void pushAttrs();
+    void popAttrs();
 
     FrameBuffer* m_fb;
     FontEngine m_fe;
-    Settings* m_settings;
+    Settings& m_settings;
     int m_penX;
     int m_penY;
-
-    void pushAttrs();
-    void applyAttrs(int i);
-    void popAttrs();
-
     Attrs a[10];
     int ai;
 };

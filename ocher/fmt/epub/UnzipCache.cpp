@@ -15,8 +15,6 @@
 
 
 UnzipCache::UnzipCache(const char* filename, const char* password) :
-    m_uf(nullptr),
-    m_root(nullptr),
     m_filename(filename),
     m_password(password ? password : "")
 {
@@ -32,15 +30,12 @@ UnzipCache::~UnzipCache()
 
 void UnzipCache::newCache()
 {
-    m_root = new TreeDirectory(".");
+    m_root = make_unique<TreeDirectory>(".");
 }
 
 void UnzipCache::clearCache()
 {
-    if (m_root) {
-        delete m_root;
-        m_root = nullptr;
-    }
+    m_root.reset();
 }
 
 TreeFile* UnzipCache::getFile(const char* filename, const char* relative)
@@ -99,7 +94,7 @@ int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
 
     char* start = pathname;
     char* p = start;
-    TreeDirectory* root = m_root;
+    TreeDirectory* root = m_root.get();
     while (true) {
         if (*p == '/' || *p == '\\' || *p == 0) {
             if (p - start) {
@@ -118,7 +113,6 @@ int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
         }
         p++;
     }
-    ;
 
     if (tfile) {
         char* buf = buffer.lockBuffer(file_info.uncompressed_size);

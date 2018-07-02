@@ -31,7 +31,7 @@ public:
 
     /**
      */
-    Epub(const std::string& epubFilename, const char* password = 0);
+    Epub(const std::string& epubFilename, const char* password = nullptr);
 
     ~Epub();
 
@@ -63,6 +63,7 @@ protected:
     TreeFile* findSpine();
     void parseSpine(TreeFile* spine);
 
+    // TODO:OWNERSHIP unique_ptr
     FileCache* m_zip;
     std::map<std::string, EpubItem> m_items;
     std::vector<std::string> m_spine;

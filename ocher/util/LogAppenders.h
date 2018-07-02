@@ -14,7 +14,7 @@ class Logger;
  */
 class LogAppenderNull : public LogAppender {
 public:
-    void append(const std::string&)
+    void append(const std::string&) override
     {
     }
 };
@@ -26,7 +26,7 @@ public:
  */
 class LogAppenderDebugger : public LogAppender {
 public:
-    void append(const std::string& s)
+    void append(const std::string& s) override
     {
         Debugger::printf(s);
     }
@@ -44,7 +44,7 @@ public:
     {
     }
 
-    void append(const std::string& s)
+    void append(const std::string& s) override
     {
         fprintf(m_f, "%s", s.c_str());
     }

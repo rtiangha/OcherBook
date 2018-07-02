@@ -22,8 +22,8 @@ public:
     int readCapacity(); ///< @return 0 if read, else -1
     int readStatus();   ///< @return 0 if read, else -1
 
-    int m_percent;      ///< @return 0..100 or -1 if unknown
-    Status m_status;
+    int percent;        ///< @return 0..100 or -1 if unknown
+    Status status;
 };
 
 #endif

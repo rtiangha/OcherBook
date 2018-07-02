@@ -23,7 +23,7 @@ class Filesystem;
  */
 class Settings {
 public:
-    Settings();
+    Settings(Filesystem& filesystem);
 
     enum class SecureLevel {
         Open,
@@ -45,8 +45,6 @@ public:
     void load();
     void load(const std::string& json);
     void save();
-
-    void inject(Filesystem* fs);
 
     /** A security level can protect a user's reading history.
      *
@@ -152,7 +150,7 @@ public:
     // home page arrangement
 
 protected:
-    Filesystem* m_fs;
+    const Filesystem& m_filesystem;
 
     nlohmann::json* m_j;
 };

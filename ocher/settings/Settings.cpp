@@ -16,8 +16,6 @@
 
 using nlohmann::json;
 
-Settings defaultSettings;
-
 const char* Settings::SecureLevelToString(SecureLevel s)
 {
     switch (s) {
@@ -39,7 +37,7 @@ const char* Settings::SleepShowToString(SleepShow s)
     }
 }
 
-Settings::Settings() :
+Settings::Settings(Filesystem& filesystem) :
     secureLevel(SecureLevel::Open),
     trackReading(0),
     minutesUntilSleep(15),
@@ -58,7 +56,7 @@ Settings::Settings() :
     smallSpace(10),
     medSpace(15),
     largeSpace(30),
-    m_fs(nullptr),
+    m_filesystem(filesystem),
     m_j(new json)
 {
     // TODO  Find these dynamically
@@ -71,16 +69,11 @@ Settings::Settings() :
 #endif
 }
 
-void Settings::inject(Filesystem* fs)
-{
-    m_fs = fs;
-}
-
 void Settings::load()
 {
     File f;
 
-    if (f.setTo(m_fs->m_settings) != 0)
+    if (f.setTo(m_filesystem.m_settings) != 0)
         return;
     std::string s;
     f.readRest(s);
@@ -204,6 +197,6 @@ void Settings::save()
     j["ShowPageNumbers"] = showPageNumbers;
 
     std::string b = j.dump();
-    File s(m_fs->m_settings, "w");
+    File s(m_filesystem.m_settings, "w");
     s.write(b.c_str(), b.size());
 }

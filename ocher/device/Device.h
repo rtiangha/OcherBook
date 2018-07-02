@@ -12,9 +12,7 @@
  */
 class Device {
 public:
-    virtual ~Device()
-    {
-    }
+    virtual ~Device() = default;
 
     std::string getVersion();
     std::string getBuildDate();

@@ -19,14 +19,10 @@ public:
 
     void draw();
 
-    int evtKey(struct OcherKeyEvent*);
-    int evtMouse(struct OcherMouseEvent*);
-
 protected:
-    void onAttached();
-    void onDetached();
+    void onAttached() override;
+    void onDetached() override;
 
-    Settings* m_settings;
     const std::vector<Meta*>* m_library;
 #define BOOKS_PER_PAGE 11
     int itemHeight;

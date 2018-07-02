@@ -20,13 +20,8 @@ void memOr(void* dst, const void* src, size_t n);
 
 class FrameBuffer {
 public:
-    FrameBuffer()
-    {
-    }
-
-    virtual ~FrameBuffer()
-    {
-    }
+    FrameBuffer() = default;
+    virtual ~FrameBuffer() = default;
 
     Rect bbox;
 
@@ -35,10 +30,6 @@ public:
     virtual unsigned int height() = 0;
     virtual unsigned int width() = 0;
     virtual unsigned int dpi() = 0;
-
-    virtual void inject(EventLoop* loop)
-    {
-    }                                         // TODO set directly on EventSource
 
     virtual void setFg(uint8_t r, uint8_t b, uint8_t g) = 0;
     virtual void setBg(uint8_t r, uint8_t b, uint8_t g) = 0;

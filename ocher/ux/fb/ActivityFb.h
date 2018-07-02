@@ -20,13 +20,9 @@ public:
     {
     }
 
-    virtual ~ActivityFb()
-    {
-    }
+    virtual ~ActivityFb() = default;
 
-    virtual void onAttached() = 0;
-    virtual void onDetached() = 0;
-
+protected:
     UxControllerFb* m_uxController;
 };
 

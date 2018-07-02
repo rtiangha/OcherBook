@@ -15,10 +15,6 @@ class Text : public Format {
 public:
     Text(const std::string& filename);
 
-    virtual ~Text()
-    {
-    }
-
     std::string m_text;
 };
 

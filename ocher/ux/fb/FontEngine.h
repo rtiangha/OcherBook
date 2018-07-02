@@ -36,6 +36,7 @@ public:
     void put(GlyphDescr& f, Glyph* g);
     Glyph* get(GlyphDescr& f);
 
+protected:
     std::map<GlyphDescr, Glyph*> m_cache;
 };
 

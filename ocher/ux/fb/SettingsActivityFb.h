@@ -14,8 +14,6 @@ public:
     SettingsActivityFb(UxControllerFb* c);
 
 protected:
-    void onAttached();
-    void onDetached();
 };
 
 #endif

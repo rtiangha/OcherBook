@@ -24,14 +24,12 @@
 
 #define LOG_NAME "ocher.mx50"
 
-
-FrameBufferMx50::FrameBufferMx50() :
-    m_fd(-1),
-    m_fb(nullptr),
-    m_fbSize(0),
-    m_marker(0),
-    m_needFull(true)
+FrameBufferMx50::~FrameBufferMx50()
 {
+    if (m_fd != -1) {
+        close(m_fd);
+        m_fd = -1;
+    }
 }
 
 bool FrameBufferMx50::init()
@@ -113,14 +111,6 @@ unsigned int FrameBufferMx50::dpi()
 {
     // Kobo Touch: 600x800; ~7" diagonal
     return 140;
-}
-
-FrameBufferMx50::~FrameBufferMx50()
-{
-    if (m_fd != -1) {
-        close(m_fd);
-        m_fd = -1;
-    }
 }
 
 static inline uint8_t getColor(uint8_t r, uint8_t b, uint8_t g)
