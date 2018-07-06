@@ -25,7 +25,7 @@
 RendererFb::RendererFb(FrameBuffer* fb) :
     m_fb(fb),
     m_fe(fb),
-    m_settings(g_container.settings),
+    m_settings(g_container->settings),
     m_penX(m_settings.marginLeft),
     m_penY(m_settings.marginTop),
     ai(0)

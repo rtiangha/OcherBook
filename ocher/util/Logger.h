@@ -47,7 +47,7 @@ public:
 
 protected:
     friend class Logger;  // Logger instances share the lock
-    std::mutex m_lock;
+    static std::mutex m_lock;
 
     void clearAppenderUnchecked(LogAppender*);
 

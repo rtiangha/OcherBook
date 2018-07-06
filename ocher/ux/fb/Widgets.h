@@ -30,7 +30,7 @@ class FbScreen {
 public:
     FbScreen(EventLoop& loop);
 
-    ~FbScreen() = default;
+    ~FbScreen();
 
     void setFrameBuffer(FrameBuffer* fb);
 

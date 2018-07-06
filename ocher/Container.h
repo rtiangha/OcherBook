@@ -36,6 +36,6 @@ public:
 
 };
 
-extern Container g_container;
+extern std::unique_ptr<Container> g_container;
 
 #endif

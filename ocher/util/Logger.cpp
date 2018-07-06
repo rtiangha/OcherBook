@@ -10,6 +10,7 @@
 
 using namespace std;
 
+std::mutex Loggers::m_lock;
 Loggers Log::loggers;
 
 
@@ -54,8 +55,6 @@ void Loggers::clearAppender(LogAppender* logAppender)
 
 void Loggers::setRoot()
 {
-    // Calling setRoot from another static is bad because I can't guarantee ordering.  Asserting
-    // because I can't honor the contract.  Just don't do it.
     assert(m_init);
     if (m_init) {
         auto root = std::unique_ptr<Logger>(new Logger(this, nullptr, "", 0));

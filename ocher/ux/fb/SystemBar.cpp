@@ -20,7 +20,7 @@ SystemBar::SystemBar(Battery& battery) :
 
     m_flags |= WIDGET_BORDERLESS;
 
-    addChild(make_unique<BatteryIcon>(g_container.settings.smallSpace, 0, battery));
+    addChild(make_unique<BatteryIcon>(g_container->settings.smallSpace, 0, battery));
 
     addChild(make_unique<ClockIcon>(m_fb->width() - 50, 0));
 

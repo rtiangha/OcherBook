@@ -11,4 +11,4 @@ Container::Container() :
 {
 }
 
-Container g_container;
+std::unique_ptr<Container> g_container;

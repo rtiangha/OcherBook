@@ -19,7 +19,7 @@
 
 LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     ActivityFb(c),
-    m_settings(g_container.settings),
+    m_settings(g_container->settings),
     m_pageNum(0)
 {
     maximize();
@@ -28,7 +28,7 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     m_booksPerPage = BOOKS_PER_PAGE;
     m_bookRects = new Rect[m_booksPerPage];
 
-    auto systemBar = make_unique<SystemBar>(g_container.battery);
+    auto systemBar = make_unique<SystemBar>(g_container->battery);
     systemBar->m_sep = false;
     systemBar->setTitle("LIBRARY");
     m_systemBar = systemBar.get();

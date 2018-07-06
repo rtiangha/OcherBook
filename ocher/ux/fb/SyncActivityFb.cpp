@@ -23,7 +23,7 @@
 class SyncActivityWork : public EventWork {
 public:
     SyncActivityWork(UxControllerFb* controller, const char* const* files) :
-        EventWork(g_container.loop),
+        EventWork(g_container->loop),
         m_files(files),
         m_uxController(controller)
     {
@@ -118,8 +118,8 @@ void SyncActivityFb::onAttached()
     Log::info(LOG_NAME, "attached");
 
     // TODO:  sync files passed on command line once.  Sync filesystem->m_libraries.  etc.
-    m_work = new SyncActivityWork(m_uxController, g_container.options.files);
-    g_container.options.files = nullptr;
+    m_work = new SyncActivityWork(m_uxController, g_container->options.files);
+    g_container->options.files = nullptr;
     m_spinner->start();
     invalidate();
 }

@@ -11,7 +11,6 @@
 
 #include <memory>
 
-class Filesystem;
 class FontEngine;
 class FrameBuffer;
 class Options;
@@ -78,7 +77,7 @@ public:
 class Controller {
 public:
     Controller(const Options& options);
-    ~Controller() = default;
+    ~Controller();
 
     void run();
 

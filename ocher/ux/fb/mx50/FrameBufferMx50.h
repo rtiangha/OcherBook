@@ -16,7 +16,7 @@ public:
     FrameBufferMx50() = default;
     ~FrameBufferMx50();
 
-    bool init();
+    bool init() override;
 
     unsigned int height() override;
     unsigned int width() override;

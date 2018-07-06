@@ -7,7 +7,12 @@
 #define OCHER_UX_FB_UXCONTROLLER_H
 
 #include "ux/Controller.h"
-#include "ux/fb/ActivityFb.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/FrameBuffer.h"
+#include "ux/fb/RendererFb.h"
+#include "ux/fb/Widgets.h"
+
+class ActivityFb;
 
 class UxControllerFb : public UxController {
 public:

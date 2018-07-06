@@ -27,7 +27,7 @@
 
 UxControllerFb::UxControllerFb() :
     m_name("fb"),
-    m_screen(g_container.loop)
+    m_screen(g_container->loop)
 {
 }
 
@@ -37,7 +37,7 @@ bool UxControllerFb::init()
 
     do {
 #ifdef UX_FB_SDL
-        frameBuffer = new FrameBufferSdl(g_container.loop);
+        frameBuffer = new FrameBufferSdl(g_container->loop);
         if (frameBuffer->init()) {
             m_name += ".sdl";
             break;
@@ -65,7 +65,7 @@ void UxControllerFb::setNextActivity(Activity::Type a)
 {
     Log::info(LOG_NAME, "next activity: %d", (int)a);
     if (a == Activity::Type::Quit) {
-        g_container.loop.stop();
+        g_container->loop.stop();
     } else {
         if (m_activity) {
             m_screen.removeChild(m_activity);

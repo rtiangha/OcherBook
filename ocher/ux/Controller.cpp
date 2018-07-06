@@ -38,18 +38,18 @@
 
 UxController::UxController()
 {
-    g_container.filesystem.dirChanged.Connect(this, &UxController::onDirChanged);
-    g_container.filesystem.initWatches(g_container.options, g_container.loop);
+    g_container->filesystem.dirChanged.Connect(this, &UxController::onDirChanged);
+    g_container->filesystem.initWatches(g_container->options, g_container->loop);
 
-    g_container.loop.emitEvent.Connect(this, &UxController::handleEvent);
-    g_container.powerSaver.wantToSleep.Connect(this, &UxController::onWantToSleep);
+    g_container->loop.emitEvent.Connect(this, &UxController::handleEvent);
+    g_container->powerSaver.wantToSleep.Connect(this, &UxController::onWantToSleep);
 }
 
 UxController::~UxController()
 {
-    g_container.filesystem.dirChanged.Disconnect(this, &UxController::onDirChanged);
-    g_container.loop.emitEvent.Disconnect(this, &UxController::handleEvent);
-    g_container.powerSaver.wantToSleep.Disconnect(this, &UxController::onWantToSleep);
+    g_container->filesystem.dirChanged.Disconnect(this, &UxController::onDirChanged);
+    g_container->loop.emitEvent.Disconnect(this, &UxController::handleEvent);
+    g_container->powerSaver.wantToSleep.Disconnect(this, &UxController::onWantToSleep);
 }
 
 void UxController::onDirChanged(const char* dir, const char* file)
@@ -64,7 +64,7 @@ void UxController::onWantToSleep()
 
     // TODO  notify
 
-    g_container.device.sleep();
+    g_container->device.sleep();
 }
 
 void UxController::handleEvent(const struct OcherEvent* evt)
@@ -76,17 +76,18 @@ void UxController::handleEvent(const struct OcherEvent* evt)
 
 Controller::Controller(const Options& options)
 {
-    g_container.options = options;
+    g_container = make_unique<Container>();
+    g_container->options = options;
 
     initLog();
     initDebug();
 
-    g_container.settings.load();
+    g_container->settings.load();
 
     // Sort UxController list based on desirability
     // (assume native >> toolkits >> framebuffer >> tui >> text)
 #ifdef UX_FB
-    if (!g_container.uxController) {
+    if (!g_container->uxController) {
         try {
             initUxController(std::unique_ptr<UxController>(new UxControllerFb));
         } catch (...)
@@ -96,7 +97,7 @@ Controller::Controller(const Options& options)
     }
 #endif
 #ifdef UX_CDK
-    if (!g_container.uxController) {
+    if (!g_container->uxController) {
         try {
             initUxController(std::unique_ptr<UxController>(new UxControllerCdk));
         } catch (...)
@@ -106,7 +107,7 @@ Controller::Controller(const Options& options)
     }
 #endif
 #ifdef UX_FD
-    if (!g_container.uxController) {
+    if (!g_container->uxController) {
         try {
             initUxController(std::unique_ptr<UxController>(new UxControllerFd));
         } catch (...)
@@ -115,13 +116,21 @@ Controller::Controller(const Options& options)
         }
     }
 #endif
-    UxController* uxController = g_container.uxController.get();
+    UxController* uxController = g_container->uxController.get();
     if (!uxController) {
         throw std::runtime_error("failed to find suitable output driver");
     }
     Log::info(LOG_NAME, "Using the '%s' driver", uxController->getName());
 
     initCrash();
+}
+
+Controller::~Controller()
+{
+    // Keep g_container valid while deleting the objects in it
+    auto container = g_container.get();
+    delete container;
+    g_container.release();
 }
 
 void Controller::initCrash()
@@ -136,19 +145,19 @@ void Controller::initUxController(std::unique_ptr<UxController> c)
 {
     Log::info(LOG_NAME, "considering driver %s", c->getName());
 
-    if (g_container.options.driverName &&
-            !strcmp(c->getName(), g_container.options.driverName)) {
+    if (g_container->options.driverName &&
+            !strcmp(c->getName(), g_container->options.driverName)) {
         throw std::runtime_error("skipping driver based on user pref");
     }
-    if (g_container.options.listDrivers) {
+    if (g_container->options.listDrivers) {
         printf("\t%s\n", c->getName());
         throw std::runtime_error("skipping driver; only listing");
     }
     if (!c->init()) {
-        Log::warn(LOG_NAME, "Failed to init the '%s' driver", g_container.options.driverName);
+        Log::warn(LOG_NAME, "Failed to init the '%s' driver", g_container->options.driverName);
         throw std::runtime_error("failed to init driver");
     }
-    g_container.uxController = std::move(c);
+    g_container->uxController = std::move(c);
 }
 
 void Controller::initLog()
@@ -158,7 +167,7 @@ void Controller::initLog()
 
     l->setAppender(&appender);
 
-    Options& opt = g_container.options;
+    Options& opt = g_container->options;
     if (opt.verbose < 0)
         l->setLevel(Log::Fatal);
     else if (opt.verbose == 0)
@@ -180,9 +189,9 @@ void Controller::initDebug()
     // Before proceeding with startup and initializing the framebuffer, check for a killswitch.
     // Useful when needing to bail to native stack (such as OcherBook vs native stack init-ing
     // framebuffer in incompatible ways).
-    if (g_container.device.fs.m_libraries) {
+    if (g_container->device.fs.m_libraries) {
         for (int i = 0;; ++i) {
-            const char* lib = g_container.device.fs.m_libraries[i];
+            const char* lib = g_container->device.fs.m_libraries[i];
             if (!lib)
                 break;
             std::string killswitch(1, "%s/.ocher/kill", lib);
@@ -205,9 +214,9 @@ void Controller::run()
     std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
 
-    Activity::Type a = g_container.options.bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
-    g_container.uxController->setNextActivity(a);
-    g_container.loop.run();
+    Activity::Type a = g_container->options.bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
+    g_container->uxController->setNextActivity(a);
+    g_container->loop.run();
 
     // TODO: sync state out
 }

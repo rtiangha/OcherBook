@@ -48,7 +48,7 @@ FontEngine::FontEngine(FrameBuffer* fb) :
     m_ft(fb->dpi())
 {
     m_next.faceId = 0;
-    m_next.points = g_container.settings.fontPoints;
+    m_next.points = g_container->settings.fontPoints;
     m_next.underline = 0;
     m_next.bold = 0;
     m_next.italic = 0;
@@ -60,10 +60,10 @@ void FontEngine::scanForFonts()
 {
     const char* search;
 
-    if (g_container.settings.fontRoot.length() == 0)
+    if (g_container->settings.fontRoot.length() == 0)
         search = ".";
     else
-        search = g_container.settings.fontRoot.c_str();
+        search = g_container->settings.fontRoot.c_str();
 
     const char* p = search;
     const char* colon;

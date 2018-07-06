@@ -21,8 +21,8 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
 {
     maximize();
 
-    int dx = g_container.settings.smallSpace;
-    int dy = g_container.settings.smallSpace;
+    int dx = g_container->settings.smallSpace;
+    int dy = g_container->settings.smallSpace;
 
     books[0].x = m_rect.w / 15;
     books[0].y = m_rect.h / 5;
@@ -49,7 +49,7 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
     books[4].w -= 2 * dx;
     books[4].h = books[4].w * coverRatio;
 
-    auto systemBar = make_unique<SystemBar>(g_container.battery);
+    auto systemBar = make_unique<SystemBar>(g_container->battery);
     systemBar->m_sep = false;
     systemBar->setTitle("HOME");
     addChild(std::move(systemBar));
@@ -132,16 +132,16 @@ void HomeActivityFb::draw()
     fe.setSize(14);
     fe.apply();
     pos.x = books[0].x;
-    pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_container.settings.smallSpace;
+    pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_container->settings.smallSpace;
     fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
 
-    pos.y += fe.m_cur.underlinePos + g_container.settings.smallSpace;
+    pos.y += fe.m_cur.underlinePos + g_container->settings.smallSpace;
     fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
     pos.y++;
     fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
 
     pos.x = books[0].x;
-    pos.y += g_container.settings.smallSpace;
+    pos.y += g_container->settings.smallSpace;
 
     {
         auto shortList = m_uxController->ctx.shortList.getList();
@@ -155,7 +155,7 @@ void HomeActivityFb::draw()
             sl.inset(-1);
             fb->roundRect(&sl, 2);
 
-            sl.x += sl.w + g_container.settings.smallSpace;
+            sl.x += sl.w + g_container->settings.smallSpace;
 
             // TODO
             (void)shortList;

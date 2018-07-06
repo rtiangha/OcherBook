@@ -39,7 +39,7 @@ RendererFd::RendererFd() :
 
 bool RendererFd::init()
 {
-    m_fd = g_container.options.inFd;
+    m_fd = g_container->options.inFd;
     if (isatty(m_fd) == -1) {
         if (errno == EBADF) {
             Log::error(LOG_NAME, "bad file descriptor");

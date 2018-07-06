@@ -5,8 +5,44 @@ project('ocher', ['cpp', 'c'],
     license: 'GPL3')
 
 if get_option('buildtype').startswith('debug')
-    add_project_arguments('-DDEBUG', language : 'cpp')
+    add_project_arguments([
+            '-DDEBUG',
+            '-DGLIBCXX_ASSERTIONS',
+            '-ggdb3',
+            '-fasynchronous-unwind-tables',
+        ],
+        language : 'cpp')
+else
+    # meson issue #2566 would obsolete this:
+    add_project_arguments('-DNDEBUG', language : 'cpp')
 endif
+
+compiler = meson.get_compiler('cpp')
+warning_flags = [
+    '-Wall',
+    '-Wextra',
+    #'-Wcast-align',                # TODO
+    #'-Wcast-align=strict',         # TODO
+    #'-Wold-style-cast',            # too many
+    #'-Wshadow',                    # libev, json too noisy
+    #'-Wuseless-cast',              # libev, json too noisy
+    #'-Wzero-as-null-pointer-constant', # json, Delegate too noisy
+    '-Wcast-qual',
+    '-Wduplicated-cond',
+    '-Werror=suggest-override',
+    '-Wformat=2',
+    '-Wframe-larger-than=16384',
+    '-Wlogical-op',
+    '-Wno-c++17-compat-mangling',   # libev too noisy
+    '-Wno-multichar',
+    '-Wno-unused-parameter',
+    '-Wnull-dereference',
+]
+foreach extra_arg : warning_flags
+    if compiler.has_argument(extra_arg)
+        add_project_arguments([extra_arg], language: 'cpp')
+    endif
+endforeach
 
 conf_data = configuration_data()
 conf_data.set('TOP_SRCDIR', meson.source_root())

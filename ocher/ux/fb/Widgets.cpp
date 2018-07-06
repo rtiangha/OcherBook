@@ -357,8 +357,6 @@ FbScreen::FbScreen(EventLoop& _loop) :
     // TODO For now I know the screen is constructed before widgets so this works
     g_screen = this;
 
-    loop.emitEvent.Connect(this, &FbScreen::dispatchEvent);
-
     // TODO probe underlying framebuffer for desired refresh rate
     ev_timer_init(&m_timer, timeoutCb, 0.25, 0.25);
     m_timer.data = this;
@@ -371,6 +369,19 @@ FbScreen::FbScreen(EventLoop& _loop) :
     ev_check_init(&m_evCheck, waking);
     m_evCheck.data = this;
     ev_check_start(loop.evLoop, &m_evCheck);
+
+    loop.emitEvent.Connect(this, &FbScreen::dispatchEvent);
+}
+
+FbScreen::~FbScreen()
+{
+    loop.emitEvent.Disconnect(this, &FbScreen::dispatchEvent);
+
+    ev_timer_stop(loop.evLoop, &m_timer);
+    ev_prepare_stop(loop.evLoop, &m_evPrepare);
+    ev_check_stop(loop.evLoop, &m_evCheck);
+
+    g_screen = nullptr;
 }
 
 void FbScreen::setFrameBuffer(FrameBuffer* _fb)

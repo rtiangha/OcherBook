@@ -49,7 +49,7 @@ void LayoutEpub::processNode(mxml_node_t* node)
             int inc = 3 - (name[1] - '0');
             if (inc < 0)
                 inc = 0;
-            pushTextAttr(AttrSizeAbs, g_container.settings.fontPoints + inc * 2);
+            pushTextAttr(AttrSizeAbs, g_container->settings.fontPoints + inc * 2);
             processSiblings(node->child);
             popTextAttr(2);
             outputNl();
