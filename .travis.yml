@@ -1,0 +1,18 @@
+sudo: false
+language: cpp
+compiler:
+  - gcc
+  - clang
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+
+install:
+  - pip3 install meson
+
+script:
+  - meson builddir
+  - ninja -C builddir
+  - ninja -C builddir test
