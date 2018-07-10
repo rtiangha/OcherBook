@@ -173,11 +173,6 @@ ocherbook_dep = declare_dependency(
     ],
 )
 
-link_args = []
-if meson.is_cross_build()
-    link_args = ['-static']
-endif
 ocher = executable('ocher', ['ocher.cpp', 'ocher.h'],
     dependencies : [ocherbook_dep],
-    link_args : link_args,
 )

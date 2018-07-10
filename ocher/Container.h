@@ -16,6 +16,9 @@
 #include "ux/Controller.h"
 #include "ux/Event.h"
 #include "ux/PowerSaver.h"
+#ifdef OCHER_TARGET_KOBO
+#include "device/kobo/KoboEvents.h"
+#endif
 
 class Container {
 public:
@@ -30,6 +33,10 @@ public:
     PowerSaver powerSaver;
 
     std::unique_ptr<UxController> uxController;
+
+#ifdef OCHER_TARGET_KOBO
+    KoboEvents koboEvents;
+#endif
 
     // TODO event source(s) (feeds to EventLoop.  eg: SdlThread, KoboEvents, BrowseFd.cpp:getKey, ncurses, ...)
     // TODO time (common timebase for events.  needed by event loop, clock, ...)

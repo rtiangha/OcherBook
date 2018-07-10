@@ -8,6 +8,9 @@
 Container::Container() :
     settings(filesystem),
     powerSaver(loop)
+#ifdef OCHER_TARGET_KOBO
+    , koboEvents(loop)
+#endif
 {
 }
 

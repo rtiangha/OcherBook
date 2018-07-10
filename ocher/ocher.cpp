@@ -11,6 +11,8 @@
 #include <cstring>
 #include <exception>
 #include <getopt.h>
+#include <iostream>
+#include <system_error>
 #include <unistd.h>
 
 
@@ -119,8 +121,10 @@ int main(int argc, char** argv)
     try {
         Controller c(opt);
         c.run();
+    } catch (std::system_error& e) {
+        std::cerr << "std::system_error " << e.what() << " code " << e.code() << std::endl;
     } catch (std::exception& e) {
-        fprintf(stderr, "%s\n", e.what());
+        std::cerr << "std::exception " << e.what() << std::endl;
     }
 
     return 0;

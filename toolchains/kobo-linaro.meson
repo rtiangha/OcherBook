@@ -21,6 +21,10 @@ ar =        '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_lin
 strip =     '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-strip'
 pkgconfig = '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-pkg-config'
 
+[properties]
+c_args = [ '-march=armv7-a', '-mfpu=neon', '-mfloat-abi=hard', '-pthread' ]
+cpp_args = [ '-march=armv7-a', '-mfpu=neon', '-mfloat-abi=hard', '-pthread' ]
+
 [host_machine]
 system = 'linux'
 cpu_family = 'arm'

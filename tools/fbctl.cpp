@@ -1,6 +1,7 @@
 #include "util/LogAppenders.h"
 #include "util/Logger.h"
 #include "ux/fb/UxControllerFb.h"
+#include "Container.h"
 
 #include <getopt.h>
 
@@ -46,9 +47,9 @@ int main(int argc, char** argv)
     root->setLevel(Log::Debug);
     auto log = Log::get(LOG_NAME);
 
-    auto controller = make_unique<UxControllerFb>();
-    controller->init();
-    FrameBuffer* fb = controller->getFrameBuffer();
+    Options opt;
+    Controller c(opt);
+    FrameBuffer* fb = g_container->uxController->getFrameBuffer();
 
     log->info("%ux%u %u dpi", fb->width(), fb->height(), fb->dpi());
 
