@@ -17,33 +17,6 @@
 #define LOG_NAME "ocher.dev.kobo"
 
 
-/*
-   Processor       : ARMv7 Processor rev 5 (v7l)
-   BogoMIPS        : 159.90
-   Features        : swp half thumb fastmult vfp edsp neon vfpv3
-   CPU implementer : 0x41
-   CPU architecture: 7
-   CPU variant     : 0x2
-   CPU part        : 0xc08
-   CPU revision    : 5
-
-   Hardware        : Freescale MX50 ARM2 Board
-   Revision        : 50011
-   Serial          : 0000000000000000
- */
-
-
-struct KoboButtonEvent {
-    uint16_t timeHigh;
-    uint16_t res1;
-    uint16_t timeLow;
-    uint16_t res2;
-    uint16_t res3;
-    uint16_t button;
-    uint16_t press;
-    uint16_t res4;
-};
-
 KoboEvents::KoboEvents(EventLoop& loop) :
     m_loop(loop)
 {
@@ -80,29 +53,35 @@ void KoboEvents::buttonCb(struct ev_loop* , ev_io* watcher, int)
 void KoboEvents::pollButton()
 {
     while (true) {
-        struct KoboButtonEvent kbe;
-        int r = read(m_buttonFd, &kbe, sizeof(kbe));
+        struct input_event ie;
+        int r = read(m_buttonFd, &ie, sizeof(ie));
         if (r == -1) {
             if (errno == EINTR)
                 continue;
             ASSERT(errno == EAGAIN || errno == EWOULDBLOCK);
             break;
-        } else if (r == sizeof(kbe)) {
+        } else if (r == sizeof(ie)) {
             bool fire = true;
             OcherEvent evt;
-            evt.type = OEVT_KEY;
-            Log::debug(LOG_NAME, "button type %x", kbe.button);
-            if (kbe.button == 0x66) {
-                evt.key.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
-                evt.key.key = OEVTK_HOME;
-            } else if (kbe.button == 0x74) {
-                evt.key.subtype = kbe.press ? OEVT_KEY_DOWN : OEVT_KEY_UP;
-                evt.key.key = OEVTK_POWER;
-            } else {
-                fire = false;
-            }
-            if (fire) {
-                m_loop.emitEvent(&evt);
+            Log::debug(LOG_NAME, "type %u code %u value %d", ie.type, ie.code, ie.value);
+            switch (ie.type) {
+            case EV_KEY:
+                evt.type = OEVT_KEY;
+                if (ie.code == KEY_HOME) {
+                    evt.key.subtype = ie.value ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                    evt.key.key = OEVTK_HOME;
+                } else if (ie.code == KEY_POWER) {
+                    evt.key.subtype = ie.value ? OEVT_KEY_DOWN : OEVT_KEY_UP;
+                    evt.key.key = OEVTK_POWER;
+                } else {
+                    fire = false;
+                }
+                if (fire) {
+                    m_loop.emitEvent(&evt);
+                }
+                break;
+            default:
+                ;
             }
         } else {
             break;
@@ -127,7 +106,7 @@ void KoboEvents::pollTouch()
     } while (r == -1 && errno == EINTR);
 
     unsigned int n = r / sizeof(struct input_event);
-    Log::debug(LOG_NAME, "read %u events", n);
+    Log::trace(LOG_NAME, "read %u events", n);
 
     // http://www.kernel.org/doc/Documentation/input/event-codes.txt
     int syn = 0;
@@ -136,15 +115,16 @@ void KoboEvents::pollTouch()
     for (unsigned int i = 0; i < n; ++i) {
         Log::debug(LOG_NAME, "type %d code %d value %d", kevt[i].type, kevt[i].code,
                 kevt[i].value);
-        if (kevt[i].type == EV_SYN) {
+        switch (kevt[i].type) {
+        case EV_SYN:
             syn = 1;
-        } else if (kevt[i].type == EV_ABS) {
-            uint16_t code = kevt[i].code;
-            if (code == ABS_X) {
+            break;
+        case EV_ABS:
+            if (kevt[i].code == ABS_X) {
                 evt->x = kevt[i].value;
-            } else if (code == ABS_Y) {
+            } else if (kevt[i].code == ABS_Y) {
                 evt->y = kevt[i].value;
-            } else if (code == ABS_PRESSURE) {
+            } else if (kevt[i].code == ABS_PRESSURE) {
                 unsigned int pressure = kevt[i].value;
                 if (pressure == 0)
                     evt->subtype = OEVT_MOUSE1_UP;
@@ -153,6 +133,10 @@ void KoboEvents::pollTouch()
                     evt->subtype = OEVT_MOUSE1_DOWN;
                 }
             }
+            break;
+        case EV_REL:
+        default:
+            ;
         }
 
         if (syn) {

@@ -8,9 +8,6 @@
 
 #include "ux/Event.h"
 
-#include <linux/input.h>
-
-
 class KoboEvents {
 public:
     KoboEvents(EventLoop& loop);
