@@ -47,6 +47,7 @@ list(APPEND LIB_SOURCES
     util/StrUtil.cpp
     util/StrUtil.h
     util/intrinsics.h
+    util/stdex.h
     ux/Activity.cpp
     ux/Activity.h
     ux/Controller.cpp
