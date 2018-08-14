@@ -36,6 +36,8 @@ To get started, try something simple like:
     $ cd builddir
     $ ninja
 
+Check the Wiki for more detailed instructions.
+
 To cross-compile, look in `toolchains` for a toolchain file for your
 device.  Each toolchain file should include some notes regarding how to acquire
 and install the cross-compiling toolchain, and how to configure OcherBook for it.

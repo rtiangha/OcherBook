@@ -6,7 +6,7 @@
 #   $ sudo tar -C /toolchains -Jxf Kobo-Reader/toolchain/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux.tar.bz2
 #
 # Note that building on x86_64 Linux may require 32-bit stdc++ compatibility packages for the toolchain, eg:
-#   $ sudo apt install libstdc++6:i386
+#   $ sudo apt install libstdc++6:i386 lib32z1
 #
 # Build OcherBook:
 #   $ cd OcherBook
@@ -15,11 +15,11 @@
 #   $ ninja
 
 [binaries]
-c =         '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-gcc'
-cpp =       '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-g++'
-ar =        '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-ar'
-strip =     '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-strip'
-pkgconfig = '/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-pkg-config'
+c =         '/usr/local/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-gcc'
+cpp =       '/usr/local/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-g++'
+ar =        '/usr/local/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-ar'
+strip =     '/usr/local/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-strip'
+pkgconfig = '/usr/local/toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2013.04-20130417_linux/bin/arm-linux-gnueabihf-pkg-config'
 
 [properties]
 c_args = [ '-march=armv7-a', '-mfpu=neon', '-mfloat-abi=hard', '-pthread' ]

@@ -16,6 +16,9 @@ unexpected.  Expect and handle the rest locally.
 
 `clang-format -style=WebKit`
 
+Admittedly sometimes this thing runs off the rails.  Read the [WebKit style
+guide](https://webkit.org/code-style-guidelines/) to understand the intent.
+Clang is a tool, not the law.
 
 # Documentation
 
@@ -62,4 +65,5 @@ Strive for good unit test coverage.
 
 Valgrind should be silent.
 
-Write good error handling.  libfiu should never be able to trigger a crash in OcherBook code.
+Write good error handling.  libfiu should never be able to trigger a crash in
+OcherBook code.
