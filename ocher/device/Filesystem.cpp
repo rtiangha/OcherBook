@@ -12,6 +12,7 @@
 #include "util/Logger.h"
 #include "util/Path.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <sys/stat.h>
 #if !defined(__HAIKU__)
@@ -53,10 +54,8 @@ static std::string settingsDir()
 Filesystem::Filesystem()
 {
 #ifdef OCHER_TARGET_KOBO
-    m_libraries = new const char*[3];
-    m_libraries[0] = "/mnt/sd";
-    m_libraries[1] = "/mnt/onboard";
-    m_libraries[2] = 0;
+    m_libraries.push_back("/mnt/sd");
+    m_libraries.push_back("/mnt/onboard");
     m_home = "/mnt/onboard/.ocher";
     m_settings = "/mnt/onboard/.ocher/settings";
 #else
@@ -75,10 +74,12 @@ Filesystem::Filesystem()
 
 Filesystem::~Filesystem()
 {
-    delete[] m_libraries;
+#ifdef __linux__
+    assert(m_notifyFd == -1);
+#endif
 }
 
-void Filesystem::initWatches(const Options& options, EventLoop& loop)
+void Filesystem::initWatches(EventLoop& loop)
 {
 #ifdef __linux__
     if (m_notifyFd == -1) {
@@ -93,29 +94,29 @@ void Filesystem::initWatches(const Options& options, EventLoop& loop)
         ev_io_start(loop.evLoop, &m_watcher);
     }
 
-    // TODO  Watch Settings->libraries instead
-    const char* const* files = options.files;
-
-    if (!files) {
-	Log::info(LOG_NAME, "No directories to watch");
+    if (m_libraries.empty()) {
+        Log::info(LOG_NAME, "No directories to watch");
         return;
     }
-    for (int i = 0; files[i]; ++i) {
-        int wd = inotify_add_watch(m_notifyFd, files[i], IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);
+    for (const auto& library : m_libraries) {
+        int wd = inotify_add_watch(m_notifyFd, library.c_str(), IN_CREATE | IN_DELETE | IN_MOVED_FROM | IN_MOVED_TO);
         if (wd == -1) {
-            Log::error(LOG_NAME, "inotify_add_watch(\"%s\") failed: %s", files[i], strerror(errno));
+            Log::error(LOG_NAME, "inotify_add_watch(\"%s\") failed: %s", library.c_str(), strerror(errno));
             continue;
         }
-        Log::info(LOG_NAME, "Watching '%s'", files[i]);
+        Log::info(LOG_NAME, "Watching '%s'", library.c_str());
     }
 #endif
 }
 
-void Filesystem::deinitWatches()
+void Filesystem::deinitWatches(EventLoop& loop)
 {
 #ifdef __linux__
-    if (m_notifyFd != -1)
+    if (m_notifyFd != -1) {
+        ev_io_stop(loop.evLoop, &m_watcher);
         close(m_notifyFd);
+        m_notifyFd = -1;
+    }
 #endif
 }
 

@@ -39,7 +39,7 @@
 UxController::UxController()
 {
     g_container->filesystem.dirChanged.Connect(this, &UxController::onDirChanged);
-    g_container->filesystem.initWatches(g_container->options, g_container->loop);
+    g_container->filesystem.initWatches(g_container->loop);
 
     g_container->loop.emitEvent.Connect(this, &UxController::handleEvent);
     g_container->powerSaver.wantToSleep.Connect(this, &UxController::onWantToSleep);
@@ -48,6 +48,8 @@ UxController::UxController()
 UxController::~UxController()
 {
     g_container->filesystem.dirChanged.Disconnect(this, &UxController::onDirChanged);
+    g_container->filesystem.deinitWatches(g_container->loop);
+
     g_container->loop.emitEvent.Disconnect(this, &UxController::handleEvent);
     g_container->powerSaver.wantToSleep.Disconnect(this, &UxController::onWantToSleep);
 }

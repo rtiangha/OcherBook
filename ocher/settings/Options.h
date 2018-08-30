@@ -8,6 +8,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 /** Options set per program run
  */
@@ -25,7 +26,7 @@ public:
 
     /** Files and/or directories passed on the command line, to be synced once.
      */
-    const char* const* files = nullptr;
+    std::vector<std::string> files;
 
     int inFd = 0;
     int outFd = 1;

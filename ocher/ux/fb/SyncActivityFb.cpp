@@ -22,7 +22,7 @@
 
 class SyncActivityWork : public EventWork {
 public:
-    SyncActivityWork(UxControllerFb* controller, const char* const* files) :
+    SyncActivityWork(UxControllerFb* controller, const std::vector<std::string>& files) :
         EventWork(g_container->loop),
         m_files(files),
         m_uxController(controller)
@@ -36,23 +36,21 @@ public:
     }
 
 protected:
-    const char* const* m_files;
+    std::vector<std::string> m_files;
     UxControllerFb* m_uxController;
 
     void work() override;
     void notifyComplete() override;
 
-    void processFile(const char* file);
+    void processFile(const std::string& file);
 };
 
 void SyncActivityWork::work()
 {
     Log::info(LOG_NAME "Work", "working");
 
-    if (m_files) {
-        for (const char* file = *m_files; file; file = *++m_files) {
-            processFile(file);
-        }
+    for (const auto& file : m_files) {
+        processFile(file);
     }
 
     Log::info(LOG_NAME "Work", "done working");
@@ -63,9 +61,10 @@ void SyncActivityWork::notifyComplete()
     m_uxController->setNextActivity(Activity::Type::Home);
 }
 
-void SyncActivityWork::processFile(const char* file)
+void SyncActivityWork::processFile(const std::string& f)
 {
     struct stat s;
+    const char* file = f.c_str();
 
     if (stat(file, &s)) {
         Log::warn(LOG_NAME, "%s: stat: %s", file, strerror(errno));
@@ -100,8 +99,9 @@ void SyncActivityFb::draw()
     m_fb->fillRect(&m_rect);
 }
 
-SyncActivityFb::SyncActivityFb(UxControllerFb* c) :
+SyncActivityFb::SyncActivityFb(UxControllerFb* c, Filesystem& filesystem) :
     ActivityFb(c),
+    m_filesystem(filesystem),
     m_fb(c->getFrameBuffer())
 {
     maximize();
@@ -117,9 +117,14 @@ void SyncActivityFb::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
-    // TODO:  sync files passed on command line once.  Sync filesystem->m_libraries.  etc.
-    m_work = new SyncActivityWork(m_uxController, g_container->options.files);
-    g_container->options.files = nullptr;
+    std::vector<std::string> libraries(m_filesystem.m_libraries);
+    // Sync files passed on command line only once.
+    auto& files = g_container->options.files;
+    if (!files.empty()) {
+        libraries.insert(libraries.end(), files.begin(), files.end());
+        files.clear();
+    }
+    m_work = new SyncActivityWork(m_uxController, libraries);
     m_spinner->start();
     invalidate();
 }

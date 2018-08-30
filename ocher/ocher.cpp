@@ -115,7 +115,9 @@ int main(int argc, char** argv)
     }
 
     if (optind < argc) {
-        opt.files = (const char* const*)&argv[optind];
+        for (int i = optind; i < argc; ++i) {
+            opt.files.push_back(argv[i]);
+        }
     }
 
     try {

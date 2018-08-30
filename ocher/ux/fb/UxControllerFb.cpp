@@ -81,7 +81,7 @@ void UxControllerFb::setNextActivity(Activity::Type a)
             activity.reset(new SleepActivityFb(this));
             break;
         case Activity::Type::Sync:
-            activity.reset(new SyncActivityFb(this));
+            activity.reset(new SyncActivityFb(this, g_container->filesystem));
             break;
         case Activity::Type::Home:
             activity.reset(new HomeActivityFb(this));

@@ -11,7 +11,6 @@
 #include "Signal.h"
 using namespace Gallant;
 
-class Options;
 
 /** Represents the interesting points of the filesystem (namely, where the books exist, and where
  * user settings might be stored.)
@@ -26,15 +25,12 @@ public:
     Filesystem(const Filesystem&) = delete;
     Filesystem& operator=(const Filesystem&) = delete;
 
-    // TODO  Filesystem should only offer up default library locations;
-    //       Settings should persist actual
-    const char** m_libraries = nullptr;
-
+    std::vector<std::string> m_libraries;
     std::string m_home;
     std::string m_settings;
 
-    void initWatches(const Options& options, EventLoop& loop);
-    void deinitWatches();
+    void initWatches(EventLoop& loop);
+    void deinitWatches(EventLoop& loop);
 
     /**
      * @param name  The file or directory with the event
