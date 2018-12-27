@@ -41,8 +41,14 @@ void SdlThread::start(std::promise<SDL_Surface*>& screenPromise)
 void SdlThread::stop()
 {
     m_stop = true;
-    if (m_thread.joinable())
+
+    if (m_thread.joinable()) {
+        SDL_Event sdlevent;
+        sdlevent.type = SDL_QUIT;
+        SDL_PushEvent(&sdlevent);
+
         m_thread.join();
+    }
 }
 
 SDL_Surface* SdlThread::init()
