@@ -16,13 +16,13 @@ SystemBar::SystemBar(Battery& battery) :
     m_sep(false),
     m_fb(m_screen->fb)
 {
-    setRect(0, 0, m_fb->width(), 30);
+    setRect(0, 0, m_fb->xres(), 30);
 
     m_flags |= WIDGET_BORDERLESS;
 
     addChild(make_unique<BatteryIcon>(g_container->settings.smallSpace, 0, battery));
 
-    addChild(make_unique<ClockIcon>(m_fb->width() - 50, 0));
+    addChild(make_unique<ClockIcon>(m_fb->xres() - 50, 0));
 
     // TODO title label, centered
 }

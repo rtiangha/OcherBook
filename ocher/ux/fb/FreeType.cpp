@@ -29,10 +29,10 @@ static const char* ttfFiles[] = {
     "liberation/LiberationSerif-Bold.ttf",
     "liberation/LiberationSerif-BoldItalic.ttf",
 #else
-    "dejavu/DejaVuSerif.ttf",
-    "dejavu/DejaVuSerif-Italic.ttf",
-    "dejavu/DejaVuSerif-Bold.ttf",
-    "dejavu/DejaVuSerif-BoldItalic.ttf",
+    "DejaVuSerif.ttf",
+    "DejaVuSerif-Italic.ttf",
+    "DejaVuSerif-Bold.ttf",
+    "DejaVuSerif-BoldItalic.ttf",
 #endif
 #endif
 };

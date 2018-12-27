@@ -47,9 +47,11 @@ endforeach
 conf_data = configuration_data()
 conf_data.set('TOP_SRCDIR', meson.source_root())
 
+# TODO  meson 0.47 https://mesonbuild.com/Build-options.html#features
 if get_option('kobo')
     conf_data.set('OCHER_TARGET_KOBO', true)
     # TODO  set hardware per submodel
+    conf_data.set('UX_FB', true)
     conf_data.set('UX_FB_MX50', true)
 endif
 
@@ -82,16 +84,6 @@ mxml_dep = dependency('mxml', fallback : ['mxml', 'mxml_dep'])
 
 freetype_dep = dependency('freetype2', fallback : ['freetype', 'freetype_dep'])
 
-if get_option('sdl')
-    sdl_dep = dependency('sdl')
-else
-    sdl_dep = dependency('sdl', required : false)
-endif
-if sdl_dep.found()
-    conf_data.set('UX_FB', true)
-    conf_data.set('UX_FB_SDL', true)
-endif
-
 if get_option('ux_fd')
     conf_data.set('UX_FD', true)
 endif
@@ -107,6 +99,15 @@ endif
 
 if get_option('ux_fb')
     conf_data.set('UX_FB', true)
+    if get_option('sdl')
+        sdl_dep = dependency('sdl')
+    else
+        sdl_dep = dependency('sdl', required : false)
+    endif
+    if sdl_dep.found()
+        conf_data.set('UX_FB_SDL', true)
+    endif
+    conf_data.set('UX_FB_LINUX', true)
 endif
 
 if get_option('epub')

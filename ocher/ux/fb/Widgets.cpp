@@ -117,8 +117,8 @@ Window::Window(int x, int y, unsigned int w, unsigned int h) :
 void Window::maximize()
 {
     m_rect.x = m_rect.y = 0;
-    m_rect.w = m_screen->fb->width();
-    m_rect.h = m_screen->fb->height();
+    m_rect.w = m_screen->fb->xres();
+    m_rect.h = m_screen->fb->yres();
 }
 
 void Window::setTitle(const std::string& title)
@@ -154,6 +154,9 @@ void Window::drawTitle(Rect* rect)
         m_screen->fb->line(rect->x + rect->w - 4, rect->y + 4, rect->x + rect->w - 12, rect->y + 12);
         rect->y += 12;
         rect->h -= 12;
+    }
+    if (!m_title.empty()) {
+        // TODO
     }
 }
 
@@ -224,7 +227,7 @@ void Button::drawBg(Rect* rect)
 
 void Button::drawLabel(Rect* rect)
 {
-    if (m_label.length()) {
+    if (!m_label.empty()) {
         FontEngine fe(m_screen->fb);
         fe.setSize(12);
         fe.apply();
@@ -358,7 +361,9 @@ FbScreen::FbScreen(EventLoop& _loop) :
     g_screen = this;
 
     // TODO probe underlying framebuffer for desired refresh rate
-    ev_timer_init(&m_timer, timeoutCb, 0.25, 0.25);
+    float refreshLatency = 0.25;
+    Log::info(LOG_NAME, "Screen refresh every %fs", refreshLatency);
+    ev_timer_init(&m_timer, timeoutCb, refreshLatency, refreshLatency);
     m_timer.data = this;
     ev_timer_start(loop.evLoop, &m_timer);
 
@@ -390,8 +395,8 @@ void FbScreen::setFrameBuffer(FrameBuffer* _fb)
 
     m_rect.x = 0;
     m_rect.y = 0;
-    m_rect.w = fb->width();
-    m_rect.h = fb->height();
+    m_rect.w = fb->xres();
+    m_rect.h = fb->yres();
 }
 
 void FbScreen::addChild(std::unique_ptr<Widget> child)

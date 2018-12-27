@@ -27,8 +27,8 @@ public:
 
     virtual bool init() = 0;
 
-    virtual unsigned int height() = 0;
-    virtual unsigned int width() = 0;
+    virtual unsigned int yres() = 0;
+    virtual unsigned int xres() = 0;
     virtual unsigned int dpi() = 0;
 
     virtual void setFg(uint8_t r, uint8_t b, uint8_t g) = 0;
@@ -82,7 +82,10 @@ public:
      */
     void blitGlyphs(Glyph* *glyphs, Pos* pen, const Rect* clip = nullptr);
 
-    virtual int update(const Rect* r, bool full = false) = 0;
+    virtual int update(const Rect* r, bool full = false)
+    {
+        return 0;
+    }
 
     /**
      * Ensures that all prior updates have completed.

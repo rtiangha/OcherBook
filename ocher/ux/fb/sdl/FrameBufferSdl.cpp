@@ -55,8 +55,8 @@ bool FrameBufferSdl::init()
     m_sdl = 1;
 
     bbox.x = bbox.y = 0;
-    bbox.w = width();
-    bbox.h = height();
+    bbox.w = xres();
+    bbox.h = yres();
     Log::info(LOG_NAME, "fb %d %d %d %d", bbox.x, bbox.y, bbox.w, bbox.h);
 
     return true;
@@ -79,19 +79,19 @@ void FrameBufferSdl::setBg(uint8_t r, uint8_t b, uint8_t g)
     m_bgColor = getColor(r, b, g);
 }
 
-inline unsigned int FrameBufferSdl::height()
+inline unsigned int FrameBufferSdl::yres()
 {
     return m_screen->h;
 }
 
-inline unsigned int FrameBufferSdl::width()
+inline unsigned int FrameBufferSdl::xres()
 {
     return m_screen->w;
 }
 
 unsigned int FrameBufferSdl::dpi()
 {
-    return 120;  // TODO
+    return 120;  // TODO SDL2 has SDL_GetDisplayDPI()
 }
 
 void FrameBufferSdl::clear()
@@ -150,8 +150,8 @@ void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, co
         clip = *userClip;
     } else {
         clip.x = clip.y = 0;
-        clip.w = width();
-        clip.h = height();
+        clip.w = xres();
+        clip.h = yres();
     }
 
     const int maxX = clip.x + clip.w - 1;
@@ -203,8 +203,8 @@ int FrameBufferSdl::update(const Rect* _r, bool /*full*/)
         r.h = _r->h;
     } else {
         r.x = r.y = 0;
-        r.w = width();
-        r.h = height();
+        r.w = xres();
+        r.h = yres();
     }
     Log::debug(LOG_NAME, "update %d %d %u %u", r.x, r.y, r.w, r.h);
     SDL_UpdateRects(m_screen, 1, &r);

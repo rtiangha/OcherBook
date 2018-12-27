@@ -20,6 +20,7 @@
 KoboEvents::KoboEvents(EventLoop& loop) :
     m_loop(loop)
 {
+    // mxckpd
     m_buttonFd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK);
     if (m_buttonFd != -1) {
         ev_io_init(&m_buttonWatcher, buttonCb, m_buttonFd, EV_READ);
@@ -27,6 +28,7 @@ KoboEvents::KoboEvents(EventLoop& loop) :
         ev_io_start(m_loop.evLoop, &m_buttonWatcher);
     }
 
+    // zForce-ir-touch
     m_touchFd = open("/dev/input/event1", O_RDONLY | O_NONBLOCK);
     if (m_touchFd != -1) {
         ev_io_init(&m_touchWatcher, touchCb, m_touchFd, EV_READ);
@@ -81,7 +83,7 @@ void KoboEvents::pollButton()
                 }
                 break;
             default:
-                ;
+                Log::trace(LOG_NAME, "other button %d", ie.type);
             }
         } else {
             break;
@@ -118,29 +120,50 @@ void KoboEvents::pollTouch()
         switch (kevt[i].type) {
         case EV_SYN:
             syn = 1;
+            Log::trace(LOG_NAME, "syn");
             break;
         case EV_ABS:
             if (kevt[i].code == ABS_X) {
                 evt->x = kevt[i].value;
+                Log::trace(LOG_NAME, "abs x %u", evt->x);
             } else if (kevt[i].code == ABS_Y) {
                 evt->y = kevt[i].value;
+                Log::trace(LOG_NAME, "abs y %u", evt->y);
             } else if (kevt[i].code == ABS_PRESSURE) {
                 unsigned int pressure = kevt[i].value;
+                Log::trace(LOG_NAME, "abs pressure %u", pressure);
                 if (pressure == 0)
                     evt->subtype = OEVT_MOUSE1_UP;
                 else {
                     // TODO: 100 down, 101 drag
                     evt->subtype = OEVT_MOUSE1_DOWN;
                 }
+            } else {
+                // ABS_DISTANCE
+                // ABS_MT
+                Log::trace(LOG_NAME, "other abs %d", kevt[i].code);
             }
             break;
         case EV_REL:
+            Log::trace(LOG_NAME, "rel");
+            break;
+        case EV_KEY:
+            if (kevt[i].code == BTN_TOUCH) {
+                // touching is the common case
+            } else {
+                Log::trace(LOG_NAME, "other mouse key %d", kevt[i].type);
+            }
         default:
-            ;
+            Log::trace(LOG_NAME, "other mouse %d", kevt[i].type);
+            break;
         }
 
         if (syn) {
-#if 1       // TODO: Why do down vs up coordinate systems differ??
+#if 1
+            // The zForce-ir-touch driver seems to be a mess.
+            // input/touchscreen/zforce_i2c.c:255-262 swaps X/Y coords,
+            // but only if a global gIsCustomerUi flag is set.
+            // TODO How to set gptHWCFG?  see mx50_ntx_io.c  CM_HWCONFIG / CM_SET_HWCONFIG
             if (evt->subtype == OEVT_MOUSE1_DOWN) {
                 evt->x = 600 - evt->y;
                 evt->y = evt->x;

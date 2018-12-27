@@ -59,6 +59,12 @@ if conf_data.get('OCHER_TARGET_KOBO', false)
         'device/kobo/KoboEvents.h',
     ]
 endif
+if conf_data.get('UX_FB_LINUX', false)
+    ocher_sources += [
+        'ux/fb/FbLinux.cpp',
+        'ux/fb/FbLinux.h',
+    ]
+endif
 if conf_data.get('UX_FB_MX50', false)
     ocher_sources += [
         'ux/fb/mx50/FrameBufferMx50.cpp',

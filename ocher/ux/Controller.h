@@ -84,8 +84,8 @@ public:
 protected:
     void initUxController(std::unique_ptr<UxController> c);
     void initCrash();
+    void initDevice();
     void initLog();
-    void initDebug();
 };
 
 #endif

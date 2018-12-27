@@ -82,7 +82,7 @@ Controller::Controller(const Options& options)
     g_container->options = options;
 
     initLog();
-    initDebug();
+    initDevice();
 
     g_container->settings.load();
 
@@ -185,7 +185,7 @@ void Controller::initLog()
     Log::info("ocher", "Log initialized");
 }
 
-void Controller::initDebug()
+void Controller::initDevice()
 {
 #if 0
     // Before proceeding with startup and initializing the framebuffer, check for a killswitch.
@@ -204,10 +204,7 @@ void Controller::initDebug()
         }
     }
 #endif
-}
 
-void Controller::run()
-{
 #ifdef OCHER_TARGET_KOBO
     // Kobo rc scripts start animate.sh, which shows an animation while nickel is starting.
     // Kill that here (so it doesn't overlay the boot menu) to simplify installation steps.
@@ -215,9 +212,13 @@ void Controller::run()
     system("killall on-animator.sh");
     std::this_thread::sleep_for(std::chrono::seconds(1));
 #endif
+}
 
+void Controller::run()
+{
     Activity::Type a = g_container->options.bootMenu ? Activity::Type::Boot : Activity::Type::Sync;
     g_container->uxController->setNextActivity(a);
+
     g_container->loop.run();
 
     // TODO: sync state out

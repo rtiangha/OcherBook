@@ -20,8 +20,8 @@ BootActivityFb::BootActivityFb(UxControllerFb* c) :
     m_fb(c->getFrameBuffer())
 {
     float ratio = 1.6;
-    int w = m_fb->width();
-    int h = m_fb->height();
+    int w = m_fb->xres();
+    int h = m_fb->yres();
 
     // Calc nice percentage widths, then calc height proportionally, then center vertically.
     apps[0].x = w / 10;

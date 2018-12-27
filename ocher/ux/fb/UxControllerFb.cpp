@@ -14,6 +14,9 @@
 
 #include "Container.h"
 #include "ux/fb/RendererFb.h"
+#ifdef UX_FB_LINUX
+#include "ux/fb/FbLinux.h"
+#endif
 #ifdef UX_FB_MX50
 #include "ux/fb/mx50/FrameBufferMx50.h"
 #endif
@@ -47,6 +50,13 @@ bool UxControllerFb::init()
         frameBuffer = new FrameBufferMx50();
         if (frameBuffer->init()) {
             m_name += ".mx50";
+            break;
+        }
+#endif
+#ifdef UX_FB_LINUX
+        frameBuffer = new FbLinux();
+        if (frameBuffer->init()) {
+            m_name += ".linux";
             break;
         }
 #endif

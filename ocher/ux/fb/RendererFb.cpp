@@ -34,7 +34,7 @@ RendererFb::RendererFb(FrameBuffer* fb) :
 
 bool RendererFb::init()
 {
-    memset(&a[ai], 0, sizeof(a[ai]));
+    a[ai] = {};
     a[ai].pts = m_settings.fontPoints;
     return true;
 }
@@ -67,13 +67,13 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
         }
     }
     if (m_penX == m_settings.marginLeft) {
-        if (m_penY >= (int)m_fb->height() - m_settings.marginBottom - m_fe.m_cur.descender) {
+        if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fe.m_cur.descender) {
             return 0;
         }
     }
 
     bool wordWrapped = false;
-    int width = m_fb->width();
+    int xres = m_fb->xres();
     do {
         // If at start of line, eat spaces
         if (m_penX == m_settings.marginLeft) {
@@ -97,13 +97,13 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
             bbox.x = m_penX;
             bbox.y = m_penY;
             m_fe.plotString(p, w, glyphs, &bbox);
-            if (m_penX + bbox.w >= width - m_settings.marginRight &&
-                bbox.w <= width - m_settings.marginRight - m_settings.marginLeft) {
+            if (m_penX + bbox.w >= xres - m_settings.marginRight &&
+                bbox.w <= xres - m_settings.marginRight - m_settings.marginLeft) {
                 bbox.x = m_penX = m_settings.marginLeft;
                 m_penY += m_fe.m_cur.lineHeight;
                 bbox.y = m_penY;
             }
-            if (m_penY >= (int)m_fb->height() - m_settings.marginBottom - m_fe.m_cur.descender)
+            if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fe.m_cur.descender)
                 return p - start;
             bbox.y -= m_fe.m_cur.ascender;
             bbox.h = m_fe.m_cur.lineHeight;
@@ -127,7 +127,7 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
         }
 
         // Word-wrap or hard linefeed, but avoid the two back-to-back.
-        if ((*p == '\n' && !wordWrapped) || m_penX >= width - 1 - m_settings.marginRight) {
+        if ((*p == '\n' && !wordWrapped) || m_penX >= xres - 1 - m_settings.marginRight) {
             m_penX = m_settings.marginLeft;
             m_penY += m_fe.m_cur.lineHeight;
             if (*p == '\n') {
@@ -136,7 +136,7 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
             } else {
                 wordWrapped = true;
             }
-            if (m_penY >= (int)m_fb->height() - m_settings.marginBottom - m_fe.m_cur.descender)
+            if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fe.m_cur.descender)
                 return p - start;
         } else {
             if (*p == '\n') {

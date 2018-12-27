@@ -65,7 +65,7 @@ Settings::Settings(Filesystem& filesystem) :
 #elif defined __FreeBSD__
     fontRoot = "/usr/local/share/fonts/";
 #else
-    fontRoot = "/usr/share/fonts/truetype/";
+    fontRoot = "/usr/share/fonts/TTF/";
 #endif
 }
 

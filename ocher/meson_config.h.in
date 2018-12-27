@@ -12,6 +12,7 @@
 #mesondefine FMT_PNG
 #mesondefine UX_CDK
 #mesondefine UX_FB
+#mesondefine UX_FB_LINUX
 #mesondefine UX_FB_MX50
 #mesondefine UX_FB_SDL
 #mesondefine UX_FD

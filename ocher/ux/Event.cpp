@@ -39,6 +39,7 @@ int EventLoop::run()
 
 void EventLoop::stop()
 {
+    Log::debug(LOG_NAME, "ev_break");
     ev_break(evLoop, EVBREAK_ALL);
 }
 

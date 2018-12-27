@@ -75,7 +75,7 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 m_navBar->hide();
                 invalidate();
             } else {
-                if (evt->x < m_fb->width() / 2) {
+                if (evt->x < m_fb->xres() / 2) {
                     if (m_pageNum > 0) {
                         Log::info(LOG_NAME, "back from page %d", m_pageNum);
                         m_pageNum--;
