@@ -6,33 +6,24 @@
 #ifndef OCHER_DEVICE_H
 #define OCHER_DEVICE_H
 
+#include <memory>
 #include <string>
 
 /** Represents the physical e-reader device.
  */
 class Device {
 public:
+    static std::unique_ptr<Device> create();
+
     virtual ~Device() = default;
 
-    std::string getVersion();
-    std::string getBuildDate();
-
-    std::string getMac();
-    std::string getIp();
-
-    virtual void reboot()
-    {
-    }
-
-    virtual void shutdown()
-    {
-    }
-
-    /**
-     * Puts the device in a low power state until ??? TODO.
-     * Returns when awake.
-     */
+    virtual const char* make() { return "unknown"; }
+    virtual const char* model() { return "unknown"; }
+    virtual bool sdCardInserted() { return false; }
+    virtual bool sdCardProtected() { return false; }
     virtual void sleep();
+    virtual void reboot() {}
+    virtual void poweroff() {}
 };
 
 #endif

@@ -4,50 +4,20 @@
  */
 
 #include "device/Device.h"
+#ifdef OCHER_TARGET_KOBO
+#include "device/ntx.h"
+#endif
 
 #include "ocher.h"
 #include "util/Logger.h"
-#include "util/StrUtil.h"
+#include "util/stdex.h"
 
 #include <cerrno>
 #include <cstring>
 #include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #define LOG_NAME "ocher.dev"
-
-
-std::string Device::getMac()
-{
-    std::string mac;
-
-    // TODO
-    return mac;
-}
-
-std::string Device::getIp()
-{
-    std::string ip;
-
-    // TODO
-    return ip;
-}
-
-std::string Device::getVersion()
-{
-    std::string version(format("%d.%d.%d", OCHER_MAJOR, OCHER_MINOR, OCHER_PATCH));
-
-    return version;
-}
-
-std::string Device::getBuildDate()
-{
-    std::string date(__DATE__);
-
-    return date;
-}
 
 void Device::sleep()
 {
@@ -71,5 +41,14 @@ void Device::sleep()
     }
 #else
     ::sleep(10);  // TODO for testing
+#endif
+}
+
+std::unique_ptr<Device> Device::create()
+{
+#ifdef OCHER_TARGET_KOBO
+    return make_unique<NtxDevice>();
+#else
+    return make_unique<Device>();
 #endif
 }

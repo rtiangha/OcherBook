@@ -66,7 +66,7 @@ void UxController::onWantToSleep()
 
     // TODO  notify
 
-    g_container->device.sleep();
+    g_container->device->sleep();
 }
 
 void UxController::handleEvent(const struct OcherEvent* evt)
@@ -187,13 +187,15 @@ void Controller::initLog()
 
 void Controller::initDevice()
 {
+    g_container->device = std::move(Device::create());
+
 #if 0
     // Before proceeding with startup and initializing the framebuffer, check for a killswitch.
     // Useful when needing to bail to native stack (such as OcherBook vs native stack init-ing
     // framebuffer in incompatible ways).
-    if (g_container->device.fs.m_libraries) {
+    if (g_container->device->fs.m_libraries) {
         for (int i = 0;; ++i) {
-            const char* lib = g_container->device.fs.m_libraries[i];
+            const char* lib = g_container->device->fs.m_libraries[i];
             if (!lib)
                 break;
             std::string killswitch(1, "%s/.ocher/kill", lib);

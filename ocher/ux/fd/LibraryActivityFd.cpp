@@ -13,7 +13,6 @@
 #include "util/Logger.h"
 
 #include <cstdio>
-#include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 

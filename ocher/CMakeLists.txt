@@ -111,6 +111,7 @@ if(OCHER_KOBO)
     list(APPEND LIB_SOURCES
         ux/fb/mx50/FrameBufferMx50.cpp
         device/kobo/KoboEvents.cpp
+        device/ntx.cpp
     )
     set(UX_FB_MX50 TRUE)
 endif()

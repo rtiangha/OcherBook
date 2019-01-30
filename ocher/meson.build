@@ -57,6 +57,8 @@ if conf_data.get('OCHER_TARGET_KOBO', false)
     ocher_sources += [
         'device/kobo/KoboEvents.cpp',
         'device/kobo/KoboEvents.h',
+        'device/ntx.cpp',
+        'device/ntx.h',
     ]
 endif
 if conf_data.get('UX_FB_LINUX', false)

@@ -41,7 +41,7 @@ void SleepActivityFb::onAttached()
     m_fb->sync();
     ::sleep(1);                  // TODO seems hackish but sync doesn't wait long enough!
 
-    g_container->device.sleep();
+    g_container->device->sleep();
 
     m_loop.setEpoch();  // Toss old events
 }

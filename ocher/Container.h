@@ -28,7 +28,7 @@ public:
     Filesystem filesystem;
     Settings settings;
     Options options;
-    Device device;
+    std::unique_ptr<Device> device;
     Battery battery;
     PowerSaver powerSaver;
 
