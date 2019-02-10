@@ -47,7 +47,7 @@ void Device::sleep()
 std::unique_ptr<Device> Device::create()
 {
 #ifdef OCHER_TARGET_KOBO
-    return make_unique<NtxDevice>();
+    return make_unique<Kobo>();
 #else
     return make_unique<Device>();
 #endif

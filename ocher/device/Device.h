@@ -13,16 +13,37 @@
  */
 class Device {
 public:
+    enum Attr {
+        Make,
+        Model,
+        ModelNumber,
+        SerialNumber,
+        NumAttrs
+    };
+    enum ScreenAttr {
+        XRes,
+        YRes,
+        PPI,
+        NumScreenAttrs
+    };
+    enum Prop {
+        SDCardInserted,
+        SDCardProtected,
+        ACPlugIn,
+        USBPlugIn,
+        NumProps
+    };
+
+    std::array<std::string, NumAttrs> attrs;
+    std::array<int, NumScreenAttrs> screenattrs;
+    std::array<bool, NumProps> props;
+
     static std::unique_ptr<Device> create();
 
     virtual ~Device() = default;
 
-    virtual const char* make() { return "unknown"; }
-    virtual const char* model() { return "unknown"; }
-    virtual bool sdCardInserted() { return false; }
-    virtual bool sdCardProtected() { return false; }
     virtual void sleep();
-    virtual void reboot() {}
+    virtual void reset() {}
     virtual void poweroff() {}
 };
 
