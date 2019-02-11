@@ -21,7 +21,7 @@ public:
 
     unsigned int yres() override;
     unsigned int xres() override;
-    unsigned int dpi() override;
+    unsigned int ppi() override;
 
     void setFg(uint8_t r, uint8_t b, uint8_t g) override;
     void setBg(uint8_t r, uint8_t b, uint8_t g) override;

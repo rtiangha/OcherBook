@@ -57,9 +57,13 @@ bool FbLinux::init()
 
     initVarInfo();
 
-    if (ioctl(m_fd, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
-        Log::error(LOG_NAME, "Failed to set variable screen info: %s", strerror(errno));
-        goto fail1;
+    {
+        const struct fb_var_screeninfo _vinfo = vinfo;
+        if (ioctl(m_fd, FBIOPUT_VSCREENINFO, &vinfo) == -1) {
+            Log::error(LOG_NAME, "Failed to set variable screen info: %s", strerror(errno));
+            goto fail1;
+        }
+        vinfo = _vinfo;
     }
 
     // Figure out the size of the screen in bytes
@@ -78,12 +82,12 @@ bool FbLinux::init()
     bbox.x = bbox.y = 0;
     bbox.w = xres();
     bbox.h = yres();
-    Log::info(LOG_NAME, "res %dx%d virtual %dx%d offset %dx%d size %dx%dmm %u dpi",
+    Log::info(LOG_NAME, "res %dx%d virtual %dx%d offset %dx%d size %dx%dmm %u ppi",
             vinfo.xres, vinfo.yres,
             vinfo.xres_virtual, vinfo.yres_virtual,
             vinfo.xoffset, vinfo.yoffset,
             vinfo.width, vinfo.height,
-            dpi());
+            ppi());
 
     return true;
 
@@ -104,7 +108,7 @@ unsigned int FbLinux::xres()
     return vinfo.xres;
 }
 
-unsigned int FbLinux::dpi()
+unsigned int FbLinux::ppi()
 {
     return vinfo.xres / (vinfo.width / 25.4);
 }
@@ -181,8 +185,7 @@ void FbLinux::blit(const unsigned char* p, int x, int y, int w, int h, const Rec
         if (x >= maxX)
             return;
         w = maxX - x;
-    }
-    if (x < minX) {
+    } else if (x < minX) {
         // TODO
     }
     const int maxY = clip.y + clip.h - 1;
@@ -191,8 +194,7 @@ void FbLinux::blit(const unsigned char* p, int x, int y, int w, int h, const Rec
         if (y >= maxY)
             return;
         h = maxY - y;
-    }
-    if (y < minY) {
+    } else if (y < minY) {
         // TODO
     }
 

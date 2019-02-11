@@ -94,7 +94,7 @@ int main(int argc, char** argv)
     FbScreen screen(g_container->loop);
     screen.setFrameBuffer(fb);
 
-    s_log->info("%ux%u %u dpi", fb->xres(), fb->yres(), fb->dpi());
+    s_log->info("%ux%u %u ppi", fb->xres(), fb->yres(), fb->ppi());
 
     int bg = 0xff;
     int fg = 0x00;

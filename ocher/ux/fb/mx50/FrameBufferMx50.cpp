@@ -5,6 +5,8 @@
 
 #include "ux/fb/mx50/FrameBufferMx50.h"
 
+#include "Container.h"
+#include "device/Device.h"
 #include "util/Logger.h"
 
 #include <cerrno>
@@ -36,10 +38,13 @@ bool FrameBufferMx50::init()
 void FrameBufferMx50::initVarInfo()
 {
     // The mxc_epdc_fb.c driver doesn't report physical size.
-    // TODO identify model
-    if (vinfo.width == -1 && vinfo.height == -1) {
-        vinfo.width = 90;
-        vinfo.height = 120;
+    if (vinfo.width == (unsigned)-1 && vinfo.height == (unsigned)-1) {
+        const auto& device = g_container->device;
+        int xres = device->screenattrs[Device::XRes];
+        int yres = device->screenattrs[Device::YRes];
+        int ppi  = device->screenattrs[Device::PPI];
+        vinfo.width = std::ceil(xres * 25.4 / ppi);
+        vinfo.height = std::ceil(yres * 25.4 / ppi);
     }
 
     vinfo.bits_per_pixel = 8;
@@ -47,6 +52,12 @@ void FrameBufferMx50::initVarInfo()
     vinfo.red = vinfo.green = vinfo.blue = vinfo.transp = { 0, 8, 0 };
     // 0 is landscape right handed, 1 portait upside-down, 2 , 3 portrait
     vinfo.rotate = 3;
+}
+
+unsigned int FrameBufferMx50::ppi()
+{
+    const auto& device = g_container->device;
+    return device->screenattrs[Device::PPI];
 }
 
 int FrameBufferMx50::update(const Rect* r, bool full)

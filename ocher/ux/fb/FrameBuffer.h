@@ -29,7 +29,7 @@ public:
 
     virtual unsigned int yres() = 0;
     virtual unsigned int xres() = 0;
-    virtual unsigned int dpi() = 0;
+    virtual unsigned int ppi() = 0;
 
     virtual void setFg(uint8_t r, uint8_t b, uint8_t g) = 0;
     virtual void setBg(uint8_t r, uint8_t b, uint8_t g) = 0;

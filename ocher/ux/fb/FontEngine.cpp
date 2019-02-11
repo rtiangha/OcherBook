@@ -45,7 +45,7 @@ Glyph* GlyphCache::get(GlyphDescr& f)
 
 FontEngine::FontEngine(FrameBuffer* fb) :
     m_fb(fb),
-    m_ft(fb->dpi())
+    m_ft(fb->ppi())
 {
     m_next.faceId = 0;
     m_next.points = g_container->settings.fontPoints;
