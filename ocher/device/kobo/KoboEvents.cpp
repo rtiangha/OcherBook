@@ -5,6 +5,8 @@
 
 #include "device/kobo/KoboEvents.h"
 
+#include "Container.h"
+#include "device/Device.h"
 #include "util/Debug.h"
 #include "util/Logger.h"
 
@@ -159,16 +161,19 @@ void KoboEvents::pollTouch()
         }
 
         if (syn) {
-#if 1
-            // The zForce-ir-touch driver seems to be a mess.
-            // input/touchscreen/zforce_i2c.c:255-262 swaps X/Y coords,
-            // but only if a global gIsCustomerUi flag is set.
-            // TODO How to set gptHWCFG?  see mx50_ntx_io.c  CM_HWCONFIG / CM_SET_HWCONFIG
-            if (evt->subtype == OEVT_MOUSE1_DOWN) {
-                evt->x = 600 - evt->y;
-                evt->y = evt->x;
+            static bool flip = g_container->device->attrs[Device::ModelNumber] == "N905C";
+            if (flip) {
+                // The zForce-ir-touch driver seems to be a mess.
+                // input/touchscreen/zforce_i2c.c:255-262 swaps X/Y coords,
+                // but only if a global gIsCustomerUi flag is set.
+                // Perhaps only affects some Kobo Touch?
+                // TODO How to set gptHWCFG?  see mx50_ntx_io.c  CM_HWCONFIG / CM_SET_HWCONFIG
+                if (evt->subtype == OEVT_MOUSE1_DOWN) {
+                    evt->x = 600 - evt->y;
+                    evt->y = evt->x;
+                }
             }
-#endif
+
             Log::info(LOG_NAME, "mouse %u, %u %s", evt->x, evt->y,
                     evt->subtype == OEVT_MOUSE1_DOWN ? "down" : "up");
             m_loop.emitEvent(&m_evt);
