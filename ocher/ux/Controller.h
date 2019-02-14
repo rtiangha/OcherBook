@@ -64,6 +64,7 @@ public:
     virtual void setNextActivity(Activity::Type a) = 0;
 
     void onWantToSleep();
+    void onWantToPowerOff();
     void onDirChanged(const char* dir, const char* file);
     void handleEvent(const struct OcherEvent* evt);
 

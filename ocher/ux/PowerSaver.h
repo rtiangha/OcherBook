@@ -16,12 +16,15 @@ class PowerSaver {
 public:
     PowerSaver(EventLoop& loop);
 
-    void setTimeout(unsigned int seconds);
+    void setSleepTimeout(int seconds);
 
     Signal0<> wantToSleep;
+    Signal0<> wantToPowerOff;
 
 protected:
-    void resetTimeout();
+    ev_tstamp now();
+    void activity();
+    void resetTimeout(int seconds);
 
     static void timeoutCb(EV_P_ ev_timer* w, int revents);
     void timeout();
@@ -30,7 +33,16 @@ protected:
 
     EventLoop& m_loop;
     ev_timer m_timer;
-    unsigned int m_seconds;
+
+    // sleep
+    int m_sleepSeconds = 15 * 60;
+    ev_tstamp m_activityTime = 0;
+
+    // power key
+    ev_tstamp m_powerKeyDownTime = 0;
+    bool m_powerKeyDown = false;
+    bool m_poweringOff = false;
+    int m_holdPoweroffSeconds = 4;
 };
 
 #endif

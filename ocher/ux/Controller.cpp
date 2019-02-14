@@ -43,6 +43,7 @@ UxController::UxController()
 
     g_container->loop.emitEvent.Connect(this, &UxController::handleEvent);
     g_container->powerSaver.wantToSleep.Connect(this, &UxController::onWantToSleep);
+    g_container->powerSaver.wantToPowerOff.Connect(this, &UxController::onWantToPowerOff);
 }
 
 UxController::~UxController()
@@ -52,6 +53,7 @@ UxController::~UxController()
 
     g_container->loop.emitEvent.Disconnect(this, &UxController::handleEvent);
     g_container->powerSaver.wantToSleep.Disconnect(this, &UxController::onWantToSleep);
+    g_container->powerSaver.wantToPowerOff.Disconnect(this, &UxController::onWantToPowerOff);
 }
 
 void UxController::onDirChanged(const char* dir, const char* file)
@@ -64,9 +66,30 @@ void UxController::onWantToSleep()
 {
     Log::info(LOG_NAME, "onWantToSleep");
 
-    // TODO  notify
+    // TODO SleepActivity: clear / sync screen
+    auto fb = getFrameBuffer();
+    if (fb) {
+        fb->clear();
+        fb->update(nullptr, true);
+        fb->sync();
+    }
 
     g_container->device->sleep();
+}
+
+void UxController::onWantToPowerOff()
+{
+    Log::info(LOG_NAME, "onWantToPowerOff");
+
+    // TODO PoweroffActivity: clear / sync screen
+    auto fb = getFrameBuffer();
+    if (fb) {
+        fb->clear();
+        fb->update(nullptr, true);
+        fb->sync();
+    }
+
+    g_container->device->poweroff();
 }
 
 void UxController::handleEvent(const struct OcherEvent* evt)
