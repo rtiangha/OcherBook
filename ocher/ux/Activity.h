@@ -20,7 +20,7 @@ public:
         Read,
         Library,
         Settings,
-        Previous,
+        PowerOff,
         Quit,
     };
 };

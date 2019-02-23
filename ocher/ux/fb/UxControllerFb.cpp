@@ -88,7 +88,10 @@ void UxControllerFb::setNextActivity(Activity::Type a)
             activity.reset(new BootActivityFb(this));
             break;
         case Activity::Type::Sleep:
-            activity.reset(new SleepActivityFb(this));
+            activity.reset(new SleepActivityFb(this, PowerLevel::Sleep));
+            break;
+        case Activity::Type::PowerOff:
+            activity.reset(new SleepActivityFb(this, PowerLevel::PowerOff));
             break;
         case Activity::Type::Sync:
             activity.reset(new SyncActivityFb(this, g_container->filesystem));
@@ -111,6 +114,7 @@ void UxControllerFb::setNextActivity(Activity::Type a)
 
         m_activity = activity.get();  // remember for removal
         m_screen.addChild(std::move(activity));
+        m_activityType = a;
 
         m_frameBuffer->needFull();
     }

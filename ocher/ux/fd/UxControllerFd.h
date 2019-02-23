@@ -28,10 +28,12 @@ public:
         return m_renderer.get();
     }
 
+    Activity::Type previousActivity() override { return m_activityType; }
     void setNextActivity(Activity::Type a) override;
 
 protected:
     std::unique_ptr<Renderer> m_renderer;
+    Activity::Type m_activityType = Activity::Type::Quit;
 };
 
 #endif

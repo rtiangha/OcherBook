@@ -66,15 +66,7 @@ void UxController::onWantToSleep()
 {
     Log::info(LOG_NAME, "onWantToSleep");
 
-    // TODO SleepActivity: clear / sync screen
-    auto fb = getFrameBuffer();
-    if (fb) {
-        fb->clear();
-        fb->update(nullptr, true);
-        fb->sync();
-    }
-
-    g_container->device->sleep();
+    setNextActivity(Activity::Type::Sleep);
 }
 
 void UxController::onWantToPowerOff()

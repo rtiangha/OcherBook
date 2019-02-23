@@ -41,6 +41,7 @@ public:
         return m_renderer.get();
     }
 
+    Activity::Type previousActivity() override { return m_activityType; }
     void setNextActivity(Activity::Type a) override;
 
 protected:
@@ -49,6 +50,7 @@ protected:
     std::unique_ptr<FontEngine> m_fontEngine;
     std::unique_ptr<FrameBuffer> m_frameBuffer;
     FbScreen m_screen;
+    Activity::Type m_activityType = Activity::Type::Quit;
     ActivityFb* m_activity = nullptr;
 };
 

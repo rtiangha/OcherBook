@@ -61,6 +61,7 @@ public:
 
     virtual Renderer* getRenderer() = 0;
 
+    virtual Activity::Type previousActivity() = 0;
     virtual void setNextActivity(Activity::Type a) = 0;
 
     void onWantToSleep();

@@ -27,5 +27,6 @@ void UxControllerFd::setNextActivity(Activity::Type a)
         g_container->loop.stop();
     } else {
         // TODO
+        m_activityType = a;
     }
 }
