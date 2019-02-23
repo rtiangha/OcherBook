@@ -89,7 +89,7 @@ inline unsigned int FrameBufferSdl::xres()
     return m_screen->w;
 }
 
-unsigned int FrameBufferSdl::dpi()
+unsigned int FrameBufferSdl::ppi()
 {
     return 120;  // TODO SDL2 has SDL_GetDisplayDPI()
 }
