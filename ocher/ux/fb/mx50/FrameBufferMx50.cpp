@@ -60,27 +60,42 @@ unsigned int FrameBufferMx50::ppi()
     return device->screenattrs[Device::PPI];
 }
 
-int FrameBufferMx50::update(const Rect* r, bool full)
+int FrameBufferMx50::update(const Rect* rect, bool full)
 {
-    Rect _r;
+    Rect r;
 
-    if (!r) {
-        _r.x = _r.y = 0;
-        _r.w = xres();
-        _r.h = yres();
-        r = &_r;
+    const int width = xres();
+    const int height = yres();
+    if (!rect) {
+        r.x = r.y = 0;
+        r.w = width;
+        r.h = height;
+    } else {
+        r = *rect;
+
+        if (r.x + r.w > width) {
+            if (r.x >= width)
+                return m_marker;
+            r.w = width - r.x;
+        }
+        if (r.y + r.h > height) {
+            if (r.y >= height)
+                return m_marker;
+            r.h = height - r.y;
+        }
     }
+
     if (m_needFull) {
         m_needFull = false;
         full = true;
     }
-    Log::info(LOG_NAME, "update %d %d %u %u", r->x, r->y, r->w, r->h);
+    Log::info(LOG_NAME, "update %d %d %u %u", r.x, r.y, r.w, r.h);
     struct mxcfb_update_data region;
 
-    region.update_region.left = r->x;
-    region.update_region.top = r->y;
-    region.update_region.width = r->w;
-    region.update_region.height = r->h;
+    region.update_region.left = r.x;
+    region.update_region.top = r.y;
+    region.update_region.width = r.w;
+    region.update_region.height = r.h;
     region.waveform_mode = WAVEFORM_MODE_AUTO;
     region.update_mode = full ? UPDATE_MODE_FULL : UPDATE_MODE_PARTIAL;
     region.update_marker = ++m_marker;
@@ -89,7 +104,7 @@ int FrameBufferMx50::update(const Rect* r, bool full)
 
     if (ioctl(m_fd, MXCFB_SEND_UPDATE, &region) == -1) {
         Log::error(LOG_NAME, "MXCFB_SEND_UPDATE(%d, %d, %d, %d, %d): %s",
-                r->x, r->y, r->w, r->h, m_marker, strerror(errno));
+                r.x, r.y, r.w, r.h, m_marker, strerror(errno));
     } else {
         Log::info(LOG_NAME, "update %d started", m_marker);
     }
