@@ -155,8 +155,6 @@ void LibraryActivityFb::onAttached()
     const std::vector<Meta *>& library = m_uxController->ctx.library.getList();
     m_pages = (library.size() + m_booksPerPage - 1) / m_booksPerPage;
     Log::info(LOG_NAME, "%u books across %u pages", (unsigned)library.size(), m_pages);
-
-    invalidate();
 }
 
 void LibraryActivityFb::leftIconPressed()

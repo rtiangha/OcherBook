@@ -43,8 +43,6 @@ void BootActivityFb::highlight(int i)
         r.inset(-1);
         m_fb->rect(&r);
     }
-    m_fb->update(&r);
-    m_fb->sync();
 }
 
 EventDisposition BootActivityFb::evtMouse(const struct OcherMouseEvent* evt)

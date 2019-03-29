@@ -126,7 +126,6 @@ void SyncActivityFb::onAttached()
     }
     m_work = new SyncActivityWork(m_uxController, libraries);
     m_spinner->start();
-    invalidate();
 }
 
 void SyncActivityFb::onDetached()

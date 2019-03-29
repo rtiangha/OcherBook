@@ -184,8 +184,6 @@ void HomeActivityFb::onAttached()
     button->setPos(430, 575);  // TODO widget packing
     button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
     addChild(std::move(button));
-
-    invalidate();
 }
 
 void HomeActivityFb::browseButtonPressed()

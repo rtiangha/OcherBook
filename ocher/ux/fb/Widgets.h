@@ -52,7 +52,7 @@ protected:
 
     // std::vector<> m_invalidRects;
 
-    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+    static void refreshTimeoutCb(EV_P_ ev_timer* w, int revents);
     static void readyToIdle(EV_P_ ev_prepare* p, int revents);
     static void waking(EV_P_ ev_check* c, int revents);
 
@@ -84,11 +84,14 @@ public:
     void hide()
     {
         m_flags |= WIDGET_HIDDEN;
+        if (m_parent)
+            m_parent->invalidate();
     }
 
     void show()
     {
         m_flags &= ~WIDGET_HIDDEN;
+        invalidate();
     }
 
     void setRect(int x, int y, int w, int h)

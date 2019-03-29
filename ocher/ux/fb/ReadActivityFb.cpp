@@ -36,7 +36,6 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
                 m_pageNum--;
                 m_systemBar->hide();
                 m_navBar->hide();
-                invalidate();
             }
             return EventDisposition::Handled;
         } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
@@ -45,7 +44,6 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
                 m_pageNum++;
                 m_systemBar->hide();
                 m_navBar->hide();
-                invalidate();
             }
             return EventDisposition::Handled;
         }
@@ -61,9 +59,7 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
             if (m_systemBar->m_flags & WIDGET_HIDDEN) {
                 Log::info(LOG_NAME, "show system bar");
                 m_systemBar->show();
-                m_fb->update(&m_systemBar->rect());
                 m_navBar->show();
-                m_fb->update(&m_navBar->rect());
             } else {
                 Log::info(LOG_NAME, "interact bar");
                 // TODO interact
@@ -73,7 +69,6 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 Log::info(LOG_NAME, "hide system bar");
                 m_systemBar->hide();
                 m_navBar->hide();
-                invalidate();
             } else {
                 if (evt->x < m_fb->xres() / 2) {
                     if (m_pageNum > 0) {
@@ -138,7 +133,6 @@ void ReadActivityFb::onAttached()
     m_systemBar->setTitle(meta->title);
 
     m_fb->clear();
-    m_fb->update(nullptr);
 
     ASSERT(m_layout == nullptr);
     Buffer memLayout;
@@ -204,7 +198,6 @@ void ReadActivityFb::onAttached()
     meta->record.touch();
     m_pageNum = meta->record.activePage;
     Log::info(LOG_NAME, "Starting on page %u", m_pageNum);
-    invalidate();
 }
 
 void ReadActivityFb::onDetached()

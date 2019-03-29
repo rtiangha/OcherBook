@@ -265,7 +265,7 @@ void Button::timeoutCb(EV_P_ ev_timer* w, int revents)
 Spinner::Spinner() :
     m_state(0),
     m_steps(12),
-    m_delayMs(200)
+    m_delayMs(1000)
 {
 }
 
@@ -273,7 +273,7 @@ Spinner::Spinner(int x, int y, unsigned int w, unsigned int h) :
     Widget(x, y, w, h),
     m_state(0),
     m_steps(12),
-    m_delayMs(200)
+    m_delayMs(1000)
 {
 }
 
@@ -363,7 +363,7 @@ FbScreen::FbScreen(EventLoop& _loop) :
     // TODO probe underlying framebuffer for desired refresh rate
     float refreshLatency = 0.25;
     Log::info(LOG_NAME, "Screen refresh every %fs", refreshLatency);
-    ev_timer_init(&m_timer, timeoutCb, refreshLatency, refreshLatency);
+    ev_timer_init(&m_timer, refreshTimeoutCb, refreshLatency, refreshLatency);
     m_timer.data = this;
     ev_timer_start(loop.evLoop, &m_timer);
 
@@ -454,7 +454,7 @@ void FbScreen::update()
  * - When even loop goes idle, do one last (perhaps the only) update, and cancel the timer.
  */
 
-void FbScreen::timeoutCb(EV_P_ ev_timer* timer, int)
+void FbScreen::refreshTimeoutCb(EV_P_ ev_timer* timer, int)
 {
     Log::trace(LOG_NAME ".screen", "timeout");
 
