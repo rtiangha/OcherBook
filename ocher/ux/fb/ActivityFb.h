@@ -18,6 +18,7 @@ public:
     ActivityFb(UxControllerFb* uxController) :
         m_uxController(uxController)
     {
+        m_winflags |= WIDGET_BORDERLESS;
     }
 
     virtual ~ActivityFb() = default;

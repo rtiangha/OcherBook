@@ -21,7 +21,7 @@ public:
 
 protected:
     void onAttached() override;
-    void drawContent(Rect* rect) override;
+    void drawContent(const Rect* rect) override;
 
     static void idleCb(EV_P_ ev_idle* w, int revents);
     void tired();

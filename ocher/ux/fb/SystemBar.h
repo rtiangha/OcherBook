@@ -19,7 +19,7 @@ public:
     bool m_sep;
 
 protected:
-    void drawContent(Rect*) override;
+    void drawContent(const Rect*) override;
 
     FrameBuffer* m_fb;
 };

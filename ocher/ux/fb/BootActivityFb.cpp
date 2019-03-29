@@ -62,14 +62,12 @@ EventDisposition BootActivityFb::evtMouse(const struct OcherMouseEvent* evt)
     return EventDisposition::Handled;
 }
 
-void BootActivityFb::draw()
+void BootActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 
-    Rect r = m_fb->bbox;
-
     m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(&r);
+    m_fb->fillRect(rect);
 
     m_fb->setFg(0, 0, 0);
     FontEngine fe(m_fb);
@@ -79,7 +77,7 @@ void BootActivityFb::draw()
 
     Pos pos;
     for (int i = 0; i < 2; ++i) {
-        r = apps[i];
+        Rect r = apps[i];
         m_fb->rect(&r);
         r.inset(-1);
         m_fb->roundRect(&r, 1);

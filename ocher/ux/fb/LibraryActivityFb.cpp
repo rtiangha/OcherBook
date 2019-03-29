@@ -96,13 +96,13 @@ EventDisposition LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)
     return Widget::evtMouse(evt);
 }
 
-void LibraryActivityFb::draw()
+void LibraryActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 
     FrameBuffer* fb = m_screen->fb;
     fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(&m_rect);
+    fb->fillRect(rect);
     fb->setFg(0, 0, 0);
 
     FontEngine fe(fb);

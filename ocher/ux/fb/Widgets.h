@@ -172,11 +172,11 @@ public:
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window() = default;
 
-    void draw() override;
+    void draw() final override;
     virtual void drawBorder(Rect* rect);
     virtual void drawTitle(Rect* rect);
     virtual void drawBg(Rect* rect);
-    virtual void drawContent(Rect* rect);
+    virtual void drawContent(const Rect* rect);
 
     void setTitle(const std::string& title);
     void maximize();

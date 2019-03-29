@@ -86,13 +86,13 @@ EventDisposition HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
     return Widget::evtMouse(evt);
 }
 
-void HomeActivityFb::draw()
+void HomeActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 
     FrameBuffer* fb = m_screen->fb;
     fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(&m_rect);
+    fb->fillRect(rect);
     fb->setFg(0, 0, 0);
 
     FontEngine fe(fb);
@@ -126,19 +126,19 @@ void HomeActivityFb::draw()
     fe.apply();
     pos.x = 0;
     pos.y = 100;
-    fe.renderString("HOME", 4, &pos, &m_rect, FE_XCENTER);
+    fe.renderString("HOME", 4, &pos, rect, FE_XCENTER);
 
     // Shortlist
     fe.setSize(14);
     fe.apply();
     pos.x = books[0].x;
     pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_container->settings.smallSpace;
-    fe.renderString("Shortlist", 9, &pos, &m_rect, 0);
+    fe.renderString("Shortlist", 9, &pos, rect, 0);
 
     pos.y += fe.m_cur.underlinePos + g_container->settings.smallSpace;
-    fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+    fb->hline(books[0].x, pos.y, rect->w - books[0].x);
     pos.y++;
-    fb->hline(books[0].x, pos.y, m_rect.w - books[0].x);
+    fb->hline(books[0].x, pos.y, rect->w - books[0].x);
 
     pos.x = books[0].x;
     pos.y += g_container->settings.smallSpace;
@@ -147,10 +147,10 @@ void HomeActivityFb::draw()
         auto shortList = m_uxController->ctx.shortList.getList();
         int margin = books[0].x;
 
-        int h = m_rect.y + m_rect.h - pos.y - margin;
+        int h = rect->y + rect->h - pos.y - margin;
         int w = h / coverRatio;
         Rect sl(pos.x, pos.y, w, h);
-        while (sl.x + sl.w <= m_rect.w - margin) {
+        while (sl.x + sl.w <= rect->w - margin) {
             fb->roundRect(&sl, 1);
             sl.inset(-1);
             fb->roundRect(&sl, 2);

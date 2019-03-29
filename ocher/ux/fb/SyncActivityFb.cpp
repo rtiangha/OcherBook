@@ -91,12 +91,12 @@ void SyncActivityWork::processFile(const std::string& f)
     }
 }
 
-void SyncActivityFb::draw()
+void SyncActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 
     m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(&m_rect);
+    m_fb->fillRect(rect);
 }
 
 SyncActivityFb::SyncActivityFb(UxControllerFb* c, Filesystem& filesystem) :

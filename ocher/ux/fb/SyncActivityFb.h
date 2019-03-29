@@ -19,7 +19,7 @@ public:
 protected:
     void onAttached() override;
     void onDetached() override;
-    void draw() override;
+    void drawContent(const Rect* rect) override;
 
     Filesystem& m_filesystem;
     FrameBuffer* m_fb;

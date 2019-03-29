@@ -70,7 +70,6 @@ void SleepActivityFb::done()
 
 void SleepActivityFb::onAttached()
 {
-    m_winflags |= WIDGET_BORDERLESS;
     maximize();
 
     m_previousActivity = g_container->uxController->previousActivity();
@@ -81,7 +80,7 @@ void SleepActivityFb::onAttached()
     ev_idle_start(m_loop.evLoop, &m_idle);
 }
 
-void SleepActivityFb::drawContent(Rect* rect)
+void SleepActivityFb::drawContent(const Rect* rect)
 {
     FontEngine fe(m_fb);
     fe.setSize(18);

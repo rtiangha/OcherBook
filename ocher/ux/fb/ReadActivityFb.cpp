@@ -115,7 +115,7 @@ ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     maximize();
 }
 
-void ReadActivityFb::draw()
+void ReadActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 

@@ -166,7 +166,7 @@ void Window::drawBg(Rect* rect)
     m_screen->fb->fillRect(rect);
 }
 
-void Window::drawContent(Rect*)
+void Window::drawContent(const Rect*)
 {
 }
 

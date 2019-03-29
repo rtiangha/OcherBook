@@ -15,7 +15,7 @@ public:
 
 protected:
     EventDisposition evtMouse(const struct OcherMouseEvent*) override;
-    void draw() override;
+    void drawContent(const Rect* rect) override;
 
     FrameBuffer* m_fb;
     void highlight(int i);

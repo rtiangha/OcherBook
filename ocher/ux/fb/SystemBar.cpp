@@ -28,10 +28,10 @@ SystemBar::SystemBar(Battery& battery) :
 }
 
 
-void SystemBar::drawContent(Rect* r)
+void SystemBar::drawContent(const Rect* r)
 {
     m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(&m_rect);
+    m_fb->fillRect(r);
     if (m_sep) {
         m_fb->setFg(0, 0, 0);
         m_fb->hline(r->x, r->y + r->h - 1, r->x + r->w - 1);
