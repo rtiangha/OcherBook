@@ -1,6 +1,7 @@
 #include "util/Logger.h"
 
 #include "util/LogAppenders.h"
+#include "util/Stopwatch.h"
 #include "util/StrUtil.h"
 #include "util/stdex.h"
 
@@ -226,24 +227,11 @@ static const char levelChar[] = {
 
 void Logger::log(Log::Level level, const char* fmt, va_list ap)
 {
+    static Stopwatch sw;
     try {
         if (getLevel() <= level) {
-#if 0
-            std::string s;
-            uint64_t usec64 = Clock::monotonicUSec();
-            unsigned int usec = (unsigned int)(usec64 % 1000000);
-            unsigned int sec = (unsigned int)(usec64 / 1000000);
-            unsigned int min = sec / 60;
-            sec = sec % 60;
-            unsigned int hour = min / 60;
-            min = min % 60;
-            s.format("%02d:%02d:%02d.%06d %c %-10s ", hour, min, sec, usec, levelChar[level - 1],
-                    m_name.c_str());
-            s.appendFormatList(fmt, ap);
-#else
-            std::string s(format("%c %-10s ", levelChar[level - 1], m_name.c_str()));
+            std::string s(format("%c %" PRIu64 " %s ", levelChar[level - 1], sw.elapsedUSec() / 1000, m_name.c_str()));
             appendFormatList(s, fmt, ap);
-#endif
             s += "\n";
             append(level, s);
         }

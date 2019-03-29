@@ -277,7 +277,7 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
 #ifdef CPS_STATS
                 chars += str->length();          // miscounts UTF8...
 #endif
-                Log::debug(LOG_NAME, "output (%d pts%s%s) %zu bytes", a[ai].pts, a[ai].b ? " bold" : "",
+                Log::trace(LOG_NAME, "output (%d pts%s%s) %zu bytes", a[ai].pts, a[ai].b ? " bold" : "",
                         a[ai].em ? " italics" : "", str->length());
                 int breakOffset = outputWrapped(str, strOffset, doBlit);
                 strOffset = 0;

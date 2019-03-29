@@ -2,7 +2,7 @@
 #define STOPWATCH_H
 
 #include <chrono>
-#include <cstdint>
+#include <cinttypes>
 
 
 class Stopwatch {
