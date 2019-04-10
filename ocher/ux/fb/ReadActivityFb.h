@@ -17,6 +17,9 @@ class Renderer;
 class ReadActivityFb : public ActivityFb {
 public:
     ReadActivityFb(UxControllerFb* c);
+    ~ReadActivityFb();
+
+    void turnPages(int n);
 
 protected:
     EventDisposition evtKey(const struct OcherKeyEvent*) override;
@@ -25,6 +28,9 @@ protected:
     void onDetached() override;
     void drawContent(const Rect* rect) override;
 
+    void backButtonPressed();
+    void forwardButtonPressed();
+
     FrameBuffer* m_fb;
     SystemBar* m_systemBar = nullptr;
     NavBar* m_navBar = nullptr;
@@ -32,7 +38,7 @@ protected:
     Layout* m_layout;
     Renderer* m_renderer;
     Meta* meta;
-    unsigned int m_pageNum;
+    int m_pageNum;
     int atEnd;
     unsigned int m_pagesSinceRefresh;
 };

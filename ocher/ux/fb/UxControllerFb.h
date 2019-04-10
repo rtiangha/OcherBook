@@ -19,9 +19,9 @@ public:
     UxControllerFb();
     ~UxControllerFb() = default;
 
-    const char* getName() const override
+    const std::string& getName() const override
     {
-        return m_name.c_str();
+        return m_name;
     }
 
     bool init() override;

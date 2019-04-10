@@ -8,6 +8,7 @@
 
 #include "ux/Event.h"
 #include "ux/fb/FrameBuffer.h"
+#include "util/stdex.h"
 
 #include "Signal.h"
 #include <ev.h>

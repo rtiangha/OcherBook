@@ -38,7 +38,7 @@ public:
     {
     }
 
-    unsigned int activePage;  // TODO:  can't use page number; varies by device/settings
+    int activePage;  // TODO:  can't use page number; varies by device/settings
 
     void touch();
     time_t touched;
@@ -78,7 +78,7 @@ public:
     std::string icon;
 
     Pagination m_pagination;
-    unsigned int pages; // is this even meaningful?
+    int pages; // is this even meaningful?
 
     BookRecord record;
 

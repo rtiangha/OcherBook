@@ -16,9 +16,9 @@ public:
     UxControllerFd() = default;
     ~UxControllerFd() = default;
 
-    const char* getName() const override
+    const std::string& getName() const override
     {
-        return "fd";
+        return m_name;
     }
 
     bool init() override;
@@ -32,6 +32,7 @@ public:
     void setNextActivity(Activity::Type a) override;
 
 protected:
+    std::string m_name = "fd";
     std::unique_ptr<Renderer> m_renderer;
     Activity::Type m_activityType = Activity::Type::Quit;
 };

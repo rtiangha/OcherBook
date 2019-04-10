@@ -9,7 +9,19 @@
 NavBar::NavBar() :
     m_fb(m_screen->fb)
 {
-    setRect(0, m_fb->yres() - 50, m_fb->xres(), 50);
+    const int height = 50;
+    auto top = m_fb->yres() - height;
+    setRect(0, top, m_fb->xres(), height);
+
+    auto button = make_unique<Button>("<<");
+    m_backButton = button.get();
+    button->setPos(20, top + 5);
+    addChild(std::move(button));
+
+    button = make_unique<Button>(">>");
+    m_forwardButton = button.get();
+    button->setPos(m_backButton->rect().x + m_backButton->rect().w + 20, top + 5);
+    addChild(std::move(button));
 }
 
 void NavBar::drawContent(const Rect* rect)

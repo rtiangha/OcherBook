@@ -13,10 +13,16 @@ class NavBar : public Window {
 public:
     NavBar();
 
+    Button& backButton() const { return *m_backButton; }
+    Button& forwardButton() const { return *m_forwardButton; }
+
 protected:
     void drawContent(const Rect*) override;
 
     FrameBuffer* m_fb;
+
+    Button* m_backButton;
+    Button* m_forwardButton;
 };
 
 #endif

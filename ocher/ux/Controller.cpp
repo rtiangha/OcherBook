@@ -137,7 +137,7 @@ Controller::Controller(const Options& options)
     if (!uxController) {
         throw std::runtime_error("failed to find suitable output driver");
     }
-    Log::info(LOG_NAME, "Using the '%s' driver", uxController->getName());
+    Log::info(LOG_NAME, "Using the '%s' driver", uxController->getName().c_str());
 
     initCrash();
 }
@@ -160,14 +160,14 @@ void Controller::initCrash()
 
 void Controller::initUxController(std::unique_ptr<UxController> c)
 {
-    Log::info(LOG_NAME, "considering driver %s", c->getName());
+    Log::info(LOG_NAME, "considering driver %s", c->getName().c_str());
 
     if (g_container->options.driverName &&
-            !strcmp(c->getName(), g_container->options.driverName)) {
+            c->getName() != g_container->options.driverName) {
         throw std::runtime_error("skipping driver based on user pref");
     }
     if (g_container->options.listDrivers) {
-        printf("\t%s\n", c->getName());
+        printf("\t%s\n", c->getName().c_str());
         throw std::runtime_error("skipping driver; only listing");
     }
     if (!c->init()) {

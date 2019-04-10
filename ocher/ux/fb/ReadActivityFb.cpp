@@ -31,20 +31,14 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
             m_uxController->setNextActivity(Activity::Type::Home);
             return EventDisposition::Handled;
         } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
-            Log::info(LOG_NAME, "back from page %d", m_pageNum);
-            if (m_pageNum > 0) {
-                m_pageNum--;
-                m_systemBar->hide();
-                m_navBar->hide();
-            }
+            m_systemBar->hide();
+            m_navBar->hide();
+            turnPages(-1);
             return EventDisposition::Handled;
         } else if (evt->key == OEVTK_RIGHT || evt->key == OEVTK_DOWN || evt->key == OEVTK_PAGEDOWN) {
-            Log::info(LOG_NAME, "forward from page %d", m_pageNum);
-            if (!atEnd) {
-                m_pageNum++;
-                m_systemBar->hide();
-                m_navBar->hide();
-            }
+            m_systemBar->hide();
+            m_navBar->hide();
+            turnPages(1);
             return EventDisposition::Handled;
         }
     }
@@ -71,17 +65,9 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 m_navBar->hide();
             } else {
                 if (evt->x < m_fb->xres() / 2) {
-                    if (m_pageNum > 0) {
-                        Log::info(LOG_NAME, "back from page %d", m_pageNum);
-                        m_pageNum--;
-                        invalidate();
-                    }
+                    turnPages(-1);
                 } else {
-                    if (!atEnd) {
-                        Log::info(LOG_NAME, "forward from page %d", m_pageNum);
-                        m_pageNum++;
-                        invalidate();
-                    }
+                    turnPages(1);
                 }
             }
         }
@@ -107,7 +93,44 @@ ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     m_navBar = navBar.get();
     addChild(std::move(navBar));
 
+    m_navBar->backButton().pressed.Connect(this, &ReadActivityFb::backButtonPressed);
+    m_navBar->forwardButton().pressed.Connect(this, &ReadActivityFb::forwardButtonPressed);
+
     maximize();
+}
+
+ReadActivityFb::~ReadActivityFb()
+{
+    m_navBar->backButton().pressed.Disconnect(this, &ReadActivityFb::backButtonPressed);
+    m_navBar->forwardButton().pressed.Disconnect(this, &ReadActivityFb::forwardButtonPressed);
+}
+
+void ReadActivityFb::turnPages(int n)
+{
+    if (n < 0) {
+        n = -n;
+        if (n >= m_pageNum)
+            n = m_pageNum;
+        m_pageNum -= n;
+        Log::info(LOG_NAME, "back from page %d to %d", m_pageNum + n, m_pageNum);
+        invalidate();
+    } else if (n > 0) {
+        if (n > meta->pages - m_pageNum - 1)
+            n = meta->pages - m_pageNum - 1;
+        m_pageNum += n;
+        Log::info(LOG_NAME, "forward from page %d to %d", m_pageNum - n, m_pageNum);
+        invalidate();
+    }
+}
+
+void ReadActivityFb::backButtonPressed()
+{
+    turnPages(-10);
+}
+
+void ReadActivityFb::forwardButtonPressed()
+{
+    turnPages(10);
 }
 
 void ReadActivityFb::drawContent(const Rect* rect)
