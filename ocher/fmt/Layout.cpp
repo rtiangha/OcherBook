@@ -155,5 +155,6 @@ void Layout::flushText()
 
 void Layout::outputPageBreak()
 {
+    flushText();
     push(OpCmd, CmdForcePage, 0);
 }
