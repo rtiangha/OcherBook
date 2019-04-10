@@ -52,9 +52,3 @@ build from source (perhaps useful when cross-compiling).  For details, see
 OcherBook itself is GPLv3.  See `COPYING`.
 
 See `doc/LICENSES` for all relevant licenses.
-
-## Links
-
-- [OcherBook](http://uscoffings.net/tech/ocherbook)
-- [Hacking the Kobo Touch](http://uscoffings.net/tech/embedded/kobo-touch)
-
