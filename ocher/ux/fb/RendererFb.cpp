@@ -3,16 +3,18 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher_config.h"
+
 #include "ux/fb/RendererFb.h"
 
 #include "Container.h"
 #include "fmt/Layout.h"
 #include "settings/Settings.h"
-#include "ux/Pagination.h"
-#include "ux/fb/FrameBuffer.h"
 #include "util/Debug.h"
 #include "util/Logger.h"
 #include "util/Stopwatch.h"
+#include "ux/Pagination.h"
+#include "ux/fb/FrameBuffer.h"
 
 #include <cctype>
 

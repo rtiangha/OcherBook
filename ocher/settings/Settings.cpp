@@ -3,6 +3,8 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher_config.h"
+
 #include "settings/Settings.h"
 
 #include "device/Device.h"

@@ -3,17 +3,21 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher_config.h"
+
 #include "ux/fb/UxControllerFb.h"
+
+#include "Container.h"
+#include "util/Debug.h"
+#include "util/Logger.h"
 #include "ux/fb/BootActivityFb.h"
 #include "ux/fb/HomeActivityFb.h"
 #include "ux/fb/LibraryActivityFb.h"
 #include "ux/fb/ReadActivityFb.h"
+#include "ux/fb/RendererFb.h"
 #include "ux/fb/SettingsActivityFb.h"
 #include "ux/fb/SleepActivityFb.h"
 #include "ux/fb/SyncActivityFb.h"
-
-#include "Container.h"
-#include "ux/fb/RendererFb.h"
 #ifdef UX_FB_LINUX
 #include "ux/fb/FbLinux.h"
 #endif
@@ -23,8 +27,6 @@
 #ifdef UX_FB_SDL
 #include "ux/fb/sdl/FrameBufferSdl.h"
 #endif
-#include "util/Debug.h"
-#include "util/Logger.h"
 
 #define LOG_NAME "ocher.ux.ctrl"
 

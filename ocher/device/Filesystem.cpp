@@ -3,14 +3,15 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
-#include "device/Filesystem.h"
+#include "ocher_config.h"
 
-#include "ux/Event.h"
+#include "device/Filesystem.h"
 
 #include "settings/Options.h"
 #include "util/File.h"
 #include "util/Logger.h"
 #include "util/Path.h"
+#include "ux/Event.h"
 
 #include <cassert>
 #include <cstdlib>

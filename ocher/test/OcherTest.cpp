@@ -38,10 +38,10 @@ TEST_CASE("Battery Capacity", "[Battery]") {
 
     r = b.readCapacity();
     if (r == -1) {
-        CHECK(b.m_percent == -1);
+        CHECK(b.percent == -1);
     } else {
-        CHECK(b.m_percent >= 0);
-        CHECK(b.m_percent <= 100);
+        CHECK(b.percent >= 0);
+        CHECK(b.percent <= 100);
     }
 }
 
@@ -51,10 +51,10 @@ TEST_CASE("Battery Status", "[Battery]") {
 
     r = b.readStatus();
     if (r == -1) {
-        CHECK(b.m_status == Battery::Status::Unknown);
+        CHECK(b.status == Battery::Status::Unknown);
     } else {
-        if (b.m_status != Battery::Status::Charging && b.m_status != Battery::Status::Discharging)
-            CHECK(b.m_status == Battery::Status::Charging);  // catch only does binary comparisons
+        if (b.status != Battery::Status::Charging && b.status != Battery::Status::Discharging)
+            CHECK(b.status == Battery::Status::Charging);  // catch only does binary comparisons
     }
 }
 
@@ -93,17 +93,13 @@ TEST_CASE("Epub") {
     class EpubBuilder : public FileCache {
     public:
         EpubBuilder() :
-            m_root(new TreeDirectory("."))
+            m_root(make_unique<TreeDirectory>("."))
         {
-            m_root->createFilepp("mimetype", "application/epub+zip");
+            Buffer data("application/epub+zip");
+            m_root->createFile("mimetype", data);
         }
 
-        ~EpubBuilder()
-        {
-            delete m_root;
-        }
-
-        TreeFile *getFile(const char *filename, const char *relative = 0)
+        TreeFile *getFile(const char *filename, const char *relative = 0) override
         {
             std::string fullPath;
 
@@ -114,9 +110,9 @@ TEST_CASE("Epub") {
             return m_root->findFile(filename);
         }
 
-        TreeDirectory *getRoot()
+        TreeDirectory *getRoot() override
         {
-            return m_root;
+            return m_root.get();
         }
 
         void createContainerXml(const char *contentOpfPath)
@@ -129,7 +125,8 @@ TEST_CASE("Epub") {
                     "<rootfile full-path=\"%s\" media-type=\"application/oebps-package+xml\"/>"
                     "</rootfiles>"
                     "</container>", contentOpfPath);
-            metaInfDir->createFilep("container.xml", containerXml);
+            Buffer b(containerXml.c_str());
+            metaInfDir->createFile("container.xml", b);
         }
 
         void createContentOpf(TreeDirectory *containingDir, const char *title)
@@ -146,17 +143,18 @@ TEST_CASE("Epub") {
                     "    <spine toc=\"ncx\">"
                     "    </spine>"
                     "</package>", title);
-            containingDir->createFilep("content.opf", contentOpf);
+            Buffer b(contentOpf.c_str());
+            containingDir->createFile("content.opf", b);
         }
 
-        TreeDirectory *m_root;
+        std::unique_ptr<TreeDirectory> m_root;
     };
 
     SECTION("Detect") {
         EpubBuilder *c = new EpubBuilder;
 
         c->createContainerXml("content.opf");
-        TreeDirectory *root = c->m_root;
+        TreeDirectory *root = c->getRoot();
         TreeDirectory *textDir = root->createDirectory("text");
         (void)textDir; // TODO
         c->createContentOpf(root, "Testing Book");

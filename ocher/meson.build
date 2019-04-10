@@ -150,7 +150,7 @@ configure_file(input : 'meson_config.h.in',
                output : 'ocher_config.h',
                configuration : conf_data)
 # TODO  How best to make linux kernel headers available?  KoboLabs has them in their repo.
-add_project_arguments(['-include', 'ocher_config.h', '-I../ocher/linux-2.6.35.3/include'], language : 'cpp')
+add_project_arguments(['-I../ocher/linux-2.6.35.3/include'], language : 'cpp')
 
 ocherbook_inc = include_directories('.')
 ocherbook = static_library('ocherbook', ocher_sources,
@@ -184,3 +184,5 @@ ocherbook_dep = declare_dependency(
 ocher = executable('ocher', ['ocher.cpp', 'ocher.h'],
     dependencies : [ocherbook_dep],
 )
+
+subdir('test')

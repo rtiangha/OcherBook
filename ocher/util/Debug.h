@@ -5,6 +5,8 @@
  *  Debugger access.
  */
 
+#include "ocher_config.h"
+
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>

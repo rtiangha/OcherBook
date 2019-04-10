@@ -3,12 +3,10 @@
  * OcherBook is released under the GPLv3.  See COPYING.
  */
 
+#include "ocher_config.h"
+
 #include "ux/fb/ReadActivityFb.h"
 
-#ifdef FMT_EPUB
-#include "fmt/epub/Epub.h"
-#include "fmt/epub/LayoutEpub.h"
-#endif
 #include "Container.h"
 #include "fmt/text/LayoutText.h"
 #include "fmt/text/Text.h"
@@ -18,6 +16,10 @@
 #include "util/Logger.h"
 #include "ux/Renderer.h"
 #include "ux/fb/UxControllerFb.h"
+#ifdef FMT_EPUB
+#include "fmt/epub/Epub.h"
+#include "fmt/epub/LayoutEpub.h"
+#endif
 
 #define LOG_NAME "ocher.ux.Read"
 

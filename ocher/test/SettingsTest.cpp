@@ -1,13 +1,17 @@
 #include "settings/Settings.h"
 
+#include "device/Filesystem.h"
+
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
+Filesystem g_filesystem;
+
 TEST_CASE("SecureLevel") {
-    Settings s;
+    Settings s(g_filesystem);
 
     // unrecognized is unchanged
-    Settings defaultSettings;
+    Settings defaultSettings(g_filesystem);
     s.load("{ \"SecureLevel\": \"garbage\" }");
     CHECK(s.secureLevel == defaultSettings.secureLevel);
     s.load("{ \"SecureLevel\": 42 }");
@@ -24,7 +28,7 @@ TEST_CASE("SecureLevel") {
 }
 
 TEST_CASE("TrackReading") {
-    Settings s;
+    Settings s(g_filesystem);
 
     s.load("{ \"TrackReading\": 0 }");
     CHECK(s.trackReading == 0);

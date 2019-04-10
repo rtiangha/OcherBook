@@ -6,7 +6,7 @@
 #ifndef OCHER_CONTAINER_H
 #define OCHER_CONTAINER_H
 
-#include <memory>
+#include "ocher_config.h"
 
 #include "device/Battery.h"
 #include "device/Device.h"
@@ -19,6 +19,8 @@
 #ifdef OCHER_TARGET_KOBO
 #include "device/kobo/KoboEvents.h"
 #endif
+
+#include <memory>
 
 class Container {
 public:

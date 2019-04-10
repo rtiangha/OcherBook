@@ -5,6 +5,8 @@
 #define OCHER_MINOR @OCHER_MINOR@
 #define OCHER_PATCH @OCHER_PATCH@
 
+// HAVE_BUILTIN_TRAP
+
 #mesondefine AIRBAG_FD
 #mesondefine FMT_EPUB
 #mesondefine FMT_HTML

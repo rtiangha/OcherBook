@@ -1,3 +1,5 @@
+#include "ocher_config.h"
+
 #include "util/Debug.h"
 
 #include "util/StrUtil.h"
