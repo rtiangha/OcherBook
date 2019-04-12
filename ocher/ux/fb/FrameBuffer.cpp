@@ -164,13 +164,3 @@ void FrameBuffer::roundRect(const Rect* r, unsigned int radius)
         // TODO
     }
 }
-
-void FrameBuffer::blitGlyphs(Glyph* *glyphs, Pos* pen, const Rect* clip)
-{
-    for (unsigned int i = 0; glyphs[i]; ++i) {
-        Glyph* g = glyphs[i];
-        blit(g->bitmap, pen->x + g->offsetX, pen->y - g->offsetY, g->w, g->h, clip);
-        pen->x += g->advanceX;
-        pen->y += g->advanceY;
-    }
-}

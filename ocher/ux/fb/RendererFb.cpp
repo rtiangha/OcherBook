@@ -114,7 +114,7 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
             // Fits; render it and advance
             if (doBlit) {
                 Pos pos(m_penX, m_penY);
-                m_fb->blitGlyphs(glyphs, &pos);
+                m_fe.blitGlyphs(glyphs, &pos);
                 m_penX = pos.x;
                 m_penY = pos.y;
             } else {

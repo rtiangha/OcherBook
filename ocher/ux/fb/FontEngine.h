@@ -60,6 +60,8 @@ public:
     GlyphFace m_cur;
     GlyphFace m_next;
 
+    void blitGlyphs(Glyph** glyphs, Pos* pen, const Rect* clip = nullptr);
+
     /**
      *
      */

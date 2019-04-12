@@ -158,6 +158,16 @@ void FontEngine::apply()
     }
 }
 
+void FontEngine::blitGlyphs(Glyph** glyphs, Pos* pen, const Rect* clip)
+{
+    for (unsigned int i = 0; glyphs[i]; ++i) {
+        Glyph* g = glyphs[i];
+        m_fb->blit(g->bitmap, pen->x + g->offsetX, pen->y - g->offsetY, g->w, g->h, clip);
+        pen->x += g->advanceX;
+        pen->y += g->advanceY;
+    }
+}
+
 void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rect* bbox)
 {
     GlyphDescr d;
@@ -261,7 +271,7 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
                 }
                 dst.x = pen->x + r->x + xOffset;
                 dst.y = pen->y + r->y;
-                m_fb->blitGlyphs(glyphs, &dst, r);
+                blitGlyphs(glyphs, &dst, r);
                 pen->x = dst.x - r->x - xOffset;
                 pen->y = dst.y - r->y;
             }
