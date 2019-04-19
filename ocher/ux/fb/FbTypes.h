@@ -9,6 +9,7 @@
 #include "ux/Types.h"
 
 #include <cstdint>
+#include <new>
 
 
 struct Rect {
@@ -68,27 +69,27 @@ struct Rect {
     }
 };
 
-class Glyph {
-public:
-    Glyph() :
-        bitmap(nullptr)
+struct Glyph {
+    static struct Glyph* create(size_t size)
     {
+        uint8_t* p = new (std::nothrow) uint8_t[sizeof(struct Glyph) - 1 + size];
+        return reinterpret_cast<struct Glyph*>(p);
+    }
+    static void destroy(struct Glyph* g)
+    {
+        uint8_t* p = reinterpret_cast<uint8_t*>(g);
+        delete[] p;
     }
 
-    ~Glyph()
-    {
-        delete[] bitmap;
-    }
-
-    uint8_t* bitmap;
-    uint8_t w;
-    uint8_t h;
-    int8_t offsetX;
-    int8_t offsetY;
-    int8_t advanceX;
-    int8_t advanceY;
-    uint8_t height;
-} __attribute__((packed));
+    int w;
+    int h;
+    int offsetX;
+    int offsetY;
+    int advanceX;
+    int advanceY;
+    int height;
+    uint8_t bitmap[1];
+};
 
 struct GlyphDescr {
     GlyphDescr() : v(0) {}

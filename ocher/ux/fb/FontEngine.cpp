@@ -19,7 +19,7 @@
 GlyphCache::~GlyphCache()
 {
     for (auto it = m_cache.begin(); it != m_cache.end(); ) {
-        delete it->second;
+        Glyph::destroy(it->second);
         it = m_cache.erase(it);
     }
 }
@@ -28,7 +28,7 @@ void GlyphCache::put(GlyphDescr& f, Glyph* g)
 {
     auto search = m_cache.find(f);
     if (search != m_cache.end()) {
-        delete search->second;
+        Glyph::destroy(search->second);
     }
     m_cache[f] = g;
 }
@@ -186,10 +186,8 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
         Glyph* g = m_cache.get(d);
         if (!g) {
             // Log::trace(LOG_NAME, "%d pt %c is not cached", d.face.points, d.c);
-            g = new Glyph;
-            if (m_ft.plotGlyph(&d, g) < 0) {
+            if (!(g = m_ft.plotGlyph(&d))) {
                 Log::warn(LOG_NAME, "plotGlyph failed for %x; skipping", d.c);
-                delete g;
                 continue;
             }
 

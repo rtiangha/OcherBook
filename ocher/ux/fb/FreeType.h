@@ -37,7 +37,7 @@ public:
         return (-m_face->underline_position) >> 6;
     }
 
-    int plotGlyph(GlyphDescr* f, Glyph* g);
+    Glyph* plotGlyph(GlyphDescr* f);
 
 protected:
     FT_Face m_face;

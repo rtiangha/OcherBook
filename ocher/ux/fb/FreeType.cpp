@@ -79,32 +79,26 @@ void FreeType::setSize(unsigned int points)
     FT_Set_Char_Size(m_face, 0, points * 64, m_dpi, m_dpi);
 }
 
-int FreeType::plotGlyph(GlyphDescr* f, Glyph* g)
+Glyph* FreeType::plotGlyph(GlyphDescr* d)
 {
-    unsigned int glyphIndex = FT_Get_Char_Index(m_face, f->c);
-    int r = FT_Load_Glyph(m_face, glyphIndex, FT_LOAD_DEFAULT);
-
-    if (r) {
-        Log::error(LOG_NAME, "FT_Load_Glyph failed: %d", r);
-        return -1;
-    }
-    if (m_face->glyph->format != FT_GLYPH_FORMAT_BITMAP) {
-        r = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
-        if (r) {
-            Log::error(LOG_NAME, "FT_Render_Glyph failed: %d", r);
-            return -1;
-        }
-    }
-
     FT_GlyphSlot slot = m_face->glyph;
-    g->w = slot->bitmap.width;
-    g->h = slot->bitmap.rows;
-    g->bitmap = new uint8_t[g->w * g->h];
-    memcpy(g->bitmap, slot->bitmap.buffer, g->w * g->h);
-    g->offsetX = slot->bitmap_left;
-    g->offsetY = slot->bitmap_top;
-    g->advanceX = slot->advance.x >> 6;
-    g->advanceY = slot->advance.y >> 6;
-    g->height = m_face->size->metrics.height >> 6;
-    return 0;
+    int r = FT_Load_Char(m_face, d->c, FT_LOAD_RENDER);
+    if (r) {
+        Log::error(LOG_NAME, "FT_Load_Char failed: %d", r);
+        return nullptr;
+    }
+
+    size_t bytes = slot->bitmap.width * slot->bitmap.rows;
+    Glyph* g = Glyph::create(bytes);
+    if (g) {
+        g->w = slot->bitmap.width;
+        g->h = slot->bitmap.rows;
+        memcpy(g->bitmap, slot->bitmap.buffer, bytes);
+        g->offsetX = slot->bitmap_left;
+        g->offsetY = slot->bitmap_top;
+        g->advanceX = slot->advance.x >> 6;
+        g->advanceY = slot->advance.y >> 6;
+        g->height = m_face->size->metrics.height >> 6;
+    }
+    return g;
 }
