@@ -1,6 +1,6 @@
 # OcherBook
 
-![Ocher handprint](doc/hand.png)
+![Ocher handprint](docs/hand.png)
 
 OcherBook is an open-source ebook reader, supporting multiple file formats and
 output devices.  The major goals are:
@@ -51,4 +51,4 @@ build from source (perhaps useful when cross-compiling).  For details, see
 
 OcherBook itself is GPLv3.  See `COPYING`.
 
-See `doc/LICENSES` for all relevant licenses.
+See `docs/LICENSES` for all relevant licenses.

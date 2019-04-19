@@ -6,7 +6,7 @@ if doxygen.found()
         configuration : conf_data,
         install : false)
 
-    datadir = join_paths(get_option('datadir'), 'doc', 'ocher')
+    datadir = join_paths(get_option('datadir'), 'docs', 'ocher')
 
     docs = custom_target('docs',
         input : doxyfile,

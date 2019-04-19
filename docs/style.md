@@ -6,7 +6,11 @@ code more than huge frameworks.)
 
 # C++ Features
 
-C++11, at most.
+C++11, at most.  Embedded toolchains tend to move slowly.
+
+Clean C++ is great.  But excessive templates can obscure stack traces.
+Somewhere there is a balance between maintainability, efficiency, and
+debugability.
 
 Use exceptions only for truly exceptional cases.  Out of memory and bugs are
 unexpected.  Expect and handle the rest locally.
@@ -36,21 +40,23 @@ https://help.github.com/categories/writing-on-github/
 
 # Naming
 
-Naming scheme follows Java standard: `MyClass, myMethod, MY_DEFINE,
-MyEnum, m_privateMember, MyCFunc, ...`
+The capitalization scheme follows the Java standard: `MyClass, myMethod,
+MY_DEFINE, MyEnum, m_privateMember, MyCFunc, ...`
 
+The WebKit style guide has some additional [naming
+guidance](https://webkit.org/code-style-guidelines/#names).
 
 # Debugging
 
-`ASSERT` contract; minimal or no runtime code to enforce it.  Fail early, fail
-hard.
+`ASSERT` the contract; minimal or no runtime code to enforce it.  Fail early,
+fail hard.
 
 No `printf`s; use logging which can be compiled out.
 
 
 # Headers
 
-System headers are `<>`, local headers are `""`.
+System and 3rd party headers are `<>`, local headers are `""`.
 
 Includes should be ordered "most local first", to more quickly expose missing
 includes.

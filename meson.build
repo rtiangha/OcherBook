@@ -127,5 +127,5 @@ if get_option('png')
 endif
 
 subdir('ocher')
-subdir('doc')
+subdir('docs')
 subdir('tools')
