@@ -75,15 +75,7 @@ void UxController::onWantToPowerOff()
 {
     Log::info(LOG_NAME, "onWantToPowerOff");
 
-    // TODO PoweroffActivity: clear / sync screen
-    auto fb = getFrameBuffer();
-    if (fb) {
-        fb->clear();
-        fb->update(nullptr, true);
-        fb->sync();
-    }
-
-    g_container->device->poweroff();
+    setNextActivity(Activity::Type::PowerOff);
 }
 
 void UxController::handleEvent(const struct OcherEvent* evt)

@@ -92,6 +92,8 @@ void SleepActivityFb::drawContent(const Rect* rect)
     p.y = rect->h / 2;
     const char* msg = m_level == PowerLevel::Sleep ? "Sleeping" : "Powered off";
     fe.renderString(msg, strlen(msg), &p, rect, FE_XCENTER);
+    if (m_level == PowerLevel::PowerOff)
+        m_fb->byLine(rect, invert);
 
     m_fb->update(rect, true); // Full refresh to clear page remnants
     m_fb->sync();
