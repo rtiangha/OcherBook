@@ -28,7 +28,7 @@
 #include "util/Logger.h"
 
 #ifdef AIRBAG_FD
-#include "airbag_fd.h"
+#include <airbag_fd.h>
 #endif
 
 #include <chrono>

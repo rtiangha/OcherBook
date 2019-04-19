@@ -12,7 +12,7 @@
 #include "util/File.h"
 #include "util/StrUtil.h"
 
-#include "json.hpp"
+#include <json.hpp>
 
 #include <cassert>
 
@@ -58,8 +58,7 @@ Settings::Settings(Filesystem& filesystem) :
     smallSpace(10),
     medSpace(15),
     largeSpace(30),
-    m_filesystem(filesystem),
-    m_j(new json)
+    m_filesystem(filesystem)
 {
     // TODO  Find these dynamically
 #ifdef OCHER_TARGET_KOBO

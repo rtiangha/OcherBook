@@ -10,7 +10,7 @@
 #include "ux/fb/FrameBuffer.h"
 #include "util/stdex.h"
 
-#include "Signal.h"
+#include <Signal.h>
 #include <ev.h>
 
 #include <string>

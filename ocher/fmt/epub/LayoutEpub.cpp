@@ -10,7 +10,7 @@
 #include "fmt/epub/TreeMem.h"
 #include "util/Logger.h"
 
-#include "mxml.h"
+#include <mxml.h>
 
 #define LOG_NAME "ocher.epub"
 

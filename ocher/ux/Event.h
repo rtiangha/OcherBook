@@ -8,7 +8,7 @@
 
 #include "ux/Types.h"
 
-#include "Signal.h"
+#include <Signal.h>
 #include <ev.h>
 
 #include <cstdint>

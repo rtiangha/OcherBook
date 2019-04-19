@@ -6,7 +6,7 @@
 #ifndef OCHER_SETTINGS_H
 #define OCHER_SETTINGS_H
 
-#include "json.hpp"
+#include <json.hpp>
 
 #include <string>
 
@@ -152,7 +152,7 @@ public:
 protected:
     const Filesystem& m_filesystem;
 
-    nlohmann::json* m_j;
+    nlohmann::json m_j;
 };
 
 #endif

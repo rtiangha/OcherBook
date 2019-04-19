@@ -8,7 +8,7 @@
 
 #include "FbTypes.h"
 
-#include "ft2build.h"
+#include <ft2build.h>
 #include FT_CACHE_H
 #include FT_FREETYPE_H
 

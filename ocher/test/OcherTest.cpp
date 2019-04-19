@@ -18,7 +18,7 @@
 #include "ux/PowerSaver.h"
 
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 #define REQUIRE_RESOURCES_DIR \
     if (!resourcesDir) { \

@@ -3,7 +3,7 @@
 #include "device/Filesystem.h"
 
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 Filesystem g_filesystem;
 

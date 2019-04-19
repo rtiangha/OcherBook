@@ -9,7 +9,7 @@
 #include "fmt/Format.h"
 #include "fmt/epub/UnzipCache.h"
 
-#include "mxml.h"
+#include <mxml.h>
 
 #include <map>
 #include <string>

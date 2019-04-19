@@ -1,7 +1,7 @@
 #include "util/Buffer.h"
 
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <catch.hpp>
 
 
 TEST_CASE("Buffer constructors") {
