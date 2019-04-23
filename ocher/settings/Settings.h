@@ -126,6 +126,8 @@ public:
      */
     int showPageNumbers;
 
+    int systemFontPoints = 12;
+
     int fontPoints;
     // force font
     // force font size

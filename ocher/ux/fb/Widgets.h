@@ -199,10 +199,10 @@ protected:
 class Button : public Widget {
 public:
     Button(int x, int y, unsigned int w = 0, unsigned int h = 0);
-    Button(const char* label);
+    Button(const char* label, int points = 0);
     ~Button() = default;
 
-    void setLabel(const char* label);
+    void setLabel(const char* label, int points = 0);
 
     void draw() override;
 
@@ -218,6 +218,7 @@ protected:
 
     static constexpr int m_pad = 10;  // TODO abitrary
     std::string m_label;
+    int m_points;
 
     bool m_mouseDown = false;
 
@@ -227,17 +228,24 @@ protected:
     // icon;
 };
 
-#if 0
 class Menu : public Widget {
-    int border;
-    int separator;
-    items;
-    icons;
-    title;
-    selected;
-};
-#endif
+public:
+    Menu(int x, int y);
+    ~Menu() = default;
 
+    void draw() final override;
+
+    struct Item {
+        std::string text;
+    };
+
+    Signal1<const Item&> selected;
+
+protected:
+    Button m_tab;
+    bool m_open = false;
+    std::vector<Item> m_items;
+};
 
 /**
  * @todo listen for powerdown event, stop spinning
@@ -316,11 +324,6 @@ protected:
 class Srubber : public Widget {
     plus / minus vs arrows
     ff arrows
-};
-#endif
-
-#if 0
-class DropDown : public Window {
 };
 #endif
 

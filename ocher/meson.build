@@ -98,6 +98,7 @@ endif
 if conf_data.get('UX_FB', false)
     ocher_sources += [
         'ux/fb/BatteryIcon.cpp',
+        'ux/fb/bitmap.cpp',
         'ux/fb/BootActivityFb.cpp',
         'ux/fb/ClockIcon.cpp',
         'ux/fb/FontEngine.cpp',
@@ -109,7 +110,6 @@ if conf_data.get('UX_FB', false)
         'ux/fb/NavBar.cpp',
         'ux/fb/ReadActivityFb.cpp',
         'ux/fb/RendererFb.cpp',
-        'ux/fb/RleBitmap.cpp',
         'ux/fb/SettingsActivityFb.cpp',
         'ux/fb/SleepActivityFb.cpp',
         'ux/fb/SyncActivityFb.cpp',

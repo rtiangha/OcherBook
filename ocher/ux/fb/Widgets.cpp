@@ -176,22 +176,22 @@ Button::Button(int x, int y, unsigned int w, unsigned int h) :
 {
 }
 
-Button::Button(const char* label)
+Button::Button(const char* label, int points)
 {
-    setLabel(label);
+    setLabel(label, points);
 }
 
-void Button::setLabel(const char* label)
+void Button::setLabel(const char* label, int points)
 {
     m_label = label;
+    m_points = points ?: g_container->settings.systemFontPoints;
 
     FontEngine fe(m_screen->fb);
-    // TODO  how to specify attributes? set GlyphFace on label?
-    fe.setSize(12);
+    fe.setSize(m_points);
     fe.apply();
 
     Rect lbox;
-    Glyph* glyphs[m_label.length() + 1]; // TODO glyphs not chars
+    Glyph* glyphs[m_label.length() + 1];
     fe.plotString(m_label.c_str(), m_label.length(), &glyphs[0], &lbox);
     m_rect.w = lbox.w + m_pad * 2;
     m_rect.h = fe.m_cur.lineHeight + m_pad * 2;
@@ -229,7 +229,7 @@ void Button::drawLabel(Rect* rect)
 {
     if (!m_label.empty()) {
         FontEngine fe(m_screen->fb);
-        fe.setSize(12);
+        fe.setSize(m_points);
         fe.apply();
 
         Pos pos;
@@ -260,6 +260,32 @@ EventDisposition Button::evtMouse(const struct OcherMouseEvent* evt)
 void Button::timeoutCb(EV_P_ ev_timer* w, int revents)
 {
     // TODO spring the button back up
+}
+
+Menu::Menu(int x, int y) :
+    m_tab(x, y)
+{
+    m_tab.m_flags |= WIDGET_BORDERLESS;
+}
+
+void Menu::draw()
+{
+#if 0
+    Rect rect(m_rect);
+    auto fb = m_screen->fb;
+
+    // TODO border
+
+    FontEngine fe(m_screen->fb);
+
+    fb->setFg(0, 0, 0);
+    fb->rect(&rect);
+    rect.inset(1);
+    fb->setFg(0xff, 0xff, 0xff);
+    fb->fillRect(&rect);
+
+    // TODO items
+#endif
 }
 
 Spinner::Spinner() :

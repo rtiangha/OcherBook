@@ -24,6 +24,10 @@ SystemBar::SystemBar(Battery& battery) :
 
     addChild(make_unique<ClockIcon>(m_fb->xres() - 50, 0));
 
+    auto menu = make_unique<Menu>(0, 0);
+    m_menu = menu.get();
+    addChild(std::move(menu));
+
     // TODO title label, centered
 }
 
