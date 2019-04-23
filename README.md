@@ -2,6 +2,8 @@
 
 ![Ocher handprint](docs/hand.png)
 
+[![Build Status](https://travis-ci.org/ccoffing/OcherBook.svg?branch=develop)](https://travis-ci.org/ccoffing/OcherBook)
+
 OcherBook is an open-source ebook reader, supporting multiple file formats and
 output devices.  The major goals are:
 
