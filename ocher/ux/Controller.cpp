@@ -196,7 +196,7 @@ void Controller::initLog()
 
 void Controller::initDevice()
 {
-    g_container->device = std::move(Device::create());
+    g_container->device = Device::create();
 
 #if 0
     // Before proceeding with startup and initializing the framebuffer, check for a killswitch.

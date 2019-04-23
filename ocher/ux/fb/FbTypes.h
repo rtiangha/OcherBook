@@ -8,6 +8,7 @@
 
 #include "ux/Types.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <new>
 

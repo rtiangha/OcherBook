@@ -6,6 +6,7 @@
 #ifndef OCHER_DEVICE_H
 #define OCHER_DEVICE_H
 
+#include <array>
 #include <memory>
 #include <string>
 

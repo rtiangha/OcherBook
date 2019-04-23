@@ -52,6 +52,7 @@ if get_option('kobo')
     conf_data.set('OCHER_TARGET_KOBO', true)
     # TODO  set hardware per submodel
     conf_data.set('UX_FB', true)
+    conf_data.set('UX_FB_LINUX', true)
     conf_data.set('UX_FB_MX50', true)
 endif
 
@@ -107,7 +108,6 @@ if get_option('ux_fb')
     if sdl_dep.found()
         conf_data.set('UX_FB_SDL', true)
     endif
-    conf_data.set('UX_FB_LINUX', true)
 endif
 
 if get_option('epub')

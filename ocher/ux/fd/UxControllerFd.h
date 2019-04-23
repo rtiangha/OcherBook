@@ -9,6 +9,8 @@
 #include "ux/Controller.h"
 #include "ux/Renderer.h"
 
+#include <string>
+
 /**
  */
 class UxControllerFd : public UxController {
