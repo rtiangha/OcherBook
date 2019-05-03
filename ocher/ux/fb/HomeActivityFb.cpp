@@ -178,10 +178,11 @@ void HomeActivityFb::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
-    // TODO set italic
+    int dx = g_container->settings.smallSpace;
+
     auto button = make_unique<Button>("Browse all...");
     button->m_flags |= WIDGET_BORDERLESS;
-    button->setPos(430, 575);  // TODO widget packing
+    button->setPos(m_rect.x + m_rect.w - button->rect().w - dx, 575);
     button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
     addChild(std::move(button));
 }

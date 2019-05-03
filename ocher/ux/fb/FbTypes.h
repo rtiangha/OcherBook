@@ -45,6 +45,12 @@ struct Rect {
 
     void unionRects(const Rect* r1, const Rect* r2);
 
+    bool intersects(const Rect& r) const
+    {
+        return r.x < x + w && r.x + r.w > x &&
+               r.y < y + h && r.y + r.h > y;
+    }
+
     bool contains(const Pos& p) const
     {
         return p.x >= x && p.y >= y && p.x < x + w && p.y < y + h;

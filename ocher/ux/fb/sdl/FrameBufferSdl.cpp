@@ -144,18 +144,10 @@ void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, co
 {
     Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
     int rectWidth = w;
-    Rect clip;
+    const Rect* clip = userClip ? userClip : &bbox;
 
-    if (userClip) {
-        clip = *userClip;
-    } else {
-        clip.x = clip.y = 0;
-        clip.w = xres();
-        clip.h = yres();
-    }
-
-    const int maxX = clip.x + clip.w - 1;
-    const int minX = clip.x;
+    const int maxX = clip->x + clip->w - 1;
+    const int minX = clip->x;
     if (x + w >= maxX) {
         if (x >= maxX)
             return;
@@ -164,8 +156,8 @@ void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, co
     if (x < minX) {
         // TODO
     }
-    const int maxY = clip.y + clip.h - 1;
-    const int minY = clip.y;
+    const int maxY = clip->y + clip->h - 1;
+    const int minY = clip->y;
     if (y + h >= maxY) {
         if (y >= maxY)
             return;

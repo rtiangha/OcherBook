@@ -158,19 +158,10 @@ void FontEngine::apply()
     }
 }
 
-void FontEngine::blitGlyphs(Glyph** glyphs, Pos* pen, const Rect* clip)
-{
-    for (unsigned int i = 0; glyphs[i]; ++i) {
-        Glyph* g = glyphs[i];
-        m_fb->blit(g->bitmap, pen->x + g->offsetX, pen->y - g->offsetY, g->w, g->h, clip);
-        pen->x += g->advanceX;
-        pen->y += g->advanceY;
-    }
-}
-
-void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rect* bbox)
+std::vector<Glyph*> FontEngine::calculateGlyphs(const char* p, unsigned int len, Rect* bbox)
 {
     GlyphDescr d;
+    std::vector<Glyph*> glyphs;
 
     d.faceId = m_cur.faceId;
     d.points = m_cur.points;
@@ -179,13 +170,11 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
     d.italic = m_cur.italic;
 
     bbox->w = 0;
-    unsigned int i = 0;
     for (const char* end = p + len; p < end; ) {
         p += utf8ToUtf32(p, &d.c);
 
         Glyph* g = m_cache.get(d);
         if (!g) {
-            // Log::trace(LOG_NAME, "%d pt %c is not cached", d.face.points, d.c);
             if (!(g = m_ft.plotGlyph(&d))) {
                 Log::warn(LOG_NAME, "plotGlyph failed for %x; skipping", d.c);
                 continue;
@@ -195,11 +184,28 @@ void FontEngine::plotString(const char* p, unsigned int len, Glyph** glyphs, Rec
             m_cache.put(d, g);
         }
 
-        glyphs[i++] = g;
+        glyphs.push_back(g);
         bbox->w += g->advanceX;
     }
     bbox->h = m_cur.lineHeight;
-    glyphs[i] = nullptr;
+    return glyphs;
+}
+
+void FontEngine::blitGlyphs(const std::vector<Glyph*>& glyphs, Pos* pen, const Rect* clip)
+{
+    for (auto g : glyphs) {
+        m_fb->blit(g->bitmap, pen->x + g->offsetX, pen->y - g->offsetY, g->w, g->h, clip);
+        pen->x += g->advanceX;
+        pen->y += g->advanceY;
+    }
+}
+
+Rect FontEngine::blitString(const char* str, unsigned int len, Pos* pen, const Rect* clip)
+{
+    Rect bbox;
+    auto glyphs = calculateGlyphs(str, len, &bbox);
+    blitGlyphs(glyphs, pen, clip);
+    return bbox;
 }
 
 // TODO:  return array of arrays of glyphs, and starting pos for each array
@@ -234,11 +240,10 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
             if (w < len)
                 ++w;
 
-            Glyph* glyphs[w + 1];
             Rect wordBox;
             wordBox.x = pen->x;
             wordBox.y = pen->y;
-            plotString(p, w, glyphs, &wordBox);
+            auto glyphs = calculateGlyphs(p, w, &wordBox);
             if (flags & FE_WRAP &&           // want wrap
                 pen->x + wordBox.w > r->w && // but wouldn't fit on this line
                 wordBox.w <= r->w) {         // but would fit on next
@@ -254,16 +259,16 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
 
             // Fits; render it and advance
             if (flags & FE_NOBLIT) {
-                for (unsigned int i = 0; glyphs[i]; ++i) {
-                    pen->x += glyphs[i]->advanceX;
-                    pen->y += glyphs[i]->advanceY;
+                for (auto glyph : glyphs) {
+                    pen->x += glyph->advanceX;
+                    pen->y += glyph->advanceY;
                 }
             } else {
                 Pos dst;
                 int xOffset = 0;
                 if (flags & FE_XCENTER) {
-                    for (unsigned int i = 0; glyphs[i]; ++i) {
-                        xOffset += glyphs[i]->advanceX;
+                    for (auto glyph : glyphs) {
+                        xOffset += glyph->advanceX;
                     }
                     xOffset = r->w / 2 - (xOffset >> 1);
                 }

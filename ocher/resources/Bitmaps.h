@@ -6,7 +6,7 @@
 #ifndef OCHER_RESOURCES_BITMAPS_H
 #define OCHER_RESOURCES_BITMAPS_H
 
-#include "ux/fb/Widgets.h"
+#include "ux/fb/bitmap.h"
 
 extern Bitmap bmpLeftArrow;
 extern Bitmap bmpRightArrow;

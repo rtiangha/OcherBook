@@ -12,6 +12,16 @@
 
 class Bitmap {
 public:
+    Bitmap() = default;
+    Bitmap(int w_, int h_, const unsigned char* bmp_) :
+        w(w_),
+        h(h_),
+        data(bmp_, bmp_ + w * h)
+    {
+    }
+
+    bool empty() const { return data.empty(); }
+
     int w = 0;
     int h = 0;
     std::vector<uint8_t> data;

@@ -95,10 +95,9 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
                 ++w;
 
             Rect bbox;
-            Glyph* glyphs[w + 1];
             bbox.x = m_penX;
             bbox.y = m_penY;
-            m_fe.plotString(p, w, glyphs, &bbox);
+            auto glyphs = m_fe.calculateGlyphs(p, w, &bbox);
             if (m_penX + bbox.w >= xres - m_settings.marginRight &&
                 bbox.w <= xres - m_settings.marginRight - m_settings.marginLeft) {
                 bbox.x = m_penX = m_settings.marginLeft;
@@ -118,10 +117,9 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
                 m_penX = pos.x;
                 m_penY = pos.y;
             } else {
-                for (unsigned int i = 0; glyphs[i]; ++i) {
-                    Glyph* g = glyphs[i];
-                    m_penX += g->advanceX;
-                    m_penY += g->advanceY;
+                for (auto glyph : glyphs) {
+                    m_penX += glyph->advanceX;
+                    m_penY += glyph->advanceY;
                 }
             }
             p += w;

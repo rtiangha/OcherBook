@@ -10,6 +10,7 @@
 #include "ux/fb/FreeType.h"
 
 #include <map>
+#include <vector>
 
 class FrameBuffer;
 
@@ -60,13 +61,18 @@ public:
     GlyphFace m_cur;
     GlyphFace m_next;
 
-    void blitGlyphs(Glyph** glyphs, Pos* pen, const Rect* clip = nullptr);
+    /** Lays out the string in memory, calculating the glyphs and the bounding rectangle.
+     */
+    std::vector<Glyph*> calculateGlyphs(const char* str, unsigned int len, Rect* boundingBox);
+
+    /** Blits the glyphs to the framebuffer, moving the pen and optionally clipping.
+     */
+    void blitGlyphs(const std::vector<Glyph*>& glyphs, Pos* pen, const Rect* clip = nullptr);
 
     /**
-     *
      */
-    void plotString(const char* str, unsigned int len, Glyph** glyphs, Rect* boundingBox);
-// TODO            int16_t bearingX, int16_t bearingY);
+    Rect blitString(const char* str, unsigned int len, Pos* pen, const Rect* clip = nullptr);
+
 
     /** Renders a string, in the current font.
      *

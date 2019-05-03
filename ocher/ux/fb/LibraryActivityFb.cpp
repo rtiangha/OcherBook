@@ -34,13 +34,13 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     m_systemBar = systemBar.get();
     addChild(std::move(systemBar));
 
-    auto leftIcon = make_unique<Icon>(m_settings.medSpace + m_settings.largeSpace,
-            m_rect.h - m_settings.medSpace - bmpLeftArrow.h, &bmpLeftArrow);
+    auto leftIcon = make_unique<Button>(m_settings.medSpace + m_settings.largeSpace,
+            m_rect.h - m_settings.medSpace - bmpLeftArrow.h, bmpLeftArrow);
     leftIcon->pressed.Connect(this, &LibraryActivityFb::leftIconPressed);
     addChild(std::move(leftIcon));
 
-    auto rightIcon = make_unique<Icon>(m_rect.w - (m_settings.medSpace + m_settings.largeSpace + bmpRightArrow.w),
-            m_rect.h - m_settings.medSpace - bmpRightArrow.h, &bmpRightArrow);
+    auto rightIcon = make_unique<Button>(m_rect.w - (m_settings.medSpace + m_settings.largeSpace + bmpRightArrow.w),
+            m_rect.h - m_settings.medSpace - bmpRightArrow.h, bmpRightArrow);
     rightIcon->pressed.Connect(this, &LibraryActivityFb::rightIconPressed);
     addChild(std::move(rightIcon));
 }

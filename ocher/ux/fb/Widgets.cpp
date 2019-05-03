@@ -64,12 +64,6 @@ void Widget::invalidate()
     }
 }
 
-void Widget::invalidate(Rect* rect)
-{
-    // TODO
-    invalidate();
-}
-
 Rect Widget::drawChildren()
 {
     Rect drawn;
@@ -156,7 +150,7 @@ void Window::drawTitle(Rect* rect)
         rect->h -= 12;
     }
     if (!m_title.empty()) {
-        // TODO
+        // TODO  change to Label
     }
 }
 
@@ -171,30 +165,93 @@ void Window::drawContent(const Rect*)
 }
 
 
-Button::Button(int x, int y, unsigned int w, unsigned int h) :
-    Widget(x, y, w, h)
+void Icon::setBitmap(const Bitmap& bitmap)
+{
+    m_bmp = bitmap;
+    m_rect.w = m_bmp.w;
+    m_rect.h = m_bmp.h;
+}
+
+void Icon::draw()
+{
+    m_screen->fb->blit(&m_bmp.data[0], m_rect.x, m_rect.y, m_bmp.w, m_bmp.h);
+}
+
+
+Label::Label() :
+    m_fe(m_screen->fb)
 {
 }
 
-Button::Button(const char* label, int points)
+Label::Label(const char* label, int points) :
+    m_fe(m_screen->fb)
 {
     setLabel(label, points);
 }
 
+void Label::setLabel(const char* label, int points)
+{
+    m_points = points ?: g_container->settings.systemFontPoints;
+    m_fe.setSize(m_points);
+    m_fe.apply();
+
+    m_glyphs = m_fe.calculateGlyphs(label, strlen(label), &m_rect);
+}
+
+void Label::draw()
+{
+    Pos pen{ m_rect.x, m_rect.y };
+    m_fe.blitGlyphs(m_glyphs, &pen);
+}
+
+
+Button::Button(int x, int y, const char* label) :
+    Widget(x, y, 0, 0),
+    m_label(label)
+{
+    calcSize();
+}
+
+Button::Button(int x, int y, const Bitmap& bitmap) :
+    Widget(x, y, bitmap.w, bitmap.h)
+{
+    setBitmap(bitmap);
+    calcSize();
+}
+
+Button::Button(const char* label, int points) :
+    m_label(label, points)
+{
+    calcSize();
+}
+
+void Button::setBitmap(const Bitmap& bitmap)
+{
+    m_icon.setBitmap(bitmap);
+    calcSize();
+}
+
 void Button::setLabel(const char* label, int points)
 {
-    m_label = label;
-    m_points = points ?: g_container->settings.systemFontPoints;
+    m_label.setLabel(label, points);
+    calcSize();
+}
 
-    FontEngine fe(m_screen->fb);
-    fe.setSize(m_points);
-    fe.apply();
+void Button::calcSize()
+{
+    const auto pad = g_container->settings.smallSpace;
 
-    Rect lbox;
-    Glyph* glyphs[m_label.length() + 1];
-    fe.plotString(m_label.c_str(), m_label.length(), &glyphs[0], &lbox);
-    m_rect.w = lbox.w + m_pad * 2;
-    m_rect.h = fe.m_cur.lineHeight + m_pad * 2;
+    m_rect.w = m_rect.h = 0;
+
+    m_icon.setPos(m_rect.x + pad, m_rect.y + pad);
+    m_rect.unionRect(&m_icon.rect());
+    // XXX padding is wrong; more generic packing
+
+    m_label.setPos(m_rect.x + m_rect.w + pad, m_rect.y + pad);
+    m_rect.unionRect(&m_label.rect());
+
+    m_rect.w += pad;
+    m_rect.h += pad;
 }
 
 void Button::draw()
@@ -203,8 +260,7 @@ void Button::draw()
 
     drawBorder(&rect);
     drawBg(&rect);
-    drawLabel(&rect);
-    drawChildren();
+    drawButton(&rect);
     if (m_mouseDown) {
         m_screen->fb->byLine(&rect, dim);
     }
@@ -225,18 +281,10 @@ void Button::drawBg(Rect* rect)
     m_screen->fb->fillRect(rect);
 }
 
-void Button::drawLabel(Rect* rect)
+void Button::drawButton(Rect* rect)
 {
-    if (!m_label.empty()) {
-        FontEngine fe(m_screen->fb);
-        fe.setSize(m_points);
-        fe.apply();
-
-        Pos pos;
-        pos.x = m_pad;
-        pos.y = m_rect.h - m_pad + fe.m_cur.descender;
-        fe.renderString(m_label.c_str(), m_label.length(), &pos, &m_rect, 0);
-    }
+    m_icon.draw();
+    m_label.draw();
 }
 
 EventDisposition Button::evtKey(const struct OcherKeyEvent*)
@@ -263,29 +311,49 @@ void Button::timeoutCb(EV_P_ ev_timer* w, int revents)
 }
 
 Menu::Menu(int x, int y) :
-    m_tab(x, y)
+    m_tab(x, y, "X")
 {
     m_tab.m_flags |= WIDGET_BORDERLESS;
+    m_tab.pressed.Connect(this, &Menu::open);
+
+    m_rect = m_tab.rect();
+}
+
+Menu::~Menu()
+{
+    m_tab.pressed.Disconnect(this, &Menu::open);
+}
+
+void Menu::open()
+{
+    m_open = !m_open;
+    m_screen->invalidate(rect());
 }
 
 void Menu::draw()
 {
-#if 0
-    Rect rect(m_rect);
-    auto fb = m_screen->fb;
+    m_tab.draw();
 
-    // TODO border
+    if (m_open) {
+        // TODO  VBox of Labels
+        Rect r(m_rect);
+        r.y += m_tab.rect().h;
+        r.w = r.h = 0;
 
-    FontEngine fe(m_screen->fb);
+        const auto& settings = g_container->settings;
 
-    fb->setFg(0, 0, 0);
-    fb->rect(&rect);
-    rect.inset(1);
-    fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(&rect);
+        auto fb = m_screen->fb;
+        FontEngine fe(fb);
+        fe.setSize(settings.systemFontPoints);
+        fe.apply();
 
-    // TODO items
-#endif
+        int16_t pad = settings.smallSpace;
+        Pos pos {r.x + pad, r.y + pad + fe.m_cur.ascender};
+        for (const auto& item : m_items) {
+            auto bbox = fe.blitString(item.text.c_str(), item.text.length(), &pos);
+            r.unionRect(&bbox);
+        }
+    }
 }
 
 Spinner::Spinner() :
@@ -358,28 +426,6 @@ void Spinner::draw()
 }
 
 
-
-void Icon::draw()
-{
-    m_screen->fb->blit(bmp->bmp, m_rect.x, m_rect.y, bmp->w, bmp->h);
-#if 0
-    if (!m_isActive) {
-        m_screen->fb->byLine(&m_rect, lighten);
-    }
-#endif
-}
-
-EventDisposition Icon::evtMouse(const struct OcherMouseEvent* evt)
-{
-    if (evt->subtype == OEVT_MOUSE1_DOWN) {
-        m_mouseDown = true;
-    } else if (evt->subtype == OEVT_MOUSE1_UP && m_mouseDown) {
-        m_mouseDown = false;
-        pressed();
-    }
-    return EventDisposition::Handled;
-}
-
 FbScreen::FbScreen(EventLoop& _loop) :
     loop(_loop)
 {
@@ -442,6 +488,15 @@ void FbScreen::removeChild(Widget* widget)
             widget->onDetached();
             m_children.erase(it);
             break;
+        }
+    }
+}
+
+void FbScreen::invalidate(const Rect& rect) const
+{
+    for (auto& w : m_children) {
+        if (!(w->m_flags & WIDGET_HIDDEN) && rect.intersects(w->rect())) {
+            w->invalidate();
         }
     }
 }

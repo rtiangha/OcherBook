@@ -25,6 +25,8 @@ SystemBar::SystemBar(Battery& battery) :
     addChild(make_unique<ClockIcon>(m_fb->xres() - 50, 0));
 
     auto menu = make_unique<Menu>(0, 0);
+    menu->m_items.push_back({"Library"});
+    menu->m_items.push_back({"Settings"});
     m_menu = menu.get();
     addChild(std::move(menu));
 
