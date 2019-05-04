@@ -347,8 +347,9 @@ void Menu::draw()
         fe.setSize(settings.systemFontPoints);
         fe.apply();
 
-        int16_t pad = settings.smallSpace;
-        Pos pos {r.x + pad, r.y + pad + fe.m_cur.ascender};
+        Pos pos;
+        pos.x = r.x + settings.smallSpace;
+        pos.y = r.y + settings.smallSpace + fe.m_cur.ascender;
         for (const auto& item : m_items) {
             auto bbox = fe.blitString(item.text.c_str(), item.text.length(), &pos);
             r.unionRect(&bbox);
