@@ -9,13 +9,12 @@
 #include <cstdint>
 
 struct Pos {
-    int16_t x, y;
+    int x = 0;
+    int y = 0;
 
-    Pos()
-    {
-    }
+    Pos() = default;
 
-    Pos(int16_t _x, int16_t _y) :
+    Pos(int _x, int _y) :
         x(_x),
         y(_y)
     {

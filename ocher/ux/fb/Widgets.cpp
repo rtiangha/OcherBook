@@ -200,7 +200,7 @@ void Label::setLabel(const char* label, int points)
 
 void Label::draw()
 {
-    Pos pen{ m_rect.x, m_rect.y };
+    Pos pen{ m_rect.x, m_rect.y + m_fe.m_cur.bearingY };
     m_fe.blitGlyphs(m_glyphs, &pen);
 }
 
@@ -237,6 +237,15 @@ void Button::setLabel(const char* label, int points)
     calcSize();
 }
 
+// TODO this goes away with real layout
+void Button::setPos(int x, int y)
+{
+    m_rect.x = x;
+    m_rect.y = y;
+    calcSize();
+}
+
+// TODO this goes away with real layout
 void Button::calcSize()
 {
     const auto pad = g_container->settings.smallSpace;
@@ -266,6 +275,7 @@ void Button::draw()
     }
 }
 
+// TODO this goes away with real layout
 void Button::drawBorder(Rect* rect)
 {
     if (!(m_flags & WIDGET_BORDERLESS)) {

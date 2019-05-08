@@ -234,6 +234,7 @@ public:
     Button(const char* label, int points = 0);
     ~Button() = default;
 
+    void setPos(int x, int y) override;
     void setBitmap(const Bitmap& bitmap);
     void setLabel(const char* label, int points = 0);
 
