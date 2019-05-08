@@ -277,7 +277,7 @@ public:
     std::vector<Item> m_items;
 
 protected:
-    Button m_tab;
+    Button* m_tab;
     bool m_open = false;
 
     void open();

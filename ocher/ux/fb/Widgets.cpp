@@ -320,18 +320,20 @@ void Button::timeoutCb(EV_P_ ev_timer* w, int revents)
     // TODO spring the button back up
 }
 
-Menu::Menu(int x, int y) :
-    m_tab(x, y, "X")
+Menu::Menu(int x, int y)
 {
-    m_tab.m_flags |= WIDGET_BORDERLESS;
-    m_tab.pressed.Connect(this, &Menu::open);
+    auto tab = make_unique<Button>(x, y, "X");
+    tab->m_flags |= WIDGET_BORDERLESS;
+    tab->pressed.Connect(this, &Menu::open);
+    m_tab = tab.get();
+    addChild(std::move(tab));
 
-    m_rect = m_tab.rect();
+    m_rect = m_tab->rect();
 }
 
 Menu::~Menu()
 {
-    m_tab.pressed.Disconnect(this, &Menu::open);
+    m_tab->pressed.Disconnect(this, &Menu::open);
 }
 
 void Menu::open()
@@ -342,12 +344,10 @@ void Menu::open()
 
 void Menu::draw()
 {
-    m_tab.draw();
-
     if (m_open) {
         // TODO  VBox of Labels
         Rect r(m_rect);
-        r.y += m_tab.rect().h;
+        r.y += m_tab->rect().h;
         r.w = r.h = 0;
 
         const auto& settings = g_container->settings;
