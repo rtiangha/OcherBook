@@ -82,16 +82,17 @@ void SleepActivityFb::onAttached()
 
 void SleepActivityFb::drawContent(const Rect* rect)
 {
-    FontEngine fe(m_fb);
-    fe.setSize(18);
-    fe.setItalic(1);
-    fe.apply();
+    auto fe = m_uxController->getFontEngine();
+    FontFace face;
+    face.points = 18;
+    face.italic = true;
+    auto fc = fe->context(face);
 
     Pos p;
     p.x = 0;
     p.y = rect->h / 2;
     const char* msg = m_level == PowerLevel::Sleep ? "Sleeping" : "Powered off";
-    fe.renderString(msg, strlen(msg), &p, rect, FE_XCENTER);
+    fe->renderString(fc, msg, strlen(msg), &p, rect, FE_XCENTER);
     if (m_level == PowerLevel::PowerOff)
         m_fb->byLine(rect, invert);
 

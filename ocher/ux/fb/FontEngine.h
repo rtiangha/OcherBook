@@ -7,28 +7,12 @@
 #define OCHER_UX_FONT_ENGINE_H
 
 #include "ux/fb/FbTypes.h"
-#include "ux/fb/FreeType.h"
+#include "ux/fb/fontcontext.h"
 
 #include <map>
 #include <vector>
 
 class FrameBuffer;
-
-/**
- */
-struct GlyphFace {
-    uint8_t faceId;
-    uint8_t points;
-    uint8_t underline;
-    uint8_t bold;
-    uint8_t italic;
-
-    int16_t bearingY;
-    int16_t ascender;
-    int16_t descender;
-    int16_t lineHeight;
-    int16_t underlinePos;
-} __attribute__((packed));
 
 class GlyphCache {
 public:
@@ -42,28 +26,23 @@ protected:
 };
 
 /** Converts glyphs to bitmaps.
- *
- * @todo  GlyphCache/FreeType should be shared; face is per local context
  */
 class FontEngine {
 public:
     FontEngine(FrameBuffer* fb);
 
-    static void scanForFonts();  // TODO move to FreeType?
+    ~FontEngine();
 
-    void setFont();
-    void setSize(unsigned int points);
-    void setBold(int b);
-    void setUnderline(int u);
-    void setItalic(int i);
-    void apply();
-    int dirty;
-    GlyphFace m_cur;
-    GlyphFace m_next;
+    FontContext context();
+
+    FontContext context(const FontFace& face);
+
+    static void scanForFonts();
 
     /** Lays out the string in memory, calculating the glyphs and the bounding rectangle.
      */
-    std::vector<Glyph*> calculateGlyphs(const char* str, unsigned int len, Rect* boundingBox);
+    std::vector<Glyph*> calculateGlyphs(const FontContext& fc, const char* str, unsigned int len,
+            Rect* boundingBox);
 
     /** Blits the glyphs to the framebuffer, moving the pen and optionally clipping.
      */
@@ -71,7 +50,8 @@ public:
 
     /**
      */
-    Rect blitString(const char* str, unsigned int len, Pos* pen, const Rect* clip = nullptr);
+    Rect blitString(const FontContext& fc, const char* str, unsigned int len, Pos* pen,
+            const Rect* clip = nullptr);
 
 
     /** Renders a string, in the current font.
@@ -96,13 +76,13 @@ public:
 #define FE_XCLIP    4
 #define FE_YCLIP    8
 #define FE_XCENTER 16
-    unsigned int renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags,
-            Rect* bbox = nullptr);
+    unsigned int renderString(const FontContext& fc, const char* str, unsigned int len, Pos* pen,
+            const Rect* r, unsigned int flags, Rect* bbox = nullptr);
 
     GlyphCache m_cache;
 
-    FrameBuffer* m_fb;
-    FreeType m_ft;
+    FrameBuffer* m_fb = nullptr;
+    FT_Library m_lib = nullptr;
 };
 
 #endif

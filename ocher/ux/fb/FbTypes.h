@@ -82,6 +82,7 @@ struct Glyph {
         uint8_t* p = new (std::nothrow) uint8_t[sizeof(struct Glyph) - 1 + size];
         return reinterpret_cast<struct Glyph*>(p);
     }
+
     static void destroy(struct Glyph* g)
     {
         uint8_t* p = reinterpret_cast<uint8_t*>(g);
@@ -111,9 +112,9 @@ struct GlyphDescr {
             uint32_t c;
             uint8_t faceId;
             uint8_t points;
-            int underline : 1;
             int bold : 1;
             int italic : 1;
+            int underline : 1;
         };
         uint64_t v;
     };

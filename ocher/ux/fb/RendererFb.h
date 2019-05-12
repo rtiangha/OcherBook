@@ -16,7 +16,7 @@ class Settings;
 
 class RendererFb : public Renderer {
 public:
-    RendererFb(FrameBuffer* fb);
+    RendererFb(FrameBuffer* fb, FontEngine* fe);
 
     bool init() override;
 
@@ -29,7 +29,8 @@ protected:
     void popAttrs();
 
     FrameBuffer* m_fb;
-    FontEngine m_fe;
+    FontEngine* m_fe;
+    FontContext m_fc;
     Settings& m_settings;
     int m_penX;
     int m_penY;

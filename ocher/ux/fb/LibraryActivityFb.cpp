@@ -105,17 +105,16 @@ void LibraryActivityFb::drawContent(const Rect* rect)
     fb->fillRect(rect);
     fb->setFg(0, 0, 0);
 
-    FontEngine fe(fb);
     Pos pos;
     Rect clip = fb->bbox;
 
-    fe.setSize(10);
-    fe.apply();
+    auto fe = m_uxController->getFontEngine();
+    auto fc = fe->context().setPoints(10);
     std::string str = format("PG. %u OF %u", m_pageNum + 1, m_pages);
     pos.x = 0;
-    pos.y = clip.h - m_settings.smallSpace - fe.m_cur.descender;
-    fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCENTER);
-// TODO        int maxY = pos.y - fe.m_cur.ascender;
+    pos.y = clip.h - m_settings.smallSpace - fc.descender();
+    fe->renderString(fc, str.c_str(), str.length(), &pos, &clip, FE_XCENTER);
+// TODO        int maxY = pos.y - fc.ascender();
 
     clip.y = m_systemBar->rect().y + m_systemBar->rect().h + m_settings.medSpace;
     clip.x = m_settings.medSpace;
@@ -127,21 +126,19 @@ void LibraryActivityFb::drawContent(const Rect* rect)
             break;
         Meta* meta = library[idx];
 
-        fe.setSize(12);
-        fe.apply();
+        fc.setPoints(12);
         pos.x = 0;
-        pos.y = m_settings.smallSpace + fe.m_cur.ascender;
-        fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &clip, FE_XCLIP);
+        pos.y = m_settings.smallSpace + fc.ascender();
+        fe->renderString(fc, meta->title.c_str(), meta->title.length(), &pos, &clip, FE_XCLIP);
         pos.x = 0;
-        pos.y = m_settings.smallSpace + fe.m_cur.ascender + fe.m_cur.lineHeight;
+        pos.y = m_settings.smallSpace + fc.ascender() + fc.lineHeight();
 
-        fe.setSize(10);
-        fe.apply();
+        fc.setPoints(10);
         str = format("%u%% read   |   %s", meta->percentRead(), meta->fmtToStr(meta->format));
-        fe.renderString(str.c_str(), str.length(), &pos, &clip, FE_XCLIP);
+        fe->renderString(fc, str.c_str(), str.length(), &pos, &clip, FE_XCLIP);
 
         m_bookRects[i] = clip;
-        m_bookRects[i].h = pos.y + fe.m_cur.descender + m_settings.smallSpace;
+        m_bookRects[i].h = pos.y + fc.descender() + m_settings.smallSpace;
         clip.y = m_bookRects[i].y + m_bookRects[i].h;
 
         fb->hline(clip.x, clip.y, clip.w);

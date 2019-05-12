@@ -95,9 +95,8 @@ void HomeActivityFb::drawContent(const Rect* rect)
     fb->fillRect(rect);
     fb->setFg(0, 0, 0);
 
-    FontEngine fe(fb);
-    fe.setSize(12);
-    fe.apply();
+    auto fe = m_uxController->getFontEngine();
+    auto fc = fe->context().setPoints(12);
     Rect r;
     Pos pos;
     auto metas = m_uxController->ctx.library.getList();
@@ -116,26 +115,24 @@ void HomeActivityFb::drawContent(const Rect* rect)
         fb->setFg(0, 0, 0);
         if (meta) {
             pos.x = 0;
-            pos.y = fe.m_cur.ascender;
+            pos.y = fc.ascender();
             r.inset(2);
-            fe.renderString(meta->title.c_str(), meta->title.length(), &pos, &r, FE_YCLIP | FE_WRAP);
+            fe->renderString(fc, meta->title.c_str(), meta->title.length(), &pos, &r, FE_YCLIP | FE_WRAP);
         }
     }
 
-    fe.setSize(18);
-    fe.apply();
+    fc.setPoints(18);
     pos.x = 0;
     pos.y = 100;
-    fe.renderString("HOME", 4, &pos, rect, FE_XCENTER);
+    fe->renderString(fc, "HOME", 4, &pos, rect, FE_XCENTER);
 
     // Shortlist
-    fe.setSize(14);
-    fe.apply();
+    fc.setPoints(14);
     pos.x = books[0].x;
-    pos.y = books[3].y + books[3].h + fe.m_cur.ascender + g_container->settings.smallSpace;
-    fe.renderString("Shortlist", 9, &pos, rect, 0);
+    pos.y = books[3].y + books[3].h + fc.ascender() + g_container->settings.smallSpace;
+    fe->renderString(fc, "Shortlist", 9, &pos, rect, 0);
 
-    pos.y += fe.m_cur.underlinePos + g_container->settings.smallSpace;
+    pos.y += fc.underlinePos() + g_container->settings.smallSpace;
     fb->hline(books[0].x, pos.y, rect->w - books[0].x);
     pos.y++;
     fb->hline(books[0].x, pos.y, rect->w - books[0].x);

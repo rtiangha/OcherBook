@@ -90,9 +90,9 @@ if(UX_FB)
         ux/fb/bitmap.cpp
         ux/fb/BootActivityFb.cpp
         ux/fb/ClockIcon.cpp
+        ux/fb/fontcontext.cpp
         ux/fb/FontEngine.cpp
         ux/fb/FrameBuffer.cpp
-        ux/fb/FreeType.cpp
         ux/fb/HomeActivityFb.cpp
         ux/fb/JPEG.cpp
         ux/fb/LibraryActivityFb.cpp

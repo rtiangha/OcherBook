@@ -44,16 +44,31 @@ Glyph* GlyphCache::get(GlyphDescr& f)
 }
 
 FontEngine::FontEngine(FrameBuffer* fb) :
-    m_fb(fb),
-    m_ft(fb->ppi())
+    m_fb(fb)
 {
-    m_next.faceId = 0;
-    m_next.points = g_container->settings.fontPoints;
-    m_next.underline = 0;
-    m_next.bold = 0;
-    m_next.italic = 0;
-    memset(&m_cur, 0xff, sizeof(m_cur));
-    dirty = 1;
+    int r = FT_Init_FreeType(&m_lib);
+    if (r) {
+        Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
+        throw std::runtime_error("FT_Init_FreeType failed"); // XXX
+    }
+}
+
+FontEngine::~FontEngine()
+{
+    FT_Done_FreeType(m_lib);
+}
+
+FontContext FontEngine::context()
+{
+    FontFace face;
+    face.points = g_container->settings.systemFontPoints;
+    return context(face);
+}
+
+FontContext FontEngine::context(const FontFace& face)
+{
+    auto fc = FontContext(m_fb->ppi());
+    return fc.apply(*this, face);
 }
 
 void FontEngine::scanForFonts()
@@ -104,70 +119,17 @@ static int utf8ToUtf32(const char* _p, uint32_t* u32)
     return len;
 }
 
-void FontEngine::setFont()
-{
-    // TODO
-}
-
-void FontEngine::setSize(unsigned int points)
-{
-    m_next.points = points;
-    dirty = 1;
-}
-
-void FontEngine::setBold(int bold)
-{
-    m_next.bold = bold;
-    dirty = 1;
-}
-
-void FontEngine::setUnderline(int underline)
-{
-    m_next.underline = underline;
-    dirty = 1;
-}
-
-void FontEngine::setItalic(int italic)
-{
-    m_next.italic = italic;
-    dirty = 1;
-}
-
-void FontEngine::apply()
-{
-    if (dirty) {
-        if (m_cur.faceId != m_next.faceId) {
-            /*TODO*/;
-        }
-        if (m_cur.italic != m_next.italic || m_cur.bold != m_next.bold) {
-            m_ft.setFace(m_next.italic, m_next.bold);
-            m_ft.setSize(m_next.points);
-        } else if (m_cur.points != m_next.points) {
-            m_ft.setSize(m_next.points);
-        }
-        if (m_cur.underline != m_next.underline) {
-            /*TODO*/;
-        }
-        m_cur = m_next;
-        m_cur.ascender = m_ft.getAscender();
-        m_cur.descender = m_ft.getDescender();
-        m_cur.bearingY = m_cur.ascender;  /* TODO */
-        m_cur.lineHeight = m_ft.getLineHeight();
-        m_cur.underlinePos = m_ft.getUnderlinePos();
-        dirty = 0;
-    }
-}
-
-std::vector<Glyph*> FontEngine::calculateGlyphs(const char* p, unsigned int len, Rect* bbox)
+std::vector<Glyph*> FontEngine::calculateGlyphs(const FontContext& fc, const char* p,
+        unsigned int len, Rect* bbox)
 {
     GlyphDescr d;
     std::vector<Glyph*> glyphs;
 
-    d.faceId = m_cur.faceId;
-    d.points = m_cur.points;
-    d.underline = m_cur.underline;
-    d.bold = m_cur.bold;
-    d.italic = m_cur.italic;
+    d.faceId    = fc.faceId();
+    d.points    = fc.points();
+    d.underline = fc.underline();
+    d.bold      = fc.bold();
+    d.italic    = fc.italic();
 
     bbox->w = 0;
     for (const char* end = p + len; p < end; ) {
@@ -175,7 +137,7 @@ std::vector<Glyph*> FontEngine::calculateGlyphs(const char* p, unsigned int len,
 
         Glyph* g = m_cache.get(d);
         if (!g) {
-            if (!(g = m_ft.plotGlyph(&d))) {
+            if (!(g = fc.plotGlyph(&d))) {
                 Log::warn(LOG_NAME, "plotGlyph failed for %x; skipping", d.c);
                 continue;
             }
@@ -187,7 +149,7 @@ std::vector<Glyph*> FontEngine::calculateGlyphs(const char* p, unsigned int len,
         glyphs.push_back(g);
         bbox->w += g->advanceX;
     }
-    bbox->h = m_cur.lineHeight;
+    bbox->h = fc.lineHeight();
     return glyphs;
 }
 
@@ -200,17 +162,19 @@ void FontEngine::blitGlyphs(const std::vector<Glyph*>& glyphs, Pos* pen, const R
     }
 }
 
-Rect FontEngine::blitString(const char* str, unsigned int len, Pos* pen, const Rect* clip)
+Rect FontEngine::blitString(const FontContext& fc, const char* str, unsigned int len, Pos* pen,
+        const Rect* clip)
 {
     Rect bbox;
-    auto glyphs = calculateGlyphs(str, len, &bbox);
+    auto glyphs = calculateGlyphs(fc, str, len, &bbox);
     blitGlyphs(glyphs, pen, clip);
     return bbox;
 }
 
 // TODO:  return array of arrays of glyphs, and starting pos for each array
 // or callback:  str, offset, len, bbox
-unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pen, const Rect* r, unsigned int flags, Rect* bbox)
+unsigned int FontEngine::renderString(const FontContext& fc, const char* str, unsigned int len,
+        Pos* pen, const Rect* r, unsigned int flags, Rect* bbox)
 {
     const char* p = str;
     bool wordWrapped = false;
@@ -218,7 +182,7 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
     if (bbox)
         bbox->setInvalid();
 
-    if (!(flags & FE_YCLIP) && pen->y >= r->h - m_cur.descender) {
+    if (!(flags & FE_YCLIP) && pen->y >= r->h - fc.descender()) {
         return 0;
     }
 
@@ -243,17 +207,17 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
             Rect wordBox;
             wordBox.x = pen->x;
             wordBox.y = pen->y;
-            auto glyphs = calculateGlyphs(p, w, &wordBox);
+            auto glyphs = calculateGlyphs(fc, p, w, &wordBox);
             if (flags & FE_WRAP &&           // want wrap
                 pen->x + wordBox.w > r->w && // but wouldn't fit on this line
                 wordBox.w <= r->w) {         // but would fit on next
                 wordBox.x = pen->x = 0;
-                pen->y += m_cur.lineHeight;
+                pen->y += fc.lineHeight();
                 wordBox.y = pen->y;
             }
-            if (pen->y >= r->h - m_cur.descender)
+            if (pen->y >= r->h - fc.descender())
                 return p - str;
-            wordBox.y -= m_cur.ascender;
+            wordBox.y -= fc.ascender();
             if (bbox)
                 bbox->unionRect(&wordBox);
 
@@ -287,14 +251,14 @@ unsigned int FontEngine::renderString(const char* str, unsigned int len, Pos* pe
             return p - str;
         if ((*p == '\n' && !wordWrapped) || pen->x >= r->w) {
             pen->x = 0;
-            pen->y += m_cur.lineHeight;
+            pen->y += fc.lineHeight();
             if (*p == '\n' && len) {
                 p++;
                 len--;
             } else {
                 wordWrapped = true;
             }
-            if (pen->y >= r->h - m_cur.descender)
+            if (pen->y >= r->h - fc.descender())
                 return p - str;
         } else {
             if (*p == '\n') {

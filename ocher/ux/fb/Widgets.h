@@ -8,7 +8,7 @@
 
 #include "ux/Event.h"
 #include "ux/fb/bitmap.h"
-#include "ux/fb/FontEngine.h"
+#include "ux/fb/fontcontext.h"
 #include "ux/fb/FrameBuffer.h"
 #include "util/stdex.h"
 
@@ -37,6 +37,8 @@ public:
 
     void setFrameBuffer(FrameBuffer* fb);
 
+    void setFontEngine(FontEngine* fe);
+
     void addChild(std::unique_ptr<Widget> child);
 
     void removeChild(Widget* child);
@@ -50,6 +52,7 @@ public:
 
     EventLoop& loop;
     FrameBuffer* fb = nullptr;
+    FontEngine* fe = nullptr;
 
 protected:
     /**
@@ -222,7 +225,7 @@ public:
     void draw() override;
 
 protected:
-    FontEngine m_fe;
+    FontContext m_fc;
     std::vector<Glyph*> m_glyphs;
     int m_points = 0;
 };

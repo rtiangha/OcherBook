@@ -24,9 +24,10 @@
 #endif
 
 
-RendererFb::RendererFb(FrameBuffer* fb) :
+RendererFb::RendererFb(FrameBuffer* fb, FontEngine* fe) :
     m_fb(fb),
-    m_fe(fb),
+    m_fe(fe),
+    m_fc(fb->ppi()),
     m_settings(g_container->settings),
     m_penX(m_settings.marginLeft),
     m_penY(m_settings.marginTop),
@@ -69,7 +70,7 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
         }
     }
     if (m_penX == m_settings.marginLeft) {
-        if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fe.m_cur.descender) {
+        if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fc.descender()) {
             return 0;
         }
     }
@@ -97,23 +98,23 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
             Rect bbox;
             bbox.x = m_penX;
             bbox.y = m_penY;
-            auto glyphs = m_fe.calculateGlyphs(p, w, &bbox);
+            auto glyphs = m_fe->calculateGlyphs(m_fc, p, w, &bbox);
             if (m_penX + bbox.w >= xres - m_settings.marginRight &&
                 bbox.w <= xres - m_settings.marginRight - m_settings.marginLeft) {
                 bbox.x = m_penX = m_settings.marginLeft;
-                m_penY += m_fe.m_cur.lineHeight;
+                m_penY += m_fc.lineHeight();
                 bbox.y = m_penY;
             }
-            if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fe.m_cur.descender)
+            if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fc.descender())
                 return p - start;
-            bbox.y -= m_fe.m_cur.ascender;
-            bbox.h = m_fe.m_cur.lineHeight;
+            bbox.y -= m_fc.ascender();
+            bbox.h = m_fc.lineHeight();
             /* TODO save bounding box + glyphs for selection */
 
             // Fits; render it and advance
             if (doBlit) {
                 Pos pos(m_penX, m_penY);
-                m_fe.blitGlyphs(glyphs, &pos);
+                m_fe->blitGlyphs(glyphs, &pos);
                 m_penX = pos.x;
                 m_penY = pos.y;
             } else {
@@ -129,14 +130,14 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
         // Word-wrap or hard linefeed, but avoid the two back-to-back.
         if ((*p == '\n' && !wordWrapped) || m_penX >= xres - 1 - m_settings.marginRight) {
             m_penX = m_settings.marginLeft;
-            m_penY += m_fe.m_cur.lineHeight;
+            m_penY += m_fc.lineHeight();
             if (*p == '\n') {
                 p++;
                 len--;
             } else {
                 wordWrapped = true;
             }
-            if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fe.m_cur.descender)
+            if (m_penY >= (int)m_fb->yres() - m_settings.marginBottom - m_fc.descender())
                 return p - start;
         } else {
             if (*p == '\n') {
@@ -151,11 +152,12 @@ int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
 
 void RendererFb::applyAttrs()
 {
-    m_fe.setSize(a[ai].pts);
-    m_fe.setBold(a[ai].b);
-    m_fe.setUnderline(a[ai].ul);
-    m_fe.setItalic(a[ai].em);
-    m_fe.apply();
+    FontFace face;
+    face.points    = a[ai].pts;
+    face.bold      = a[ai].b;
+    face.underline = a[ai].ul;
+    face.italic    = a[ai].em;
+    m_fc.apply(*m_fe, face);
 }
 
 int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit)
@@ -164,7 +166,7 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
 
     // TODO reapply font settings before relying on font metrics
     m_penX = m_settings.marginLeft;
-    m_penY = m_settings.marginTop + m_fe.m_cur.ascender;
+    m_penY = m_settings.marginTop + m_fc.ascender();
     if (doBlit)
         m_fb->clear();
 
@@ -207,31 +209,26 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                 pushAttrs();
                 Log::trace(LOG_NAME, "font push bold");
                 a[ai].b = 1;
-                m_fe.setBold(1);
                 break;
             case Layout::AttrUnderline:
                 pushAttrs();
                 Log::trace(LOG_NAME, "font push underline");
                 a[ai].ul = 1;
-                m_fe.setUnderline(1);
                 break;
             case Layout::AttrItalics:
                 pushAttrs();
                 Log::trace(LOG_NAME, "font push italics");
                 a[ai].em = 1;
-                m_fe.setItalic(1);
                 break;
             case Layout::AttrSizeRel:
                 pushAttrs();
                 Log::trace(LOG_NAME, "font push rel %d", (int)arg);
                 a[ai].pts += (int)arg;
-                m_fe.setSize(a[ai].pts);
                 break;
             case Layout::AttrSizeAbs:
                 pushAttrs();
                 Log::trace(LOG_NAME, "font push abs %d", (int)arg);
                 a[ai].pts = (int)arg;
-                m_fe.setSize(a[ai].pts);
                 break;
             default:
                 Log::error(LOG_NAME, "unknown OpPushTextAttr");
@@ -271,7 +268,7 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
             case Layout::CmdOutputStr: {
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
                 ASSERT(i + sizeof(Buffer*) <= N);
-                m_fe.apply();
+                applyAttrs();
                 auto str = *(Buffer* const*)(raw + i);
                 ASSERT(strOffset <= str->size());
 #ifdef CPS_STATS

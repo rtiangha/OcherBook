@@ -5,7 +5,8 @@
 
 #include "ocher_config.h"
 
-#include "ux/fb/FreeType.h"
+#include "ux/fb/FontEngine.h"
+#include "ux/fb/fontcontext.h"
 
 #include "Container.h"
 #include "settings/Settings.h"
@@ -39,34 +40,21 @@ static const char* ttfFiles[] = {
 #endif
 };
 
-FreeType::FreeType(unsigned int dpi) :
-    m_face(nullptr),
-    m_lib(nullptr),
+FontContext::FontContext(unsigned int dpi) :
     m_dpi(dpi)
 {
-    int r = FT_Init_FreeType(&m_lib);
-    if (r) {
-        Log::error(LOG_NAME, "FT_Init_FreeType failed: %d", r);
-        throw std::runtime_error("FT_Init_FreeType failed"); // XXX
-    }
-    setFace(0, 0);  // XXX internal error state on failure
 }
 
-FreeType::~FreeType()
-{
-    FT_Done_FreeType(m_lib);
-}
-
-bool FreeType::setFace(int i, int b)
+bool FontContext::setFace(FontEngine& engine, const FontFace& face)
 {
     std::string file = g_container->settings.fontRoot;
 
-    i = i ? 1 : 0;
-    b = b ? 1 : 0;
+    int i = face.italic ? 1 : 0;
+    int b = face.bold ? 1 : 0;
     file += "/";
     file += ttfFiles[i + b * 2];
 
-    int r = FT_New_Face(m_lib, file.c_str(), 0, &m_face);
+    int r = FT_New_Face(engine.m_lib, file.c_str(), 0, &m_face);
     if (r || !m_face) {
         Log::error(LOG_NAME, "FT_New_Face(\"%s\") failed: %d", file.c_str(), r);
         return false;
@@ -74,12 +62,29 @@ bool FreeType::setFace(int i, int b)
     return true;
 }
 
-void FreeType::setSize(unsigned int points)
+FontContext& FontContext::setPoints(int points)
 {
     FT_Set_Char_Size(m_face, 0, points * 64, m_dpi, m_dpi);
+    m_cur.points = points;
+
+    m_ascender   = m_face->size->metrics.ascender >> 6;
+    m_descender  = m_face->size->metrics.descender >> 6;
+    m_bearingY   = m_face->size->metrics.ascender >> 6; // TODO
+    m_lineHeight = m_face->size->metrics.height >> 6;
+    m_underlinePos = (-m_face->underline_position) >> 6;
+
+    return *this;
 }
 
-Glyph* FreeType::plotGlyph(GlyphDescr* d)
+FontContext& FontContext::apply(FontEngine& engine, const FontFace& face)
+{
+    setFace(engine, face);
+    setPoints(face.points);
+    m_cur = face;
+    return *this;
+}
+
+Glyph* FontContext::plotGlyph(const GlyphDescr* d) const
 {
     FT_GlyphSlot slot = m_face->glyph;
     int r = FT_Load_Char(m_face, d->c, FT_LOAD_RENDER);

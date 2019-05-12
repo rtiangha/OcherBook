@@ -68,10 +68,11 @@ void BootActivityFb::drawContent(const Rect* rect)
     m_fb->fillRect(rect);
 
     m_fb->setFg(0, 0, 0);
-    FontEngine fe(m_fb);
-    fe.setSize(16);
-    fe.setItalic(1);
-    fe.apply();
+    auto fe = m_uxController->getFontEngine();
+    FontFace face;
+    face.points = 16;
+    face.italic = true;
+    const auto fc = fe->context(face);
 
     Pos pos;
     for (int i = 0; i < 2; ++i) {
@@ -84,7 +85,7 @@ void BootActivityFb::drawContent(const Rect* rect)
         const char* label = i == 0 ? "OcherBook" : "Kobo" /* or "Nickel" ? */;
         pos.x = 0;
         pos.y = r.h / 2;
-        fe.renderString(label, strlen(label), &pos, &r, FE_XCENTER);
+        fe->renderString(fc, label, strlen(label), &pos, &r, FE_XCENTER);
     }
     m_fb->update(nullptr);
 }

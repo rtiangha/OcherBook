@@ -66,9 +66,10 @@ bool UxControllerFb::init()
     } while (false);
 
     m_frameBuffer = std::unique_ptr<FrameBuffer>(frameBuffer);
+    m_fontEngine = make_unique<FontEngine>(frameBuffer);
+    m_renderer = make_unique<RendererFb>(frameBuffer, m_fontEngine.get());
     m_screen.setFrameBuffer(frameBuffer);
-    m_renderer = make_unique<RendererFb>(m_frameBuffer.get());
-    m_fontEngine = make_unique<FontEngine>(m_frameBuffer.get());
+    m_screen.setFontEngine(m_fontEngine.get());
 
     return true;
 }

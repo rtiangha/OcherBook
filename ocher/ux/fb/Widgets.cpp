@@ -179,29 +179,27 @@ void Icon::draw()
 
 
 Label::Label() :
-    m_fe(m_screen->fb)
+    m_fc(m_screen->fe->context())
 {
 }
 
 Label::Label(const char* label, int points) :
-    m_fe(m_screen->fb)
+    m_fc(m_screen->fe->context())
 {
     setLabel(label, points);
 }
 
 void Label::setLabel(const char* label, int points)
 {
-    m_points = points ?: g_container->settings.systemFontPoints;
-    m_fe.setSize(m_points);
-    m_fe.apply();
-
-    m_glyphs = m_fe.calculateGlyphs(label, strlen(label), &m_rect);
+    if (points)
+        m_fc.setPoints(points);
+    m_glyphs = m_screen->fe->calculateGlyphs(m_fc, label, strlen(label), &m_rect);
 }
 
 void Label::draw()
 {
-    Pos pen{ m_rect.x, m_rect.y + m_fe.m_cur.bearingY };
-    m_fe.blitGlyphs(m_glyphs, &pen);
+    Pos pen{ m_rect.x, m_rect.y + m_fc.bearingY() };
+    m_screen->fe->blitGlyphs(m_glyphs, &pen);
 }
 
 
@@ -351,17 +349,14 @@ void Menu::draw()
         r.w = r.h = 0;
 
         const auto& settings = g_container->settings;
-
-        auto fb = m_screen->fb;
-        FontEngine fe(fb);
-        fe.setSize(settings.systemFontPoints);
-        fe.apply();
+        auto fe = m_screen->fe;
+        const auto fc = fe->context();
 
         Pos pos;
         pos.x = r.x + settings.smallSpace;
-        pos.y = r.y + settings.smallSpace + fe.m_cur.ascender;
+        pos.y = r.y + settings.smallSpace + fc.ascender();
         for (const auto& item : m_items) {
-            auto bbox = fe.blitString(item.text.c_str(), item.text.length(), &pos);
+            auto bbox = fe->blitString(fc, item.text.c_str(), item.text.length(), &pos);
             r.unionRect(&bbox);
         }
     }
@@ -472,14 +467,19 @@ FbScreen::~FbScreen()
     g_screen = nullptr;
 }
 
-void FbScreen::setFrameBuffer(FrameBuffer* _fb)
+void FbScreen::setFrameBuffer(FrameBuffer* fb_)
 {
-    fb = _fb;
+    fb = fb_;
 
     m_rect.x = 0;
     m_rect.y = 0;
     m_rect.w = fb->xres();
     m_rect.h = fb->yres();
+}
+
+void FbScreen::setFontEngine(FontEngine* fe_)
+{
+    fe = fe_;
 }
 
 void FbScreen::addChild(std::unique_ptr<Widget> child)
