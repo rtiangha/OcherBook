@@ -9,6 +9,8 @@
 #include "ux/Renderer.h"
 #include "ux/fb/FontEngine.h"
 
+#include <string>
+
 class FrameBuffer;
 class Pagination;
 class Settings;
@@ -23,7 +25,7 @@ public:
     int render(Pagination* pagination, unsigned int pageNum, bool doBlit) override;
 
 protected:
-    int outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(std::string* b, unsigned int strOffset, bool doBlit);
     void applyAttrs();
     void pushAttrs();
     void popAttrs();

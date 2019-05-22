@@ -15,14 +15,14 @@
 #define LOG_NAME "ocher.epub"
 
 
-static bool stripUtf8Bom(Buffer& data)
+static bool stripUtf8Bom(std::string& data)
 {
     // Unicode standard does not recommend BOM for UTF8.
     // UTF8 is assumed anyway.
     if (data.length() >= 3 &&
-        ((unsigned char*)data.c_str())[0] == 0xef &&
-        ((unsigned char*)data.c_str())[1] == 0xbb &&
-        ((unsigned char*)data.c_str())[2] == 0xbf) {
+        ((unsigned char*)data.data())[0] == 0xef &&
+        ((unsigned char*)data.data())[1] == 0xbb &&
+        ((unsigned char*)data.data())[2] == 0xbf) {
         data.erase(0, 3);
         return true;
     }

@@ -5,16 +5,19 @@
 
 #include "fmt/text/Text.h"
 
-#include "util/File.h"
 #include "util/Logger.h"
+
+#include <fstream>
+#include <sstream>
 
 #define LOG_NAME "ocher.text"
 
 
 Text::Text(const std::string& filename)
 {
-    File f(filename);
-
-    f.readRest(m_text);
+    std::ifstream file(filename);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    m_text = buffer.str();
     Log::debug(LOG_NAME, "Loaded %zu bytes", m_text.size());
 }

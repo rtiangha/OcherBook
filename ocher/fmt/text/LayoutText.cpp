@@ -10,7 +10,7 @@
 LayoutText::LayoutText(Text* text) :
     m_text(text)
 {
-    int sawNl = 0;
+    bool sawNl = false;
     unsigned int n = m_text->m_text.size();
     const char* raw = m_text->m_text.data();
 
@@ -18,18 +18,24 @@ LayoutText::LayoutText(Text* text) :
         // \n\n means real line break; otherwise reflow text
         if (raw[i] == '\n') {
             if (sawNl) {
-                outputNl();
-                outputBr();
+                m_layout->outputNl();
+                m_layout->outputBr();
                 continue;
             } else
-                sawNl = 1;
+                sawNl = true;
         } else if (raw[i] == '\f') {
-            outputPageBreak();
+            m_layout->outputPageBreak();
             continue;
         } else {
-            sawNl = 0;
+            sawNl = false;
         }
-        outputChar(raw[i]);
+        m_layout->outputChar(raw[i]);
     }
-    flushText();
+    m_layout->flushText();
+}
+
+std::unique_ptr<Layout> LayoutText::finish()
+{
+    m_layout->finish();
+    return std::move(m_layout);
 }

@@ -14,6 +14,11 @@
 
 #define LOG_NAME "ocher.epub"
 
+std::unique_ptr<Layout> LayoutEpub::finish()
+{
+    m_layout->finish();
+    return std::move(m_layout);
+}
 
 void LayoutEpub::processNode(mxml_node_t* node)
 {
@@ -30,46 +35,44 @@ void LayoutEpub::processNode(mxml_node_t* node)
             if (type && strcmp(type, "text/css") == 0) {
                 const char* href = mxmlElementGetAttr(node, "href");
                 if (href) {
-                    std::string css;
-                    css = m_epub->getFile(href);
+                    auto css = m_epub->getFile(href);
                     // TODO: parse CSS
                 }
             }
         } else if (strcasecmp(name, "p") == 0) {
-            outputNl();
+            m_layout->outputNl();
             processSiblings(node->child);
-            outputNl();
-            outputBr();
+            m_layout->outputNl();
+            m_layout->outputBr();
         } else if (strcasecmp(name, "br") == 0) {
-            outputBr();
+            m_layout->outputBr();
         } else if ((name[0] == 'h' || name[0] == 'H') && isdigit(name[1]) && !name[2]) {
-            outputNl();
-            pushTextAttr(AttrBold, 0);
+            m_layout->outputNl();
+            m_layout->pushTextAttr(Layout::AttrBold, 0);
             // TODO CSS: text size, ...
             int inc = 3 - (name[1] - '0');
             if (inc < 0)
                 inc = 0;
-            pushTextAttr(AttrSizeAbs, g_container->settings.fontPoints + inc * 2);
+            m_layout->pushTextAttr(Layout::AttrSizeAbs, g_container->settings.fontPoints + inc * 2);
             processSiblings(node->child);
-            popTextAttr(2);
-            outputNl();
+            m_layout->popTextAttr(2);
+            m_layout->outputNl();
         } else if (strcasecmp(name, "b") == 0) {
-            pushTextAttr(AttrBold, 0);
+            m_layout->pushTextAttr(Layout::AttrBold, 0);
             processSiblings(node->child);
-            popTextAttr();
+            m_layout->popTextAttr();
         } else if (strcasecmp(name, "ul") == 0) {
-            pushTextAttr(AttrUnderline, 0);
+            m_layout->pushTextAttr(Layout::AttrUnderline, 0);
             processSiblings(node->child);
-            popTextAttr();
+            m_layout->popTextAttr();
         } else if (strcasecmp(name, "em") == 0) {
-            pushTextAttr(AttrItalics, 0);
+            m_layout->pushTextAttr(Layout::AttrItalics, 0);
             processSiblings(node->child);
-            popTextAttr();
+            m_layout->popTextAttr();
         } else if (strcasecmp(name, "img") == 0) {
             const char* src = mxmlElementGetAttr(node, "src");
             if (src) {
-                std::string img;
-                img = m_epub->getFile(src);
+                auto img = m_epub->getFile(src);
                 // TODO width, height, scale, ...
                 // pushImage(img, 0, index);
             }
@@ -79,9 +82,9 @@ void LayoutEpub::processNode(mxml_node_t* node)
     } else if (node->type == MXML_OPAQUE) {
         Log::trace(LOG_NAME, "found opaque");
         for (char* p = node->value.opaque; *p; ++p) {
-            outputChar(*p);
+            m_layout->outputChar(*p);
         }
-        flushText();
+        m_layout->flushText();
     }
 }
 
@@ -101,7 +104,7 @@ void LayoutEpub::append(mxml_node_t* tree)
     if (body) {
         // mxmlFindPath returns the first child node.  Ok, so processSiblings.
         processSiblings(body);
-        outputPageBreak();
+        m_layout->outputPageBreak();
     } else {
         Log::warn(LOG_NAME, "no body");
     }

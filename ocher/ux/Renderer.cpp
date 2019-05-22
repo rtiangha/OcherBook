@@ -5,6 +5,12 @@
 
 #include "ux/Renderer.h"
 
+#include "fmt/Layout.h"
+
+void Renderer::set(std::unique_ptr<Layout> layout)
+{
+    m_layout = std::move(layout);
+}
 
 #if 0
 void Renderer::pushOp(uint16_t op)

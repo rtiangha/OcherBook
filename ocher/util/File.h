@@ -1,8 +1,6 @@
 #ifndef OCHER_UTIL_FILE_H
 #define OCHER_UTIL_FILE_H
 
-#include "Buffer.h"
-
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -85,25 +83,6 @@ public:
      *  @throw  std::system_error on error (EOF is not an error)
      */
     uint32_t read(char* buffer, uint32_t numBytes);
-
-    /** Reads a line, up to any and including any line terminator.
-     *  @param keepEol Whether to keep or strip the end of line character, if any.
-     *  @param maxLen Maximum reasonable length (or 0 for unlimited); greater causes an exception
-     *  @throw std::system_error on error (EOF is not an error)
-     *  @throw BufferOverflowException if maxLen exceeded
-     */
-    std::string readLine(bool keepEol = false, size_t maxLen = 0);
-
-    /** Reads numBytes into buffer at offset.
-     *  @throw  std::system_error on error (EOF is not an error)
-     */
-    uint32_t read(Buffer& buffer, uint32_t numBytes, uint32_t offset = 0);
-
-    /** Reads and returns the remainder of the file, appending it to the string.
-     *  @param[out] b  Rest of file is appended to this buffer.
-     *  @throw  std::system_error on error (EOF is not an error)
-     */
-    void readRest(std::string& b);
 
     /** @throw  std::system_error
      */

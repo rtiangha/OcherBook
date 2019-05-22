@@ -15,6 +15,8 @@
 #include <json.hpp>
 
 #include <cassert>
+#include <fstream>
+#include <sstream>
 
 using nlohmann::json;
 
@@ -72,13 +74,11 @@ Settings::Settings(Filesystem& filesystem) :
 
 void Settings::load()
 {
-    File f;
-
-    if (f.setTo(m_filesystem.m_settings) != 0)
-        return;
-    std::string s;
-    f.readRest(s);
-    load(s);
+    std::ifstream file(m_filesystem.m_settings);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    if (file.good())
+        load(buffer.str());
 }
 
 void Settings::load(const std::string& data)

@@ -11,22 +11,20 @@
 #include <cctype>
 
 Layout::Layout() :
-    m_dataLen(0),
     nl(0),
     ws(0),
     pre(0),
-    m_buffer(new Buffer),
-    m_bufferLen(0)
+    m_buffer(new std::string)
 {
-    m_buffer->lockBuffer(chunk);
-    m_data.lockBuffer(chunk);
+    m_buffer->reserve(chunk);
+    m_data.reserve(chunk);
 }
 
 Layout::~Layout()
 {
     // Walk the bytecode and delete embedded strings
     const unsigned int N = m_data.size();
-    const char* raw = m_data.data();
+    const unsigned char* raw = m_data.data();
 
     for (unsigned int i = 0; i < N; ) {
         auto code = *(const uint16_t*)(raw + i);
@@ -34,49 +32,33 @@ Layout::~Layout()
         unsigned int opType = (code >> 12) & 0xf;
         unsigned int op = (code >> 8) & 0xf;
         if (opType == OpCmd && op == CmdOutputStr) {
-            delete *(Buffer* const*)(raw + i);
-            i += sizeof(Buffer*);
+            delete *(std::string* const*)(raw + i);
+            i += sizeof(std::string*);
         }
     }
 
     delete m_buffer;
 }
 
-Buffer Layout::unlock()
+void Layout::finish()
 {
     flushText();
     delete m_buffer;
     m_buffer = nullptr;
 
-    m_data.unlockBuffer(m_dataLen);
-    return m_data;
-}
-
-char* Layout::checkAlloc(unsigned int n)
-{
-    if (m_dataLen + n > m_data.size()) {
-        m_data.unlockBuffer(m_data.size());
-        m_data.lockBuffer(m_dataLen + n + chunk);
-    }
-    char* p = m_data.c_str() + m_dataLen;
-    m_dataLen += n;
-    return p;
+    m_data.shrink_to_fit();
 }
 
 void Layout::push(unsigned int opType, unsigned int op, unsigned int arg)
 {
-    char* p = checkAlloc(2);
-    uint16_t i = (opType << 12) | (op << 8) | arg;
-
-    *(uint16_t*)p = i;
+    m_data.push_back(arg);
+    m_data.push_back((opType << 4) | op);
 }
 
 void Layout::pushPtr(void* ptr)
 {
-    int n = sizeof(ptr);
-    char* p = checkAlloc(n);
-
-    *((char**)p) = (char*)ptr;
+    m_data.insert(m_data.end(), sizeof(char*), 0);
+    *((char**)(m_data.data() + m_data.size() - sizeof(char*))) = (char*)ptr;
 }
 
 void Layout::pushTextAttr(TextAttr attr, uint8_t arg)
@@ -106,10 +88,10 @@ void Layout::popLineAttr(unsigned int n)
 
 inline void Layout::_outputChar(char c)
 {
-    if (m_bufferLen == chunk) {
+    if (m_buffer->size() == m_buffer->capacity()) {
         flushText();
     }
-    (*m_buffer)[m_bufferLen++] = c;
+    m_buffer->push_back(c);
 }
 
 void Layout::outputChar(char c)
@@ -142,14 +124,13 @@ void Layout::outputBr()
 
 void Layout::flushText()
 {
-    if (m_bufferLen) {
+    if (m_buffer->size()) {
         push(OpCmd, CmdOutputStr, 0);
-        m_buffer->unlockBuffer(m_bufferLen);
+        m_buffer->shrink_to_fit();
         pushPtr(m_buffer);
         // m_buffer pointer is now owned by the layout bytecode.
-        m_buffer = new Buffer;
-        m_buffer->lockBuffer(chunk);
-        m_bufferLen = 0;
+        m_buffer = new std::string;
+        m_buffer->reserve(chunk);
     }
 }
 

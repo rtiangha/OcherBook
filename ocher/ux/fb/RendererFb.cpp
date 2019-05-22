@@ -53,7 +53,7 @@ void RendererFb::popAttrs()
     ai--;
 }
 
-int RendererFb::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
+int RendererFb::outputWrapped(std::string* b, unsigned int strOffset, bool doBlit)
 {
     unsigned int len = b->size();
     const char* start = b->data();
@@ -183,8 +183,8 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
     }
 
     int r = 1;
-    const unsigned int N = m_layout.size();
-    const char* raw = m_layout.data();
+    const unsigned int N = m_layout->size();
+    const auto raw = m_layout->data();
     ASSERT(layoutOffset <= N);
 
     applyAttrs();
@@ -267,9 +267,9 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                 break;
             case Layout::CmdOutputStr: {
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
-                ASSERT(i + sizeof(Buffer*) <= N);
+                ASSERT(i + sizeof(std::string*) <= N);
                 applyAttrs();
-                auto str = *(Buffer* const*)(raw + i);
+                auto str = *(std::string* const*)(raw + i);
                 ASSERT(strOffset <= str->size());
 #ifdef CPS_STATS
                 chars += str->length();          // miscounts UTF8...
@@ -283,7 +283,7 @@ int RendererFb::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                     r = 0;
                     goto done;
                 }
-                i += sizeof(Buffer*);
+                i += sizeof(std::string*);
                 break;
             }
             case Layout::CmdForcePage:

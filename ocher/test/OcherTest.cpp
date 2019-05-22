@@ -61,7 +61,7 @@ TEST_CASE("Battery Status", "[Battery]") {
 TEST_CASE("Detect format") {
     REQUIRE_RESOURCES_DIR;
 
-    Buffer fn;
+    std::string fn;
     Encoding enc;
     Fmt fmt;
 
@@ -95,7 +95,7 @@ TEST_CASE("Epub") {
         EpubBuilder() :
             m_root(make_unique<TreeDirectory>("."))
         {
-            Buffer data("application/epub+zip");
+            std::string data("application/epub+zip");
             m_root->createFile("mimetype", data);
         }
 
@@ -125,8 +125,7 @@ TEST_CASE("Epub") {
                     "<rootfile full-path=\"%s\" media-type=\"application/oebps-package+xml\"/>"
                     "</rootfiles>"
                     "</container>", contentOpfPath);
-            Buffer b(containerXml.c_str());
-            metaInfDir->createFile("container.xml", b);
+            metaInfDir->createFile("container.xml", containerXml);
         }
 
         void createContentOpf(TreeDirectory *containingDir, const char *title)
@@ -143,8 +142,7 @@ TEST_CASE("Epub") {
                     "    <spine toc=\"ncx\">"
                     "    </spine>"
                     "</package>", title);
-            Buffer b(contentOpf.c_str());
-            containingDir->createFile("content.opf", b);
+            containingDir->createFile("content.opf", contentOpf);
         }
 
         std::unique_ptr<TreeDirectory> m_root;

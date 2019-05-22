@@ -41,12 +41,10 @@ public:
     std::string getFile(const char* filename)
     {
         TreeFile* f = m_zip->getFile(filename, m_contentPath.c_str());
-        std::string b;
-
         if (f) {
-            b = f->data;
+            return f->data;
         }
-        return b;
+        return {};
     }
 
     int getSpineItemByIndex(unsigned int i, std::string& item);

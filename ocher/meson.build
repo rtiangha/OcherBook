@@ -18,8 +18,6 @@ ocher_sources = [
     'shelf/Meta.cpp',
     'shelf/Shelf.cpp',
     'util/Bitops.h',
-    'util/Buffer.cpp',
-    'util/Buffer.h',
     'util/Debug.cpp',
     'util/Debug.h',
     'util/DirIter.cpp',

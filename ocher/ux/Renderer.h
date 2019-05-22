@@ -6,8 +6,13 @@
 #ifndef OCHER_UX_RENDERER_H
 #define OCHER_UX_RENDERER_H
 
-#include "util/Buffer.h"
+#include "fmt/Layout.h"
 
+#include <cstdint>
+#include <memory>
+#include <vector>
+
+class Layout;
 class Pagination;
 
 /**
@@ -47,10 +52,7 @@ public:
         return true;
     }
 
-    virtual void set(Buffer layout)
-    {
-        m_layout = layout;
-    }
+    void set(std::unique_ptr<Layout> layout);
 
     /**
      * Render the page.
@@ -61,7 +63,7 @@ public:
     virtual int render(Pagination* pagination, unsigned int pageNum, bool doBlit) = 0;
 
 protected:
-    Buffer m_layout;
+    std::unique_ptr<Layout> m_layout;
 };
 
 #endif

@@ -110,11 +110,11 @@ void RendererFd::popAttrs()
     applyAttrs(-1);
 }
 
-int RendererFd::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
+int RendererFd::outputWrapped(std::string* b, unsigned int strOffset, bool doBlit)
 {
     unsigned int len = b->size();
-    auto start = (const unsigned char*)b->data();
-    auto p = start;
+    const char* start = b->data();
+    const char* p = start;
 
     ASSERT(strOffset <= len);
     len -= strOffset;
@@ -132,17 +132,17 @@ int RendererFd::outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit)
         }
 
         // How many chars should go out on this line?
-        const unsigned char* nl = nullptr;
+        const char* nl = nullptr;
         unsigned int n = w;
         if (w >= len) {
             n = len;
-            nl = (const unsigned char*)memchr(p, '\n', n);
+            nl = (const char*)memchr(p, '\n', n);
         } else {
-            nl = (const unsigned char*)memchr(p, '\n', n);
+            nl = (const char*)memchr(p, '\n', n);
             if (!nl) {
                 // don't break words
                 if (!isspace(*(p + n - 1)) && !isspace(*(p + n))) {
-                    auto space = (const unsigned char*)memrchr(p, ' ', n);
+                    auto space = (const char*)memrchr(p, ' ', n);
                     if (space) {
                         nl = space;
                     }
@@ -197,8 +197,8 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
         return -1;
     }
 
-    const unsigned int N = m_layout.size();
-    const char* raw = m_layout.data();
+    const unsigned int N = m_layout->size();
+    const auto raw = m_layout->data();
     ASSERT(layoutOffset < N);
     for (unsigned int i = layoutOffset; i < N; ) {
         ASSERT(i + 2 <= N);
@@ -271,8 +271,8 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                 break;
             case Layout::CmdOutputStr: {
                 Log::trace(LOG_NAME, "OpCmd CmdOutputStr");
-                ASSERT(i + sizeof(Buffer*) <= N);
-                auto str = *(Buffer* const*)(raw + i);
+                ASSERT(i + sizeof(std::string*) <= N);
+                auto str = *(std::string* const*)(raw + i);
                 ASSERT(strOffset <= str->size());
                 int breakOffset = outputWrapped(str, strOffset, doBlit);
                 strOffset = 0;
@@ -281,7 +281,7 @@ int RendererFd::render(Pagination* pagination, unsigned int pageNum, bool doBlit
                     Log::debug(LOG_NAME, "page %u break", pageNum);
                     return 0;
                 }
-                i += sizeof(Buffer*);
+                i += sizeof(std::string*);
                 break;
             }
             case Layout::CmdForcePage:

@@ -10,9 +10,9 @@
  * Represents a simple filesystem in memory.
  */
 
-#include "util/Buffer.h"
 #include "util/stdex.h"
 
+#include <cstring>
 #include <list>
 #include <string>
 
@@ -23,14 +23,14 @@ public:
     {
     }
 
-    TreeFile(const std::string& _name, Buffer& _data) :
+    TreeFile(const std::string& _name, const std::string& _data) :
         name(_name),
         data(_data)
     {
     }
 
     const std::string name;
-    Buffer data;
+    std::string data;
     // error
 };
 
@@ -53,7 +53,7 @@ public:
     std::list<std::unique_ptr<TreeDirectory>> subdirs;
     std::list<std::unique_ptr<TreeFile>> files;
 
-    TreeFile* createFile(const std::string& _name, Buffer& _data)
+    TreeFile* createFile(const std::string& _name, const std::string& _data = {})
     {
         TreeFile* file = getFile(_name);
 

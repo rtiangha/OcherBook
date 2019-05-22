@@ -10,7 +10,9 @@
  * Rough layout of a book.
  */
 
-#include "util/Buffer.h"
+#include <cstdint>
+#include <string>
+#include <vector>
 
 /**
  *  Contains the rough layout of the book's chapters in a file format independent and output device
@@ -82,14 +84,6 @@ public:
     Layout(const Layout& ) = delete;
     Layout& operator=(const Layout&) = delete;
 
-    // virtual void append(...) = 0;
-
-    /** Finishes and returns the laid-out internal buffer.
-     * @todo terrible API; buffer holds pointers, freed by the class
-     */
-    Buffer unlock();
-
-protected:
     void push(unsigned int opType, unsigned int op, unsigned int arg);
     void pushPtr(void* ptr);
 
@@ -98,24 +92,26 @@ protected:
     void pushLineAttr(LineAttr attr, uint8_t arg);
     void popLineAttr(unsigned int n = 1);
 
-    void _outputChar(char c);
     void outputChar(char c);
     void outputNl();
     void outputBr();
     void flushText();
     void outputPageBreak();
 
-    /** Ensure m_data can hold n additional bytes */
-    char* checkAlloc(unsigned int n);
+    void finish();
 
-    Buffer m_data;
-    unsigned int m_dataLen;
+    inline unsigned int size() const { return m_data.size(); }
+    inline const uint8_t* data() const { return m_data.data(); }
+
+protected:
+    void _outputChar(char c);
+
+    std::vector<uint8_t> m_data;
 
     int nl;
     int ws;
     int pre;
-    Buffer* m_buffer;
-    unsigned int m_bufferLen;
+    std::string* m_buffer;
 
     // Image* m_images[];
 

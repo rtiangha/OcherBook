@@ -1,7 +1,5 @@
 #include "util/File.h"
 
-#include "util/Buffer.h"
-
 #include <cassert>
 #include <cerrno>
 #include <cstdio>
@@ -242,81 +240,6 @@ uint32_t File::read(char* buf, uint32_t numBytes)
         }
     }
     return r;
-}
-
-std::string File::readLine(bool keepEol, size_t maxLen)
-{
-    if (!m_file) {
-        throw std::system_error(EINVAL, std::system_category(), "readLine");
-    }
-    uint32_t bytesRead = 0;
-    Buffer buf;
-    while (true) {
-        const size_t lineChunk = 2048;
-        char* tmpBuf = buf.lockBuffer(bytesRead + lineChunk);
-        tmpBuf += bytesRead;
-        char* r = fgets(tmpBuf, lineChunk, m_file);
-        if (r == nullptr) {
-            if (isEof()) {
-                break;
-            } else {
-                buf.unlockBuffer(bytesRead);
-                throw std::system_error(errno, std::system_category(), "fgets");
-            }
-        }
-        size_t len = strlen(r);
-        bytesRead += len;
-        if (tmpBuf[len - 1] != '\n') {
-            buf.unlockBuffer(bytesRead);
-            if (maxLen && len > maxLen)
-                throw std::overflow_error("readLine");
-        } else {
-            if (!keepEol) {
-                tmpBuf[len - 1] = '\0';
-                bytesRead--;
-            }
-            break;
-        }
-    }
-    buf.unlockBuffer(bytesRead);
-    return std::string(buf.c_str(), buf.length());
-}
-
-uint32_t File::read(Buffer& s, uint32_t numBytes, uint32_t offset)
-{
-    uint32_t received = 0;
-    char* buffer = s.lockBuffer(offset + numBytes);
-
-    try {
-        received = read(buffer + offset, numBytes);
-    } catch (...) {
-        s.unlockBuffer(offset + received);
-        throw;
-    }
-    s.unlockBuffer(offset + received);
-    return received;
-}
-
-void File::readRest(std::string& s)
-{
-    // Tempting to query size and prealloc that much, but some files in /proc claim 0 size.
-    const uint32_t maxChunk = 16384;
-    uint32_t offset = s.length();
-    uint32_t received = 0;
-    Buffer buf;
-
-    do {
-        char* buffer = buf.lockBuffer(offset + maxChunk);
-        try {
-            received = read(buffer + offset, maxChunk);
-        } catch (...) {
-            buf.unlockBuffer(offset);
-            throw;
-        }
-        offset += received;
-        buf.unlockBuffer(offset);
-    } while (received == maxChunk);
-    s.assign(buf.c_str(), buf.length());
 }
 
 void File::write(const char* buf, uint32_t numBytes)

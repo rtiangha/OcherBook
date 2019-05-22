@@ -10,7 +10,6 @@
 #include "ux/fb/NavBar.h"
 #include "ux/fb/SystemBar.h"
 
-class Layout;
 class Meta;
 class Renderer;
 
@@ -35,7 +34,6 @@ protected:
     SystemBar* m_systemBar = nullptr;
     NavBar* m_navBar = nullptr;
 
-    Layout* m_layout;
     Renderer* m_renderer;
     Meta* meta;
     int m_pageNum;

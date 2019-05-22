@@ -19,7 +19,7 @@ public:
     int render(Pagination* pagination, unsigned int pageNum, bool doBlit) override;
 
 protected:
-    int outputWrapped(Buffer* b, unsigned int strOffset, bool doBlit);
+    int outputWrapped(std::string* b, unsigned int strOffset, bool doBlit);
 
     int m_isTty;
 

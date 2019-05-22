@@ -81,7 +81,6 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     m_fb(c->getFrameBuffer()),
-    m_layout(nullptr),
     atEnd(1),
     m_pagesSinceRefresh(0)
 {
@@ -151,6 +150,7 @@ void ReadActivityFb::onAttached()
 {
     Log::info(LOG_NAME, "attached");
 
+    m_renderer = m_uxController->getRenderer();
     meta = m_uxController->ctx.selected;
     ASSERT(meta);
     Log::debug(LOG_NAME, "selected %p", meta);
@@ -159,38 +159,32 @@ void ReadActivityFb::onAttached()
 
     m_fb->clear();
 
-    ASSERT(m_layout == nullptr);
-    Buffer memLayout;
     const char* file = meta->relPath.c_str();
     Log::info(LOG_NAME, "Loading %s: %s", Meta::fmtToStr(meta->format), file);
     switch (meta->format) {
     case OCHER_FMT_TEXT: {
         Text text(file);
-        m_layout = new LayoutText(&text);
-        memLayout = m_layout->unlock();
+        LayoutText layout(&text);
+        m_renderer->set(layout.finish());
         break;
     }
 #ifdef FMT_EPUB
     case OCHER_FMT_EPUB: {
         Epub epub(file);
-        m_layout = new LayoutEpub(&epub);
+        LayoutEpub layout(&epub);
         std::string html;
         for (int i = 0;; i++) {
             if (epub.getSpineItemByIndex(i, html) != 0)
                 break;
-#if 1
             mxml_node_t* tree = epub.parseXml(html);
             if (tree) {
-                static_cast<LayoutEpub*>(m_layout)->append(tree);
+                layout.append(tree);
                 mxmlDelete(tree);
             } else {
                 Log::warn(LOG_NAME, "No tree found for spine item %d", i);
             }
-#else
-            ((LayoutEpub*)m_layout)->append(html);
-#endif
         }
-        memLayout = m_layout->unlock();
+        m_renderer->set(layout.finish());
         break;
     }
 #endif
@@ -198,9 +192,6 @@ void ReadActivityFb::onAttached()
         Log::warn(LOG_NAME, "Unhandled format %d", meta->format);
     }
     }
-
-    m_renderer = m_uxController->getRenderer();
-    m_renderer->set(memLayout);
 
     // Optionally, run through all pages without blitting to get an accurate
     // page count.  Alternative is to do some sort of "idealize" page layout that might be faster.
@@ -230,9 +221,4 @@ void ReadActivityFb::onDetached()
     Log::info(LOG_NAME, "Quitting on page %u", m_pageNum);
 
     meta->record.activePage = m_pageNum;
-
-    if (m_layout) {
-        delete m_layout;
-        m_layout = nullptr;
-    }
 }

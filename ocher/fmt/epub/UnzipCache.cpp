@@ -5,7 +5,6 @@
 
 #include "fmt/epub/UnzipCache.h"
 
-#include "util/Buffer.h"
 #include "util/Logger.h"
 #include "util/Path.h"
 
@@ -88,7 +87,6 @@ int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
         }
     }
 
-    Buffer buffer;
     std::string filename;
     TreeFile* tfile = nullptr;
 
@@ -102,7 +100,7 @@ int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
                 if (*p) {
                     root = root->createDirectory(name);
                 } else {
-                    tfile = root->createFile(name, buffer);
+                    tfile = root->createFile(name);
                     filename = name;
                     Log::trace(LOG_NAME, "Creating file %s", filename.c_str());
                 }
@@ -115,7 +113,7 @@ int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
     }
 
     if (tfile) {
-        char* buf = buffer.lockBuffer(file_info.uncompressed_size);
+        tfile->data.resize(file_info.uncompressed_size);
 
         err = unzOpenCurrentFilePassword(m_uf, m_password.empty() ? nullptr : m_password.c_str());
         if (err != UNZ_OK) {
@@ -124,14 +122,12 @@ int UnzipCache::unzipFile(const char* pattern, std::string* matchedName)
             Log::trace(LOG_NAME, "extracting: %s", pathname);
 
             do {
-                err = unzReadCurrentFile(m_uf, buf, buffer.size());
+                err = unzReadCurrentFile(m_uf, (void*)tfile->data.data(), tfile->data.size());
                 if (err < 0) {
                     Log::error(LOG_NAME, "unzReadCurrentFile: %d", err);
                 }
             } while (err > 0);
         }
-        buffer.unlockBuffer(file_info.uncompressed_size);
-        tfile->data = buffer;
 
         if (err == UNZ_OK) {
             err = unzCloseCurrentFile(m_uf);
