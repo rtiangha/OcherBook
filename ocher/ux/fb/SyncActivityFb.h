@@ -16,6 +16,8 @@ class SyncActivityFb : public ActivityFb {
 public:
     SyncActivityFb(UxControllerFb* c, Filesystem& fileystem);
 
+    EventDisposition evtKey(const struct OcherKeyEvent*) override;
+
 protected:
     void onAttached() override;
     void onDetached() override;

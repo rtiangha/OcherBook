@@ -19,6 +19,7 @@
 
 #define LOG_NAME "ocher.ux.Sync"
 
+class InterruptedException {};
 
 class SyncActivityWork : public EventWork {
 public:
@@ -35,9 +36,15 @@ public:
         join();
     }
 
+    void interrupt()
+    {
+        m_interrupted = true;
+    }
+
 protected:
     std::vector<std::string> m_files;
     UxControllerFb* m_uxController;
+    bool m_interrupted = false;
 
     void work() override;
     void notifyComplete() override;
@@ -49,8 +56,13 @@ void SyncActivityWork::work()
 {
     Log::info(LOG_NAME "Work", "working");
 
-    for (const auto& file : m_files) {
-        processFile(file);
+    try {
+        for (const auto& file : m_files) {
+            processFile(file);
+        }
+    } catch (InterruptedException&)
+    {
+        Log::info(LOG_NAME "Work", "interrupted");
     }
 
     Log::info(LOG_NAME "Work", "done working");
@@ -65,6 +77,10 @@ void SyncActivityWork::processFile(const std::string& f)
 {
     struct stat s;
     const char* file = f.c_str();
+
+    if (m_interrupted) {
+        throw InterruptedException();
+    }
 
     if (stat(file, &s)) {
         Log::warn(LOG_NAME, "%s: stat: %s", file, strerror(errno));
@@ -113,6 +129,19 @@ SyncActivityFb::SyncActivityFb(UxControllerFb* c, Filesystem& filesystem) :
     addChild(std::move(spinner));
 }
 
+EventDisposition SyncActivityFb::evtKey(const struct OcherKeyEvent* evt)
+{
+    if (evt->subtype == OEVT_KEY_DOWN) {
+        if (evt->key == OEVTK_HOME) {
+            if (m_work) {
+                m_work->interrupt();
+                return EventDisposition::Handled;
+            }
+        }
+    }
+    return EventDisposition::Pass;
+}
+
 void SyncActivityFb::onAttached()
 {
     Log::info(LOG_NAME, "attached");
@@ -135,6 +164,7 @@ void SyncActivityFb::onDetached()
     // TODO:  Can be detached not due to work finishing, but being
     // forced out, eg, power saver.  Pause work, don't delete.
     delete m_work;
+    m_work = nullptr;
     m_spinner->stop();
 
     m_uxController->ctx.library.notify();
