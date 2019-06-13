@@ -16,7 +16,6 @@ public:
 
 protected:
     EventDisposition evtMouse(const struct OcherMouseEvent*) override;
-    void onAttached() override;
     void drawContent(const Rect* rect) override;
 
     void browseButtonPressed();

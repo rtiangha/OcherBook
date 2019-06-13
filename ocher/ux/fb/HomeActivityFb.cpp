@@ -53,6 +53,12 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
     systemBar->m_sep = false;
     systemBar->setTitle("HOME");
     addChild(std::move(systemBar));
+
+    auto button = make_unique<Button>("Browse all...");
+    button->m_flags |= WIDGET_BORDERLESS;
+    button->setPos(m_rect.x + m_rect.w - button->rect().w - dx, 575);
+    button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
+    addChild(std::move(button));
 }
 
 EventDisposition HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
@@ -169,19 +175,6 @@ void HomeActivityFb::drawContent(const Rect* rect)
     fb->setFg(0xff, 0xff, 0xff);
     fb->fillRect(&popup);
 #endif
-}
-
-void HomeActivityFb::onAttached()
-{
-    Log::info(LOG_NAME, "attached");
-
-    int dx = g_container->settings.smallSpace;
-
-    auto button = make_unique<Button>("Browse all...");
-    button->m_flags |= WIDGET_BORDERLESS;
-    button->setPos(m_rect.x + m_rect.w - button->rect().w - dx, 575);
-    button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
-    addChild(std::move(button));
 }
 
 void HomeActivityFb::browseButtonPressed()
