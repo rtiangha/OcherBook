@@ -26,7 +26,11 @@ struct FontFace {
 
 class FontContext {
 public:
-    FontContext(unsigned int dpi);
+    inline FontContext& setDPI(unsigned int dpi)
+    {
+        m_dpi = dpi;
+        return *this;
+    }
 
     FontContext& setPoints(int points);
 

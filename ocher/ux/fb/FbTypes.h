@@ -14,12 +14,16 @@
 
 
 struct Rect {
-    int16_t x, y;
-    uint16_t w, h;
+    int16_t x = 0;
+    int16_t y = 0;
+    uint16_t w = 0;
+    uint16_t h = 0;
 
-    Rect()
+    Rect() = default;
+
+    Rect(const Pos& pos)
     {
-        setInvalid();
+        setPos(pos);
     }
 
     Rect(int16_t _x, int16_t _y, uint16_t _w, uint16_t _h) :
@@ -30,20 +34,37 @@ struct Rect {
     {
     }
 
-    const Pos* pos() const
+    void setPos(const Pos& pos)
     {
-        return reinterpret_cast<const Pos*>(this);
+        x = pos.x;
+        y = pos.y;
     }
 
-    void offsetBy(const Pos* p)
+    const Pos pos() const
     {
-        x += p->x;
-        y += p->y;
+        return {x, y};
     }
 
-    void unionRect(const Rect* r);
+    Pos below() const
+    {
+        return {x, y + h};
+    }
 
-    void unionRects(const Rect* r1, const Rect* r2);
+    void offsetBy(const Pos& p)
+    {
+        x += p.x;
+        y += p.y;
+    }
+
+    void grow(int dx, int dy)
+    {
+        w += dx;
+        h += dy;
+    }
+
+    void unionRect(const Rect& r);
+
+    void unionRects(const Rect& r1, const Rect& r2);
 
     bool intersects(const Rect& r) const
     {
@@ -61,9 +82,9 @@ struct Rect {
         return x + w >= 0 && y + h >= 0;
     }
 
-    void setInvalid()
+    void clear()
     {
-        x = y = -1;
+        x = y = 0;
         w = h = 0;
     }
 

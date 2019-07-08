@@ -71,6 +71,7 @@ protected:
 
     Rect m_rect;
     std::vector<std::unique_ptr<Widget>> m_children;
+    // TODO focus
 };
 
 
@@ -81,9 +82,10 @@ protected:
 class Widget {
 public:
     Widget();
-
     Widget(int x, int y, unsigned int w, unsigned int h);
-
+    Widget(const Widget&) = delete;
+    Widget& operator=(Widget&&);
+    Widget& operator=(const Widget&) = delete;
     virtual ~Widget() = default;
 
     void addChild(std::unique_ptr<Widget> child);
@@ -103,10 +105,9 @@ public:
         invalidate();
     }
 
-    virtual void setPos(int x, int y)
+    virtual void setPos(const Pos& pos)
     {
-        m_rect.x = x;
-        m_rect.y = y;
+        m_rect.setPos(pos);
     }
 
     void resize(int dx, int dy);
@@ -159,7 +160,6 @@ protected:
     FbScreen* m_screen;
     Widget* m_parent;
     std::vector<std::unique_ptr<Widget>> m_children;
-    // TODO focus
 };
 
 #define OWF_CLOSE 1
@@ -218,8 +218,8 @@ protected:
 
 class Label : public Widget {
 public:
-    Label();
-    Label(const char* label, int points = 0);
+    Label(const char* label = "", int points = 0);
+    Label(Label&&);
 
     void setLabel(const char* label, int points = 0);
     void draw() override;
@@ -237,7 +237,9 @@ public:
     Button(const char* label, int points = 0);
     ~Button() = default;
 
-    void setPos(int x, int y) override;
+    void setPos(const Pos& pos) override;
+    void setBorder(bool border);
+    void setPad(int points);
     void setBitmap(const Bitmap& bitmap);
     void setLabel(const char* label, int points = 0);
 
@@ -257,6 +259,7 @@ protected:
 
     Icon m_icon;
     Label m_label;
+    int m_pad;
 
     bool m_mouseDown = false;
 
@@ -266,24 +269,35 @@ protected:
 
 class Menu : public Widget {
 public:
+    Menu() = delete;
     Menu(int x, int y);
+    Menu(const Menu&) = delete;
+    Menu& operator=(const Menu&) = delete;
     ~Menu();
+
+    void addItem(const char* text);
 
     void draw() final override;
 
+    //EventDisposition evtMouse(const struct OcherMouseEvent*) override;
+
     struct Item {
-        std::string text;
+        Button* label;
     };
 
     Signal1<const Item&> selected;
 
-    std::vector<Item> m_items;
-
 protected:
+    std::vector<Item> m_items;
     Button* m_tab;
     bool m_open = false;
+    Rect m_closedRect;
+    Rect m_openRect;
 
+    void tabPressed();
+    void itemSelected();
     void open();
+    void close();
 };
 
 /**

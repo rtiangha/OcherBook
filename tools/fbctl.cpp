@@ -132,7 +132,7 @@ int main(int argc, char** argv)
             w->setTitle("Test Window");
             w->maximize();
             auto button = make_unique<Button>("Press me!");
-            button->setPos(200, 200);
+            button->setPos({200, 200});
             button->pressed.Connect(stopLoop);
             w->addChild(std::move(button));
             screen.addChild(std::move(w));

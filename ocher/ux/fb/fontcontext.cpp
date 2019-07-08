@@ -40,11 +40,6 @@ static const char* ttfFiles[] = {
 #endif
 };
 
-FontContext::FontContext(unsigned int dpi) :
-    m_dpi(dpi)
-{
-}
-
 bool FontContext::setFace(FontEngine& engine, const FontFace& face)
 {
     std::string file = g_container->settings.fontRoot;

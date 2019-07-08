@@ -72,39 +72,39 @@ void memOr(void* dst, const void* src, size_t n)
     }
 }
 
-void Rect::unionRect(const Rect* r)
+void Rect::unionRect(const Rect& r)
 {
     if (!valid()) {
-        *this = *r;
+        *this = r;
         return;
     }
-    if (!r->valid()) {
+    if (!r.valid()) {
         return;
     }
-    int x1 = std::min(x, r->x);
-    int y1 = std::min(y, r->y);
-    int x2 = std::max(x + w, r->x + r->w);
-    int y2 = std::max(y + h, r->y + r->h);
+    int x1 = std::min(x, r.x);
+    int y1 = std::min(y, r.y);
+    int x2 = std::max(x + w, r.x + r.w);
+    int y2 = std::max(y + h, r.y + r.h);
     x = x1;
     y = y1;
     w = x2 - x1;
     h = y2 - y1;
 }
 
-void Rect::unionRects(const Rect* r1, const Rect* r2)
+void Rect::unionRects(const Rect& r1, const Rect& r2)
 {
-    if (!r1->valid()) {
-        *this = *r2;
+    if (!r1.valid()) {
+        *this = r2;
         return;
     }
-    if (!r2->valid()) {
-        *this = *r1;
+    if (!r2.valid()) {
+        *this = r1;
         return;
     }
-    x = std::min(r1->x, r2->x);
-    y = std::min(r1->y, r2->y);
-    w = std::max(r1->x + r1->w, r2->x + r2->w) - x;
-    h = std::max(r1->y + r1->h, r2->y + r2->h) - y;
+    x = std::min(r1.x, r2.x);
+    y = std::min(r1.y, r2.y);
+    w = std::max(r1.x + r1.w, r2.x + r2.w) - x;
+    h = std::max(r1.y + r1.h, r2.y + r2.h) - y;
 }
 
 void FrameBuffer::line(int x0, int y0, int x1, int y1)

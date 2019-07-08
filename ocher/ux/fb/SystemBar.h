@@ -22,8 +22,6 @@ protected:
     void drawContent(const Rect*) override;
 
     FrameBuffer* m_fb;
-
-    Menu* m_menu;
 };
 
 #endif

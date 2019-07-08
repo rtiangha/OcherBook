@@ -67,8 +67,8 @@ FontContext FontEngine::context()
 
 FontContext FontEngine::context(const FontFace& face)
 {
-    auto fc = FontContext(m_fb->ppi());
-    return fc.apply(*this, face);
+    FontContext fc;
+    return fc.setDPI(m_fb->ppi()).apply(*this, face);
 }
 
 void FontEngine::scanForFonts()
@@ -180,7 +180,7 @@ unsigned int FontEngine::renderString(const FontContext& fc, const char* str, un
     bool wordWrapped = false;
 
     if (bbox)
-        bbox->setInvalid();
+        bbox->clear();
 
     if (!(flags & FE_YCLIP) && pen->y >= r->h - fc.descender()) {
         return 0;
@@ -219,7 +219,7 @@ unsigned int FontEngine::renderString(const FontContext& fc, const char* str, un
                 return p - str;
             wordBox.y -= fc.ascender();
             if (bbox)
-                bbox->unionRect(&wordBox);
+                bbox->unionRect(wordBox);
 
             // Fits; render it and advance
             if (flags & FE_NOBLIT) {

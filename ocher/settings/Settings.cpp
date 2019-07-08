@@ -42,24 +42,8 @@ const char* Settings::SleepShowToString(SleepShow s)
 }
 
 Settings::Settings(Filesystem& filesystem) :
-    secureLevel(SecureLevel::Open),
-    trackReading(0),
-    minutesUntilSleep(15),
-    sleepShow(SleepShow::Sleeping),
     sleepHtml("<center>Custom sleep message</center>"),
-    minutesUntilPowerOff(60),
     powerOffHtml("<center>Off</center>"),
-    wirelessPrompt(0),
-    fullRefreshPages(6),
-    showPageNumbers(1),
-    fontPoints(10),
-    marginTop(10),
-    marginBottom(10),
-    marginLeft(10),
-    marginRight(10),
-    smallSpace(10),
-    medSpace(15),
-    largeSpace(30),
     m_filesystem(filesystem)
 {
     // TODO  Find these dynamically

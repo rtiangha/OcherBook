@@ -35,11 +35,26 @@ Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     assert(g_screen != nullptr);
 }
 
+Widget& Widget::operator=(Widget&& other)
+{
+    if (this != &other)
+    {
+        m_rect = other.m_rect;
+        m_screen = other.m_screen;
+        m_parent = other.m_parent;
+        m_children = std::move(other.m_children);
+        other.m_parent = nullptr;
+        other.m_screen = nullptr;
+    }
+    return *this;
+}
+
 void Widget::addChild(std::unique_ptr<Widget> child)
 {
     auto widget = child.get();
     m_children.push_back(std::move(child));
     widget->onAttached();
+    widget->m_parent = this;
     if (!(widget->m_flags & WIDGET_HIDDEN)) {
         widget->invalidate();
     }
@@ -51,6 +66,7 @@ void Widget::removeChild(Widget* widget)
         if (it->get() == widget) {
             widget->onDetached();
             m_children.erase(it);
+            widget->m_parent = nullptr;
             break;
         }
     }
@@ -72,10 +88,10 @@ Rect Widget::drawChildren()
             if (w->m_flags & WIDGET_DIRTY) {
                 w->draw();
                 w->m_flags &= ~WIDGET_DIRTY;
-                drawn.unionRect(&w->m_rect);
+                drawn.unionRect(w->m_rect);
             }
             Rect r = w->drawChildren();
-            drawn.unionRect(&r);
+            drawn.unionRect(r);
         }
     }
     return drawn;
@@ -178,15 +194,21 @@ void Icon::draw()
 }
 
 
-Label::Label() :
-    m_fc(m_screen->fe->context())
-{
-}
-
 Label::Label(const char* label, int points) :
     m_fc(m_screen->fe->context())
 {
     setLabel(label, points);
+}
+
+Label::Label(Label&& other)
+{
+    Widget::operator =(std::move(other));
+
+    m_fc = other.m_fc;
+    m_glyphs = other.m_glyphs;
+    m_points = other.m_points;
+
+    other.m_glyphs.clear();
 }
 
 void Label::setLabel(const char* label, int points)
@@ -207,19 +229,34 @@ Button::Button(int x, int y, const char* label) :
     Widget(x, y, 0, 0),
     m_label(label)
 {
-    calcSize();
+    setPad(g_container->settings.systemFontPoints / 2);
 }
 
 Button::Button(int x, int y, const Bitmap& bitmap) :
     Widget(x, y, bitmap.w, bitmap.h)
 {
+    setPad(g_container->settings.systemFontPoints / 2);
     setBitmap(bitmap);
-    calcSize();
 }
 
 Button::Button(const char* label, int points) :
     m_label(label, points)
 {
+    setPad(points / 2);
+}
+
+void Button::setBorder(bool border)
+{
+    if (border)
+        m_flags &= ~WIDGET_BORDERLESS;
+    else
+        m_flags |= WIDGET_BORDERLESS;
+    calcSize();
+}
+
+void Button::setPad(int points)
+{
+    m_pad = points * m_screen->fb->ppi() / 72;
     calcSize();
 }
 
@@ -236,29 +273,28 @@ void Button::setLabel(const char* label, int points)
 }
 
 // TODO this goes away with real layout
-void Button::setPos(int x, int y)
+void Button::setPos(const Pos& pos)
 {
-    m_rect.x = x;
-    m_rect.y = y;
+    m_rect.x = pos.x;
+    m_rect.y = pos.y;
     calcSize();
 }
 
 // TODO this goes away with real layout
 void Button::calcSize()
 {
-    const auto pad = g_container->settings.smallSpace;
-
     m_rect.w = m_rect.h = 0;
 
-    m_icon.setPos(m_rect.x + pad, m_rect.y + pad);
-    m_rect.unionRect(&m_icon.rect());
-    // XXX padding is wrong; more generic packing
+    if (m_icon.rect().w > 0) {
+        m_icon.setPos({m_rect.x + m_pad, m_rect.y + m_pad});
+        m_rect.unionRect(m_icon.rect());
+    }
 
-    m_label.setPos(m_rect.x + m_rect.w + pad, m_rect.y + pad);
-    m_rect.unionRect(&m_label.rect());
+    m_label.setPos({m_rect.x + m_rect.w + m_pad, m_rect.y + m_pad});
+    m_rect.unionRect(m_label.rect());
 
-    m_rect.w += pad;
-    m_rect.h += pad;
+    m_rect.w += m_pad;
+    m_rect.h += m_pad;
 }
 
 void Button::draw()
@@ -320,46 +356,105 @@ void Button::timeoutCb(EV_P_ ev_timer* w, int revents)
 
 Menu::Menu(int x, int y)
 {
-    auto tab = make_unique<Button>(x, y, "X");
-    tab->m_flags |= WIDGET_BORDERLESS;
-    tab->pressed.Connect(this, &Menu::open);
+    auto tab = make_unique<Button>(x + 1, y + 1, "X");
+    tab->setBorder(false);
+    tab->pressed.Connect(this, &Menu::tabPressed);
     m_tab = tab.get();
     addChild(std::move(tab));
 
-    m_rect = m_tab->rect();
+    m_closedRect = m_tab->rect();
+    m_closedRect.inset(-1);
+    m_rect = m_closedRect;
 }
 
 Menu::~Menu()
 {
-    m_tab->pressed.Disconnect(this, &Menu::open);
+    m_tab->pressed.Disconnect(this, &Menu::tabPressed);
+    for (auto& item : m_items) {
+        item.label->pressed.Disconnect(this, &Menu::itemSelected);
+    }
 }
 
 void Menu::open()
 {
-    m_open = !m_open;
+    Log::info(LOG_NAME ".menu", "open");
+    m_open = true;
     m_screen->invalidate(rect());
+    m_rect = m_openRect;
+
+    for (auto& item : m_items) {
+        item.label->show();
+    }
+}
+
+void Menu::close()
+{
+    Log::info(LOG_NAME ".menu", "close");
+    m_open = false;
+    m_screen->invalidate(rect());
+    m_rect = m_closedRect;
+
+    for (auto& item : m_items) {
+        item.label->hide();
+    }
+}
+
+void Menu::tabPressed()
+{
+    if (m_open)
+        close();
+    else
+        open();
+}
+
+void Menu::itemSelected()
+{
+    Log::info(LOG_NAME ".menu", "selected");
+    // TODO which?
+}
+
+void Menu::addItem(const char* text)
+{
+    const auto& settings = g_container->settings;
+
+    auto label = make_unique<Button>(text, settings.systemFontPoints);
+    label->setBorder(false);
+    label->setPad(0);
+    label->pressed.Connect(this, &Menu::itemSelected);
+    label->hide();
+    Item item;
+    item.label = label.get();
+    m_items.push_back(item);
+    addChild(std::move(label));
+
+    const auto fc = m_screen->fe->context();
+    Rect r{m_tab->rect()};
+    Pos pos = r.below();
+    pos.x += settings.smallSpace;
+    pos.y += settings.smallSpace;
+    for (auto& item : m_items) {
+        // TODO make all widths the same
+        item.label->setPos(pos);
+        r.unionRect(item.label->rect());
+        pos.y += fc.lineHeight();
+    }
+    r.grow(settings.smallSpace, fc.descender() + settings.smallSpace);
+    m_openRect = r;
 }
 
 void Menu::draw()
 {
     if (m_open) {
-        // TODO  VBox of Labels
-        Rect r(m_rect);
-        r.y += m_tab->rect().h;
-        r.w = r.h = 0;
+        // TODO draw non-rectangular outline around tab and menu
 
-        const auto& settings = g_container->settings;
-        auto fe = m_screen->fe;
-        const auto fc = fe->context();
-
-        Pos pos;
-        pos.x = r.x + settings.smallSpace;
-        pos.y = r.y + settings.smallSpace + fc.ascender();
-        for (const auto& item : m_items) {
-            auto bbox = fe->blitString(fc, item.text.c_str(), item.text.length(), &pos);
-            r.unionRect(&bbox);
-        }
+        auto fb = m_screen->fb;
+        fb->setFg(0xff, 0xff, 0xff);
+        fb->fillRect(&m_openRect);
+        fb->setFg(0, 0, 0);
+        fb->rect(&m_openRect);
     }
+
+    drawChildren();
 }
 
 Spinner::Spinner() :
@@ -526,10 +621,10 @@ void FbScreen::update()
             if (w->m_flags & WIDGET_DIRTY) {
                 w->draw();
                 w->m_flags &= ~WIDGET_DIRTY;
-                drawn.unionRect(&w->rect());
+                drawn.unionRect(w->rect());
             }
             Rect r = w->drawChildren();
-            drawn.unionRect(&r);
+            drawn.unionRect(r);
         }
     }
 

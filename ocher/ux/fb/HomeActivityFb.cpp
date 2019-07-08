@@ -56,7 +56,7 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
 
     auto button = make_unique<Button>("Browse all...");
     button->m_flags |= WIDGET_BORDERLESS;
-    button->setPos(m_rect.x + m_rect.w - button->rect().w - dx, 575);
+    button->setPos({m_rect.x + m_rect.w - button->rect().w - dx, 575});
     button->pressed.Connect(this, &HomeActivityFb::browseButtonPressed);
     addChild(std::move(button));
 }

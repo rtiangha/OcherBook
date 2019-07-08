@@ -10,17 +10,17 @@ NavBar::NavBar() :
     m_fb(m_screen->fb)
 {
     const int height = 50;
-    auto top = m_fb->yres() - height;
+    int top = m_fb->yres() - height;
     setRect(0, top, m_fb->xres(), height);
 
     auto button = make_unique<Button>("<<");
     m_backButton = button.get();
-    button->setPos(20, top + 5);
+    button->setPos({20, top + 5});
     addChild(std::move(button));
 
     button = make_unique<Button>(">>");
     m_forwardButton = button.get();
-    button->setPos(m_backButton->rect().x + m_backButton->rect().w + 20, top + 5);
+    button->setPos({m_backButton->rect().x + m_backButton->rect().w + 20, top + 5});
     addChild(std::move(button));
 }
 

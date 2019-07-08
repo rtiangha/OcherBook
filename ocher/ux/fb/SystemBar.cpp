@@ -20,15 +20,16 @@ SystemBar::SystemBar(Battery& battery) :
 
     m_flags |= WIDGET_BORDERLESS;
 
-    addChild(make_unique<BatteryIcon>(g_container->settings.smallSpace, 0, battery));
-
-    addChild(make_unique<ClockIcon>(m_fb->xres() - 50, 0));
-
     auto menu = make_unique<Menu>(0, 0);
-    menu->m_items.push_back({"Library"});
-    menu->m_items.push_back({"Settings"});
-    m_menu = menu.get();
+    menu->addItem("Library");
+    menu->addItem("Settings");
     addChild(std::move(menu));
+
+    addChild(make_unique<ClockIcon>(m_fb->xres() / 2, 0));
+
+    auto batteryIcon = make_unique<BatteryIcon>(0, 0, battery);
+    batteryIcon->setPos({m_fb->xres() - batteryIcon->rect().w, 0});
+    addChild(std::move(batteryIcon));
 
     // TODO title label, centered
 }
@@ -36,8 +37,6 @@ SystemBar::SystemBar(Battery& battery) :
 
 void SystemBar::drawContent(const Rect* r)
 {
-    m_fb->setFg(0xff, 0xff, 0xff);
-    m_fb->fillRect(r);
     if (m_sep) {
         m_fb->setFg(0, 0, 0);
         m_fb->hline(r->x, r->y + r->h - 1, r->x + r->w - 1);

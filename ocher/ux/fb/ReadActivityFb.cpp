@@ -57,8 +57,7 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 m_systemBar->show();
                 m_navBar->show();
             } else {
-                Log::info(LOG_NAME, "interact bar");
-                // TODO interact
+                return EventDisposition::Pass;
             }
         } else {
             if (!(m_systemBar->m_flags & WIDGET_HIDDEN)) {

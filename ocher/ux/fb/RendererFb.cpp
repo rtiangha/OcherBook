@@ -27,12 +27,12 @@
 RendererFb::RendererFb(FrameBuffer* fb, FontEngine* fe) :
     m_fb(fb),
     m_fe(fe),
-    m_fc(fb->ppi()),
     m_settings(g_container->settings),
     m_penX(m_settings.marginLeft),
     m_penY(m_settings.marginTop),
     ai(0)
 {
+    m_fc.setDPI(fb->ppi());
 }
 
 bool RendererFb::init()

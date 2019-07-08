@@ -18,12 +18,7 @@
 
 class TreeFile {
 public:
-    TreeFile(const std::string& _name) :
-        name(_name)
-    {
-    }
-
-    TreeFile(const std::string& _name, const std::string& _data) :
+    TreeFile(const std::string& _name, const std::string& _data={}) :
         name(_name),
         data(_data)
     {
@@ -36,11 +31,6 @@ public:
 
 class TreeDirectory {
 public:
-    TreeDirectory(const char* _name) :
-        name(_name)
-    {
-    }
-
     TreeDirectory(const std::string& _name) :
         name(_name)
     {

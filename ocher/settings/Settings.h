@@ -57,7 +57,7 @@ public:
      * - `private`:  Like `personal`, but wake-after-sleep also requires password to access your
      *   metadata.
      */
-    SecureLevel secureLevel;
+    SecureLevel secureLevel = SecureLevel::Open;
 
     /** Track reading events?  Some people like a log of the books they have read.
      *
@@ -67,7 +67,7 @@ public:
      * - `finish-books`: Only track when a book is finished.
      * - `all-books`: Track whenever a book is read or finished.
      */
-    int trackReading;
+    int trackReading = 0;
 
     /** Minutes of inactivity until sleep.
      *
@@ -75,7 +75,7 @@ public:
      *
      * - `0`: Never sleep
      */
-    unsigned int minutesUntilSleep;
+    unsigned int minutesUntilSleep = 15;
 
     /** What to show while sleeping.
      *
@@ -86,7 +86,7 @@ public:
      * - `cover`: Show the cover of the most recent book.
      * - `blank`:  Blank the screen completely.
      */
-    SleepShow sleepShow;
+    SleepShow sleepShow = SleepShow::Sleeping;
 
     /** Custom HTML to show when sleeping.
      *
@@ -100,7 +100,7 @@ public:
      *
      * - `0`: Never automatically power-off.
      */
-    unsigned int minutesUntilPowerOff;
+    unsigned int minutesUntilPowerOff = 60;
 
     /**
      */
@@ -116,28 +116,28 @@ public:
 
     /** Prompt before using wireless?  So-called airplane mode.
      */
-    int wirelessPrompt;
+    bool wirelessPrompt = false;
 
     /**
      */
-    unsigned int fullRefreshPages;
+    unsigned int fullRefreshPages = 6;
 
     /**
      */
-    int showPageNumbers;
+    bool showPageNumbers = true;
 
     int systemFontPoints = 12;
+    int fontPoints = 10;
 
-    int fontPoints;
     // force font
     // force font size
     // line spacing
-    int marginTop;
-    int marginBottom;
-
-    int marginLeft;
-    int marginRight;
     // justification
+
+    int marginTop = 10;
+    int marginBottom = 10;
+    int marginLeft = 10;
+    int marginRight = 10;
 
     // icons
 
@@ -145,9 +145,9 @@ public:
     std::string fontRoot;
 
     // UI scaling
-    int smallSpace;
-    int medSpace;
-    int largeSpace;
+    int smallSpace = 10;
+    int medSpace = 15;
+    int largeSpace = 30;
 
     // home page arrangement
 
