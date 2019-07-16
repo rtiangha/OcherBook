@@ -79,17 +79,17 @@ void FrameBufferSdl::setBg(uint8_t r, uint8_t b, uint8_t g)
     m_bgColor = getColor(r, b, g);
 }
 
-inline unsigned int FrameBufferSdl::yres()
+inline int FrameBufferSdl::yres()
 {
     return m_screen->h;
 }
 
-inline unsigned int FrameBufferSdl::xres()
+inline int FrameBufferSdl::xres()
 {
     return m_screen->w;
 }
 
-unsigned int FrameBufferSdl::ppi()
+int FrameBufferSdl::ppi()
 {
     return 120;  // TODO SDL2 has SDL_GetDisplayDPI()
 }

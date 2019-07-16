@@ -98,17 +98,17 @@ fail:
     return false;
 }
 
-unsigned int FbLinux::yres()
+int FbLinux::yres()
 {
     return vinfo.yres;
 }
 
-unsigned int FbLinux::xres()
+int FbLinux::xres()
 {
     return vinfo.xres;
 }
 
-unsigned int FbLinux::ppi()
+int FbLinux::ppi()
 {
     return vinfo.xres / (vinfo.width / 25.4);
 }

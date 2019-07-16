@@ -54,7 +54,7 @@ void FrameBufferMx50::initVarInfo()
     vinfo.rotate = 3;
 }
 
-unsigned int FrameBufferMx50::ppi()
+int FrameBufferMx50::ppi()
 {
     const auto& device = g_container->device;
     return device->screenattrs[Device::PPI];

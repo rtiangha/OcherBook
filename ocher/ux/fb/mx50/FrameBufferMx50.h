@@ -17,7 +17,7 @@ public:
     bool init() override;
     void initVarInfo() override;
 
-    unsigned int ppi() override;
+    int ppi() override;
 
     int update(const Rect* r, bool full = false) override;
     void sync() override;

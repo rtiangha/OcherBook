@@ -19,9 +19,9 @@ public:
 
     bool init() override;
 
-    unsigned int xres() override;
-    unsigned int yres() override;
-    unsigned int ppi() override;
+    int xres() override;
+    int yres() override;
+    int ppi() override;
 
     void setFg(uint8_t r, uint8_t b, uint8_t g) override;
     void setBg(uint8_t r, uint8_t b, uint8_t g) override;
