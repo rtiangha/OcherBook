@@ -133,9 +133,6 @@ public:
 
     Rect drawChildren();
 
-    /**
-     * @return -1 handled, -2 pass on, >=0 done
-     */
     virtual EventDisposition evtKey(const struct OcherKeyEvent*)
     {
         return EventDisposition::Pass;

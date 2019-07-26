@@ -82,6 +82,11 @@ struct Rect {
         return x + w >= 0 && y + h >= 0;
     }
 
+    bool empty() const
+    {
+        return x + w <= 0 || y + h <= 0;
+    }
+
     void clear()
     {
         x = y = 0;

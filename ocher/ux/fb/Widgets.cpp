@@ -628,7 +628,7 @@ void FbScreen::update()
         }
     }
 
-    if (drawn.valid()) {
+    if (!drawn.empty()) {
         fb->update(&drawn);
     }
 }
@@ -668,11 +668,14 @@ void FbScreen::waking(EV_P_ ev_check* c, int)
 void FbScreen::dispatchEvent(const struct OcherEvent* evt)
 {
     if (evt->type == OEVT_MOUSE) {
-        /* TODO find the right child */
+        const auto& mouseEvt = evt->mouse;
+        Pos pos(mouseEvt.x, mouseEvt.y);
         for (auto& w : m_children) {
-            EventDisposition r = w->evtMouse(&evt->mouse);
-            if (r != EventDisposition::Pass)
-                break;
+            if (w->rect().contains(pos)) {
+                EventDisposition r = w->evtMouse(&mouseEvt);
+                if (r != EventDisposition::Pass)
+                    break;
+            }
         }
     } else if (evt->type == OEVT_KEY) {
         /* TODO one widget has focus */

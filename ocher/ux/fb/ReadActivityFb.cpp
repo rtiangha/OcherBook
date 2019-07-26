@@ -57,7 +57,7 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 m_systemBar->show();
                 m_navBar->show();
             } else {
-                return EventDisposition::Pass;
+                return Widget::evtMouse(evt);
             }
         } else {
             if (!(m_systemBar->m_flags & WIDGET_HIDDEN)) {
@@ -74,7 +74,7 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
         }
         return EventDisposition::Handled;
     }
-    return EventDisposition::Pass;
+    return Widget::evtMouse(evt);
 }
 
 ReadActivityFb::ReadActivityFb(UxControllerFb* c) :

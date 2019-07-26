@@ -63,8 +63,8 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
 
 EventDisposition HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
-    FrameBuffer* fb = m_screen->fb;
     if (evt->subtype == OEVT_MOUSE1_UP) {
+        FrameBuffer* fb = m_screen->fb;
         Pos pos(evt->x, evt->y);
         auto metas = m_uxController->ctx.library.getList();
         for (unsigned int i = 0; i < metas.size() && i < NUM_CLUSTER_BOOKS; i++) {
