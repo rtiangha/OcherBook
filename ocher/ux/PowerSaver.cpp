@@ -47,6 +47,7 @@ PowerSaver::PowerSaver(EventLoop& loop) :
 
 void PowerSaver::setSleepTimeout(int seconds)
 {
+    Log::debug(LOG_NAME, "sleep timeout %ds", seconds);
     m_sleepSeconds = seconds;
     resetTimeout(m_sleepSeconds);
 }

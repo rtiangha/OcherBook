@@ -134,6 +134,8 @@ Controller::Controller(const Options& options)
     Log::info(LOG_NAME, "Using the '%s' driver", uxController->getName().c_str());
 
     initCrash();
+
+    g_container->powerSaver.setSleepTimeout(g_container->settings.minutesUntilSleep * 60);
 }
 
 Controller::~Controller()
