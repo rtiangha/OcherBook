@@ -30,7 +30,7 @@ public:
         Personal,
         Private,
     };
-    static const char* SecureLevelToString(SecureLevel s);
+    static const char* secureLevelToString(SecureLevel s);
 
     enum class SleepShow {
         Sleeping,
@@ -38,7 +38,7 @@ public:
         Cover,
         Blank,
     };
-    static const char* SleepShowToString(SleepShow s);
+    static const char* sleepShowToString(SleepShow s);
 
     void reset();
 

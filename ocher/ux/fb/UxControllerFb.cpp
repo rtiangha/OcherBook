@@ -78,6 +78,7 @@ void UxControllerFb::setNextActivity(Activity::Type a)
 {
     Log::info(LOG_NAME, "next activity: %d", (int)a);
     if (a == Activity::Type::Quit) {
+        g_container->settings.save();
         g_container->loop.stop();
     } else {
         if (m_activity) {

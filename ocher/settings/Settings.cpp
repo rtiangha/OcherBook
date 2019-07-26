@@ -20,24 +20,39 @@
 
 using nlohmann::json;
 
-const char* Settings::SecureLevelToString(SecureLevel s)
+namespace Keys
+{
+    static constexpr const char* FullRefreshPages     = "FullRefreshPages";
+    static constexpr const char* MinutesUntilPowerOff = "MinutesUntilPowerOff";
+    static constexpr const char* MinutesUntilSleep    = "MinutesUntilSleep";
+    static constexpr const char* PowerOffHtml         = "PowerOffHtml";
+    static constexpr const char* SecureLevel          = "SecureLevel";
+    static constexpr const char* ShowPageNumbers      = "ShowPageNumbers";
+    static constexpr const char* SleepHtml            = "SleepHtml";
+    static constexpr const char* SleepShow            = "SleepShow";
+    static constexpr const char* TrackReading         = "TrackReading";
+    static constexpr const char* WirelessPrompt       = "WirelessPrompt";
+    static constexpr const char* WirelessSSID         = "WirelessSSID";
+}
+
+const char* Settings::secureLevelToString(SecureLevel s)
 {
     switch (s) {
-    case SecureLevel::Open: return "open";
+    case SecureLevel::Open:     return "open";
     case SecureLevel::Personal: return "personal";
-    case SecureLevel::Private: return "private";
-    default: assert(0); return "";
+    case SecureLevel::Private:  return "private";
+    default: assert(0);         return "";
     }
 }
 
-const char* Settings::SleepShowToString(SleepShow s)
+const char* Settings::sleepShowToString(SleepShow s)
 {
     switch (s) {
     case SleepShow::Sleeping: return "sleeping";
-    case SleepShow::Html: return "html";
-    case SleepShow::Cover: return "cover";
-    case SleepShow::Blank: return "blank";
-    default: assert(0); return "";
+    case SleepShow::Html:     return "html";
+    case SleepShow::Cover:    return "cover";
+    case SleepShow::Blank:    return "blank";
+    default: assert(0);       return "";
     }
 }
 
@@ -78,22 +93,22 @@ void Settings::load(const std::string& data)
     // For each value, parse if possible (else keep previous), then normalize.
 
     try {
-        s = j["SecureLevel"];
+        s = j[Keys::SecureLevel];
         parsed = true;
     } catch (const std::domain_error&) {
         parsed = false;
     }
     if (parsed) {
-        if (s == SecureLevelToString(SecureLevel::Open))
+        if (s == secureLevelToString(SecureLevel::Open))
             secureLevel = SecureLevel::Open;
-        else if (s == SecureLevelToString(SecureLevel::Personal))
+        else if (s == secureLevelToString(SecureLevel::Personal))
             secureLevel = SecureLevel::Personal;
-        else if (s == SecureLevelToString(SecureLevel::Private))
+        else if (s == secureLevelToString(SecureLevel::Private))
             secureLevel = SecureLevel::Private;
     }
 
     try {
-        trackReading = j["TrackReading"];
+        trackReading = j[Keys::TrackReading];
     } catch (const std::domain_error&) {
     }
     if (trackReading < 0)
@@ -102,36 +117,36 @@ void Settings::load(const std::string& data)
         trackReading = 2;
 
     try {
-        minutesUntilSleep = j["MinutesUntilSleep"];
+        minutesUntilSleep = j[Keys::MinutesUntilSleep];
     } catch (const std::domain_error&) {
     }
     if (minutesUntilSleep > 24*60)
         minutesUntilSleep = 24*60;
 
     try {
-        s = j["SleepShow"];
+        s = j[Keys::SleepShow];
         parsed = true;
     } catch (const std::domain_error&) {
         parsed = false;
     }
     if (parsed) {
-        if (s == SleepShowToString(SleepShow::Blank))
+        if (s == sleepShowToString(SleepShow::Blank))
             sleepShow = SleepShow::Blank;
-        else if (s == SleepShowToString(SleepShow::Sleeping))
+        else if (s == sleepShowToString(SleepShow::Sleeping))
             sleepShow = SleepShow::Sleeping;
-        else if (s == SleepShowToString(SleepShow::Html))
+        else if (s == sleepShowToString(SleepShow::Html))
             sleepShow = SleepShow::Html;
-        else if (s == SleepShowToString(SleepShow::Cover))
+        else if (s == sleepShowToString(SleepShow::Cover))
             sleepShow = SleepShow::Cover;
     }
 
     try {
-        sleepHtml = j["SleepHtml"];
+        sleepHtml = j[Keys::SleepHtml];
     } catch (const std::domain_error&) {
     }
 
     try {
-        minutesUntilPowerOff = j["MinutesUntilPowerOff"];
+        minutesUntilPowerOff = j[Keys::MinutesUntilPowerOff];
     } catch (const std::domain_error&) {
     }
     if (minutesUntilPowerOff > 24*60)
@@ -140,27 +155,27 @@ void Settings::load(const std::string& data)
         minutesUntilPowerOff = minutesUntilSleep;
 
     try {
-        sleepHtml = j["PowerOffHtml"];
+        sleepHtml = j[Keys::PowerOffHtml];
     } catch (const std::domain_error&) {
     }
 
     try {
-        wirelessSsid = j["WirelessSSID"];
+        wirelessSsid = j[Keys::WirelessSSID];
     } catch (const std::domain_error&) {
     }
 
     try {
-        wirelessPrompt = j["WirelessPrompt"];
+        wirelessPrompt = j[Keys::WirelessPrompt];
     } catch (const std::domain_error&) {
     }
 
     try {
-        fullRefreshPages = j["FullRefreshPages"];
+        fullRefreshPages = j[Keys::FullRefreshPages];
     } catch (const std::domain_error&) {
     }
 
     try {
-        showPageNumbers = j["ShowPageNumbers"];
+        showPageNumbers = j[Keys::ShowPageNumbers];
     } catch (const std::domain_error&) {
     }
 }
@@ -169,19 +184,19 @@ void Settings::save()
 {
     json j;
 
-    j["SecureLevel"] = SecureLevelToString(secureLevel);
-    j["TrackReading"] = trackReading;
-    j["MinutesUntilSleep"] = minutesUntilSleep;
-    j["SleepShow"] = SleepShowToString(sleepShow);
-    j["SleepHtml"] = sleepHtml;
-    j["MinutesUntilPowerOff"] = minutesUntilPowerOff;
-    j["PowerOffHtml"] = powerOffHtml;
-    j["WirelessSSID"] = wirelessSsid;
-    j["WirelessPrompt"] = wirelessPrompt;
-    j["FullRefreshPages"] = fullRefreshPages;
-    j["ShowPageNumbers"] = showPageNumbers;
+    j[Keys::FullRefreshPages]     = fullRefreshPages;
+    j[Keys::MinutesUntilPowerOff] = minutesUntilPowerOff;
+    j[Keys::MinutesUntilSleep]    = minutesUntilSleep;
+    j[Keys::PowerOffHtml]         = powerOffHtml;
+    j[Keys::SecureLevel]          = secureLevelToString(secureLevel);
+    j[Keys::ShowPageNumbers]      = showPageNumbers;
+    j[Keys::SleepHtml]            = sleepHtml;
+    j[Keys::SleepShow]            = sleepShowToString(sleepShow);
+    j[Keys::TrackReading]         = trackReading;
+    j[Keys::WirelessPrompt]       = wirelessPrompt;
+    j[Keys::WirelessSSID]         = wirelessSsid;
 
-    std::string b = j.dump();
+    std::string b = j.dump(4);
     File s(m_filesystem.m_settings, "w");
     s.write(b.c_str(), b.size());
 }
