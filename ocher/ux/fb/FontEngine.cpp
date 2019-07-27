@@ -68,7 +68,7 @@ FontContext FontEngine::context()
 FontContext FontEngine::context(const FontFace& face)
 {
     FontContext fc;
-    return fc.setDPI(m_fb->ppi()).apply(*this, face);
+    return std::move(fc.setDPI(m_fb->ppi()).apply(*this, face));
 }
 
 void FontEngine::scanForFonts()

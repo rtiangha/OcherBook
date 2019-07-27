@@ -102,7 +102,8 @@ void HomeActivityFb::drawContent(const Rect* rect)
     fb->setFg(0, 0, 0);
 
     auto fe = m_uxController->getFontEngine();
-    auto fc = fe->context().setPoints(12);
+    auto fc = fe->context();
+    fc.setPoints(12);
     Rect r;
     Pos pos;
     auto metas = m_uxController->ctx.library.getList();

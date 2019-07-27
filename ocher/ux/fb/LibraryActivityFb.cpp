@@ -109,7 +109,8 @@ void LibraryActivityFb::drawContent(const Rect* rect)
     Rect clip = fb->bbox;
 
     auto fe = m_uxController->getFontEngine();
-    auto fc = fe->context().setPoints(10);
+    auto fc = fe->context();
+    fc.setPoints(10);
     std::string str = format("PG. %u OF %u", m_pageNum + 1, m_pages);
     pos.x = 0;
     pos.y = clip.h - m_settings.smallSpace - fc.descender();

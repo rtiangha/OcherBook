@@ -46,9 +46,9 @@ public:
 
 protected:
     std::string m_name;
-    std::unique_ptr<Renderer> m_renderer;
     std::unique_ptr<FontEngine> m_fontEngine;
     std::unique_ptr<FrameBuffer> m_frameBuffer;
+    std::unique_ptr<Renderer> m_renderer;
     FbScreen m_screen;
     Activity::Type m_activityType = Activity::Type::Quit;
     ActivityFb* m_activity = nullptr;

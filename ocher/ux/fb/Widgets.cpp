@@ -204,11 +204,9 @@ Label::Label(Label&& other)
 {
     Widget::operator =(std::move(other));
 
-    m_fc = other.m_fc;
-    m_glyphs = other.m_glyphs;
+    m_fc = std::move(other.m_fc);
+    m_glyphs = std::move(other.m_glyphs);
     m_points = other.m_points;
-
-    other.m_glyphs.clear();
 }
 
 void Label::setLabel(const char* label, int points)

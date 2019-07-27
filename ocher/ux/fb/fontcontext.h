@@ -26,6 +26,13 @@ struct FontFace {
 
 class FontContext {
 public:
+    FontContext() = default;
+    FontContext(FontContext&&);
+    FontContext(const FontContext&) = delete;
+    FontContext& operator=(const FontContext&) = delete;
+    FontContext& operator=(FontContext&&);
+    ~FontContext();
+
     inline FontContext& setDPI(unsigned int dpi)
     {
         m_dpi = dpi;
@@ -90,6 +97,7 @@ public:
 
 protected:
     bool setFace(FontEngine& engine, const FontFace& face);
+    void doneFace();
 
     unsigned int m_dpi;
 

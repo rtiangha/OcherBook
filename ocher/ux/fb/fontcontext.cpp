@@ -40,6 +40,38 @@ static const char* ttfFiles[] = {
 #endif
 };
 
+FontContext::FontContext(FontContext&& other)
+{
+    *this = std::move(other);
+}
+
+FontContext& FontContext::operator=(FontContext&& other)
+{
+    m_dpi          = other.m_dpi;
+    m_face         = other.m_face;
+    other.m_face   = nullptr;
+    m_cur          = other.m_cur;
+    m_ascender     = other.m_ascender;
+    m_descender    = other.m_descender;
+    m_bearingY     = other.m_bearingY;
+    m_lineHeight   = other.m_lineHeight;
+    m_underlinePos = other.m_underlinePos;
+    return *this;
+}
+
+FontContext::~FontContext()
+{
+    doneFace();
+}
+
+void FontContext::doneFace()
+{
+    if (m_face != nullptr) {
+        FT_Done_Face(m_face);
+        m_face = nullptr;
+    }
+}
+
 bool FontContext::setFace(FontEngine& engine, const FontFace& face)
 {
     std::string file = g_container->settings.fontRoot;
@@ -49,6 +81,7 @@ bool FontContext::setFace(FontEngine& engine, const FontFace& face)
     file += "/";
     file += ttfFiles[i + b * 2];
 
+    doneFace();
     int r = FT_New_Face(engine.m_lib, file.c_str(), 0, &m_face);
     if (r || !m_face) {
         Log::error(LOG_NAME, "FT_New_Face(\"%s\") failed: %d", file.c_str(), r);
