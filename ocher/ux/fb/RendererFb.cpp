@@ -98,7 +98,7 @@ int RendererFb::outputWrapped(std::string* b, unsigned int strOffset, bool doBli
             Rect bbox;
             bbox.x = m_penX;
             bbox.y = m_penY;
-            auto glyphs = m_fe->calculateGlyphs(m_fc, p, w, &bbox);
+            const auto glyphs = m_fe->calculateGlyphs(m_fc, p, w, &bbox);
             if (m_penX + bbox.w >= xres - m_settings.marginRight &&
                 bbox.w <= xres - m_settings.marginRight - m_settings.marginLeft) {
                 bbox.x = m_penX = m_settings.marginLeft;

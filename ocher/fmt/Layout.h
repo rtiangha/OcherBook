@@ -108,9 +108,9 @@ protected:
 
     std::vector<uint8_t> m_data;
 
-    int nl;
-    int ws;
-    int pre;
+    bool nl = false;
+    bool ws = false;
+    bool pre = false;
     std::string* m_buffer;
 
     // Image* m_images[];

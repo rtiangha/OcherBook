@@ -90,7 +90,7 @@ void FontEngine::scanForFonts()
 
 static int utf8ToUtf32(const char* _p, uint32_t* u32)
 {
-    auto p = (const unsigned char*)_p;
+    auto p = reinterpret_cast<const unsigned char*>(_p);
     int len = 1;
     uint32_t c = *p;
 

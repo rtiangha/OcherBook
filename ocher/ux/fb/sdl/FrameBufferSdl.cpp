@@ -142,7 +142,6 @@ void FrameBufferSdl::vline(int x, int y1, int y2)
 
 void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, const Rect* userClip)
 {
-    Log::trace(LOG_NAME, "blit %d %d %d %d", x, y, w, h);
     int rectWidth = w;
     const Rect* clip = userClip ? userClip : &bbox;
 
@@ -172,7 +171,6 @@ void FrameBufferSdl::blit(const unsigned char* p, int x, int y, int w, int h, co
             return;
         }
     }
-    Log::trace(LOG_NAME, "blit clipped %d %d %d %d", x, y, w, h);
     unsigned char* dst = ((unsigned char*)m_screen->pixels) + y * m_screen->pitch + x;
     for (int i = 0; i < h; ++i) {
         memAnd(dst, p, w);

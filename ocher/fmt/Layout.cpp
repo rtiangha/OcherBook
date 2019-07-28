@@ -11,9 +11,6 @@
 #include <cctype>
 
 Layout::Layout() :
-    nl(0),
-    ws(0),
-    pre(0),
     m_buffer(new std::string)
 {
     m_buffer->reserve(chunk);
@@ -98,12 +95,12 @@ void Layout::outputChar(char c)
 {
     if (isspace(c)) {
         if (!ws) {
-            ws = 1;
+            ws = true;
             _outputChar(' ');
         }
     } else {
-        nl = 0;
-        ws = 0;
+        nl = false;
+        ws = false;
         _outputChar(c);
     }
 }
@@ -112,14 +109,14 @@ void Layout::outputNl()
 {
     if (!nl) {
         _outputChar('\n');
-        nl = 1;
+        nl = true;
     }
 }
 
 void Layout::outputBr()
 {
     _outputChar('\n');
-    nl = 1;
+    nl = true;
 }
 
 void Layout::flushText()

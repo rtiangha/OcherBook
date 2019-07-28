@@ -52,26 +52,6 @@ void fade(void* p, size_t n)
     }
 }
 
-void memAnd(void* dst, const void* src, size_t n)
-{
-    auto d = (uint8_t*)dst;
-    auto s = (const uint8_t*)src;
-
-    while (n--) {
-        *d++ &= *s++;
-    }
-}
-
-void memOr(void* dst, const void* src, size_t n)
-{
-    auto d = (uint8_t*)dst;
-    auto s = (const uint8_t*)src;
-
-    while (n--) {
-        *d++ |= *s++;
-    }
-}
-
 void Rect::unionRect(const Rect& r)
 {
     if (!valid()) {
