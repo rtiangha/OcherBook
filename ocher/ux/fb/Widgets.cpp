@@ -80,6 +80,12 @@ void Widget::invalidate()
     }
 }
 
+void Widget::erase()
+{
+    m_screen->fb->setFg(0xff, 0xff, 0xff);
+    m_screen->fb->fillRect(&m_rect);
+}
+
 Rect Widget::drawChildren()
 {
     Rect drawn;
@@ -214,6 +220,7 @@ void Label::setLabel(const char* label, int points)
     if (points)
         m_fc.setPoints(points);
     m_glyphs = m_screen->fe->calculateGlyphs(m_fc, label, strlen(label), &m_rect);
+    invalidate();
 }
 
 void Label::draw()

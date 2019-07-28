@@ -117,6 +117,8 @@ public:
      */
     void invalidate();
 
+    void erase();
+
     /**
      */
     virtual void draw() = 0;

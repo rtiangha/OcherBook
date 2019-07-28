@@ -9,16 +9,19 @@
 #include "ux/fb/Widgets.h"
 
 
-class ClockIcon : public Widget {
+class ClockIcon : public Label {
 public:
     ClockIcon(int x, int y);
 
 protected:
     void onAttached() override;
     void onDetached() override;
-    void draw() override;
 
-    bool m_active;
+    void resetTimeout(float seconds);
+    void update();
+
+    ev_timer m_timer;
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
 };
 
 #endif
