@@ -28,7 +28,7 @@ SystemBar::SystemBar(Battery& battery) :
     addChild(make_unique<ClockIcon>(m_fb->xres() / 2, 0));
 
     auto batteryIcon = make_unique<BatteryIcon>(0, 0, battery);
-    batteryIcon->setPos({m_fb->xres() - batteryIcon->rect().w, 0});
+    batteryIcon->setPos({m_fb->xres() - 1 - batteryIcon->rect().w, 0});
     addChild(std::move(batteryIcon));
 
     // TODO title label, centered

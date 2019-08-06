@@ -15,6 +15,7 @@
 #include <Signal.h>
 #include <ev.h>
 
+#include <cassert>
 #include <string>
 #include <vector>
 
@@ -108,9 +109,11 @@ public:
     virtual void setPos(const Pos& pos)
     {
         m_rect.setPos(pos);
+        assert(m_rect.x >= 0);
+        assert(m_rect.y >= 0);
+        assert(m_rect.x + m_rect.w < m_screen->fb->xres());
+        assert(m_rect.y + m_rect.h < m_screen->fb->yres());
     }
-
-    void resize(int dx, int dy);
 
     /**
      * Invalidates the widget, so that it will be redrawn.
@@ -131,7 +134,10 @@ public:
     {
     }
 
-    const Rect& rect() { return m_rect; }
+    const Rect& rect()
+    {
+        return m_rect;
+    }
 
     Rect drawChildren();
 

@@ -23,7 +23,7 @@ Widget::Widget() :
     m_screen(g_screen),
     m_parent(nullptr)
 {
-    assert(g_screen != nullptr);
+    assert(m_screen != nullptr);
 }
 
 Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
@@ -32,7 +32,11 @@ Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     m_screen(g_screen),
     m_parent(nullptr)
 {
-    assert(g_screen != nullptr);
+    assert(m_screen != nullptr);
+    assert(x >= 0);
+    assert(y >= 0);
+    assert(x + w < m_screen->fb->xres());
+    assert(y + h < m_screen->fb->yres());
 }
 
 Widget& Widget::operator=(Widget&& other)
