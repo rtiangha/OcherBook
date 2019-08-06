@@ -12,12 +12,14 @@
 class ClockIcon : public Label {
 public:
     ClockIcon(int x, int y);
+    ~ClockIcon();
 
 protected:
     void onAttached() override;
     void onDetached() override;
 
     void resetTimeout(float seconds);
+    void clearTimeout();
     void update();
 
     ev_timer m_timer;

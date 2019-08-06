@@ -6,33 +6,9 @@
 #include "ux/fb/ClockIcon.h"
 
 #include "util/Logger.h"
-
-#include <chrono>
-#include <ctime>
+#include "util/time.h"
 
 #define LOG_NAME "ocher.widgets.clock"
-
-namespace {
-
-struct tm localTime()
-{
-    const auto now = std::chrono::system_clock::now();
-    const auto tt = std::chrono::system_clock::to_time_t(now);
-    struct tm currentLocalTime;
-    localtime_r(&tt, &currentLocalTime);
-    return currentLocalTime;
-}
-
-float secondsUntilMinute(const struct tm& now)
-{
-    float sec = 60.0 - now.tm_sec;
-    // beware leap seconds
-    if (sec <= 0.0)
-        sec = 1.0;
-    return sec;
-}
-
-}  // end ns
 
 ClockIcon::ClockIcon(int x, int y)
 {
@@ -44,11 +20,21 @@ ClockIcon::ClockIcon(int x, int y)
     update();
 }
 
+ClockIcon::~ClockIcon()
+{
+    clearTimeout();
+}
+
 void ClockIcon::resetTimeout(float seconds)
 {
     Log::debug(LOG_NAME, "update in %3.1fs", seconds);
     m_timer.repeat = seconds;
     ev_timer_again(m_screen->loop.evLoop, &m_timer);
+}
+
+void ClockIcon::clearTimeout()
+{
+    ev_timer_stop(m_screen->loop.evLoop, &m_timer);
 }
 
 void ClockIcon::update()
@@ -78,5 +64,5 @@ void ClockIcon::onAttached()
 
 void ClockIcon::onDetached()
 {
-    ev_timer_stop(m_screen->loop.evLoop, &m_timer);
+    clearTimeout();
 }

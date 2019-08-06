@@ -37,6 +37,8 @@ ocher_sources = [
     'util/StrUtil.h',
     'util/intrinsics.h',
     'util/stdex.h',
+    'util/time.cpp',
+    'util/time.h',
     'ux/Activity.cpp',
     'ux/Activity.h',
     'ux/Controller.cpp',
