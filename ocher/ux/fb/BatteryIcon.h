@@ -13,11 +13,20 @@ class Battery;
 class BatteryIcon : public Widget {
 public:
     BatteryIcon(int x, int y, Battery& battery);
+    ~BatteryIcon();
 
 protected:
-    void draw() override;
+    void onAttached() override;
+    void onDetached() override;
 
-    void onUpdate();
+    void startTimer();
+    void stopTimer();
+    void update();
+
+    ev_timer m_timer;
+    static void timeoutCb(EV_P_ ev_timer* w, int revents);
+
+    void draw() override;
 
     Battery& m_battery;
 };

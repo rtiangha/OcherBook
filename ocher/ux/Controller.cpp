@@ -8,7 +8,6 @@
 #include "ux/Controller.h"
 
 #include "Container.h"
-#include "device/Battery.h"
 #include "device/Device.h"
 #include "device/Filesystem.h"
 #include "settings/Options.h"

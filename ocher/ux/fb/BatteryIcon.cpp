@@ -7,16 +7,17 @@
 
 #include "device/Battery.h"
 
-
-#define BBORDER 1
-#define BHEIGHT 18  // height of battery bounding box
-#define BWIDTH 25   // width  of battery bounding box
-
 BatteryIcon::BatteryIcon(int x, int y, Battery& battery) :
     Widget(x, y, 30, 29),
-    // BWIDTH+BBORDER*2, BHEIGHT+BBORDER*2),
     m_battery(battery)
 {
+    ev_timer_init(&m_timer, timeoutCb, 0, 60);
+    m_timer.data = this;
+}
+
+BatteryIcon::~BatteryIcon()
+{
+    stopTimer();
 }
 
 void BatteryIcon::draw()
@@ -40,8 +41,34 @@ void BatteryIcon::draw()
     fb->fillRect(&rect);
 }
 
-// TODO  trigger this periodically
-void BatteryIcon::onUpdate()
+void BatteryIcon::startTimer()
 {
-    m_battery.readAll();
+    ev_timer_start(m_screen->loop.evLoop, &m_timer);
+}
+
+void BatteryIcon::stopTimer()
+{
+    ev_timer_stop(m_screen->loop.evLoop, &m_timer);
+}
+
+void BatteryIcon::update()
+{
+    if (m_battery.readAll() == 0) {
+        invalidate();
+    }
+}
+
+void BatteryIcon::timeoutCb(EV_P_ ev_timer* timer, int)
+{
+    static_cast<BatteryIcon*>(timer->data)->update();
+}
+
+void BatteryIcon::onAttached()
+{
+    startTimer();
+}
+
+void BatteryIcon::onDetached()
+{
+    stopTimer();
 }
