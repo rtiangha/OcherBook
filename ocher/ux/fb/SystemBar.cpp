@@ -21,6 +21,7 @@ SystemBar::SystemBar(Battery& battery) :
     m_flags |= WIDGET_BORDERLESS;
 
     auto menu = make_unique<Menu>(0, 0);
+    menu->addItem("Home");
     menu->addItem("Library");
     menu->addItem("Settings");
     addChild(std::move(menu));

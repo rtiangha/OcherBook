@@ -156,8 +156,9 @@ void HomeActivityFb::drawContent(const Rect* rect)
         Rect sl(pos.x, pos.y, w, h);
         while (sl.x + sl.w <= rect->w - margin) {
             fb->roundRect(&sl, 1);
-            sl.inset(-1);
+            sl.inset(1);
             fb->roundRect(&sl, 2);
+            sl.inset(-1);
 
             sl.x += sl.w + g_container->settings.smallSpace;
 

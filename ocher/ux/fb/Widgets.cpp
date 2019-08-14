@@ -122,15 +122,13 @@ EventDisposition Widget::evtMouse(const struct OcherMouseEvent* evt)
 
 Window::Window() :
     Widget(0, 0, 0, 0),
-    m_bgColor(0xffffffff),
-    m_winflags(0)
+    m_bgColor(0xffffffff)
 {
 }
 
 Window::Window(int x, int y, unsigned int w, unsigned int h) :
     Widget(x, y, w, h),
-    m_bgColor(0xffffffff),
-    m_winflags(0)
+    m_bgColor(0xffffffff)
 {
 }
 
@@ -365,7 +363,7 @@ void Button::timeoutCb(EV_P_ ev_timer* w, int revents)
 
 Menu::Menu(int x, int y)
 {
-    auto tab = make_unique<Button>(x + 1, y + 1, "X");
+    auto tab = make_unique<Button>(x + 1, y + 1, "+");
     tab->setBorder(false);
     tab->pressed.Connect(this, &Menu::tabPressed);
     m_tab = tab.get();
@@ -437,10 +435,9 @@ void Menu::addItem(const char* text)
     addChild(std::move(label));
 
     const auto fc = m_screen->fe->context();
-    Rect r{m_tab->rect()};
+    Rect r{m_closedRect};
     Pos pos = r.below();
     pos.x += settings.smallSpace;
-    pos.y += settings.smallSpace;
     for (auto& item : m_items) {
         // TODO make all widths the same
         item.label->setPos(pos);

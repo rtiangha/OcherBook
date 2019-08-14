@@ -193,7 +193,7 @@ public:
     void maximize();
 
     uint32_t m_bgColor;
-    uint32_t m_winflags;
+    uint32_t m_winflags = 0;
 
 protected:
     std::string m_title;
