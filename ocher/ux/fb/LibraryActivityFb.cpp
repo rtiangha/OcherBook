@@ -28,7 +28,7 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     m_booksPerPage = BOOKS_PER_PAGE;
     m_bookRects = new Rect[m_booksPerPage];
 
-    auto systemBar = make_unique<SystemBar>(g_container->battery);
+    auto systemBar = make_unique<SystemBar>(m_uxController, g_container->battery);
     systemBar->m_sep = false;
     systemBar->setTitle("LIBRARY");
     m_systemBar = systemBar.get();
@@ -155,7 +155,7 @@ void LibraryActivityFb::onAttached()
     Log::info(LOG_NAME, "%u books across %u pages", (unsigned)library.size(), m_pages);
 }
 
-void LibraryActivityFb::leftIconPressed()
+void LibraryActivityFb::leftIconPressed(Button&)
 {
     Log::info(LOG_NAME, "Left icon pressed");
     if (m_pageNum > 0) {
@@ -164,7 +164,7 @@ void LibraryActivityFb::leftIconPressed()
     }
 }
 
-void LibraryActivityFb::rightIconPressed()
+void LibraryActivityFb::rightIconPressed(Button&)
 {
     Log::info(LOG_NAME, "Right icon pressed");
     if (m_pageNum + 1 < m_pages) {

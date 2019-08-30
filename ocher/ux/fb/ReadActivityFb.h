@@ -27,8 +27,8 @@ protected:
     void onDetached() override;
     void drawContent(const Rect* rect) override;
 
-    void backButtonPressed();
-    void forwardButtonPressed();
+    void backButtonPressed(Button&);
+    void forwardButtonPressed(Button&);
 
     FrameBuffer* m_fb;
     SystemBar* m_systemBar = nullptr;

@@ -16,6 +16,7 @@
 #include <ev.h>
 
 #include <cassert>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -93,7 +94,7 @@ public:
 
     void removeChild(Widget* child);
 
-    void hide()
+    virtual void hide()
     {
         m_flags |= WIDGET_HIDDEN;
         if (m_parent)
@@ -248,9 +249,12 @@ public:
     void setBitmap(const Bitmap& bitmap);
     void setLabel(const char* label, int points = 0);
 
+    void hide() override;
     void draw() final override;
 
-    Signal0<> pressed;
+    Signal1<Button&> pressed;
+
+    int id = 0;
 
 protected:
     void calcSize();
@@ -280,27 +284,29 @@ public:
     Menu& operator=(const Menu&) = delete;
     ~Menu();
 
-    void addItem(const char* text);
+    using SelectedCb = std::function<void()>;
+    void addItem(const char* text, SelectedCb cb);
 
     void draw() final override;
 
-    //EventDisposition evtMouse(const struct OcherMouseEvent*) override;
-
     struct Item {
         Button* label;
+        SelectedCb cb;
     };
 
     Signal1<const Item&> selected;
 
 protected:
+    EventDisposition evtMouse(const struct OcherMouseEvent* evt) override;
+
     std::vector<Item> m_items;
     Button* m_tab;
     bool m_open = false;
     Rect m_closedRect;
     Rect m_openRect;
 
-    void tabPressed();
-    void itemSelected();
+    void tabPressed(Button&);
+    void itemSelected(Button&);
     void open();
     void close();
 };

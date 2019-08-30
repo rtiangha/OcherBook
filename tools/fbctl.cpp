@@ -54,7 +54,7 @@ void setLogLevel(int level)
         root->setLevel(Log::Trace);
 }
 
-void stopLoop()
+void stopLoop(Button&)
 {
     s_log->info("stopping event loop");
     g_container->loop.stop();

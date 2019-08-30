@@ -7,13 +7,15 @@
 
 #include "ux/fb/BatteryIcon.h"
 #include "ux/fb/ClockIcon.h"
+#include "ux/fb/UxControllerFb.h"
 
 #include "Container.h"
 #include "settings/Settings.h"
 
 
-SystemBar::SystemBar(Battery& battery) :
+SystemBar::SystemBar(UxControllerFb* uxController, Battery& battery) :
     m_sep(false),
+    m_uxController(uxController),
     m_fb(m_screen->fb)
 {
     setRect(0, 0, m_fb->xres(), 30);
@@ -21,9 +23,15 @@ SystemBar::SystemBar(Battery& battery) :
     m_flags |= WIDGET_BORDERLESS;
 
     auto menu = make_unique<Menu>(0, 0);
-    menu->addItem("Home");
-    menu->addItem("Library");
-    menu->addItem("Settings");
+    menu->addItem("Home", [&](){
+            m_uxController->setNextActivity(Activity::Type::Home);
+        });
+    menu->addItem("Library", [&](){
+            m_uxController->setNextActivity(Activity::Type::Library);
+        });
+    menu->addItem("Settings", [&](){
+            m_uxController->setNextActivity(Activity::Type::Settings);
+        });
     addChild(std::move(menu));
 
     addChild(make_unique<ClockIcon>(m_fb->xres() / 2, 0));

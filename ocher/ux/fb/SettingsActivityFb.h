@@ -14,6 +14,10 @@ public:
     SettingsActivityFb(UxControllerFb* c);
 
 protected:
+    void onAttached() override;
+    void onDetached() override;
+
+    FrameBuffer* m_fb;
 };
 
 #endif

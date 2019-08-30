@@ -49,7 +49,7 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
     books[4].w -= 2 * dx;
     books[4].h = books[4].w * coverRatio;
 
-    auto systemBar = make_unique<SystemBar>(g_container->battery);
+    auto systemBar = make_unique<SystemBar>(m_uxController, g_container->battery);
     systemBar->m_sep = false;
     systemBar->setTitle("HOME");
     addChild(std::move(systemBar));
@@ -179,7 +179,7 @@ void HomeActivityFb::drawContent(const Rect* rect)
 #endif
 }
 
-void HomeActivityFb::browseButtonPressed()
+void HomeActivityFb::browseButtonPressed(Button&)
 {
     Log::info(LOG_NAME, "Browse button pressed");
     m_uxController->setNextActivity(Activity::Type::Library);

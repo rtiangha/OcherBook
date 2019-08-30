@@ -83,7 +83,7 @@ ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     atEnd(1),
     m_pagesSinceRefresh(0)
 {
-    auto systemBar = make_unique<SystemBar>(g_container->battery);
+    auto systemBar = make_unique<SystemBar>(m_uxController, g_container->battery);
     systemBar->m_sep = true;
     systemBar->hide();
     m_systemBar = systemBar.get();
@@ -123,12 +123,12 @@ void ReadActivityFb::turnPages(int n)
     }
 }
 
-void ReadActivityFb::backButtonPressed()
+void ReadActivityFb::backButtonPressed(Button&)
 {
     turnPages(-10);
 }
 
-void ReadActivityFb::forwardButtonPressed()
+void ReadActivityFb::forwardButtonPressed(Button&)
 {
     turnPages(10);
 }

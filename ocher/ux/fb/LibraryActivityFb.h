@@ -23,8 +23,8 @@ protected:
     void onAttached() override;
     void drawContent(const Rect* rect) override;
 
-    void leftIconPressed();
-    void rightIconPressed();
+    void leftIconPressed(Button&);
+    void rightIconPressed(Button&);
 
     Settings& m_settings;
     SystemBar* m_systemBar = nullptr;

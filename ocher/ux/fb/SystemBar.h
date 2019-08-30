@@ -11,16 +11,18 @@
 #include <string>
 
 class Battery;
+class UxControllerFb;
 
 class SystemBar : public Window {
 public:
-    SystemBar(Battery& battery);
+    SystemBar(UxControllerFb* uxController, Battery& battery);
 
     bool m_sep;
 
 protected:
     void drawContent(const Rect*) override;
 
+    UxControllerFb* m_uxController;
     FrameBuffer* m_fb;
 };
 

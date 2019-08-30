@@ -35,8 +35,8 @@ Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
     assert(m_screen != nullptr);
     assert(x >= 0);
     assert(y >= 0);
-    assert(x + w < m_screen->fb->xres());
-    assert(y + h < m_screen->fb->yres());
+    assert(x + (int)w < m_screen->fb->xres());
+    assert(y + (int)h < m_screen->fb->yres());
 }
 
 Widget& Widget::operator=(Widget&& other)
@@ -111,11 +111,9 @@ EventDisposition Widget::evtMouse(const struct OcherMouseEvent* evt)
 {
     Pos pos(evt->x, evt->y);
     for (auto& w : m_children) {
-        if (w->m_rect.contains(pos)) {
-            EventDisposition r = w->evtMouse(evt);
-            if (r != EventDisposition::Pass)
-                return r;
-        }
+        EventDisposition r = w->evtMouse(evt);
+        if (r != EventDisposition::Pass)
+            return r;
     }
     return EventDisposition::Pass;
 }
@@ -304,6 +302,12 @@ void Button::calcSize()
     m_rect.h += m_pad;
 }
 
+void Button::hide()
+{
+    m_mouseDown = false;
+    Widget::hide();
+}
+
 void Button::draw()
 {
     Rect rect(m_rect);
@@ -345,13 +349,17 @@ EventDisposition Button::evtKey(const struct OcherKeyEvent*)
 
 EventDisposition Button::evtMouse(const struct OcherMouseEvent* evt)
 {
+    Pos pos(evt->x, evt->y);
+    if (!m_rect.contains(pos))
+        return EventDisposition::Pass;
+
     if (evt->subtype == OEVT_MOUSE1_DOWN) {
         m_mouseDown = true;
         invalidate();
     } else if (evt->subtype == OEVT_MOUSE1_UP && m_mouseDown) {
         m_mouseDown = false;
         invalidate();
-        pressed();
+        pressed(*this);
     }
     return EventDisposition::Handled;
 }
@@ -406,7 +414,7 @@ void Menu::close()
     }
 }
 
-void Menu::tabPressed()
+void Menu::tabPressed(Button&)
 {
     if (m_open)
         close();
@@ -414,13 +422,14 @@ void Menu::tabPressed()
         open();
 }
 
-void Menu::itemSelected()
+void Menu::itemSelected(Button& item)
 {
-    Log::info(LOG_NAME ".menu", "selected");
-    // TODO which?
+    int index = item.id;
+    Log::info(LOG_NAME ".menu", "index %d selected", index);
+    m_items[index].cb();
 }
 
-void Menu::addItem(const char* text)
+void Menu::addItem(const char* text, Menu::SelectedCb cb)
 {
     const auto& settings = g_container->settings;
 
@@ -428,9 +437,11 @@ void Menu::addItem(const char* text)
     label->setBorder(false);
     label->setPad(0);
     label->pressed.Connect(this, &Menu::itemSelected);
+    label->id = m_items.size();
     label->hide();
     Item item;
     item.label = label.get();
+    item.cb = cb;
     m_items.push_back(item);
     addChild(std::move(label));
 
@@ -446,6 +457,20 @@ void Menu::addItem(const char* text)
     }
     r.grow(settings.smallSpace, fc.descender() + settings.smallSpace);
     m_openRect = r;
+}
+
+EventDisposition Menu::evtMouse(const struct OcherMouseEvent* evt)
+{
+    if (evt->subtype == OEVT_MOUSE_MOTION)
+        return EventDisposition::Pass;
+
+    Pos pos(evt->x, evt->y);
+    if (!m_rect.contains(pos)) {
+        close();
+        return EventDisposition::Handled;
+    }
+
+    return Widget::evtMouse(evt);
 }
 
 void Menu::draw()
