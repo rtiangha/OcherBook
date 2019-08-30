@@ -139,7 +139,7 @@ EventDisposition SyncActivityFb::evtKey(const struct OcherKeyEvent* evt)
             }
         }
     }
-    return EventDisposition::Pass;
+    return ActivityFb::evtKey(evt);
 }
 
 void SyncActivityFb::onAttached()

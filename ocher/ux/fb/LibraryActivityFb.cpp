@@ -53,11 +53,7 @@ LibraryActivityFb::~LibraryActivityFb()
 EventDisposition LibraryActivityFb::evtKey(const struct OcherKeyEvent *evt)
 {
     if (evt->subtype == OEVT_KEY_DOWN) {
-        if (evt->key == OEVTK_HOME) {
-            Log::info(LOG_NAME, "home");
-            m_uxController->setNextActivity(Activity::Type::Home);
-            return EventDisposition::Handled;
-        } else if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
+        if (evt->key == OEVTK_LEFT || evt->key == OEVTK_UP || evt->key == OEVTK_PAGEUP) {
             Log::info(LOG_NAME, "back from page %u", m_pageNum);
             if (m_pageNum > 0) {
                 m_pageNum--;
@@ -73,7 +69,7 @@ EventDisposition LibraryActivityFb::evtKey(const struct OcherKeyEvent *evt)
             return EventDisposition::Handled;
         }
     }
-    return EventDisposition::Pass;
+    return ActivityFb::evtKey(evt);
 }
 
 EventDisposition LibraryActivityFb::evtMouse(const struct OcherMouseEvent *evt)

@@ -44,7 +44,7 @@ EventDisposition ReadActivityFb::evtKey(const struct OcherKeyEvent* evt)
             return EventDisposition::Handled;
         }
     }
-    return EventDisposition::Pass;
+    return ActivityFb::evtKey(evt);
 }
 
 EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
