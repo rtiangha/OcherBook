@@ -36,7 +36,6 @@ protected:
     Disposition m_state = Disposition::Tired;
     PowerLevel m_level;
 
-    FrameBuffer* m_fb;
     EventLoop& m_loop;
     ev_idle m_idle;
 

@@ -19,8 +19,6 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
     ActivityFb(c),
     coverRatio(1.6)
 {
-    maximize();
-
     int dx = g_container->settings.smallSpace;
     int dy = g_container->settings.smallSpace;
 
@@ -51,7 +49,6 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
 
     auto systemBar = make_unique<SystemBar>(m_uxController, g_container->battery);
     systemBar->m_sep = false;
-    systemBar->setTitle("HOME");
     addChild(std::move(systemBar));
 
     auto button = make_unique<Button>("Browse all...");
@@ -64,7 +61,6 @@ HomeActivityFb::HomeActivityFb(UxControllerFb* c) :
 EventDisposition HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 {
     if (evt->subtype == OEVT_MOUSE1_UP) {
-        FrameBuffer* fb = m_screen->fb;
         Pos pos(evt->x, evt->y);
         auto metas = m_uxController->ctx.library.getList();
         for (unsigned int i = 0; i < metas.size() && i < NUM_CLUSTER_BOOKS; i++) {
@@ -77,11 +73,11 @@ EventDisposition HomeActivityFb::evtMouse(const struct OcherMouseEvent* evt)
                 Log::info(LOG_NAME, "book %d selected %p", i, meta);
                 Rect r = books[i];
                 r.inset(-2);
-                fb->roundRect(&r, 3);
+                m_fb->roundRect(&r, 3);
                 r.inset(-1);
-                fb->roundRect(&r, 4);
-                fb->update(&r);
-                fb->sync();
+                m_fb->roundRect(&r, 4);
+                m_fb->update(&r);
+                m_fb->sync();
                 m_uxController->ctx.selected = meta;
                 m_uxController->setNextActivity(Activity::Type::Read);
                 return EventDisposition::Handled;
@@ -96,10 +92,9 @@ void HomeActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 
-    FrameBuffer* fb = m_screen->fb;
-    fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(rect);
-    fb->setFg(0, 0, 0);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(rect);
+    m_fb->setFg(0, 0, 0);
 
     auto fe = m_uxController->getFontEngine();
     auto fc = fe->context();
@@ -110,16 +105,16 @@ void HomeActivityFb::drawContent(const Rect* rect)
     for (unsigned int i = 0; i < NUM_CLUSTER_BOOKS; ++i) {
         r = books[i];
         r.inset(-1);
-        fb->rect(&r);
+        m_fb->rect(&r);
         r.inset(-1);
-        fb->roundRect(&r, 1);
+        m_fb->roundRect(&r, 1);
         r.inset(2);
 
         Meta* meta = i < metas.size() ? metas[i] : nullptr;
         uint8_t c = meta ? 0xf0 : 0xd0;
-        fb->setFg(c, c, c);
-        fb->fillRect(&r);
-        fb->setFg(0, 0, 0);
+        m_fb->setFg(c, c, c);
+        m_fb->fillRect(&r);
+        m_fb->setFg(0, 0, 0);
         if (meta) {
             pos.x = 0;
             pos.y = fc.ascender();
@@ -140,9 +135,9 @@ void HomeActivityFb::drawContent(const Rect* rect)
     fe->renderString(fc, "Shortlist", 9, &pos, rect, 0);
 
     pos.y += fc.underlinePos() + g_container->settings.smallSpace;
-    fb->hline(books[0].x, pos.y, rect->w - books[0].x);
+    m_fb->hline(books[0].x, pos.y, rect->w - books[0].x);
     pos.y++;
-    fb->hline(books[0].x, pos.y, rect->w - books[0].x);
+    m_fb->hline(books[0].x, pos.y, rect->w - books[0].x);
 
     pos.x = books[0].x;
     pos.y += g_container->settings.smallSpace;
@@ -155,9 +150,9 @@ void HomeActivityFb::drawContent(const Rect* rect)
         int w = h / coverRatio;
         Rect sl(pos.x, pos.y, w, h);
         while (sl.x + sl.w <= rect->w - margin) {
-            fb->roundRect(&sl, 1);
+            m_fb->roundRect(&sl, 1);
             sl.inset(1);
-            fb->roundRect(&sl, 2);
+            m_fb->roundRect(&sl, 2);
             sl.inset(-1);
 
             sl.x += sl.w + g_container->settings.smallSpace;
@@ -168,14 +163,14 @@ void HomeActivityFb::drawContent(const Rect* rect)
     }
 
 #if 0
-    fb->byLine(&fb->bbox, dim);
+    m_fb->byLine(&m_fb->bbox, dim);
     Rect popup(25, 200, 550, 400);
-    fb->rect(&popup);
+    m_fb->rect(&popup);
     popup.inset(1);
-    fb->rect(&popup);
+    m_fb->rect(&popup);
     popup.inset(1);
-    fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(&popup);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(&popup);
 #endif
 }
 

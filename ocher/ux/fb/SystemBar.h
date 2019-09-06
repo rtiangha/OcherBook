@@ -23,7 +23,6 @@ protected:
     void drawContent(const Rect*) override;
 
     UxControllerFb* m_uxController;
-    FrameBuffer* m_fb;
 };
 
 #endif

@@ -79,7 +79,6 @@ EventDisposition ReadActivityFb::evtMouse(const struct OcherMouseEvent* evt)
 
 ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
     ActivityFb(c),
-    m_fb(c->getFrameBuffer()),
     atEnd(1),
     m_pagesSinceRefresh(0)
 {
@@ -95,8 +94,6 @@ ReadActivityFb::ReadActivityFb(UxControllerFb* c) :
 
     m_navBar->backButton().pressed.Connect(this, &ReadActivityFb::backButtonPressed);
     m_navBar->forwardButton().pressed.Connect(this, &ReadActivityFb::forwardButtonPressed);
-
-    maximize();
 }
 
 ReadActivityFb::~ReadActivityFb()

@@ -6,8 +6,7 @@
 #include "ux/fb/NavBar.h"
 
 
-NavBar::NavBar() :
-    m_fb(m_screen->fb)
+NavBar::NavBar()
 {
     auto backButton = make_unique<Button>("<<");
     auto forwardButton = make_unique<Button>(">>");
@@ -16,7 +15,7 @@ NavBar::NavBar() :
     const int width = backButton->rect().w;
 
     int top = m_fb->yres() - 1 - height * 2;
-    setRect(0, top, m_fb->xres(), height * 2);
+    setRect(0, top, m_fb->xres() - 1, height * 2);
 
     m_backButton = backButton.get();
     backButton->setPos({width, top + height / 2});

@@ -94,27 +94,12 @@ public:
 
     void removeChild(Widget* child);
 
-    virtual void hide()
-    {
-        m_flags |= WIDGET_HIDDEN;
-        if (m_parent)
-            m_parent->invalidate();
-    }
-
-    void show()
-    {
-        m_flags &= ~WIDGET_HIDDEN;
-        invalidate();
-    }
-
-    virtual void setPos(const Pos& pos)
-    {
-        m_rect.setPos(pos);
-        assert(m_rect.x >= 0);
-        assert(m_rect.y >= 0);
-        assert(m_rect.x + m_rect.w < m_screen->fb->xres());
-        assert(m_rect.y + m_rect.h < m_screen->fb->yres());
-    }
+    virtual void hide();
+    virtual void show();
+    virtual void setRect(int x, int y, int w, int h);
+    virtual void setPos(const Pos& pos);
+    virtual void setSize(int w, int h);
+    virtual void resize();
 
     /**
      * Invalidates the widget, so that it will be redrawn.
@@ -164,6 +149,7 @@ public:
 protected:
     Rect m_rect;
     FbScreen* m_screen;
+    FrameBuffer* m_fb;
     Widget* m_parent;
     std::vector<std::unique_ptr<Widget>> m_children;
 };
@@ -175,14 +161,6 @@ public:
     Window();
     Window(int x, int y, unsigned int w, unsigned int h);
     ~Window() = default;
-
-    void setRect(int x, int y, int w, int h)
-    {
-        m_rect.x = x;
-        m_rect.y = y;
-        m_rect.w = w;
-        m_rect.h = h;
-    }
 
     void draw() final override;
     virtual void drawBorder(Rect* rect);
@@ -319,14 +297,6 @@ public:
     Spinner();
     Spinner(int x, int y, unsigned int w, unsigned int h);
     ~Spinner();
-
-    void setRect(int x, int y, int w, int h)
-    {
-        m_rect.x = x;
-        m_rect.y = y;
-        m_rect.w = w;
-        m_rect.h = h;
-    }
 
     void start();
     void stop();

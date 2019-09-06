@@ -15,10 +15,11 @@
 
 SystemBar::SystemBar(UxControllerFb* uxController, Battery& battery) :
     m_sep(false),
-    m_uxController(uxController),
-    m_fb(m_screen->fb)
+    m_uxController(uxController)
 {
-    setRect(0, 0, m_fb->xres(), 30);
+    const auto fc = m_screen->fe->context();
+
+    setRect(0, 0, m_fb->xres() - 1, 1);
 
     m_flags |= WIDGET_BORDERLESS;
 
@@ -34,13 +35,15 @@ SystemBar::SystemBar(UxControllerFb* uxController, Battery& battery) :
         });
     addChild(std::move(menu));
 
-    addChild(make_unique<ClockIcon>(m_fb->xres() / 2, 0));
+    // TODO h-center
+    addChild(make_unique<ClockIcon>(m_fb->xres() / 2, fc.bearingY()));
 
+    // TODO v-center
     auto batteryIcon = make_unique<BatteryIcon>(0, 0, battery);
     batteryIcon->setPos({m_fb->xres() - 1 - batteryIcon->rect().w, 0});
     addChild(std::move(batteryIcon));
 
-    // TODO title label, centered
+    resize();
 }
 
 

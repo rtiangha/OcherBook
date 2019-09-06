@@ -117,11 +117,8 @@ void SyncActivityFb::drawContent(const Rect* rect)
 
 SyncActivityFb::SyncActivityFb(UxControllerFb* c, Filesystem& filesystem) :
     ActivityFb(c),
-    m_filesystem(filesystem),
-    m_fb(c->getFrameBuffer())
+    m_filesystem(filesystem)
 {
-    maximize();
-
     int w = m_rect.w / 8;
     auto spinner = make_unique<Spinner>();
     spinner->setRect(m_rect.w / 2 - w / 2, m_rect.h / 2 - w - 2, w, w);

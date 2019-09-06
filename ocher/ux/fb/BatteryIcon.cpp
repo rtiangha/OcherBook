@@ -22,15 +22,14 @@ BatteryIcon::~BatteryIcon()
 
 void BatteryIcon::draw()
 {
-    FrameBuffer* fb = m_screen->fb;
     Rect rect(m_rect);
 
-    fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(&rect);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(&rect);
     rect.y += 8;
     rect.h -= 16;
-    fb->setFg(0, 0, 0);
-    fb->rect(&rect);
+    m_fb->setFg(0, 0, 0);
+    m_fb->rect(&rect);
     rect.inset(2);
     int percent = m_battery.percent;
     if (percent < 0 || percent > 100)
@@ -38,7 +37,7 @@ void BatteryIcon::draw()
     rect.w *= percent;
     rect.w /= 100;
 
-    fb->fillRect(&rect);
+    m_fb->fillRect(&rect);
 }
 
 void BatteryIcon::startTimer()

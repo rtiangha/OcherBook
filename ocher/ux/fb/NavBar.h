@@ -19,8 +19,6 @@ public:
 protected:
     void drawContent(const Rect*) override;
 
-    FrameBuffer* m_fb;
-
     Button* m_backButton;
     Button* m_forwardButton;
 };

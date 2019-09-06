@@ -21,22 +21,16 @@ static FbScreen* g_screen;
 Widget::Widget() :
     m_flags(WIDGET_DIRTY),
     m_screen(g_screen),
+    m_fb(m_screen->fb),
     m_parent(nullptr)
 {
     assert(m_screen != nullptr);
 }
 
 Widget::Widget(int x, int y, unsigned int w, unsigned int h) :
-    m_flags(WIDGET_DIRTY),
-    m_rect(x, y, w, h),
-    m_screen(g_screen),
-    m_parent(nullptr)
+    Widget()
 {
-    assert(m_screen != nullptr);
-    assert(x >= 0);
-    assert(y >= 0);
-    assert(x + (int)w < m_screen->fb->xres());
-    assert(y + (int)h < m_screen->fb->yres());
+    setRect(x, y, w, h);
 }
 
 Widget& Widget::operator=(Widget&& other)
@@ -76,6 +70,53 @@ void Widget::removeChild(Widget* widget)
     }
 }
 
+void Widget::hide()
+{
+    m_flags |= WIDGET_HIDDEN;
+    if (m_parent)
+        m_parent->invalidate();
+}
+
+void Widget::show()
+{
+    m_flags &= ~WIDGET_HIDDEN;
+    invalidate();
+}
+
+void Widget::setRect(int x, int y, int w, int h)
+{
+    assert(x >= 0);
+    assert(y >= 0);
+    assert(x + (int)w < m_fb->xres());
+    assert(y + (int)h < m_fb->yres());
+    m_rect.x = x;
+    m_rect.y = y;
+    m_rect.w = w;
+    m_rect.h = h;
+}
+
+void Widget::setPos(const Pos& pos)
+{
+    m_rect.setPos(pos);
+    assert(m_rect.x >= 0);
+    assert(m_rect.y >= 0);
+    assert(m_rect.x + m_rect.w < m_fb->xres());
+    assert(m_rect.y + m_rect.h < m_fb->yres());
+}
+
+void Widget::setSize(int w, int h)
+{
+    m_rect.w = w;
+    m_rect.h = h;
+}
+
+void Widget::resize()
+{
+    for (auto& w : m_children) {
+        m_rect.unionRect(w->rect());
+    }
+}
+
 void Widget::invalidate()
 {
     m_flags |= WIDGET_DIRTY;
@@ -86,8 +127,8 @@ void Widget::invalidate()
 
 void Widget::erase()
 {
-    m_screen->fb->setFg(0xff, 0xff, 0xff);
-    m_screen->fb->fillRect(&m_rect);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(&m_rect);
 }
 
 Rect Widget::drawChildren()
@@ -133,8 +174,8 @@ Window::Window(int x, int y, unsigned int w, unsigned int h) :
 void Window::maximize()
 {
     m_rect.x = m_rect.y = 0;
-    m_rect.w = m_screen->fb->xres();
-    m_rect.h = m_screen->fb->yres();
+    m_rect.w = m_fb->xres();
+    m_rect.h = m_fb->yres();
 }
 
 void Window::setTitle(const std::string& title)
@@ -156,8 +197,8 @@ void Window::draw()
 void Window::drawBorder(Rect* rect)
 {
     if (!(m_flags & WIDGET_BORDERLESS)) {
-        m_screen->fb->setFg(0, 0, 0);
-        m_screen->fb->rect(rect);
+        m_fb->setFg(0, 0, 0);
+        m_fb->rect(rect);
         rect->inset(1);
     }
 }
@@ -165,9 +206,9 @@ void Window::drawBorder(Rect* rect)
 void Window::drawTitle(Rect* rect)
 {
     if (m_winflags & OWF_CLOSE) {
-        m_screen->fb->setFg(0, 0, 0);
-        m_screen->fb->line(rect->x + rect->w - 12, rect->y + 4, rect->x + rect->w - 4, rect->y + 12);
-        m_screen->fb->line(rect->x + rect->w - 4, rect->y + 4, rect->x + rect->w - 12, rect->y + 12);
+        m_fb->setFg(0, 0, 0);
+        m_fb->line(rect->x + rect->w - 12, rect->y + 4, rect->x + rect->w - 4, rect->y + 12);
+        m_fb->line(rect->x + rect->w - 4, rect->y + 4, rect->x + rect->w - 12, rect->y + 12);
         rect->y += 12;
         rect->h -= 12;
     }
@@ -178,8 +219,8 @@ void Window::drawTitle(Rect* rect)
 
 void Window::drawBg(Rect* rect)
 {
-    m_screen->fb->setFg(0xff, 0xff, 0xff);
-    m_screen->fb->fillRect(rect);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(rect);
 }
 
 void Window::drawContent(const Rect*)
@@ -196,7 +237,7 @@ void Icon::setBitmap(const Bitmap& bitmap)
 
 void Icon::draw()
 {
-    m_screen->fb->blit(&m_bmp.data[0], m_rect.x, m_rect.y, m_bmp.w, m_bmp.h);
+    m_fb->blit(&m_bmp.data[0], m_rect.x, m_rect.y, m_bmp.w, m_bmp.h);
 }
 
 
@@ -261,7 +302,7 @@ void Button::setBorder(bool border)
 
 void Button::setPad(int points)
 {
-    m_pad = points * m_screen->fb->ppi() / 72;
+    m_pad = points * m_fb->ppi() / 72;
     calcSize();
 }
 
@@ -316,7 +357,7 @@ void Button::draw()
     drawBg(&rect);
     drawButton(&rect);
     if (m_mouseDown) {
-        m_screen->fb->byLine(&rect, dim);
+        m_fb->byLine(&rect, dim);
     }
 }
 
@@ -324,16 +365,16 @@ void Button::draw()
 void Button::drawBorder(Rect* rect)
 {
     if (!(m_flags & WIDGET_BORDERLESS)) {
-        m_screen->fb->setFg(0, 0, 0);
-        m_screen->fb->roundRect(rect, roundRadius);
+        m_fb->setFg(0, 0, 0);
+        m_fb->roundRect(rect, roundRadius);
         rect->inset(1);
     }
 }
 
 void Button::drawBg(Rect* rect)
 {
-    m_screen->fb->setFg(0xff, 0xff, 0xff);
-    m_screen->fb->fillRect(rect);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(rect);
 }
 
 void Button::drawButton(Rect* rect)
@@ -449,11 +490,20 @@ void Menu::addItem(const char* text, Menu::SelectedCb cb)
     Rect r{m_closedRect};
     Pos pos = r.below();
     pos.x += settings.smallSpace;
+    uint16_t w = 0;
     for (auto& item : m_items) {
-        // TODO make all widths the same
+        // position
         item.label->setPos(pos);
-        r.unionRect(item.label->rect());
+        // find max width
+        const auto& rect = item.label->rect();
+        w = std::max(w, rect.w);
+        r.unionRect(rect);
+        // move down to next
         pos.y += fc.lineHeight();
+    }
+    // make all widths the same
+    for (auto& item : m_items) {
+        item.label->setSize(w, item.label->rect().h);
     }
     r.grow(settings.smallSpace, fc.descender() + settings.smallSpace);
     m_openRect = r;
@@ -465,7 +515,7 @@ EventDisposition Menu::evtMouse(const struct OcherMouseEvent* evt)
         return EventDisposition::Pass;
 
     Pos pos(evt->x, evt->y);
-    if (!m_rect.contains(pos)) {
+    if (m_open && !m_rect.contains(pos)) {
         close();
         return EventDisposition::Handled;
     }
@@ -478,11 +528,10 @@ void Menu::draw()
     if (m_open) {
         // TODO draw non-rectangular outline around tab and menu
 
-        auto fb = m_screen->fb;
-        fb->setFg(0xff, 0xff, 0xff);
-        fb->fillRect(&m_openRect);
-        fb->setFg(0, 0, 0);
-        fb->rect(&m_openRect);
+        m_fb->setFg(0xff, 0xff, 0xff);
+        m_fb->fillRect(&m_openRect);
+        m_fb->setFg(0, 0, 0);
+        m_fb->rect(&m_openRect);
     }
 
     drawChildren();
@@ -551,8 +600,8 @@ void Spinner::draw()
         int y1 = m_rect.y + m_rect.h / 2 + sin(rad) * l1;
         int x2 = m_rect.x + m_rect.w / 2 + cos(rad) * l2;
         int y2 = m_rect.y + m_rect.h / 2 + sin(rad) * l2;
-        m_screen->fb->setFg(c, c, c);
-        m_screen->fb->line(x1, y1, x2, y2);
+        m_fb->setFg(c, c, c);
+        m_fb->line(x1, y1, x2, y2);
         Log::trace(LOG_NAME ".spinner", "%d,%d %d,%d %02x", x1, y1, x2, y2, c);
     }
 }

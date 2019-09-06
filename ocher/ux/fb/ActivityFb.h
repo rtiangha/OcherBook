@@ -20,6 +20,7 @@ public:
         m_uxController(uxController)
     {
         m_flags |= WIDGET_BORDERLESS;
+        maximize();
     }
 
     virtual ~ActivityFb() = default;

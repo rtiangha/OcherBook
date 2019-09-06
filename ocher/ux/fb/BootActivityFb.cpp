@@ -16,8 +16,7 @@
 
 
 BootActivityFb::BootActivityFb(UxControllerFb* c) :
-    ActivityFb(c),
-    m_fb(c->getFrameBuffer())
+    ActivityFb(c)
 {
     float ratio = 1.6;
     int w = m_fb->xres();

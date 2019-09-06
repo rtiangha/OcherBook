@@ -30,7 +30,6 @@ protected:
     void backButtonPressed(Button&);
     void forwardButtonPressed(Button&);
 
-    FrameBuffer* m_fb;
     SystemBar* m_systemBar = nullptr;
     NavBar* m_navBar = nullptr;
 

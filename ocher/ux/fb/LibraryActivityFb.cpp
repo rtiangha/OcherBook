@@ -22,8 +22,6 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     m_settings(g_container->settings),
     m_pageNum(0)
 {
-    maximize();
-
     // TODO calc this
     m_booksPerPage = BOOKS_PER_PAGE;
     m_bookRects = new Rect[m_booksPerPage];
@@ -34,13 +32,14 @@ LibraryActivityFb::LibraryActivityFb(UxControllerFb *c) :
     m_systemBar = systemBar.get();
     addChild(std::move(systemBar));
 
+    // TODO widget packing; button has padding so can go off screen
     auto leftIcon = make_unique<Button>(m_settings.medSpace + m_settings.largeSpace,
-            m_rect.h - m_settings.medSpace - bmpLeftArrow.h, bmpLeftArrow);
+            m_rect.h - m_settings.medSpace*3 - bmpLeftArrow.h, bmpLeftArrow);
     leftIcon->pressed.Connect(this, &LibraryActivityFb::leftIconPressed);
     addChild(std::move(leftIcon));
 
     auto rightIcon = make_unique<Button>(m_rect.w - (m_settings.medSpace + m_settings.largeSpace + bmpRightArrow.w),
-            m_rect.h - m_settings.medSpace - bmpRightArrow.h, bmpRightArrow);
+            m_rect.h - m_settings.medSpace*3 - bmpRightArrow.h, bmpRightArrow);
     rightIcon->pressed.Connect(this, &LibraryActivityFb::rightIconPressed);
     addChild(std::move(rightIcon));
 }
@@ -96,13 +95,12 @@ void LibraryActivityFb::drawContent(const Rect* rect)
 {
     Log::debug(LOG_NAME, "draw");
 
-    FrameBuffer* fb = m_screen->fb;
-    fb->setFg(0xff, 0xff, 0xff);
-    fb->fillRect(rect);
-    fb->setFg(0, 0, 0);
+    m_fb->setFg(0xff, 0xff, 0xff);
+    m_fb->fillRect(rect);
+    m_fb->setFg(0, 0, 0);
 
     Pos pos;
-    Rect clip = fb->bbox;
+    Rect clip = m_fb->bbox;
 
     auto fe = m_uxController->getFontEngine();
     auto fc = fe->context();
@@ -138,7 +136,7 @@ void LibraryActivityFb::drawContent(const Rect* rect)
         m_bookRects[i].h = pos.y + fc.descender() + m_settings.smallSpace;
         clip.y = m_bookRects[i].y + m_bookRects[i].h;
 
-        fb->hline(clip.x, clip.y, clip.w);
+        m_fb->hline(clip.x, clip.y, clip.w);
     }
 }
 

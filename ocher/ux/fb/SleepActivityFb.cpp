@@ -18,7 +18,6 @@
 SleepActivityFb::SleepActivityFb(UxControllerFb* c, PowerLevel level) :
     ActivityFb(c),
     m_level(level),
-    m_fb(c->getFrameBuffer()),
     m_loop(g_container->loop)
 {
 }
@@ -70,8 +69,6 @@ void SleepActivityFb::done()
 
 void SleepActivityFb::onAttached()
 {
-    maximize();
-
     m_previousActivity = g_container->uxController->previousActivity();
 
     m_state = Disposition::Tired;

@@ -24,7 +24,6 @@ protected:
     void drawContent(const Rect* rect) override;
 
     Filesystem& m_filesystem;
-    FrameBuffer* m_fb;
     SyncActivityWork* m_work = nullptr;
     Spinner* m_spinner = nullptr;
 };

@@ -16,8 +16,7 @@ public:
 protected:
     void onAttached() override;
     void onDetached() override;
-
-    FrameBuffer* m_fb;
+    void drawBg(Rect* rect) override;
 };
 
 #endif
