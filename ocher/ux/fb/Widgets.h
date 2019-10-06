@@ -147,7 +147,7 @@ public:
     unsigned int m_flags;
 
 protected:
-    Rect m_rect;
+    Rect m_rect = {0, 0, 0, 0};
     FbScreen* m_screen;
     FrameBuffer* m_fb;
     Widget* m_parent;

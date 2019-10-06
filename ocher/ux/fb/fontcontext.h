@@ -99,17 +99,17 @@ protected:
     bool setFace(FontEngine& engine, const FontFace& face);
     void doneFace();
 
-    unsigned int m_dpi;
+    unsigned int m_dpi = 96;
 
     FT_Face m_face = nullptr;
 
     FontFace m_cur;
 
-    int m_ascender;
-    int m_descender;
-    int m_bearingY;
-    int m_lineHeight;
-    int m_underlinePos;
+    int m_ascender = 0;
+    int m_descender = 0;
+    int m_bearingY = 0;
+    int m_lineHeight = 0;
+    int m_underlinePos = 0;
 };
 
 #endif

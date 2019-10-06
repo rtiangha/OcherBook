@@ -216,14 +216,6 @@ void Controller::initDevice()
         }
     }
 #endif
-
-#ifdef OCHER_TARGET_KOBO
-    // Kobo rc scripts start animate.sh, which shows an animation while nickel is starting.
-    // Kill that here (so it doesn't overlay the boot menu) to simplify installation steps.
-    // TODO: Remove when more closely integrated.
-    system("killall on-animator.sh");
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-#endif
 }
 
 void Controller::run()

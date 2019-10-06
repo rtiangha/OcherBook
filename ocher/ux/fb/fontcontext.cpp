@@ -92,14 +92,16 @@ bool FontContext::setFace(FontEngine& engine, const FontFace& face)
 
 FontContext& FontContext::setPoints(int points)
 {
-    FT_Set_Char_Size(m_face, 0, points * 64, m_dpi, m_dpi);
-    m_cur.points = points;
+    if (m_face != nullptr) {
+        FT_Set_Char_Size(m_face, 0, points * 64, m_dpi, m_dpi);
+        m_cur.points = points;
 
-    m_ascender   = m_face->size->metrics.ascender >> 6;
-    m_descender  = m_face->size->metrics.descender >> 6;
-    m_bearingY   = m_face->size->metrics.ascender >> 6; // TODO
-    m_lineHeight = m_face->size->metrics.height >> 6;
-    m_underlinePos = (-m_face->underline_position) >> 6;
+        m_ascender   = m_face->size->metrics.ascender >> 6;
+        m_descender  = m_face->size->metrics.descender >> 6;
+        m_bearingY   = m_face->size->metrics.ascender >> 6; // TODO
+        m_lineHeight = m_face->size->metrics.height >> 6;
+        m_underlinePos = (-m_face->underline_position) >> 6;
+    }
 
     return *this;
 }
@@ -114,6 +116,9 @@ FontContext& FontContext::apply(FontEngine& engine, const FontFace& face)
 
 Glyph* FontContext::plotGlyph(const GlyphDescr* d) const
 {
+    if (m_face == nullptr)
+        return nullptr;
+
     FT_GlyphSlot slot = m_face->glyph;
     int r = FT_Load_Char(m_face, d->c, FT_LOAD_RENDER);
     if (r) {

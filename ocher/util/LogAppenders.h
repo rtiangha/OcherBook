@@ -46,7 +46,7 @@ public:
 
     void append(const std::string& s) override
     {
-        fprintf(m_f, "%s", s.c_str());
+        fputs(s.c_str(), m_f);
     }
 
 protected:
