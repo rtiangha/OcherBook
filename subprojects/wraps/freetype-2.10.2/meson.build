@@ -1,5 +1,5 @@
 project('freetype', 'c',
-    version : '2.4.12',
+    version : '2.10.2',
     license : 'GPL2')
 
 # Derived from reading freetype-x.x.x/docs/INSTALL.ANY

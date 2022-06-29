@@ -6,8 +6,8 @@ if (WITH_SYSTEM_FREETYPE)
     find_library(freetype REQUIRED)
 else()
     ExternalProject_add(freetype-external
-        URL http://download.savannah.gnu.org/releases/freetype/freetype-2.4.12.tar.bz2
-        URL_HASH SHA256=a78a17486689ab6852a9e1a759b179827ac9dfd7e2f237ddf169c73398c85381
+        URL https://download.savannah.gnu.org/releases/freetype/freetype-2.10.2.tar.gz
+        URL_HASH SHA256=e09aa914e4f7a5d723ac381420949c55c0b90b15744adce5d1406046022186ab
         DOWNLOAD_DIR ${TOP_SRCDIR}/subprojects/packagecache/
         CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR> --disable-shared --without-bzip2
         BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}

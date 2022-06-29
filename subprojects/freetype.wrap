@@ -1,11 +1,11 @@
 [wrap-file]
-directory = freetype-2.4.12
+directory = freetype-2.10.2
 
-source_url = http://download.savannah.gnu.org/releases/freetype/freetype-2.4.12.tar.bz2
-source_filename = freetype-2.4.12.tar.bz2
-source_hash = a78a17486689ab6852a9e1a759b179827ac9dfd7e2f237ddf169c73398c85381
+source_url = https://download.savannah.gnu.org/releases/freetype/freetype-2.10.2.tar.gz
+source_filename = freetype-2.10.2.tar.gz
+source_hash = e09aa914e4f7a5d723ac381420949c55c0b90b15744adce5d1406046022186ab
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
-patch_filename = freetype-2.4.12-wrap.tar
-patch_hash = ba617963cf9a2f75f8567dbf8b585a22294d1456b580dc146730a59c7e452f48
+patch_filename = freetype-2.10.2-wrap.tar
+patch_hash = 02432faef12646736a2d5af0e0c40cdbcc7f123e8daff963815a434834261615 
 
