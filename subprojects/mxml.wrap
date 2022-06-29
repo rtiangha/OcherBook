@@ -1,11 +1,11 @@
 [wrap-file]
-directory = mxml-2.10
+directory = mxml-2.12
 
-source_url = https://github.com/michaelrsweet/mxml/releases/download/release-2.10/mxml-2.10.tar.gz
-source_filename = mxml-2.10.tar.gz
-source_hash = 267ff58b64ddc767170d71dab0c729c06f45e1df9a9b6f75180b564f09767891
+source_url = https://github.com/michaelrsweet/mxml/releases/download/v2.12/mxml-2.12.tar.gz
+source_filename = mxml-2.12.tar.gz
+source_hash = 6bfb53baa1176e916855bd3b6d592fd5b962c3c259aacdb5670d90c57ce4034f
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
-patch_filename = mxml-2.10-wrap.tar
-patch_hash = b7cb7ae5b4047f836750a35d8280bf217a47ea6c2a4503148c64fbb406f4e02b
+patch_filename = mxml-2.12-wrap.tar
+patch_hash = 2a193f93313f7d3f134c05be97e902960b6d22128fcb4d5d84cec362263cfb28
 

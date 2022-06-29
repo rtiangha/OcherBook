@@ -4,8 +4,8 @@ if (WITH_SYSTEM_MXML)
     find_library(mxml REQUIRED)
 else()
     ExternalProject_add(mxml-external
-        URL https://github.com/michaelrsweet/mxml/releases/download/release-2.10/mxml-2.10.tar.gz
-        URL_MD5 8804c961a24500a95690ef287d150abe
+        URL https://github.com/michaelrsweet/mxml/releases/download/v2.12/mxml-2.12.tar.gz 
+        URL_HASH SHA256=6bfb53baa1176e916855bd3b6d592fd5b962c3c259aacdb5670d90c57ce4034f
         DOWNLOAD_DIR ${TOP_SRCDIR}/subprojects/packagecache/
         BUILD_IN_SOURCE 1
         CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>

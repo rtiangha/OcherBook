@@ -1,5 +1,5 @@
 project('mxml', 'c',
-    version : '2.10',
+    version : '2.12',
     license : 'LGPL2'
 )
 
