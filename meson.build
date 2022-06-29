@@ -49,8 +49,8 @@ conf_data.set('TOP_SRCDIR', meson.source_root())
 
 # TODO  meson 0.47 https://mesonbuild.com/Build-options.html#features
 if get_option('kobo')
-    add_project_arguments(['-Os'], language : 'c')
-    add_project_arguments(['-Os'], language : 'cpp')
+    add_project_arguments(['-Os', '-static'], language : 'c')
+    add_project_arguments(['-Os', '-static'], language : 'cpp')
     conf_data.set('OCHER_TARGET_KOBO', true)
     # TODO  set hardware per submodel
     conf_data.set('UX_FB', true)
