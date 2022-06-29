@@ -4,8 +4,8 @@ if (WITH_SYSTEM_LIBEV)
     find_library(ev REQUIRED)
 else()
     ExternalProject_add(libev-external
-        URL http://dist.schmorp.de/libev/Attic/libev-4.24.tar.gz
-        URL_HASH SHA256=973593d3479abdf657674a55afe5f78624b0e440614e2b8cb3a07f16d4d7f821
+        URL http://dist.schmorp.de/libev/Attic/libev-4.33.tar.gz
+        URL_HASH SHA256=507eb7b8d1015fbec5b935f34ebed15bf346bed04a11ab82b8eee848c4205aea
         DOWNLOAD_DIR ${TOP_SRCDIR}/subprojects/packagecache/
         CONFIGURE_COMMAND ${cross_env_prefix} <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>
         BUILD_COMMAND ${CMAKE_MAKE_PROGRAM}

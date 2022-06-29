@@ -1,5 +1,5 @@
 project('libev', 'c',
-    version : '4.24',
+    version : '4.33',
     license : 'BSD'
 )
 
