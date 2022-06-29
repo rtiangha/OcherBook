@@ -1,11 +1,11 @@
 [wrap-file]
-directory = zlib-1.2.11
+directory = zlib-1.2.12
 
-source_url = http://zlib.net/fossils/zlib-1.2.11.tar.gz
-source_filename = zlib-1.2.11.tar.gz
-source_hash = c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
+source_url = http://zlib.net/fossils/zlib-1.2.12.tar.gz
+source_filename = zlib-1.2.12.tar.gz
+source_hash = 91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9
 
 patch_url = https://fake.url.to.please.meson.but.file.in.packagecache/
-patch_filename = zlib-1.2.11-wrap.tar
-patch_hash = bed7ca6e434ffeaca8e34762dbbcbd89d7d7b323bd0b89c52535ca913d8e9f59
+patch_filename = zlib-1.2.12-wrap.tar
+patch_hash = f339c42fc599a59d9680d9d686eb9add53635e3b3c7c5912ecca4ae5dd56a920 
 
